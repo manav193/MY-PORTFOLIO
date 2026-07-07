@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="460" viewBox="0 0 720 460" role="img" aria-labelledby="title desc">
+  <title id="title">Pulse Commerce OS preview</title>
+  <desc id="desc">Analytics dashboard with revenue cards and charts.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0b1020"/><stop offset="1" stop-color="#18263a"/></linearGradient>
+    <linearGradient id="line" x1="0" x2="1"><stop stop-color="#ffd166"/><stop offset="1" stop-color="#78fff1"/></linearGradient>
+  </defs>
+  <rect width="720" height="460" fill="url(#bg)"/>
+  <rect x="54" y="48" width="612" height="364" rx="20" fill="#fff" opacity=".08" stroke="#fff" stroke-opacity=".18"/>
+  <g transform="translate(88 86)">
+    <rect width="154" height="86" rx="14" fill="#fff" opacity=".1"/>
+    <text x="22" y="38" fill="#fff" font-family="Arial" font-size="18" font-weight="700">$84.2k</text>
+    <rect x="22" y="54" width="84" height="8" rx="4" fill="#78fff1" opacity=".7"/>
+  </g>
+  <g transform="translate(266 86)">
+    <rect width="154" height="86" rx="14" fill="#fff" opacity=".1"/>
+    <text x="22" y="38" fill="#fff" font-family="Arial" font-size="18" font-weight="700">38.6%</text>
+    <rect x="22" y="54" width="104" height="8" rx="4" fill="#ffd166" opacity=".8"/>
+  </g>
+  <g transform="translate(444 86)">
+    <rect width="154" height="86" rx="14" fill="#fff" opacity=".1"/>
+    <text x="22" y="38" fill="#fff" font-family="Arial" font-size="18" font-weight="700">12.4k</text>
+    <rect x="22" y="54" width="72" height="8" rx="4" fill="#ff8bd7" opacity=".8"/>
+  </g>
+  <rect x="88" y="206" width="330" height="160" rx="16" fill="#fff" opacity=".1"/>
+  <path d="M116 328c42-84 82-34 118-76 34-40 72 22 110-22 28-32 48-24 58-8" fill="none" stroke="url(#line)" stroke-width="8" stroke-linecap="round"/>
+  <rect x="448" y="206" width="150" height="160" rx="16" fill="#fff" opacity=".1"/>
+  <circle cx="523" cy="286" r="50" fill="none" stroke="#fff" stroke-opacity=".18" stroke-width="16"/>
+  <path d="M523 236a50 50 0 0 1 45 72" fill="none" stroke="#78fff1" stroke-width="16" stroke-linecap="round"/>
+</svg>

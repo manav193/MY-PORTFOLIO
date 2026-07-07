@@ -1,0 +1,49 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 436 >>
+stream
+BT
+/F1 22 Tf
+72 720 Td
+(Manav Singh) Tj
+/F1 12 Tf
+0 -30 Td
+(Product-Focused Full Stack Developer) Tj
+0 -28 Td
+(Portfolio: https://manav193.github.io/MY-PORTFOLIO/) Tj
+0 -18 Td
+(GitHub: https://github.com/manav193) Tj
+0 -30 Td
+(Focus: frontend engineering, AI workflows, game systems, design engineering, performance.) Tj
+0 -24 Td
+(Selected work: Nexus AI Workspace, Pulse Commerce OS, Orbit Runner.) Tj
+0 -24 Td
+(Strengths: semantic HTML, modern CSS, vanilla JavaScript, accessibility, SEO, product polish.) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000000728 00000 n 
+trailer
+<< /Root 1 0 R /Size 6 >>
+startxref
+798
+%%EOF

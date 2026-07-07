@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://manav193.github.io/MY-PORTFOLIO/sitemap.xml
