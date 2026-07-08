@@ -4,7 +4,6 @@ import { initTyping } from "./modules/typing.js";
 import { initParticles } from "./modules/particles.js";
 import { initMagnetic, initCursor, initTilt, initParallax } from "./modules/motion.js";
 import { initProjects } from "./modules/projects.js";
-import { initCarousel } from "./modules/carousel.js";
 import { initCommandPalette } from "./modules/command-palette.js";
 import { initContactForm } from "./modules/contact.js";
 
@@ -27,7 +26,6 @@ initCursor();
 initTilt();
 initParallax();
 initProjects();
-initCarousel();
 initCommandPalette();
 initContactForm();
 
