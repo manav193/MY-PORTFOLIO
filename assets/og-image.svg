@@ -7,7 +7,8 @@
   <circle cx="170" cy="120" r="180" fill="#78fff1" opacity=".16"/>
   <circle cx="1010" cy="130" r="220" fill="#ff8bd7" opacity=".14"/>
   <rect x="86" y="86" width="1028" height="458" rx="32" fill="#fff" opacity=".07" stroke="#fff" stroke-opacity=".16"/>
-  <text x="130" y="252" fill="#fff" font-family="Arial, sans-serif" font-size="86" font-weight="800">Manav Singh</text>
-  <text x="130" y="340" fill="url(#text)" font-family="Arial, sans-serif" font-size="44" font-weight="700">Product-Focused Developer</text>
-  <text x="130" y="416" fill="#aab3cf" font-family="Arial, sans-serif" font-size="30">Frontend. AI. Game systems. Design engineering.</text>
+  <text x="130" y="238" fill="#fff" font-family="Arial, sans-serif" font-size="82" font-weight="800">Manav Agarwal</text>
+  <text x="130" y="326" fill="url(#text)" font-family="Arial, sans-serif" font-size="42" font-weight="700">Creative Technologist</text>
+  <text x="130" y="398" fill="#aab3cf" font-family="Arial, sans-serif" font-size="29">UI/UX. Frontend. Graphics. Video. Game UI.</text>
+  <text x="130" y="456" fill="#aab3cf" font-family="Arial, sans-serif" font-size="24">Hyderabad, India - GitHub: manav193</text>
 </svg>

@@ -2,6 +2,8 @@ const commands = [
   { label: "Go to About", hint: "Story and timeline", target: "#about" },
   { label: "Go to Skills", hint: "Capability map", target: "#skills" },
   { label: "Go to Projects", hint: "Featured work", target: "#projects" },
+  { label: "Go to Resume", hint: "Education and proof", target: "#resume" },
+  { label: "Go to GitHub", hint: "Development projects", target: "#github" },
   { label: "Go to Contact", hint: "Email and form", target: "#contact" },
   { label: "Open GitHub", hint: "manav193", url: "https://github.com/manav193" }
 ];

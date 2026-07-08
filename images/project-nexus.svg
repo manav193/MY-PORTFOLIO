@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="720" height="460" viewBox="0 0 720 460" role="img" aria-labelledby="title desc">
-  <title id="title">Nexus AI Workspace preview</title>
-  <desc id="desc">A glass dashboard with AI command cards and task routes.</desc>
+  <title id="title">Creative Productivity App preview</title>
+  <desc id="desc">A glass dashboard for creator tasks and project context.</desc>
   <defs>
     <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
       <stop stop-color="#10172e"/>

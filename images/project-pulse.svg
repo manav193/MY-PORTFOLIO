@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="720" height="460" viewBox="0 0 720 460" role="img" aria-labelledby="title desc">
-  <title id="title">Pulse Commerce OS preview</title>
-  <desc id="desc">Analytics dashboard with revenue cards and charts.</desc>
+  <title id="title">Modern Portfolio Website preview</title>
+  <desc id="desc">A polished website dashboard-style preview for portfolio work.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0b1020"/><stop offset="1" stop-color="#18263a"/></linearGradient>
     <linearGradient id="line" x1="0" x2="1"><stop stop-color="#ffd166"/><stop offset="1" stop-color="#78fff1"/></linearGradient>

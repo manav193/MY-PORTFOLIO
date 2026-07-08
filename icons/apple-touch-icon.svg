@@ -2,5 +2,6 @@
   <rect width="180" height="180" rx="42" fill="#070914"/>
   <circle cx="44" cy="44" r="42" fill="#78fff1" opacity=".28"/>
   <circle cx="142" cy="46" r="48" fill="#ff8bd7" opacity=".22"/>
-  <path d="M45 124V54h22l23 36 23-36h22v70h-22V86l-16 27H84L67 86v38z" fill="#fff"/>
+  <path d="M36 126l27-72h22l27 72H91l-5-15H62l-5 15zM67 94h14l-7-23z" fill="#78fff1"/>
+  <path d="M108 126V54h18l15 25 15-25h18v72h-18V86l-10 19h-10l-10-19v40z" fill="#fff"/>
 </svg>

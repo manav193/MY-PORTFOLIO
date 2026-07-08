@@ -1,8 +1,8 @@
 const phrases = [
-  "fast web products.",
-  "AI-powered workflows.",
-  "premium interfaces.",
-  "game-like interactions."
+  "apps and websites.",
+  "UI/UX experiences.",
+  "game interface concepts.",
+  "creator-grade visuals."
 ];
 
 export function initTyping() {

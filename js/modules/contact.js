@@ -14,11 +14,11 @@ export function initContactForm() {
     }
 
     const data = new FormData(form);
-    const subject = encodeURIComponent(`Portfolio inquiry from ${data.get("name")}`);
+    const subject = encodeURIComponent(`Portfolio inquiry for Manav Agarwal from ${data.get("name")}`);
     const body = encodeURIComponent(`${data.get("message")}\n\nReply to: ${data.get("email")}`);
-    status.textContent = "Message ready. Opening your email app now.";
+    status.textContent = "Message prepared. Opening your email app so you can choose the recipient.";
     status.style.color = "var(--accent)";
     form.reset();
-    window.location.href = `mailto:hello@manavsingh.dev?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
   });
 }

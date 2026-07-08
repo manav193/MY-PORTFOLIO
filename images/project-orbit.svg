@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="720" height="460" viewBox="0 0 720 460" role="img" aria-labelledby="title desc">
-  <title id="title">Orbit Runner preview</title>
-  <desc id="desc">A browser game arena with orbit paths and energy pickups.</desc>
+  <title id="title">Game UI Concept preview</title>
+  <desc id="desc">A browser game interface concept with orbit paths and HUD elements.</desc>
   <defs>
     <radialGradient id="bg" cx=".5" cy=".5" r=".8"><stop stop-color="#20264d"/><stop offset="1" stop-color="#070914"/></radialGradient>
     <linearGradient id="ship" x1="0" x2="1"><stop stop-color="#78fff1"/><stop offset="1" stop-color="#ff8bd7"/></linearGradient>

@@ -20,5 +20,5 @@ export function initTheme() {
 }
 
 function updateIcon(icon, theme) {
-  if (icon) icon.textContent = theme === "dark" ? "☾" : "☀";
+  if (icon) icon.textContent = theme === "dark" ? "Dark" : "Light";
 }
