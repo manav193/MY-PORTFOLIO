@@ -1,10 +1,7 @@
 import { initTheme } from "./modules/theme.js";
 import { initReveal, initCounters, initScrollProgress, initBackToTop } from "./modules/scroll.js";
 import { initTyping } from "./modules/typing.js";
-import { initParticles } from "./modules/particles.js";
 import { initMagnetic, initCursor, initTilt, initParallax } from "./modules/motion.js";
-import { initProjects } from "./modules/projects.js";
-import { initCommandPalette } from "./modules/command-palette.js";
 import { initContactForm } from "./modules/contact.js";
 
 document.body.classList.add("is-loading");
@@ -20,13 +17,10 @@ initCounters();
 initScrollProgress();
 initBackToTop();
 initTyping();
-initParticles();
 initMagnetic();
 initCursor();
 initTilt();
 initParallax();
-initProjects();
-initCommandPalette();
 initContactForm();
 
 if ("serviceWorker" in navigator) {

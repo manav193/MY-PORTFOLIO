@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ToolVerse — Manav Agarwal Case Study</title>
+  <meta name="description" content="In-depth engineering and design case study for ToolVerse by Manav Agarwal.">
+  <meta name="theme-color" content="#000000">
+  <link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
+  
+  <link rel="preload" href="css/styles.css" as="style">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/project-page.css">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="nav-container">
+      <a href="index.html#work" class="brand" style="display:flex; align-items:center; gap:8px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back to Portfolio
+      </a>
+    </div>
+  </nav>
+
+  <main>
+    <header class="project-hero">
+      <h1>ToolVerse</h1>
+      <p class="tagline">Engineering Case Study</p>
+      <div class="project-actions">
+        <a href="https://tool-verse-theta.vercel.app/" class="btn-primary" target="_blank" rel="noopener">Live Demo</a>
+<a href="https://github.com/manav193" class="btn-secondary" target="_blank" rel="noopener">GitHub</a>
+
+      </div>
+      <div class="project-hero-image">
+        <img src="images/toolverse_4.png" alt="ToolVerse Hero Showcase">
+      </div>
+    </header>
+
+    <article class="project-content">
+      <section class="content-section"><h2>Short Overview</h2>
+<p>ToolVerse is a Progressive Web App (PWA) delivering over 50 ad-free, completely offline-capable utility tools. It offers instant access to PDF utilities, image converters, text formatters, and developer tools without requiring sign-ups or server-side processing.</p>
+</section>
+<section class="content-section"><h2>Problem</h2>
+<p>Online utility tools (like PDF converters or character counters) are predominantly ad-heavy, slow, and require a constant internet connection. Furthermore, many require users to upload sensitive files to third-party servers, raising privacy concerns.</p>
+</section>
+<section class="content-section"><h2>My Approach</h2>
+<p>I architected ToolVerse as a client-side heavy Progressive Web App. By moving all computation to the browser using modern Web APIs, I eliminated the need for server-side processing, thereby guaranteeing user privacy and zero latency.</p>
+</section>
+<section class="content-section"><h2>Design Decisions</h2>
+<ul>
+<li><strong>Minimalist UI:</strong> Designed a distraction-free, dark-mode native interface to reduce cognitive load.</li>
+<li><strong>Categorization:</strong> Implemented a robust search and tag-based filtering system to navigate 50+ tools instantly.</li>
+<li><strong>Offline First:</strong> Prioritized Service Worker caching so the app functions entirely offline after the initial load.</li>
+</ul>
+</section>
+<section class="content-section"><h2>Technical Implementation</h2>
+<p>The platform was built using vanilla JavaScript and modern browser APIs to keep the bundle size extremely lightweight. Service Workers cache all static assets and tool logic, enabling the "Install App" functionality standard in PWAs. Testing was automated using Playwright to ensure cross-tool reliability.</p>
+</section>
+<section class="content-section"><h2>Challenges</h2>
+<p>The primary challenge was implementing complex utilities (like image conversion and text parsing) entirely on the client side without bloating the main thread or causing UI jank. This required efficient memory management and optimized DOM manipulation.</p>
+</section>
+<section class="content-section"><h2>Result</h2>
+<p>A 100% free, privacy-first tool aggregator that loads instantly. The app successfully passes all Lighthouse PWA criteria with perfect performance scores.</p>
+</section>
+<section class="content-section"><h2>Tech Stack</h2>
+<ul>
+<li><strong>Frontend:</strong> HTML, CSS, Vanilla JavaScript</li>
+<li><strong>Architecture:</strong> Progressive Web App (PWA), Service Workers</li>
+<li><strong>Testing:</strong> Playwright</li>
+<li><strong>Deployment:</strong> Vercel</li>
+</ul>
+</section>
+<section class="content-section"><h2>Key Features</h2>
+<ul>
+<li>50+ Client-side utility tools</li>
+<li>Zero server uploads (100% Privacy)</li>
+<li>Installable Desktop/Mobile App (PWA)</li>
+<li>Offline functionality</li>
+<li>Sub-second load times</li>
+</ul>
+</section>
+<section class="content-section"><h2>Lessons Learned</h2>
+<p>Building ToolVerse reinforced my understanding of browser architecture, specifically the power and limitations of the main thread. It also deepened my expertise in Service Worker lifecycle management and caching strategies.</p>
+</section>
+
+    </article>
+
+    <nav class="project-nav">
+      <a href="project-nike.html" class="nav-link prev">
+        <span class="nav-label">Previous Project</span>
+        <span class="nav-title">Nike Air Zoom UI</span>
+      </a>
+      <a href="project-selfyy.html" class="nav-link next">
+        <span class="nav-label">Next Project</span>
+        <span class="nav-title">SELFYY</span>
+      </a>
+    </nav>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 Manav Agarwal. Handcrafted Product Portfolio.</p>
+  </footer>
+</body>
+</html>

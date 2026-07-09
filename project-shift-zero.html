@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SHIFT ZERO — Manav Agarwal Case Study</title>
+  <meta name="description" content="In-depth engineering and design case study for SHIFT ZERO by Manav Agarwal.">
+  <meta name="theme-color" content="#000000">
+  <link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
+  
+  <link rel="preload" href="css/styles.css" as="style">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/project-page.css">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="nav-container">
+      <a href="index.html#work" class="brand" style="display:flex; align-items:center; gap:8px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back to Portfolio
+      </a>
+    </div>
+  </nav>
+
+  <main>
+    <header class="project-hero">
+      <h1>SHIFT ZERO</h1>
+      <p class="tagline">Engineering Case Study</p>
+      <div class="project-actions">
+        
+      </div>
+      <div class="project-hero-image">
+        <img src="images/sz_screens.png" alt="SHIFT ZERO Hero Showcase">
+      </div>
+    </header>
+
+    <article class="project-content">
+      <section class="content-section"><h2>Short Overview</h2>
+<p>SHIFT ZERO is a multi-disciplinary project encompassing both a premium Cyberpunk Heads-Up Display (HUD) interface design and a fully playable collaborative game prototype built in the Godot 4 engine.</p>
+</section>
+<section class="content-section"><h2>Problem</h2>
+<p>In fast-paced, visually chaotic action games, critical player information (health, ammo, objectives) is often lost in the noise. The challenge was to design a UI that matched the aggressive, neon-drenched cyberpunk aesthetic while maintaining absolute clarity and split-second readability.</p>
+</section>
+<section class="content-section"><h2>My Approach</h2>
+<p>I separated the project into two distinct phases: UI/UX conceptualization in Figma, and technical implementation in Godot. I approached the UI by studying military aviation HUDs, focusing on angular geometries, high-contrast neon accents against dark transparencies, and kinetic motion.</p>
+</section>
+<section class="content-section"><h2>Design Decisions</h2>
+<ul>
+<li><strong>Typography:</strong> Selected a highly legible, aggressive sans-serif typeface to convey technical precision.</li>
+<li><strong>Color Theory:</strong> Utilized a stark monochromatic base with highly saturated, singular accent colors (e.g., electric cyan or alert red) strictly reserved for critical status changes.</li>
+<li><strong>Diegetic Elements:</strong> Designed components that look like they exist within the game world (angled projections, scanlines) rather than flat overlays.</li>
+</ul>
+</section>
+<section class="content-section"><h2>Technical Implementation</h2>
+<p>The UI mockups were translated into the Godot 4 engine. I utilized Godot's Control nodes and custom shaders to replicate the CRT scanline effects and chromatic aberration seen in the Figma designs.</p>
+</section>
+<section class="content-section"><h2>Challenges</h2>
+<p>The hardest technical challenge was ensuring the UI shaders in Godot did not severely impact the game's framerate. The design challenge lay in balancing the "cool factor" of a cluttered cyberpunk interface with the strict usability requirements of an action game.</p>
+</section>
+<section class="content-section"><h2>Result</h2>
+<p>A cohesive game prototype featuring a highly praised, visually striking UI that successfully communicates complex game states in a chaotic environment without breaking immersion.</p>
+</section>
+<section class="content-section"><h2>Tech Stack</h2>
+<ul>
+<li><strong>Design:</strong> Figma, Photoshop</li>
+<li><strong>Game Engine:</strong> Godot 4</li>
+<li><strong>Scripting:</strong> GDScript, Custom Shaders</li>
+</ul>
+</section>
+<section class="content-section"><h2>Key Features</h2>
+<ul>
+<li>High-contrast, readability-focused HUD</li>
+<li>Custom CRT and chromatic aberration shaders</li>
+<li>Playable prototype mechanics</li>
+</ul>
+</section>
+<section class="content-section"><h2>Lessons Learned</h2>
+<p>This project was a masterclass in bridging the gap between static design and real-time rendering. It taught me how to optimize visual effects for game engines and the importance of playtesting UI designs in motion.</p>
+</section>
+
+    </article>
+
+    <nav class="project-nav">
+      <a href="project-promptai.html" class="nav-link prev">
+        <span class="nav-label">Previous Project</span>
+        <span class="nav-title">PromptAI Concept</span>
+      </a>
+      <a href="project-nintendo.html" class="nav-link next">
+        <span class="nav-label">Next Project</span>
+        <span class="nav-title">Nintendo UI Redesign</span>
+      </a>
+    </nav>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 Manav Agarwal. Handcrafted Product Portfolio.</p>
+  </footer>
+</body>
+</html>

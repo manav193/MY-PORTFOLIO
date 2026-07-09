@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SELFYY — Manav Agarwal Case Study</title>
+  <meta name="description" content="In-depth engineering and design case study for SELFYY by Manav Agarwal.">
+  <meta name="theme-color" content="#000000">
+  <link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
+  
+  <link rel="preload" href="css/styles.css" as="style">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/project-page.css">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="nav-container">
+      <a href="index.html#work" class="brand" style="display:flex; align-items:center; gap:8px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back to Portfolio
+      </a>
+    </div>
+  </nav>
+
+  <main>
+    <header class="project-hero">
+      <h1>SELFYY</h1>
+      <p class="tagline">Engineering Case Study</p>
+      <div class="project-actions">
+        <a href="https://selfyy.vercel.app/" class="btn-primary" target="_blank" rel="noopener">Live Demo</a>
+<a href="https://github.com/manav193" class="btn-secondary" target="_blank" rel="noopener">GitHub</a>
+
+      </div>
+      <div class="project-hero-image">
+        <img src="images/project-nexus.svg" alt="SELFYY Hero Showcase">
+      </div>
+    </header>
+
+    <article class="project-content">
+      <section class="content-section"><h2>Short Overview</h2>
+<p>SELFYY is a modular application platform designed to integrate a static website alongside a dynamic, modular application builder. It serves as a structured digital ecosystem emphasizing high performance and modular architecture.</p>
+</section>
+<section class="content-section"><h2>Problem</h2>
+<p>When scaling a web presence that includes both a marketing/static front and a dynamic application backend, standard architectures often result in a monolithic structure that is slow to load and difficult to maintain. The challenge was maintaining static site speed while enabling complex application routing.</p>
+</section>
+<section class="content-section"><h2>My Approach</h2>
+<p>I focused on decoupled architecture. By leveraging Vercel's edge routing and custom configuration rules, I isolated the static marketing layers from the application logic. This allowed each layer to be optimized independently.</p>
+</section>
+<section class="content-section"><h2>Design Decisions</h2>
+<ul>
+<li><strong>Modular File Structure:</strong> Adopted a strict component-based architecture for scalability.</li>
+<li><strong>High-Contrast Identity:</strong> Designed a visually distinct interface to differentiate the platform's utility tools from its informational pages.</li>
+</ul>
+</section>
+<section class="content-section"><h2>Technical Implementation</h2>
+<p>Deployed on Vercel, SELFYY utilizes advanced routing and caching strategies to deliver static assets from the edge while gracefully handling application logic. The architecture relies on clean HTML/CSS/JS with modular project boundaries.</p>
+</section>
+<section class="content-section"><h2>Challenges</h2>
+<p>Configuring the deployment pipeline to correctly route between static assets and application endpoints without causing 404 errors or infinite redirects proved challenging, requiring deep configuration of deployment JSON rules.</p>
+</section>
+<section class="content-section"><h2>Result</h2>
+<p>A scalable, highly organized platform that delivers instant page loads for static content while supporting dynamic application routes flawlessly.</p>
+</section>
+<section class="content-section"><h2>Tech Stack</h2>
+<ul>
+<li><strong>Architecture:</strong> Vercel Routing, Modular Monorepo pattern</li>
+<li><strong>Frontend:</strong> Web native (HTML, CSS, JS)</li>
+</ul>
+</section>
+<section class="content-section"><h2>Key Features</h2>
+<ul>
+<li>High-performance static delivery</li>
+<li>Modular application boundaries</li>
+<li>Edge routing integration</li>
+</ul>
+</section>
+<section class="content-section"><h2>Lessons Learned</h2>
+<p>Working on SELFYY solidified my understanding of edge networks, deployment configurations, and the critical importance of decoupling static assets from application logic early in the project lifecycle.</p>
+</section>
+
+    </article>
+
+    <nav class="project-nav">
+      <a href="project-toolverse.html" class="nav-link prev">
+        <span class="nav-label">Previous Project</span>
+        <span class="nav-title">ToolVerse</span>
+      </a>
+      <a href="project-love-journey.html" class="nav-link next">
+        <span class="nav-label">Next Project</span>
+        <span class="nav-title">Manav & My Love Journey</span>
+      </a>
+    </nav>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 Manav Agarwal. Handcrafted Product Portfolio.</p>
+  </footer>
+</body>
+</html>
