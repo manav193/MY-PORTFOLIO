@@ -38,13 +38,8 @@ initParallax();
 initContactForm();
 
 window.addEventListener("load", () => {
-  import("./arcade-qa-fixes.js").catch((error) => {
-    console.warn("Arcade stabilization module failed to load", error);
-  });
-
-  import("./arcade-mobile.js").catch((error) => {
-    console.warn("Arcade mobile module failed to load", error);
-  });
+  import("./arcade-qa-fixes.js").catch(() => {});
+  import("./mobile-arcade-hotfix.js").catch(() => {});
 
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("./sw.js").catch(() => {});
