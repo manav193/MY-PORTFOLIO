@@ -3,100 +3,269 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Velora Bites — Manav Agarwal Case Study</title>
-  <meta name="description" content="In-depth engineering and design case study for Velora Bites by Manav Agarwal.">
-  <meta name="theme-color" content="#000000">
+  <title>Velora Bites — Premium Hospitality Experience</title>
+  <meta name="theme-color" content="#0c0a09">
   <link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
-  
-  <link rel="preload" href="css/styles.css" as="style">
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/project-page.css">
-  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <script>
+    (function() {
+      try {
+        var localTheme = localStorage.getItem('premium-theme');
+        var sysTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark-graphite' : 'light-apple';
+        var activeTheme = localTheme || sysTheme;
+        document.documentElement.setAttribute('data-theme', activeTheme);
+      } catch (e) {}
+    })();
+  </script>
 </head>
-<body>
-  <nav class="site-nav">
+<body data-project-theme="velora">
+  <nav class="site-nav showroom-nav">
     <div class="nav-container">
       <a href="index.html#work" class="brand" style="display:flex; align-items:center; gap:8px;">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-        Back to Portfolio
+        Index
       </a>
+      <div class="project-nav-actions">
+        <a href="https://github.com/manav193" class="btn-primary" target="_blank" rel="noopener">Source Code</a>
+      </div>
     </div>
   </nav>
 
-  <main>
-    <header class="project-hero">
-      <h1>Velora Bites</h1>
-      <p class="tagline">Engineering Case Study</p>
-      <div class="project-actions">
-        
+  <main class="cs-premium-layout">
+    
+    <!-- 1. CINEMATIC HERO BANNER -->
+    <header class="cs-hero-cinematic">
+      <div class="cs-hero-content">
+        <h1 class="cs-hero-title reveal-text" style="font-family: serif;">Velora Bites</h1>
+        <p class="cs-hero-subtitle reveal-text" style="animation-delay: 0.1s;">
+          A premium restaurant experience designed around elegance, storytelling and modern hospitality.
+        </p>
       </div>
-      <div class="project-hero-image">
-        <img src="images/velora_2.png" alt="Velora Bites Hero Showcase">
+      <div class="cs-hero-visual reveal-scale">
+        <img src="images/velora_desktop.png" alt="Velora Bites Desktop UI" class="cs-hero-img">
+        <div class="cs-hero-stats">
+          <div class="cs-stat-pill">Responsive UI</div>
+          <div class="cs-stat-pill">Luxury Brand</div>
+          <div class="cs-stat-pill">Desktop + Mobile</div>
+          <div class="cs-stat-pill">Modern Design System</div>
+          <div class="cs-stat-pill">Editorial Layout</div>
+        </div>
       </div>
     </header>
 
-    <article class="project-content">
-      <section class="content-section"><h2>Short Overview</h2>
-<p>Velora Bites is a conceptual luxury restaurant landing page focused on delivering a high-end digital dining experience through exquisite culinary typography, sophisticated whitespace, and frictionless booking flows.</p>
-</section>
-<section class="content-section"><h2>Problem</h2>
-<p>Many restaurant websites suffer from outdated, cluttered layouts that fail to reflect the quality of the dining experience they offer. Critical user goals—like viewing the menu or booking a table—are often buried beneath aggressive marketing popups or poorly optimized PDF menus.</p>
-</section>
-<section class="content-section"><h2>My Approach</h2>
-<p>I designed Velora Bites with the philosophy that the digital experience should be the appetizer. The approach was deeply editorial, treating the landing page like a spread in a Michelin Guide.</p>
-</section>
-<section class="content-section"><h2>Design Decisions</h2>
-<ul>
-<li><strong>Whitespace:</strong> Employed extreme, intentional whitespace to frame food photography like art.</li>
-<li><strong>Typography:</strong> Paired a classic, elegant Serif font for headings with a highly readable, geometric Sans-serif for body copy and UI elements.</li>
-<li><strong>Color Palette:</strong> Avoided standard "food" colors (like bright reds/yellows). Instead, opted for deep charcoal, cream, and subtle gold accents to communicate exclusivity and luxury.</li>
-</ul>
-</section>
-<section class="content-section"><h2>Technical Implementation (Design)</h2>
-<p>The landing page was mapped out using a strict 12-column grid system in Figma to ensure perfect alignment. Component variants were created for interactive elements (like the reservation picker) to prototype the micro-interactions.</p>
-</section>
-<section class="content-section"><h2>Challenges</h2>
-<p>Designing an interface that feels incredibly expensive and luxurious while remaining entirely accessible and highly functional for rapid booking conversions.</p>
-</section>
-<section class="content-section"><h2>Result</h2>
-<p>A visually stunning, high-converting digital storefront concept that successfully translates the tactile luxury of fine dining into a web interface.</p>
-</section>
-<section class="content-section"><h2>Tech Stack</h2>
-<ul>
-<li><strong>Design:</strong> Figma</li>
-<li><strong>Assets:</strong> High-resolution culinary photography curation</li>
-</ul>
-</section>
-<section class="content-section"><h2>Key Features</h2>
-<ul>
-<li>Editorial, magazine-style layout</li>
-<li>Frictionless reservation UI prototype</li>
-<li>Premium typographic hierarchy</li>
-</ul>
-</section>
-<section class="content-section"><h2>Lessons Learned</h2>
-<p>Velora Bites taught me the power of restraint in UI design. It reinforced that when dealing with high-quality imagery, the UI's primary job is to get out of the way and provide an elegant structural frame.</p>
-</section>
+    <!-- 2. PROJECT OVERVIEW -->
+    <section class="cs-editorial-section cs-fade-up">
+      <div class="cs-grid-layout">
+        <div class="cs-grid-col-4">
+          <span class="cs-section-marker">01. Overview</span>
+          <h2 class="cs-section-heading">Digital Fine Dining.</h2>
+        </div>
+        <div class="cs-grid-col-8">
+          <div class="cs-overview-blocks">
+            <div class="cs-overview-block">
+              <h3>Project Vision</h3>
+              <p>To translate the sensory experience of a Michelin-star dining room into a digital interface. The platform must feel as meticulously plated and refined as the cuisine it presents.</p>
+            </div>
+            <div class="cs-overview-block">
+              <h3>Target Audience</h3>
+              <p>Discerning gourmands, high-net-worth individuals, and food enthusiasts seeking an uncompromising, seamless premium food ordering experience.</p>
+            </div>
+            <div class="cs-overview-block">
+              <h3>Business Goals</h3>
+              <p>Elevate the brand identity above typical fast-casual delivery apps, driving higher average order values through a luxurious, trustworthy digital presence.</p>
+            </div>
+            <div class="cs-overview-block">
+              <h3>Restaurant Positioning</h3>
+              <p>Positioned as a digital-first luxury kitchen where convenience does not compromise elegance or perceived quality.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    </article>
+    <!-- 3. BRAND IDENTITY -->
+    <section class="cs-editorial-section cs-bg-alternate cs-fade-up">
+      <div class="cs-grid-layout">
+        <div class="cs-grid-col-6 cs-sticky-col">
+          <span class="cs-section-marker">02. Identity</span>
+          <h2 class="cs-section-heading">The language of luxury.</h2>
+          <p class="cs-editorial-lead">Luxury is defined by what is removed, not what is added. The visual identity relies on exquisite restraint, allowing the food photography to act as the primary brand ambassador.</p>
+        </div>
+        <div class="cs-grid-col-6">
+          <div class="cs-design-list">
+            <div class="cs-design-item">
+              <h4>Typography</h4>
+              <p>A sophisticated high-contrast serif typeface establishes authority and elegance for headings, paired with a highly legible geometric sans-serif for menus and UI elements.</p>
+            </div>
+            <div class="cs-design-item">
+              <h4>Color Palette</h4>
+              <p>Deep, immersive black surfaces absorb distraction. Warm, ambient gold accents and soft orange gradients evoke the feeling of candlelight and premium hospitality.</p>
+            </div>
+            <div class="cs-design-item">
+              <h4>Visual Hierarchy & Spacing</h4>
+              <p>Extravagant use of negative space. Content breathes freely, mimicking the physical distance between tables in a luxury dining room. The minimal navigation never intrudes on the imagery.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    <nav class="project-nav">
-      <a href="project-nintendo.html" class="nav-link prev">
-        <span class="nav-label">Previous Project</span>
-        <span class="nav-title">Nintendo UI Redesign</span>
-      </a>
-      <a href="project-nike.html" class="nav-link next">
-        <span class="nav-label">Next Project</span>
-        <span class="nav-title">Nike Air Zoom UI</span>
-      </a>
-    </nav>
+    <!-- 4. DESIGN PROCESS -->
+    <section class="cs-editorial-section cs-fade-up">
+      <div class="cs-split-layout">
+        <div class="cs-split-half">
+          <span class="cs-section-marker">03. Process</span>
+          <h3 class="cs-subheading">Crafting the standard.</h3>
+          <p class="cs-editorial-body">The design process began with extensive competitive analysis of physical high-end restaurant menus rather than digital apps. We sought to capture the tactile feel of premium cardstock and gold foil.</p>
+        </div>
+        <div class="cs-split-half">
+          <ul class="cs-bullet-list">
+            <li><strong>Research:</strong> Auditing physical luxury hospitality touchpoints.</li>
+            <li><strong>Wireframes:</strong> Establishing a grid that prioritizes vast imagery over dense text arrays.</li>
+            <li><strong>Visual Language:</strong> Developing a tokenized system for the Gold/Black aesthetic.</li>
+            <li><strong>Component System:</strong> Building reusable UI cards that maintain their elegance across any data payload.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. RESPONSIVE EXPERIENCE -->
+    <section class="cs-editorial-section cs-bg-alternate cs-fade-up">
+      <span class="cs-section-marker text-center">04. Adaptability</span>
+      <h2 class="cs-section-heading text-center">Uncompromised on every screen.</h2>
+      
+      <div class="cs-grid-layout" style="margin-top: 64px;">
+        <div class="cs-grid-col-6">
+          <div class="cs-mag-caption" style="text-align:left; margin-top:24px;">
+            <h4 style="color:var(--color-text-primary); margin-bottom:8px; font-size:1.8rem; font-family:serif;">The Desktop Panorama</h4>
+            <p style="color:var(--color-text-secondary); line-height:1.6; font-size: 1.1rem; margin-bottom: 24px;">Expansive imagery, horizontal scrolling carousels, and highly refined typographic scaling. The desktop view feels like an interactive editorial spread where high-fidelity food photography dominates the visual hierarchy.</p>
+            <p style="color:var(--color-text-secondary); line-height:1.6; font-size: 1.1rem;">Through the careful use of CSS Grid and massive horizontal padding, the experience mimics reading a physical luxury hospitality brochure on a wide mahogany table.</p>
+          </div>
+        </div>
+        <div class="cs-grid-col-6">
+          <img src="images/velora_mobile.png" alt="Velora Mobile Experience" style="width:60%; margin:0 auto; display:block; border-radius:24px; box-shadow: 0 30px 60px rgba(0,0,0,0.5);">
+          <div class="cs-mag-caption" style="text-align:center; margin-top:24px; max-width: 60%; margin-left: auto; margin-right: auto;">
+            <h4 style="color:var(--color-text-primary); margin-bottom:8px; font-size:1.2rem;">The Mobile Concierge</h4>
+            <p style="color:var(--color-text-secondary); line-height:1.6;">Touch targets are expanded for thumb ergonomics. Navigation collapses into an elegant minimal overlay. The luxury feel is preserved through strict adherence to the golden ratio in vertical spacing.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. PREMIUM GALLERY (REPLACED WITH TEXT-DRIVEN MICRO-INTERACTIONS) -->
+    <section class="cs-editorial-section cs-gallery-section cs-fade-up">
+      <span class="cs-section-marker text-center">05. Micro-Interactions</span>
+      <h2 class="cs-section-heading text-center">The Devil in the Details.</h2>
+      
+      <div class="cs-grid-layout" style="margin-top: 64px;">
+        <div class="cs-grid-col-12">
+          <div class="cs-mag-card" style="display:flex; justify-content:center; padding: 60px; background:var(--color-surface); border-radius:16px;">
+             <div style="max-width: 800px; text-align: center;">
+               <h3 style="color:var(--color-text-primary); font-size:2rem; margin-bottom:24px; font-family:serif;">Tactile Digital Feedback</h3>
+               <p style="color:var(--color-text-secondary); line-height:1.7; font-size: 1.2rem; margin-bottom: 32px;">Hover states in a luxury context don't simply change color; they reveal subtle, warm inner shadows and gentle up-scales that mimic physical interaction. The primary Call-to-Action commands attention without screaming, relying on soft easing curves to feel natural and deliberate rather than sudden and mechanical.</p>
+             </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. FEATURES -->
+    <section class="cs-editorial-section cs-fade-up">
+      <div class="cs-grid-layout">
+        <div class="cs-grid-col-4">
+          <span class="cs-section-marker">06. System</span>
+          <h2 class="cs-section-heading">The Ingredients.</h2>
+        </div>
+        <div class="cs-grid-col-8">
+          <ul class="cs-feature-grid">
+            <li><strong>Luxury Landing Page:</strong> Immediate brand immersion upon load.</li>
+            <li><strong>Responsive Layout:</strong> Flawless adaptation across all device viewports.</li>
+            <li><strong>Menu Highlights:</strong> Curated dishes presented like gallery artwork.</li>
+            <li><strong>Food Cards:</strong> Component-driven architecture for scalable menus.</li>
+            <li><strong>Testimonials:</strong> Trust-building social proof wrapped in elegant typography.</li>
+            <li><strong>Premium CTA:</strong> A unified hierarchy for order flows.</li>
+            <li><strong>Micro Interactions:</strong> Deliberate, smooth feedback loops.</li>
+            <li><strong>Modern UI System:</strong> Fully tokenized variables for rapid iteration.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. TECHNICAL IMPLEMENTATION -->
+    <section class="cs-editorial-section cs-bg-alternate cs-fade-up">
+      <div class="cs-grid-layout">
+        <div class="cs-grid-col-12">
+          <span class="cs-section-marker">07. Architecture</span>
+          <h2 class="cs-section-heading">Built to perform.</h2>
+        </div>
+        <div class="cs-grid-col-6">
+          <p class="cs-editorial-body">A luxury experience must be fast. We rejected heavy JS frameworks in favor of semantic HTML and highly optimized CSS, utilizing modern CSS Grid and Flexbox for complex, asymmetrical layouts.</p>
+          <p class="cs-editorial-body">The animation system relies on CSS transitions and hardware-accelerated transforms (`translate3d`, `scale`) ensuring 60fps performance even on older mobile devices. Reusable design tokens govern the strict color and spacing logic.</p>
+        </div>
+        <div class="cs-grid-col-6">
+          <div class="cs-tech-stack">
+            <div class="cs-tech-tag">Semantic HTML5</div>
+            <div class="cs-tech-tag">CSS Grid</div>
+            <div class="cs-tech-tag">CSS Flexbox</div>
+            <div class="cs-tech-tag">Vanilla JavaScript</div>
+            <div class="cs-tech-tag">Hardware Acceleration</div>
+            <div class="cs-tech-tag">Design Tokens (Variables)</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. CHALLENGES & 10. RESULTS -->
+    <section class="cs-editorial-section cs-fade-up">
+      <div class="cs-split-layout">
+        <div class="cs-split-half">
+          <span class="cs-section-marker">08. Challenges</span>
+          <h3 class="cs-subheading">The Balancing Act</h3>
+          <ul class="cs-bullet-list">
+            <li><strong>Aesthetics vs. Usability:</strong> Ensuring that the ultra-minimalist, high-contrast design did not negatively impact legibility or accessibility for ordering functionality.</li>
+            <li><strong>Typography Scaling:</strong> Managing fluid typography so that the massive serif headlines retained their dramatic impact on mobile screens without breaking word-wraps.</li>
+            <li><strong>Asset Performance:</strong> Loading high-fidelity, premium food photography while maintaining lightning-fast time-to-interactive metrics.</li>
+          </ul>
+        </div>
+        <div class="cs-split-half">
+          <span class="cs-section-marker">09. Results</span>
+          <h3 class="cs-subheading">The Outcome</h3>
+          <ul class="cs-bullet-list">
+            <li><strong>Visual Identity:</strong> Established a distinct, highly recognizable premium digital presence.</li>
+            <li><strong>Responsiveness:</strong> Delivered a seamless, app-like ordering experience on mobile devices.</li>
+            <li><strong>Scalability:</strong> The component architecture allows the restaurant to easily add hundreds of menu items without breaking the layout.</li>
+            <li><strong>Presentation:</strong> Elevated the standard for digital hospitality interfaces.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11. LESSONS LEARNED & 12. FUTURE -->
+    <section class="cs-editorial-section cs-bg-alternate cs-fade-up">
+      <div class="cs-grid-layout">
+        <div class="cs-grid-col-6">
+          <span class="cs-section-marker">10. Reflection</span>
+          <h2 class="cs-section-heading">Lessons Learned</h2>
+          <p class="cs-editorial-body">True luxury in UI design comes from restraint. It is tempting to over-animate or over-decorate, but allowing high-quality photography and excellent typography to speak for themselves yields a much more confident and expensive-feeling product. The negative space is just as important as the content itself.</p>
+        </div>
+        <div class="cs-grid-col-6">
+          <span class="cs-section-marker">11. Roadmap</span>
+          <h2 class="cs-section-heading">Future Improvements</h2>
+          <p class="cs-editorial-body">Looking ahead, the platform is poised to integrate a seamless <strong>Table Reservation System</strong>, full <strong>Online Ordering</strong> capabilities with real-time tracking, and a bespoke <strong>Restaurant CMS</strong>. We also plan to explore <strong>AI Recommendations</strong> to suggest wine pairings based on cart contents, further elevating the digital concierge experience.</p>
+        </div>
+      </div>
+    </section>
+
   </main>
 
-  <footer class="site-footer">
-    <p>&copy; 2026 Manav Agarwal. Handcrafted Product Portfolio.</p>
+  <footer class="cs-footer">
+    <a href="index.html#work" class="cs-back-link">Return to Portfolio</a>
   </footer>
+
 </body>
 </html>

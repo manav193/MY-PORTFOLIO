@@ -7,8 +7,26 @@ import { initOS } from "./modules/os.js";
 
 document.body.classList.add("is-loading");
 
+// Chamber Entry Physics
+document.body.style.opacity = '0';
+document.body.style.transition = 'opacity 0.8s var(--motion-momentum)';
+
+const chamberElements = document.querySelectorAll('main, footer, #intro-sequence, .project-hero, .cs-container');
+chamberElements.forEach(el => {
+  el.style.transform = 'scale(1.03)';
+  el.style.transition = 'transform 0.8s var(--motion-momentum)';
+});
+
+requestAnimationFrame(() => {
+  requestAnimationFrame(() => {
+    document.body.style.opacity = '1';
+    chamberElements.forEach(el => {
+      el.style.transform = 'scale(1)';
+    });
+  });
+});
+
 initOS();
-initTheme();
 initReveal();
 initCounters();
 initScrollProgress();

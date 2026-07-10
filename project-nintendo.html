@@ -3,99 +3,236 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Nintendo UI Redesign — Manav Agarwal Case Study</title>
-  <meta name="description" content="In-depth engineering and design case study for Nintendo UI Redesign by Manav Agarwal.">
-  <meta name="theme-color" content="#000000">
+  <title>Nintendo Switch — Gaming UI Concept</title>
+  <meta name="theme-color" content="#f8fafc">
   <link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
-  
-  <link rel="preload" href="css/styles.css" as="style">
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/project-page.css">
-  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <script>
+    (function() {
+      try {
+        var localTheme = localStorage.getItem('premium-theme');
+        var sysTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark-graphite' : 'light-apple';
+        var activeTheme = localTheme || sysTheme;
+        document.documentElement.setAttribute('data-theme', activeTheme);
+      } catch (e) {}
+    })();
+  </script>
+  <style>
+    /* Removed CSS crops to enforce single-image usage rule */
+    
+    [data-project-theme="nintendo"] .cs-hero-title {
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      text-transform: uppercase;
+      color: #e60012; /* Nintendo Red */
+      background: none;
+      -webkit-text-fill-color: #e60012;
+    }
+    [data-project-theme="nintendo"] .cs-hero-subtitle {
+      color: var(--color-text-secondary);
+    }
+    
+    .nintendo-red-text { color: #e60012; }
+    
+    /* Ensure the hero image pops against the light background */
+    .cs-hero-visual .cs-hero-img {
+      border-radius: 32px;
+      box-shadow: 0 40px 100px -20px rgba(230, 0, 18, 0.2), 0 20px 40px rgba(0,0,0,0.15);
+    }
+  </style>
 </head>
-<body>
-  <nav class="site-nav">
+<body data-project-theme="nintendo">
+  <nav class="site-nav showroom-nav">
     <div class="nav-container">
       <a href="index.html#work" class="brand" style="display:flex; align-items:center; gap:8px;">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-        Back to Portfolio
+        Index
       </a>
+      <div class="project-nav-actions">
+        <a href="https://github.com/manav193" class="btn-primary" target="_blank" rel="noopener">Source Code</a>
+      </div>
     </div>
   </nav>
 
-  <main>
-    <header class="project-hero">
-      <h1>Nintendo UI Redesign</h1>
-      <p class="tagline">Engineering Case Study</p>
-      <div class="project-actions">
-        
+  <main class="cs-premium-layout">
+    
+    <!-- 1. CINEMATIC HERO BANNER -->
+    <header class="cs-hero-cinematic">
+      <div class="cs-hero-content">
+        <h1 class="cs-hero-title reveal-text">Nintendo<br>Switch</h1>
+        <p class="cs-hero-subtitle reveal-text" style="animation-delay: 0.1s;">
+          A premium product showcase concept blending bold gaming brand identity with modern editorial composition.
+        </p>
       </div>
-      <div class="project-hero-image">
-        <img src="images/nintendo.jpg" alt="Nintendo UI Redesign Hero Showcase">
+      <div class="cs-hero-visual reveal-scale">
+        <img src="images/nintendo.jpg" alt="Nintendo Switch UI Showcase" class="cs-hero-img">
+        <div class="cs-hero-stats">
+          <div class="cs-stat-pill" style="color: #000; border-color: rgba(0,0,0,0.1);">Gaming Identity</div>
+          <div class="cs-stat-pill" style="color: #000; border-color: rgba(0,0,0,0.1);">Product Showcase</div>
+          <div class="cs-stat-pill" style="color: #000; border-color: rgba(0,0,0,0.1);">Editorial Composition</div>
+          <div class="cs-stat-pill" style="color: #000; border-color: rgba(0,0,0,0.1);">Immersive UI</div>
+        </div>
       </div>
     </header>
 
-    <article class="project-content">
-      <section class="content-section"><h2>Short Overview</h2>
-<p>A conceptual redesign of the Nintendo console user interface. The project aimed to modernize the visual density, improve navigation speed, and inject a more premium, mature aesthetic into the dashboard while retaining the brand's core playful identity.</p>
-</section>
-<section class="content-section"><h2>Problem</h2>
-<p>The current Nintendo Switch interface, while functional, suffers from a lack of visual hierarchy, sluggish navigation through large game libraries, and a somewhat dated, sterile aesthetic that doesn't fully leverage the vibrancy of modern game art.</p>
-</section>
-<section class="content-section"><h2>My Approach</h2>
-<p>I conducted a teardown of the existing UX to identify friction points (specifically around library management and store discovery). My redesign focused on introducing a modern card-based layout with intelligent, context-aware blurred backgrounds that adapt to the currently selected game.</p>
-</section>
-<section class="content-section"><h2>Design Decisions</h2>
-<ul>
-<li><strong>Adaptive Theming:</strong> The entire UI background subtly shifts its color palette and ambient blur based on the primary colors of the highlighted game cover art.</li>
-<li><strong>Visual Hierarchy:</strong> Increased the scale of game tiles and reduced the prominence of system icons to ensure the games remain the absolute focus.</li>
-<li><strong>Typography:</strong> Updated the system font to a cleaner, more geometric sans-serif to improve readability on both handheld and large television screens.</li>
-</ul>
-</section>
-<section class="content-section"><h2>Technical Implementation (Design)</h2>
-<p>Created entirely in Figma. The adaptive background effect was simulated using layer blurs, heavy saturation adjustments, and overlay blending modes to mimic real-time OS-level rendering engines.</p>
-</section>
-<section class="content-section"><h2>Challenges</h2>
-<p>Balancing the need for a "premium" feel without losing the inherent approachability and joy associated with the Nintendo brand. The design had to feel sleek, but not intimidating.</p>
-</section>
-<section class="content-section"><h2>Result</h2>
-<p>A highly polished, fan-favorite concept that demonstrates a strong grasp of OS-level interface design, adaptive theming, and spatial navigation tailored for D-pad/joystick inputs.</p>
-</section>
-<section class="content-section"><h2>Tech Stack</h2>
-<ul>
-<li><strong>Design:</strong> Figma</li>
-</ul>
-</section>
-<section class="content-section"><h2>Key Features</h2>
-<ul>
-<li>Adaptive UI background blur</li>
-<li>Optimized spatial navigation layout</li>
-<li>Modernized typographic scale</li>
-</ul>
-</section>
-<section class="content-section"><h2>Lessons Learned</h2>
-<p>Designing for a console interface (10-foot UI) requires a fundamentally different approach than web or mobile design. This project taught me how to optimize layouts for controller-based navigation, focusing on clear focus states and reduced visual clutter.</p>
-</section>
+    <!-- 2. PROJECT OVERVIEW & 3. DESIGN VISION -->
+    <section class="cs-editorial-section cs-fade-up">
+      <div class="cs-grid-layout">
+        <div class="cs-grid-col-4">
+          <span class="cs-section-marker">01. Overview</span>
+          <h2 class="cs-section-heading">Playful Precision.</h2>
+        </div>
+        <div class="cs-grid-col-8">
+          <div class="cs-overview-blocks">
+            <div class="cs-overview-block">
+              <h3>Project Overview</h3>
+              <p>This UI concept reimagines how premium gaming hardware is presented digitally. Moving away from cluttered e-commerce pages, this layout adopts a sleek, magazine-inspired presentation that heroes the physical product against a bold, brand-aligned backdrop.</p>
+            </div>
+            <div class="cs-overview-block">
+              <h3>Design Vision</h3>
+              <p>The vision was to synthesize Nintendo's inherently playful DNA with high-end tech minimalism. The layout must feel fun and energetic, yet incredibly clean, utilizing stark contrast and overlapping structural layers to build depth.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    </article>
+    <!-- 4. GAMING BRAND IDENTITY & 5. PRODUCT PRESENTATION -->
+    <section class="cs-editorial-section cs-bg-alternate cs-fade-up">
+      <div class="cs-grid-layout">
+        <div class="cs-grid-col-6 cs-sticky-col">
+          <span class="cs-section-marker">02. Identity</span>
+          <h2 class="cs-section-heading">Bold. <span class="nintendo-red-text">Iconic.</span></h2>
+          <p class="cs-editorial-lead">The brand identity is instantly recognizable. A searing crimson background anchored by massive, knocked-out typography sets the stage for the hardware to break the fourth wall.</p>
+        </div>
+        <div class="cs-grid-col-6">
+          <div class="cs-design-list">
+            <div class="cs-design-item">
+              <h4>Gaming Brand Identity</h4>
+              <p>The stark red and deep black palette is quintessentially Nintendo. By treating the word "CONSOLE" as a background architectural texture rather than readable text, the branding becomes an environmental graphic.</p>
+            </div>
+            <div class="cs-design-item">
+              <h4>Product Presentation</h4>
+              <p>The console isn't just placed on the page; it breaks out of the dark UI card, intersecting multiple z-depth layers. This overlapping technique makes the physical device feel tangible and immediately graspable.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    <nav class="project-nav">
-      <a href="project-shift-zero.html" class="nav-link prev">
-        <span class="nav-label">Previous Project</span>
-        <span class="nav-title">SHIFT ZERO</span>
-      </a>
-      <a href="project-velora-bites.html" class="nav-link next">
-        <span class="nav-label">Next Project</span>
-        <span class="nav-title">Velora Bites</span>
-      </a>
-    </nav>
+    <!-- 6. COLOR SYSTEM & 7. TYPOGRAPHY & 8. UI COMPONENTS -->
+    <section class="cs-editorial-section cs-fade-up">
+      <div class="cs-split-layout">
+        <div class="cs-split-half">
+          <span class="cs-section-marker">03. Language</span>
+          <h3 class="cs-subheading">Color System & Typography</h3>
+          <ul class="cs-bullet-list">
+            <li><strong>Color System:</strong> A high-octane trio: Nintendo Red for energy, Midnight Black for premium tech grounding, and Neon Cyan/Red from the Joy-Cons to draw the eye directly to the product.</li>
+            <li><strong>Primary Typography:</strong> A heavy, condensed sans-serif is used for the main headings ("NINTENDO SWITCH") to project authority and strength.</li>
+            <li><strong>Ambient Typography:</strong> The oversized, translucent "CONSOLE" text wrapping the red background operates as a watermark, providing texture without distracting from the UI card.</li>
+          </ul>
+        </div>
+        <div class="cs-split-half">
+          <span class="cs-section-marker">04. Elements</span>
+          <h3 class="cs-subheading">UI Components</h3>
+          <ul class="cs-bullet-list">
+            <li><strong>The Floating Card:</strong> The dark container houses the pricing and purchasing logic, elevating it above the red background using a soft, diffuse shadow.</li>
+            <li><strong>Micro-Color Selectors:</strong> Elegant, minimal radio buttons (Cyan/Red vs Grey/Grey) let users customize the product without overwhelming the interface.</li>
+            <li><strong>Primary CTA:</strong> A pill-shaped button that inherits a subtle gradient, ensuring the "Add to Cart" action remains clear but secondary to the product hero shot.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- EDITORIAL GALLERY (REPLACED WITH TEXT) -->
+    <section class="cs-editorial-section cs-gallery-section cs-fade-up">
+      <span class="cs-section-marker text-center">05. Anatomy</span>
+      <h2 class="cs-section-heading text-center">Dissecting the layout.</h2>
+      
+      <div class="cs-grid-layout" style="margin-top: 64px;">
+        <div class="cs-grid-col-6">
+           <h3 style="color:var(--color-text-primary); font-size:1.8rem; margin-bottom:16px; font-family:serif;">Layer Intersection</h3>
+           <p style="color:var(--color-text-secondary); line-height:1.7;">The hardware isn't trapped in a bounding box. It breaks the fourth wall, intersecting both the searing crimson background and the deep black UI card. This intentional overlap creates tangible depth and physicality without relying on skeumorphism.</p>
+        </div>
+        <div class="cs-grid-col-6">
+           <h3 style="color:var(--color-text-primary); font-size:1.8rem; margin-bottom:16px; font-family:serif;">Condensed Authority</h3>
+           <p style="color:var(--color-text-secondary); line-height:1.7;">The heavily condensed typography commands attention without consuming excessive horizontal space. By utilizing a massive font weight and knocking out the color, the text acts as an environmental texture that grounds the entire composition.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. DESIGN PROCESS & 10. TECHNICAL IMPLEMENTATION -->
+    <section class="cs-editorial-section cs-bg-alternate cs-fade-up">
+      <div class="cs-grid-layout">
+        <div class="cs-grid-col-4">
+          <span class="cs-section-marker">06. Structure</span>
+          <h2 class="cs-section-heading">Architectural decisions.</h2>
+        </div>
+        <div class="cs-grid-col-8">
+          <div class="cs-overview-blocks">
+            <div class="cs-overview-block">
+              <h3>Design Process</h3>
+              <p>The concept was born from the desire to break the standard horizontal e-commerce layout. I started by anchoring the dark UI card to the right, freeing up the left side of the canvas to allow the Switch console to float freely in negative space, bridging the gap between the red background and the black card.</p>
+            </div>
+            <div class="cs-overview-block">
+              <h3>Technical Implementation</h3>
+              <p>Translating this to code requires a robust CSS Grid foundation to manage the overlapping z-indexes. The background typography is achieved using `opacity` and CSS `mask-image` to fade into the red gradient, while the dark UI card utilizes a subtle `backdrop-filter` for a premium finish.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11. CHALLENGES & 12. RESULTS -->
+    <section class="cs-editorial-section cs-fade-up">
+      <div class="cs-split-layout">
+        <div class="cs-split-half">
+          <span class="cs-section-marker">07. Execution</span>
+          <h3 class="cs-subheading">Challenges</h3>
+          <ul class="cs-bullet-list">
+            <li><strong>Managing Contrast:</strong> Ensuring the white text on the dark grey card remained perfectly legible while sitting atop a vibrantly saturated red background.</li>
+            <li><strong>Responsive Bleed:</strong> Adapting a layout where the product image intentionally breaks out of its container bounds, ensuring it scales correctly without causing horizontal scrolling on mobile.</li>
+            <li><strong>Visual Balance:</strong> Offsetting the immense visual weight of the bright neon Joy-Cons with the dense, dark UI card on the right side of the screen.</li>
+          </ul>
+        </div>
+        <div class="cs-split-half">
+          <span class="cs-section-marker">08. Impact</span>
+          <h3 class="cs-subheading">Results</h3>
+          <ul class="cs-bullet-list">
+            <li><strong>Premium Positioning:</strong> Successfully shifted the visual language from a standard retail store to a luxury product launch experience.</li>
+            <li><strong>Editorial Flow:</strong> The asymmetrical composition naturally guides the user's eye from the vibrant hardware directly to the pricing and CTA.</li>
+            <li><strong>Brand Alignment:</strong> Captured the core essence of Nintendo—vibrant, playful, yet highly polished and precise.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 13. LESSONS LEARNED & 14. FUTURE IMPROVEMENTS -->
+    <section class="cs-editorial-section cs-bg-alternate cs-fade-up">
+      <div class="cs-grid-layout">
+        <div class="cs-grid-col-6">
+          <span class="cs-section-marker">09. Reflection</span>
+          <h2 class="cs-section-heading">Lessons Learned</h2>
+          <p class="cs-editorial-body">This project reinforced the power of breaking container boundaries. When a product image is allowed to intersect multiple background layers rather than being trapped in a bounding box, it gains a sense of physicality and depth that immediately elevates the perceived value of the design.</p>
+        </div>
+        <div class="cs-grid-col-6">
+          <span class="cs-section-marker">10. Roadmap</span>
+          <h2 class="cs-section-heading">Future Improvements</h2>
+          <p class="cs-editorial-body">To push this concept further, I would introduce scroll-triggered parallax effects, causing the console to float independently from the dark UI card as the user scrolls. Additionally, interacting with the Joy-Con color selectors would trigger a seamless 3D rotation of the hardware render.</p>
+        </div>
+      </div>
+    </section>
+
   </main>
 
-  <footer class="site-footer">
-    <p>&copy; 2026 Manav Agarwal. Handcrafted Product Portfolio.</p>
+  <footer class="cs-footer">
+    <a href="index.html#work" class="cs-back-link">Return to Portfolio</a>
   </footer>
+
 </body>
 </html>

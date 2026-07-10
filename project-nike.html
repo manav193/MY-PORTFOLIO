@@ -3,100 +3,237 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Nike Air Zoom UI — Manav Agarwal Case Study</title>
-  <meta name="description" content="In-depth engineering and design case study for Nike Air Zoom UI by Manav Agarwal.">
+  <title>Nike Air Zoom Pegasus 41 — UI Concept</title>
   <meta name="theme-color" content="#000000">
   <link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
-  
-  <link rel="preload" href="css/styles.css" as="style">
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/project-page.css">
-  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <script>
+    (function() {
+      try {
+        var localTheme = localStorage.getItem('premium-theme');
+        var sysTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark-graphite' : 'light-apple';
+        var activeTheme = localTheme || sysTheme;
+        document.documentElement.setAttribute('data-theme', activeTheme);
+      } catch (e) {}
+    })();
+  </script>
+  <style>
+    .nike-neon {
+      color: #84cc16 !important; /* Nike Volt Green */
+    }
+    [data-project-theme="nike"] .cs-hero-title {
+      font-weight: 900;
+      font-style: italic;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+    }
+  </style>
 </head>
-<body>
-  <nav class="site-nav">
+<body data-project-theme="nike">
+  <nav class="site-nav showroom-nav">
     <div class="nav-container">
       <a href="index.html#work" class="brand" style="display:flex; align-items:center; gap:8px;">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-        Back to Portfolio
+        Index
       </a>
+      <div class="project-nav-actions">
+        <a href="https://github.com/manav193" class="btn-primary" target="_blank" rel="noopener">Source Code</a>
+      </div>
     </div>
   </nav>
 
-  <main>
-    <header class="project-hero">
-      <h1>Nike Air Zoom UI</h1>
-      <p class="tagline">Engineering Case Study</p>
-      <div class="project-actions">
-        
+  <main class="cs-premium-layout">
+    
+    <!-- 1. CINEMATIC HERO BANNER -->
+    <header class="cs-hero-cinematic">
+      <div class="cs-hero-content">
+        <h1 class="cs-hero-title reveal-text">Nike Air Zoom<br><span class="nike-neon">Pegasus 41</span></h1>
+        <p class="cs-hero-subtitle reveal-text" style="animation-delay: 0.1s;">
+          A high-performance conceptual UI exploration focused on premium sports branding, bold typography, and dynamic product storytelling.
+        </p>
       </div>
-      <div class="project-hero-image">
-        <img src="images/nike.png" alt="Nike Air Zoom UI Hero Showcase">
+      <div class="cs-hero-visual reveal-scale">
+        <img src="images/nike.png" alt="Nike Air Zoom Pegasus 41 UI" class="cs-hero-img">
+        <div class="cs-hero-stats">
+          <div class="cs-stat-pill">Sports Branding</div>
+          <div class="cs-stat-pill">Visual Hierarchy</div>
+          <div class="cs-stat-pill">Typography Scale</div>
+          <div class="cs-stat-pill">Glassmorphism</div>
+        </div>
       </div>
     </header>
 
-    <article class="project-content">
-      <section class="content-section"><h2>Short Overview</h2>
-<p>A bold, immersive e-commerce UI concept designed specifically to showcase the dynamic energy of the Nike Air Zoom product line. It challenges traditional, grid-heavy storefronts by placing the product in a dynamic, full-bleed environment.</p>
-</section>
-<section class="content-section"><h2>Problem</h2>
-<p>Standard e-commerce product pages often feel transactional and static. For high-performance athletic gear, a static white background fails to convey the product's core value proposition: speed, motion, and energy.</p>
-</section>
-<section class="content-section"><h2>My Approach</h2>
-<p>I treated the interface as an interactive advertisement. The design approach centered on breaking the grid, allowing the shoe imagery to bleed across layout boundaries and interact dynamically with the typography.</p>
-</section>
-<section class="content-section"><h2>Design Decisions</h2>
-<ul>
-<li><strong>Typography:</strong> Utilized massive, aggressive, italicized typography to visually communicate forward momentum and speed.</li>
-<li><strong>Image Masking:</strong> Carefully masked the product imagery so that elements of the shoe could overlap the text and UI elements, creating a sense of 3D depth.</li>
-<li><strong>Color Palette:</strong> Stuck to a high-contrast palette—stark blacks, bright whites, and the signature neon accents of the shoe—to maximize visual impact.</li>
-</ul>
-</section>
-<section class="content-section"><h2>Technical Implementation (Design)</h2>
-<p>The concept was built in Figma, utilizing complex masking layers and blending modes. I prototyped the scroll interactions to ensure that as the user scrolled, the typography and the product image moved at different parallax speeds to amplify the 3D effect.</p>
-</section>
-<section class="content-section"><h2>Challenges</h2>
-<p>Achieving the perfect balance between artistic expression and e-commerce usability. It was critical to ensure that while the design was bold and grid-breaking, the call-to-action (Add to Cart) and size selectors remained instantly recognizable and accessible.</p>
-</section>
-<section class="content-section"><h2>Result</h2>
-<p>A high-energy, premium product landing page concept that successfully merges brand storytelling with e-commerce functionality, demonstrating a deep understanding of visual hierarchy and motion design.</p>
-</section>
-<section class="content-section"><h2>Tech Stack</h2>
-<ul>
-<li><strong>Design & Prototyping:</strong> Figma</li>
-<li><strong>Image Editing:</strong> Adobe Photoshop</li>
-</ul>
-</section>
-<section class="content-section"><h2>Key Features</h2>
-<ul>
-<li>Grid-breaking 3D layout</li>
-<li>Kinetic typography</li>
-<li>Parallax scroll prototyping</li>
-</ul>
-</section>
-<section class="content-section"><h2>Lessons Learned</h2>
-<p>This project honed my skills in advanced image masking and composition. It proved that e-commerce does not have to be boring, and that pushing boundaries with layout can actually enhance the perceived value of a product.</p>
-</section>
+    <!-- 2. PROJECT OVERVIEW & 3. DESIGN GOALS -->
+    <section class="cs-editorial-section cs-fade-up">
+      <div class="cs-grid-layout">
+        <div class="cs-grid-col-4">
+          <span class="cs-section-marker">01. Overview</span>
+          <h2 class="cs-section-heading">Engineered for speed.</h2>
+        </div>
+        <div class="cs-grid-col-8">
+          <div class="cs-overview-blocks">
+            <div class="cs-overview-block">
+              <h3>Project Overview</h3>
+              <p>This UI concept reimagines the digital product launch experience for Nike's flagship running shoe. The interface breaks away from traditional e-commerce grids, adopting a dramatic, immersive storytelling canvas that prioritizes emotional connection over simple transactional logic.</p>
+            </div>
+            <div class="cs-overview-block">
+              <h3>Design Goals</h3>
+              <p>The primary objective was to capture the kinetic energy and "forward motion" inherent to the Nike brand. The layout must feel aggressively modern, utilizing extreme contrast, oversized typography, and deep spatial layers to hero the product.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    </article>
+    <!-- 4. BRAND IDENTITY & 5. PRODUCT EXPERIENCE -->
+    <section class="cs-editorial-section cs-bg-alternate cs-fade-up">
+      <div class="cs-grid-layout">
+        <div class="cs-grid-col-6 cs-sticky-col">
+          <span class="cs-section-marker">02. Identity</span>
+          <h2 class="cs-section-heading">Motion captured in pixels.</h2>
+          <p class="cs-editorial-lead">The digital identity mirrors the physical product: lightweight, responsive, and precision-engineered. The dark backdrop serves as an infinite stage for the vibrant Volt Green accents to explode.</p>
+        </div>
+        <div class="cs-grid-col-6">
+          <div class="cs-design-list">
+            <div class="cs-design-item">
+              <h4>Brand Identity</h4>
+              <p>Adhering to Nike's unapologetic visual language, the UI utilizes stark blacks, industrial greys, and high-energy neon hues. The aesthetic is heavily inspired by brutalist sports marketing—bold, raw, and impactful.</p>
+            </div>
+            <div class="cs-design-item">
+              <h4>Product Experience</h4>
+              <p>Users don't just view the shoe; they explore it. The interface uses overlapping glassmorphic orbs and structural boundary lines to create depth, pulling the viewer's eye exactly where the engineering happens.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    <nav class="project-nav">
-      <a href="project-velora-bites.html" class="nav-link prev">
-        <span class="nav-label">Previous Project</span>
-        <span class="nav-title">Velora Bites</span>
-      </a>
-      <a href="project-toolverse.html" class="nav-link next">
-        <span class="nav-label">Next Project</span>
-        <span class="nav-title">ToolVerse</span>
-      </a>
-    </nav>
+    <!-- 6. TYPOGRAPHY & 7. UI COMPONENTS -->
+    <section class="cs-editorial-section cs-fade-up">
+      <div class="cs-split-layout">
+        <div class="cs-split-half">
+          <span class="cs-section-marker">03. Language</span>
+          <h3 class="cs-subheading">Typography & Color System</h3>
+          <ul class="cs-bullet-list">
+            <li><strong>Headline Typography:</strong> Heavy, italicized sans-serif weights dominate the visual space, mimicking physical speed and forward momentum.</li>
+            <li><strong>Secondary Typography:</strong> Monospaced caps are used for technical specifications and side-bars, evoking an engineering schematic.</li>
+            <li><strong>Color System:</strong> A strict palette consisting of Void Black, Concrete Grey, Ocean Blue, and the signature Nike Volt Green.</li>
+          </ul>
+        </div>
+        <div class="cs-split-half">
+          <span class="cs-section-marker">04. Elements</span>
+          <h3 class="cs-subheading">UI Components</h3>
+          <ul class="cs-bullet-list">
+            <li><strong>Glassmorphic Orbs:</strong> Subtle blurred spheres float behind and over the shoe, creating a sense of three-dimensional space without distracting from the product.</li>
+            <li><strong>Vertical Axis Text:</strong> The "STYLE TAKES OVER" side-bar grounds the composition and creates a striking editorial frame that breaks standard web conventions.</li>
+            <li><strong>Ghost Buttons:</strong> The primary CTA uses an outlined pill shape, ensuring it remains visible but doesn't compete with the massive product shot.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- EDITORIAL GALLERY (REPLACED WITH TEXT) -->
+    <section class="cs-editorial-section cs-gallery-section cs-fade-up">
+      <span class="cs-section-marker text-center">05. Anatomy</span>
+      <h2 class="cs-section-heading text-center">Dissecting the Interface.</h2>
+      
+      <div class="cs-grid-layout" style="margin-top: 64px;">
+        <div class="cs-grid-col-6">
+           <h3 style="color:var(--color-text-primary); font-size:1.8rem; margin-bottom:16px; font-family:serif;">Aggressive Scaling</h3>
+           <p style="color:var(--color-text-secondary); line-height:1.7;">Typography acts as architecture rather than simply information. By pushing the "AIR ZOOM" lockup to the absolute boundary of the viewport, it mimics the feeling of physical speed and forces the user to confront the brand identity immediately.</p>
+        </div>
+        <div class="cs-grid-col-6">
+           <h3 style="color:var(--color-text-primary); font-size:1.8rem; margin-bottom:16px; font-family:serif;">Spatial Layering</h3>
+           <p style="color:var(--color-text-secondary); line-height:1.7;">Depth is established without relying on traditional drop shadows. By interleaving floating glassmorphic orbs both behind and in front of the high-fidelity shoe render, the UI creates a dynamic 3D volume that feels inherently modern.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. VISUAL HIERARCHY & 9. RESPONSIVE THINKING -->
+    <section class="cs-editorial-section cs-bg-alternate cs-fade-up">
+      <div class="cs-grid-layout">
+        <div class="cs-grid-col-4">
+          <span class="cs-section-marker">06. Structure</span>
+          <h2 class="cs-section-heading">Calculated impact.</h2>
+        </div>
+        <div class="cs-grid-col-8">
+          <div class="cs-overview-blocks">
+            <div class="cs-overview-block">
+              <h3>Visual Hierarchy</h3>
+              <p>The eye is intentionally guided in an inverted 'Z' pattern. It starts at the massive "AIR ZOOM" typographic lockup, drops down the aggressive Volt Green subheader, and sweeps across the highly detailed product render before landing on the CTA.</p>
+            </div>
+            <div class="cs-overview-block">
+              <h3>Responsive Thinking</h3>
+              <p>Translating an editorial desktop layout to mobile requires shifting from a horizontal narrative to a vertical stack. The typography scales fluidly using CSS clamp functions, ensuring the aggressive impact of the headlines is maintained on 320px screens.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10. TECHNICAL IMPLEMENTATION & 11. CHALLENGES -->
+    <section class="cs-editorial-section cs-fade-up">
+      <div class="cs-split-layout">
+        <div class="cs-split-half">
+          <span class="cs-section-marker">07. Execution</span>
+          <h3 class="cs-subheading">Technical Implementation</h3>
+          <div class="cs-tech-stack" style="margin-bottom: 24px;">
+            <div class="cs-tech-tag">HTML5</div>
+            <div class="cs-tech-tag">CSS Grid</div>
+            <div class="cs-tech-tag">Backdrop Filter</div>
+            <div class="cs-tech-tag">Fluid Typography</div>
+          </div>
+          <p class="cs-editorial-body">The layout is constructed using advanced CSS Grid to easily manage overlapping layers without heavy absolute positioning. The glassmorphism is achieved using `backdrop-filter: blur()`, heavily optimized to prevent GPU lag.</p>
+        </div>
+        <div class="cs-split-half">
+          <span class="cs-section-marker">08. Obstacles</span>
+          <h3 class="cs-subheading">Challenges</h3>
+          <ul class="cs-bullet-list">
+            <li><strong>Balancing Contrast:</strong> Ensuring the delicate technical blue text remained readable against the dark gradient background without losing its subtlety.</li>
+            <li><strong>Layer Management:</strong> Coordinating z-indexes for the vertical sidebar, the background orbs, the shoe render, and the foreground glass effects to maintain a cohesive 3D space.</li>
+            <li><strong>Typographic Tension:</strong> Pushing font sizes to their absolute maximum limits while ensuring no layout breaks across intermediate tablet breakpoints.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12. RESULTS, 13. LESSONS LEARNED & 14. FUTURE -->
+    <section class="cs-editorial-section cs-bg-alternate cs-fade-up">
+      <div class="cs-grid-layout">
+        <div class="cs-grid-col-12" style="margin-bottom: 48px;">
+          <h2 class="cs-section-heading text-center">Closing the loop.</h2>
+        </div>
+        
+        <div class="cs-grid-col-4">
+          <span class="cs-section-marker">09. Impact</span>
+          <h3 class="cs-subheading" style="font-size: 1.5rem;">Results</h3>
+          <p class="cs-editorial-body">The resulting concept successfully demonstrates how premium sports branding can transcend basic e-commerce templates. The interface feels less like a store and more like a high-end product showcase, elevating the perceived value of the sneaker.</p>
+        </div>
+        
+        <div class="cs-grid-col-4">
+          <span class="cs-section-marker">10. Insight</span>
+          <h3 class="cs-subheading" style="font-size: 1.5rem;">Lessons Learned</h3>
+          <p class="cs-editorial-body">I discovered that aggressive, oversized typography acts as a structural element, not just content. When text is large enough, it becomes an architectural anchor for the rest of the composition, demanding negative space to balance its weight.</p>
+        </div>
+        
+        <div class="cs-grid-col-4">
+          <span class="cs-section-marker">11. Roadmap</span>
+          <h3 class="cs-subheading" style="font-size: 1.5rem;">Future Improvements</h3>
+          <p class="cs-editorial-body">Future iterations would introduce Scroll-Linked WebGL animations, allowing the shoe to rotate in 3D space as the user scrolls down the page. Additionally, adding interactive hotspots to the shoe would reveal deeper technical specifications dynamically.</p>
+        </div>
+      </div>
+    </section>
+
   </main>
 
-  <footer class="site-footer">
-    <p>&copy; 2026 Manav Agarwal. Handcrafted Product Portfolio.</p>
+  <footer class="cs-footer">
+    <a href="index.html#work" class="cs-back-link">Return to Portfolio</a>
   </footer>
+
 </body>
 </html>

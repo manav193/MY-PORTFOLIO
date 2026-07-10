@@ -1,0 +1,579 @@
+/* 
+ * PHASE 2: INDUSTRIAL DESIGN PASS (ARCADE CABINET CRAFTSMANSHIP)
+ * Premium hardware details, anodized aluminum, glass lighting.
+ */
+
+#intro-sequence {
+  width: 100%;
+  height: 200vh;
+  position: relative;
+  z-index: 9999;
+}
+body.intro-skipped #intro-sequence {
+  display: none !important;
+}
+
+.intro-sticky-container {
+  position: sticky;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  perspective: 2500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #030303;
+  transform-style: preserve-3d;
+}
+
+/* ==========================================================================
+   MATERIALS & THEME INTEGRATION
+   ========================================================================== */
+:root {
+  --cab-bg: #121214;
+  --cab-highlight: rgba(255,255,255,0.06);
+  --cab-led: #fcd34d; /* warm white */
+}
+[data-theme="light-apple"] { --cab-bg: #d1d5db; --cab-highlight: rgba(255,255,255,0.8); --cab-led: #ffffff; }
+[data-theme="aurora-violet"] { --cab-bg: #1e1b2e; --cab-highlight: rgba(168,85,247,0.15); --cab-led: #22d3ee; }
+[data-theme="forest-premium"] { --cab-bg: #14201a; --cab-highlight: rgba(16,185,129,0.15); --cab-led: #10b981; }
+[data-theme="sunset-copper"] { --cab-bg: #261914; --cab-highlight: rgba(249,115,22,0.15); --cab-led: #f97316; }
+[data-theme="midnight-sapphire"] { --cab-bg: #0f172a; --cab-highlight: rgba(59,130,246,0.15); --cab-led: #3b82f6; }
+[data-theme="dark-graphite"] { --cab-bg: #121214; --cab-highlight: rgba(255,255,255,0.06); --cab-led: #fcd34d; }
+[data-theme="monochrome"] { --cab-bg: #111111; --cab-highlight: rgba(255,255,255,0.03); --cab-led: #ffffff; }
+
+.mat-anodized {
+  background-color: var(--cab-bg);
+  background-image: 
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse at 50% 0%, var(--cab-highlight) 0%, transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(0,0,0,0.4) 100%);
+  box-shadow: 
+    inset 0 1px 1px rgba(255,255,255,0.15),
+    inset 0 0 0 1px rgba(0,0,0,0.8),
+    0 10px 30px rgba(0,0,0,0.5);
+  transition: background-color 1.5s ease;
+}
+
+.mat-machined {
+  background: linear-gradient(90deg, #18181b 0%, #2a2a2e 50%, #18181b 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), inset 0 -1px 0 rgba(0,0,0,0.8), 0 2px 6px rgba(0,0,0,0.9);
+}
+
+.mat-rubber {
+  background: #0a0a0a;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,1), inset 0 0 0 1px rgba(255,255,255,0.02);
+}
+
+/* ==========================================================================
+   MAIN CHASSIS
+   ========================================================================== */
+.cabinet-chassis {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+  transform-style: preserve-3d;
+  will-change: transform, opacity, border-radius, width, height;
+  
+  /* Initial full-screen state */
+  transform: scale(1) translateZ(0) rotateX(0deg);
+  transition: border-radius 0.3s ease-out;
+}
+
+/* Base structural scaling */
+.cabinet-chassis.is-scaled {
+  width: 90vw;
+  height: 90vh;
+  max-width: 1100px;
+  max-height: 900px;
+  border-radius: 32px 32px 12px 12px; 
+  box-shadow: 0 50px 100px -20px rgba(0,0,0,1), 0 20px 40px rgba(0,0,0,0.8);
+}
+
+/* ==========================================================================
+   CABINET SEAMS & MICRO DETAILS
+   ========================================================================== */
+.cab-hardware-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  border-radius: inherit;
+  transition: opacity 0.5s ease;
+  overflow: hidden;
+}
+.cabinet-chassis.is-scaled .cab-hardware-layer { opacity: 1; }
+
+.cab-panel-seam-v {
+  position: absolute;
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(255,255,255,0.05) 100%);
+  top: 0;
+}
+.cab-panel-seam-v.left { left: 48px; }
+.cab-panel-seam-v.right { right: 48px; transform: scaleX(-1); }
+
+.cab-branding-plate {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 14px;
+  background: #080808;
+  border-radius: 2px;
+  border: 1px solid rgba(255,255,255,0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.25);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.35rem;
+  letter-spacing: 0.2em;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,1);
+}
+
+.cab-branding-plate::after {
+  content: "REV. 4.2";
+  position: absolute;
+  right: -45px;
+  top: 4px;
+  font-size: 0.2rem;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.15);
+}
+
+.cab-power-btn {
+  position: absolute;
+  top: 22px;
+  right: 64px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #0f0f11;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,1), inset 0 0 0 1px rgba(255,255,255,0.08), 0 1px 1px rgba(255,255,255,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.cab-power-btn:active {
+  box-shadow: inset 0 3px 6px rgba(0,0,0,1), inset 0 0 0 1px rgba(255,255,255,0.03), 0 1px 0 rgba(255,255,255,0.05);
+  transform: translateY(1.5px);
+}
+.cab-power-led {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--cab-led);
+  box-shadow: 0 0 4px var(--cab-led);
+  transition: all 1.5s ease;
+  animation: led-breathe 4s ease-in-out infinite;
+}
+
+@keyframes led-breathe {
+  0%, 100% { opacity: 0.4; box-shadow: 0 0 2px var(--cab-led); }
+  50% { opacity: 1; box-shadow: 0 0 8px var(--cab-led); }
+}
+
+/* Discoverable Interaction: LED reacts to Theme (Using CSS variables above) */
+
+/* Discoverable Interaction: Engineered Tooltips */
+[data-tooltip] {
+  position: relative;
+}
+[data-tooltip]::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(5px);
+  background: #111;
+  color: #888;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border: 1px solid rgba(255,255,255,0.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+[data-tooltip]:hover::before {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.cab-ventilation {
+  position: absolute;
+  top: 22px;
+  left: 64px;
+  display: flex;
+  gap: 4px;
+}
+.cab-vent-hole {
+  width: 4px;
+  height: 16px;
+  background: #000;
+  border-radius: 2px;
+  box-shadow: inset 0 2px 2px rgba(0,0,0,1), 0 1px 0 rgba(255,255,255,0.05);
+}
+
+/* TINY OLED STATUS DISPLAY */
+.cab-oled-display {
+  position: absolute;
+  top: 18px;
+  left: 92px;
+  width: 74px;
+  height: 24px;
+  background: #000;
+  border-radius: 2px;
+  border: 1px solid rgba(255,255,255,0.05);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,1), 0 1px 0 rgba(255,255,255,0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 6px;
+  gap: 2px;
+}
+.cab-oled-display::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+.oled-status, .oled-theme {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.35rem;
+  letter-spacing: 0.05em;
+  color: #a5f3fc; /* Cyan phosphor */
+  text-shadow: 0 0 2px rgba(165,243,252,0.6);
+  line-height: 1;
+}
+
+/* Screws */
+.cab-screw {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #111;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,1), 0 1px 0 rgba(255,255,255,0.1);
+}
+.cab-screw::after {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+  border: 1px solid rgba(0,0,0,0.8);
+  transform: rotate(45deg);
+}
+
+/* ==========================================================================
+   SCREEN & BEZEL
+   ========================================================================== */
+.cabinet-screen-bezel {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-radius: inherit;
+}
+
+.cabinet-chassis.is-scaled .cabinet-screen-bezel {
+  width: 80%;
+  height: 65%;
+  margin-top: 50px;
+  border-radius: 16px;
+  background-color: #050505;
+  box-shadow: inset 0 0 0 1px #222, inset 0 2px 8px rgba(0,0,0,0.9), 0 20px 40px rgba(0,0,0,0.8);
+}
+
+/* Smoked Glass Thickness & Bloom */
+.cab-glass-thickness {
+  position: absolute;
+  inset: 4px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.04);
+  border-top: 1px solid rgba(255,255,255,0.15); /* Beveled glass top edge catch-light */
+  box-shadow: inset 0 1px 3px rgba(255,255,255,0.08), inset 0 0 20px rgba(0,0,0,0.8);
+
+  pointer-events: none;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.cabinet-chassis.is-scaled .cab-glass-thickness { opacity: 1; }
+
+.cabinet-screen {
+  width: 100%;
+  height: 100%;
+  background: #000;
+  position: relative;
+  overflow: hidden;
+}
+
+.cabinet-chassis.is-scaled .cabinet-screen {
+  width: calc(100% - 32px);
+  height: calc(100% - 32px);
+  border-radius: 8px;
+}
+
+/* Physical Screen Characteristics */
+.cab-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, transparent 60%, rgba(0,0,0,0.85) 100%);
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.9);
+  pointer-events: none;
+  z-index: 5;
+}
+/* Removed fake exaggerated CRT scanlines, screen is now premium laminated glass */
+.cab-scanlines {
+  display: none;
+}
+
+/* Physical Glass Reflection mapped to mouse */
+.cab-glass-reflection {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 20;
+  background: linear-gradient(105deg, 
+    rgba(255,255,255,0) 0%, 
+    rgba(255,255,255,0.02) 40%, 
+    rgba(255,255,255,0.08) 50%, 
+    rgba(255,255,255,0) 60%);
+  opacity: 0;
+  transform: translateX(-10%);
+  will-change: transform, opacity;
+}
+
+/* ==========================================================================
+   CONTROL DECK
+   ========================================================================== */
+.cab-control-deck {
+  width: 80%;
+  height: 15%;
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.cabinet-chassis.is-scaled .cab-control-deck { opacity: 1; }
+
+.cab-deck-left, .cab-deck-right {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+/* Precision Joystick */
+.cab-joystick {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cab-joy-base {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #111;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.9), 0 1px 0 rgba(255,255,255,0.1);
+  border: 1px solid #222;
+}
+.cab-joy-stick {
+  position: absolute;
+  width: 8px;
+  height: 24px;
+  background: linear-gradient(90deg, #333 0%, #666 50%, #333 100%);
+  border-radius: 4px;
+  box-shadow: inset 0 0 4px rgba(0,0,0,0.5);
+}
+.cab-joy-ball {
+  position: relative;
+  z-index: 2;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #444 0%, #111 80%);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.8), inset -2px -2px 4px rgba(0,0,0,0.5);
+  will-change: transform;
+}
+.cab-joy-specular {
+  position: absolute;
+  top: 4px; left: 4px;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  filter: blur(1px);
+}
+
+/* Convex Buttons with Hover Interaction */
+.cab-btn {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #1a1a1a;
+  box-shadow: 
+    0 3px 5px rgba(0,0,0,0.8),
+    inset 0 1px 1px rgba(255,255,255,0.15),
+    inset 0 -1px 0 rgba(0,0,0,0.5);
+  border: 1px solid #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: transform 0.1s cubic-bezier(0.17, 0.84, 0.44, 1), box-shadow 0.1s cubic-bezier(0.17, 0.84, 0.44, 1);
+}
+.cab-btn:active {
+  transform: translateY(3px) scale(0.96); /* Heavy mechanical spring */
+  box-shadow: 
+    0 0 1px rgba(0,0,0,0.8),
+    inset 0 4px 8px rgba(0,0,0,0.9);
+}
+.cab-btn-inner {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 100%, #222 0%, #111 80%);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.05);
+  transition: background 0.2s ease;
+}
+.cab-btn:hover .cab-btn-inner {
+  background: radial-gradient(circle at 50% 100%, #333 0%, #111 80%);
+}
+.cab-btn-specular {
+  position: absolute;
+  top: 6px; left: 50%;
+  transform: translateX(-50%);
+  width: 12px; height: 3px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  filter: blur(1px);
+  will-change: transform, opacity;
+}
+
+/* ==========================================================================
+   COIN SLOT & SERIAL
+   ========================================================================== */
+.cab-bottom-details {
+  width: 80%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: auto;
+  margin-bottom: 32px;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.cabinet-chassis.is-scaled .cab-bottom-details { opacity: 1; }
+
+.cab-coin-door {
+  width: 60px;
+  height: 80px;
+  background: #111;
+  border-radius: 4px;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.9), 0 1px 0 rgba(255,255,255,0.1);
+  border: 1px solid #222;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 12px;
+  gap: 16px;
+}
+.cab-coin-slot {
+  width: 6px;
+  height: 24px;
+  background: #000;
+  border-radius: 3px;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,1), 0 1px 0 rgba(255,255,255,0.1);
+}
+.cab-coin-return {
+  width: 24px;
+  height: 16px;
+  background: #0a0a0a;
+  border-radius: 2px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,1);
+}
+
+.cab-serial {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.4rem;
+  color: rgba(255,255,255,0.2);
+  letter-spacing: 0.1em;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: right;
+  mix-blend-mode: overlay;
+}
+
+/* SERVICE HATCH & QR */
+.cab-service-hatch {
+  width: 48px;
+  height: 32px;
+  border: 1px solid rgba(0,0,0,0.8);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cab-qr-code {
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  opacity: 0.1;
+  background-image: repeating-linear-gradient(45deg, #000 0, #000 2px, transparent 2px, transparent 4px), repeating-linear-gradient(-45deg, #000 0, #000 2px, transparent 2px, transparent 4px);
+  mix-blend-mode: overlay;
+}
+
+/* ==========================================================================
+   BASE & RUBBER FEET
+   ========================================================================== */
+.cabinet-base {
+  display: none;
+}
+.cabinet-chassis.is-scaled .cabinet-base {
+  display: flex;
+  justify-content: space-between;
+  position: absolute;
+  bottom: -20px;
+  width: 80%;
+  height: 20px;
+  background: transparent;
+}
+.cab-rubber-foot {
+  width: 60px;
+  height: 100%;
+  background: #0a0a0a;
+  border-radius: 0 0 8px 8px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 10px 20px rgba(0,0,0,0.9);
+}

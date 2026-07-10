@@ -7,7 +7,18 @@
     <meta name="robots" content="noindex">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
-  </head>
+  
+  <script>
+    (function() {
+      try {
+        var localTheme = localStorage.getItem('premium-theme');
+        var sysTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark-graphite' : 'light-apple';
+        var activeTheme = localTheme || sysTheme;
+        document.documentElement.setAttribute('data-theme', activeTheme);
+      } catch (e) {}
+    })();
+  </script>
+</head>
   <body>
     <main class="section hero" style="min-height:100svh">
       <div class="aurora" aria-hidden="true"></div>
@@ -23,5 +34,9 @@
         </div>
       </div>
     </main>
-  </body>
+  
+  <div class="cursor-dot" data-cursor-dot></div>
+  <div class="cursor-ring" data-cursor-ring></div>
+  <script type="module" src="js/main.js"></script>
+</body>
 </html>

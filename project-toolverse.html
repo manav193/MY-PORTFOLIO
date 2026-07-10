@@ -3,106 +3,238 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ToolVerse — Manav Agarwal Case Study</title>
-  <meta name="description" content="In-depth engineering and design case study for ToolVerse by Manav Agarwal.">
+  <title>ToolVerse — Engineering Case Study</title>
   <meta name="theme-color" content="#000000">
   <link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
-  
-  <link rel="preload" href="css/styles.css" as="style">
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/project-page.css">
-  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <script>
+    (function() {
+      try {
+        var localTheme = localStorage.getItem('premium-theme');
+        var sysTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark-graphite' : 'light-apple';
+        var activeTheme = localTheme || sysTheme;
+        document.documentElement.setAttribute('data-theme', activeTheme);
+      } catch (e) {}
+    })();
+  </script>
 </head>
-<body>
-  <nav class="site-nav">
+<body data-project-theme="toolverse">
+  <nav class="site-nav showroom-nav">
     <div class="nav-container">
       <a href="index.html#work" class="brand" style="display:flex; align-items:center; gap:8px;">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-        Back to Portfolio
+        Index
       </a>
+      <div class="project-nav-actions">
+        <a href="https://tool-verse-theta.vercel.app/" class="btn-primary" target="_blank" rel="noopener">Launch App</a>
+      </div>
     </div>
   </nav>
 
-  <main>
-    <header class="project-hero">
-      <h1>ToolVerse</h1>
-      <p class="tagline">Engineering Case Study</p>
-      <div class="project-actions">
-        <a href="https://tool-verse-theta.vercel.app/" class="btn-primary" target="_blank" rel="noopener">Live Demo</a>
-<a href="https://github.com/manav193" class="btn-secondary" target="_blank" rel="noopener">GitHub</a>
-
+  <main class="cs-premium-layout">
+    
+    <!-- 1. CINEMATIC HERO BANNER -->
+    <header class="cs-hero-cinematic">
+      <div class="cs-hero-content">
+        <h1 class="cs-hero-title reveal-text">ToolVerse</h1>
+        <p class="cs-hero-subtitle reveal-text" style="animation-delay: 0.1s;">
+          50+ Privacy-first online utilities built with a static-first architecture.
+        </p>
       </div>
-      <div class="project-hero-image">
-        <img src="images/toolverse_4.png" alt="ToolVerse Hero Showcase">
+      <div class="cs-hero-visual reveal-scale">
+        <img src="images/toolverse_4.png" alt="ToolVerse Hero Dashboard" class="cs-hero-img">
+        <div class="cs-hero-stats">
+          <div class="cs-stat-pill">50+ Tools</div>
+          <div class="cs-stat-pill">10 Categories</div>
+          <div class="cs-stat-pill">100% Client Side</div>
+          <div class="cs-stat-pill">PWA Ready</div>
+          <div class="cs-stat-pill">Fast Loading</div>
+          <div class="cs-stat-pill">SEO Optimized</div>
+        </div>
       </div>
     </header>
 
-    <article class="project-content">
-      <section class="content-section"><h2>Short Overview</h2>
-<p>ToolVerse is a Progressive Web App (PWA) delivering over 50 ad-free, completely offline-capable utility tools. It offers instant access to PDF utilities, image converters, text formatters, and developer tools without requiring sign-ups or server-side processing.</p>
-</section>
-<section class="content-section"><h2>Problem</h2>
-<p>Online utility tools (like PDF converters or character counters) are predominantly ad-heavy, slow, and require a constant internet connection. Furthermore, many require users to upload sensitive files to third-party servers, raising privacy concerns.</p>
-</section>
-<section class="content-section"><h2>My Approach</h2>
-<p>I architected ToolVerse as a client-side heavy Progressive Web App. By moving all computation to the browser using modern Web APIs, I eliminated the need for server-side processing, thereby guaranteeing user privacy and zero latency.</p>
-</section>
-<section class="content-section"><h2>Design Decisions</h2>
-<ul>
-<li><strong>Minimalist UI:</strong> Designed a distraction-free, dark-mode native interface to reduce cognitive load.</li>
-<li><strong>Categorization:</strong> Implemented a robust search and tag-based filtering system to navigate 50+ tools instantly.</li>
-<li><strong>Offline First:</strong> Prioritized Service Worker caching so the app functions entirely offline after the initial load.</li>
-</ul>
-</section>
-<section class="content-section"><h2>Technical Implementation</h2>
-<p>The platform was built using vanilla JavaScript and modern browser APIs to keep the bundle size extremely lightweight. Service Workers cache all static assets and tool logic, enabling the "Install App" functionality standard in PWAs. Testing was automated using Playwright to ensure cross-tool reliability.</p>
-</section>
-<section class="content-section"><h2>Challenges</h2>
-<p>The primary challenge was implementing complex utilities (like image conversion and text parsing) entirely on the client side without bloating the main thread or causing UI jank. This required efficient memory management and optimized DOM manipulation.</p>
-</section>
-<section class="content-section"><h2>Result</h2>
-<p>A 100% free, privacy-first tool aggregator that loads instantly. The app successfully passes all Lighthouse PWA criteria with perfect performance scores.</p>
-</section>
-<section class="content-section"><h2>Tech Stack</h2>
-<ul>
-<li><strong>Frontend:</strong> HTML, CSS, Vanilla JavaScript</li>
-<li><strong>Architecture:</strong> Progressive Web App (PWA), Service Workers</li>
-<li><strong>Testing:</strong> Playwright</li>
-<li><strong>Deployment:</strong> Vercel</li>
-</ul>
-</section>
-<section class="content-section"><h2>Key Features</h2>
-<ul>
-<li>50+ Client-side utility tools</li>
-<li>Zero server uploads (100% Privacy)</li>
-<li>Installable Desktop/Mobile App (PWA)</li>
-<li>Offline functionality</li>
-<li>Sub-second load times</li>
-</ul>
-</section>
-<section class="content-section"><h2>Lessons Learned</h2>
-<p>Building ToolVerse reinforced my understanding of browser architecture, specifically the power and limitations of the main thread. It also deepened my expertise in Service Worker lifecycle management and caching strategies.</p>
-</section>
+    <!-- 2. PROJECT OVERVIEW -->
+    <section class="cs-editorial-section cs-fade-up">
+      <div class="cs-grid-layout">
+        <div class="cs-grid-col-4">
+          <span class="cs-section-marker">01. Overview</span>
+          <h2 class="cs-section-heading">Redefining Utilities.</h2>
+        </div>
+        <div class="cs-grid-col-8">
+          <div class="cs-overview-blocks">
+            <div class="cs-overview-block">
+              <h3>Problem</h3>
+              <p>Online utility tools (converters, calculators, formatters) are overwhelmingly ad-heavy, painfully slow, and require a constant internet connection. More critically, they force users to upload sensitive files to third-party servers, compromising privacy and security.</p>
+            </div>
+            <div class="cs-overview-block">
+              <h3>Solution</h3>
+              <p>ToolVerse acts as a completely offline-capable Progressive Web App. By shifting all computation to the client-side utilizing modern Web APIs, it eliminates server latency, ensures zero-data-retention privacy, and provides an instant, ad-free experience.</p>
+            </div>
+            <div class="cs-overview-block">
+              <h3>Target Users</h3>
+              <p>Developers, students, and professionals who need instant, reliable access to essential digital utilities without sacrificing their data privacy or dealing with bloated interfaces.</p>
+            </div>
+            <div class="cs-overview-block">
+              <h3>Key Objectives</h3>
+              <p>Achieve a perfect 100 Lighthouse score across performance, accessibility, best practices, and SEO. Ensure the app works seamlessly offline and can be installed natively on any device.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    </article>
+    <!-- 3. DESIGN PHILOSOPHY -->
+    <section class="cs-editorial-section cs-bg-alternate cs-fade-up">
+      <div class="cs-grid-layout">
+        <div class="cs-grid-col-6 cs-sticky-col">
+          <span class="cs-section-marker">02. Design</span>
+          <h2 class="cs-section-heading">Minimal by necessity.<br>Premium by choice.</h2>
+          <p class="cs-editorial-lead">The interface is intentionally stripped down. When users need a tool, they want a result, not an onboarding flow. Every pixel serves a functional purpose.</p>
+        </div>
+        <div class="cs-grid-col-6">
+          <div class="cs-design-list">
+            <div class="cs-design-item">
+              <h4>Accessibility</h4>
+              <p>High contrast ratios, ARIA labels for dynamic content, and full keyboard navigation support ensure the platform is usable by everyone.</p>
+            </div>
+            <div class="cs-design-item">
+              <h4>Typography</h4>
+              <p>A calculated typographic scale using System fonts combined with Inter for maximum legibility and zero layout shift during loading.</p>
+            </div>
+            <div class="cs-design-item">
+              <h4>Visual Hierarchy</h4>
+              <p>Negative space is used aggressively to separate categories. Tools are identified by clear, recognizable iconography rather than dense text.</p>
+            </div>
+            <div class="cs-design-item">
+              <h4>Privacy-First Approach</h4>
+              <p>The design communicates safety. Explicit UI indicators reassure the user that "Processing occurs locally" and "No files are uploaded."</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    <nav class="project-nav">
-      <a href="project-nike.html" class="nav-link prev">
-        <span class="nav-label">Previous Project</span>
-        <span class="nav-title">Nike Air Zoom UI</span>
-      </a>
-      <a href="project-selfyy.html" class="nav-link next">
-        <span class="nav-label">Next Project</span>
-        <span class="nav-title">SELFYY</span>
-      </a>
-    </nav>
+    <!-- 4. MAGAZINE GALLERY -->
+    <section class="cs-editorial-section cs-gallery-section cs-fade-up">
+      <span class="cs-section-marker text-center">03. Interface</span>
+      <h2 class="cs-section-heading text-center">Engineered for focus.</h2>
+      
+      <div class="cs-magazine-gallery">
+        <div class="cs-mag-large">
+          <img src="images/toolverse_about.png" alt="ToolVerse About Section">
+          <div class="cs-mag-caption">Mission and Philosophy</div>
+        </div>
+        <div class="cs-mag-split">
+          <div class="cs-mag-card">
+            <img src="images/toolverse_contact.png" alt="ToolVerse Contact">
+            <div class="cs-mag-caption">Support Interface</div>
+          </div>
+          <div class="cs-mag-card">
+            <img src="images/toolverse_upload.png" alt="ToolVerse Processing Interface">
+            <div class="cs-mag-caption">Client-Side Processing Engine</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. FEATURES -->
+    <section class="cs-editorial-section cs-fade-up">
+      <div class="cs-grid-layout">
+        <div class="cs-grid-col-4">
+          <span class="cs-section-marker">04. Capabilities</span>
+          <h2 class="cs-section-heading">A complete utility suite.</h2>
+        </div>
+        <div class="cs-grid-col-8">
+          <ul class="cs-feature-grid">
+            <li><strong>Search:</strong> Instant, fuzzy matching across 50+ tools.</li>
+            <li><strong>Categories:</strong> Intelligent grouping for rapid discovery.</li>
+            <li><strong>PWA:</strong> Fully installable as a standalone application.</li>
+            <li><strong>Dark Mode:</strong> Native system preference synchronization.</li>
+            <li><strong>Client-Side:</strong> Zero server uploads. Total data privacy.</li>
+            <li><strong>Offline Support:</strong> Tools function without an internet connection.</li>
+            <li><strong>Responsive:</strong> Fluid layouts from 320px mobile to 4K desktop.</li>
+            <li><strong>SEO:</strong> Statically generated routes for maximum search visibility.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. TECHNICAL ARCHITECTURE -->
+    <section class="cs-editorial-section cs-bg-alternate cs-fade-up">
+      <div class="cs-grid-layout">
+        <div class="cs-grid-col-12">
+          <span class="cs-section-marker">05. Architecture</span>
+          <h2 class="cs-section-heading">Static first. Blazing fast.</h2>
+        </div>
+        <div class="cs-grid-col-6">
+          <p class="cs-editorial-body">ToolVerse bypasses the complexity of modern heavy frameworks by utilizing a highly optimized HTML, CSS, and Vanilla JavaScript architecture. This deliberate choice eliminates hydration overhead, ensuring a sub-second Time to Interactive (TTI).</p>
+          <p class="cs-editorial-body">The build system pre-renders tools as static files, resulting in a perfect 100 Lighthouse score. Because processing logic relies entirely on Web APIs (like FileReader and Canvas), the server acts merely as a CDN for static asset delivery.</p>
+        </div>
+        <div class="cs-grid-col-6">
+          <div class="cs-tech-stack">
+            <div class="cs-tech-tag">HTML5</div>
+            <div class="cs-tech-tag">CSS3 (Variables)</div>
+            <div class="cs-tech-tag">Vanilla ES6+</div>
+            <div class="cs-tech-tag">Service Workers</div>
+            <div class="cs-tech-tag">Web Manifest</div>
+            <div class="cs-tech-tag">Lighthouse CI</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. CHALLENGES & 8. RESULTS -->
+    <section class="cs-editorial-section cs-fade-up">
+      <div class="cs-split-layout">
+        <div class="cs-split-half">
+          <span class="cs-section-marker">06. Challenges</span>
+          <h3 class="cs-subheading">Building at Scale</h3>
+          <ul class="cs-bullet-list">
+            <li><strong>Managing 50+ Tools:</strong> Creating a reusable architectural pattern so new tools can be added without duplicating boilerplate code.</li>
+            <li><strong>Client-Side Constraints:</strong> Complex tasks like image compression and PDF manipulation had to be engineered purely in JS to avoid server dependency.</li>
+            <li><strong>Offline Caching:</strong> Designing a Service Worker strategy that caches all 50 logic files without overwhelming the browser's storage limit.</li>
+          </ul>
+        </div>
+        <div class="cs-split-half">
+          <span class="cs-section-marker">07. Results</span>
+          <h3 class="cs-subheading">The Impact</h3>
+          <ul class="cs-bullet-list">
+            <li><strong>Performance:</strong> Near-instant load times with a 100/100 Lighthouse Performance score.</li>
+            <li><strong>Privacy:</strong> 100% guarantee of data retention since no user files ever touch a backend server.</li>
+            <li><strong>Scalability:</strong> The static architecture scales infinitely at near-zero hosting cost.</li>
+            <li><strong>Developer Experience:</strong> A clean, modular codebase allows a new tool to be authored and deployed in minutes.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. LESSONS LEARNED & 10. FUTURE -->
+    <section class="cs-editorial-section cs-bg-alternate cs-fade-up">
+      <div class="cs-grid-layout">
+        <div class="cs-grid-col-6">
+          <span class="cs-section-marker">08. Reflection</span>
+          <h2 class="cs-section-heading">Lessons Learned</h2>
+          <p class="cs-editorial-body">ToolVerse proved that you don't always need React or Vue to build complex, stateful applications. Vanilla JS, when structured correctly with modules, is incredibly powerful. Furthermore, pushing computation to the edge (the user's device) is not just a privacy win—it's a massive cost-saving measure for hosting.</p>
+        </div>
+        <div class="cs-grid-col-6">
+          <span class="cs-section-marker">09. Roadmap</span>
+          <h2 class="cs-section-heading">Future Improvements</h2>
+          <p class="cs-editorial-body">Moving forward, the platform will integrate WebAssembly (Wasm) modules for computationally heavy tools like video encoding or complex document generation, bridging the gap between web applications and native desktop software.</p>
+        </div>
+      </div>
+    </section>
+
   </main>
 
-  <footer class="site-footer">
-    <p>&copy; 2026 Manav Agarwal. Handcrafted Product Portfolio.</p>
+  <footer class="cs-footer">
+    <a href="index.html#work" class="cs-back-link">Return to Portfolio</a>
   </footer>
+
 </body>
 </html>

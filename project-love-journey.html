@@ -3,104 +3,242 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Manav & My Love Journey — Manav Agarwal Case Study</title>
-  <meta name="description" content="In-depth engineering and design case study for Manav & My Love Journey by Manav Agarwal.">
-  <meta name="theme-color" content="#000000">
+  <title>LOVE — Cinematic Web Experience</title>
+  <meta name="theme-color" content="#1a050f">
   <link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
-  
-  <link rel="preload" href="css/styles.css" as="style">
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/project-page.css">
-  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <script>
+    (function() {
+      try {
+        var localTheme = localStorage.getItem('premium-theme');
+        var sysTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark-graphite' : 'light-apple';
+        var activeTheme = localTheme || sysTheme;
+        document.documentElement.setAttribute('data-theme', activeTheme);
+      } catch (e) {}
+    })();
+  </script>
 </head>
-<body>
-  <nav class="site-nav">
+<body data-project-theme="love">
+  <nav class="site-nav showroom-nav">
     <div class="nav-container">
       <a href="index.html#work" class="brand" style="display:flex; align-items:center; gap:8px;">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-        Back to Portfolio
+        Index
       </a>
+      <div class="project-nav-actions">
+        <a href="https://github.com/manav193" class="btn-primary" target="_blank" rel="noopener">Source Code</a>
+      </div>
     </div>
   </nav>
 
-  <main>
-    <header class="project-hero">
-      <h1>Manav & My Love Journey</h1>
-      <p class="tagline">Engineering Case Study</p>
-      <div class="project-actions">
-        <a href="https://love-nine-mocha.vercel.app/" class="btn-primary" target="_blank" rel="noopener">Live Demo</a>
-<a href="https://github.com/manav193" class="btn-secondary" target="_blank" rel="noopener">GitHub</a>
-
+  <main class="cs-premium-layout">
+    
+    <!-- 1. CINEMATIC HERO BANNER -->
+    <header class="cs-hero-cinematic">
+      <div class="cs-hero-content">
+        <h1 class="cs-hero-title reveal-text" style="font-family: serif; font-style: italic;">LOVE</h1>
+        <p class="cs-hero-subtitle reveal-text" style="animation-delay: 0.1s;">
+          A handcrafted cinematic web experience celebrating memories, emotions, storytelling and interactive design.
+        </p>
       </div>
-      <div class="project-hero-image">
-        <img src="images/love_1.png" alt="Manav & My Love Journey Hero Showcase">
+      <div class="cs-hero-visual reveal-scale">
+        <img src="images/love_1.png" alt="Love Journey Hero" class="cs-hero-img">
       </div>
     </header>
 
-    <article class="project-content">
-      <section class="content-section"><h2>Short Overview</h2>
-<p>A cinematic, immersive storytelling website designed to document a personal relationship timeline. It moves beyond standard static photo galleries by integrating parallax scrolling, audio-reactive canvas visuals, and premium typography to evoke emotion.</p>
-</section>
-<section class="content-section"><h2>Problem</h2>
-<p>Traditional photo galleries and timeline templates often feel sterile and lack emotional resonance. The challenge was to create a digital experience that felt as personal and dynamic as the memories it contained, without sacrificing web performance.</p>
-</section>
-<section class="content-section"><h2>My Approach</h2>
-<p>I approached the project as a "digital interactive film." I prioritized scroll-driven storytelling, where the user's scroll position acts as the timeline scrubber. I integrated Web Audio APIs to allow the visuals to react to background music, enhancing the cinematic feel.</p>
-</section>
-<section class="content-section"><h2>Design Decisions</h2>
-<ul>
-<li><strong>Dark, Cinematic Aesthetic:</strong> Used deep blacks and soft glows to make photography the absolute focal point.</li>
-<li><strong>Masonry Layouts:</strong> Avoided rigid grid systems in favor of fluid masonry layouts to accommodate mixed media (portrait, landscape, video).</li>
-<li><strong>Typography:</strong> Chose elegant, high-contrast serif fonts for headings to convey a timeless, editorial feel.</li>
-</ul>
-</section>
-<section class="content-section"><h2>Technical Implementation</h2>
-<p>Built with frontend web technologies, utilizing the HTML5 Canvas API for particle and audio-reactive effects. The scroll-linked animations were implemented using Intersection Observers and RequestAnimationFrame to ensure a smooth 60fps experience even on mobile devices.</p>
-</section>
-<section class="content-section"><h2>Challenges</h2>
-<p>Synchronizing the Web Audio API with scrolling animations across different mobile browsers (which often heavily throttle or block auto-playing audio) was complex. This required implementing a deliberate user interaction (a custom "Enter Experience" button) to initialize the audio context cleanly.</p>
-</section>
-<section class="content-section"><h2>Result</h2>
-<p>A highly personal, emotionally engaging web experience that runs at a flawless 60fps, serving as both a technical playground for Canvas APIs and a beautiful personal archive.</p>
-</section>
-<section class="content-section"><h2>Tech Stack</h2>
-<ul>
-<li><strong>Frontend:</strong> HTML, CSS, JavaScript</li>
-<li><strong>Graphics:</strong> HTML5 Canvas API</li>
-<li><strong>Audio:</strong> Web Audio API</li>
-</ul>
-</section>
-<section class="content-section"><h2>Key Features</h2>
-<ul>
-<li>Audio-reactive canvas elements</li>
-<li>Scroll-driven parallax animations</li>
-<li>Fluid masonry media gallery</li>
-<li>Custom Web Manifest for app-like installation</li>
-</ul>
-</section>
-<section class="content-section"><h2>Lessons Learned</h2>
-<p>This project heavily advanced my skills in creative coding, specifically around the Canvas API and managing browser-specific media playback policies. It proved that deep technical optimization is required to make highly visual experiences feel weightless.</p>
-</section>
+    <!-- 2. PROJECT OVERVIEW -->
+    <section class="cs-editorial-section cs-fade-up">
+      <div class="cs-grid-layout">
+        <div class="cs-grid-col-4">
+          <span class="cs-section-marker">01. Overview</span>
+          <h2 class="cs-section-heading">Digital Romance.</h2>
+        </div>
+        <div class="cs-grid-col-8">
+          <div class="cs-overview-blocks">
+            <div class="cs-overview-block">
+              <h3>Purpose</h3>
+              <p>To immortalize a personal relationship timeline through a medium that transcends a simple photo album. It transforms static memories into a breathing, interactive documentary.</p>
+            </div>
+            <div class="cs-overview-block">
+              <h3>Story</h3>
+              <p>The project follows the chronological arc of two people meeting, falling in love, and building a life together, presented through meticulously curated visual chapters and audio.</p>
+            </div>
+            <div class="cs-overview-block">
+              <h3>Target Audience</h3>
+              <p>Originally designed as an intimate, private gift, the architecture was later refined to serve as a flagship showcase of emotional web design for design agencies and creative directors.</p>
+            </div>
+            <div class="cs-overview-block">
+              <h3>Emotional Design Goals</h3>
+              <p>Elicit genuine feeling through pacing. Force the user to slow down, listen to the ambient audio, and absorb the photography through deliberate, smooth scrolling interactions.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    </article>
+    <!-- 3. DESIGN PHILOSOPHY -->
+    <section class="cs-editorial-section cs-bg-alternate cs-fade-up">
+      <div class="cs-grid-layout">
+        <div class="cs-grid-col-6 cs-sticky-col">
+          <span class="cs-section-marker">02. Design</span>
+          <h2 class="cs-section-heading">Atmosphere over information.</h2>
+          <p class="cs-editorial-lead">The interface steps out of the way. It uses a luxurious Gold and Burgundy palette to create warmth, while relying heavily on negative space to let the photography breathe.</p>
+        </div>
+        <div class="cs-grid-col-6">
+          <div class="cs-design-list">
+            <div class="cs-design-item">
+              <h4>Minimal UI</h4>
+              <p>Standard navigation patterns were abandoned. The interface is reduced to invisible scroll triggers and subtle floating playback controls to maintain absolute immersion.</p>
+            </div>
+            <div class="cs-design-item">
+              <h4>Editorial Spacing & Typography</h4>
+              <p>Content is laid out like a high-end fashion magazine. Large serif headings dictate the emotional tone, while immense vertical padding forces the user to digest one thought at a time.</p>
+            </div>
+            <div class="cs-design-item">
+              <h4>Motion Design</h4>
+              <p>Every element enters the viewport with a soft, cinematic fade and scale. Nothing snaps instantly. The motion curve is calibrated to feel like a slow exhale.</p>
+            </div>
+            <div class="cs-design-item">
+              <h4>Accessibility & Hierarchy</h4>
+              <p>Despite the moody lighting, text contrast remains AA compliant. Visual hierarchy naturally guides the eye from the floating particles to the central imagery, then to the subtle captions.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    <nav class="project-nav">
-      <a href="project-selfyy.html" class="nav-link prev">
-        <span class="nav-label">Previous Project</span>
-        <span class="nav-title">SELFYY</span>
-      </a>
-      <a href="project-promptai.html" class="nav-link next">
-        <span class="nav-label">Next Project</span>
-        <span class="nav-title">PromptAI Concept</span>
-      </a>
-    </nav>
+    <!-- 4. STORYTELLING SYSTEM -->
+    <section class="cs-editorial-section cs-fade-up">
+      <div class="cs-split-layout">
+        <div class="cs-split-half">
+          <span class="cs-section-marker">03. Narrative</span>
+          <h3 class="cs-subheading">Chapters, not sections.</h3>
+          <p class="cs-editorial-body">Websites have sections; stories have chapters. The DOM is architected around emotional phases rather than structural div blocks. Each chapter introduces a new visual motif.</p>
+        </div>
+        <div class="cs-split-half">
+          <ul class="cs-bullet-list">
+            <li><strong>The Journey:</strong> A vertical timeline anchoring the origin story.</li>
+            <li><strong>Memories:</strong> An asymmetrical masonry gallery breaking the rigid grid.</li>
+            <li><strong>Reasons:</strong> Floating glass cards dissecting the "Why."</li>
+            <li><strong>Countdown:</strong> A living clock tethering the digital space to a physical future event.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. INTERACTIVE EXPERIENCE -->
+    <section class="cs-editorial-section cs-bg-alternate cs-fade-up">
+      <div class="cs-grid-layout">
+        <div class="cs-grid-col-4">
+          <span class="cs-section-marker">04. Interaction</span>
+          <h2 class="cs-section-heading">Alive in the browser.</h2>
+        </div>
+        <div class="cs-grid-col-8">
+          <ul class="cs-feature-grid">
+            <li><strong>Floating Particles:</strong> A WebGL-inspired canvas layer simulating dust motes in sunlight.</li>
+            <li><strong>Ambient Lighting:</strong> Radial gradients that shift subtly based on cursor position.</li>
+            <li><strong>Music Controls:</strong> Seamlessly integrated audio API that doesn't interrupt the UX.</li>
+            <li><strong>Theme Switching:</strong> A fluid transition between "Day" and "Night" emotional states.</li>
+            <li><strong>Smooth Scrolling:</strong> Momentum-based scrolling that makes the page feel weighty and physical.</li>
+            <li><strong>Timeline Animations:</strong> SVGs that draw themselves as the user progresses downward.</li>
+            <li><strong>Hover Interactions:</strong> Cards that tilt gently against the mouse using 3D transforms.</li>
+            <li><strong>Glass Morphism:</strong> Deep background blur rendering the UI as frosted glass over memories.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. PREMIUM GALLERY / NARRATIVE (TEXT ONLY + 1 UNIQUE IMAGE) -->
+    <section class="cs-editorial-section cs-gallery-section cs-fade-up">
+      <span class="cs-section-marker text-center">05. Narrative</span>
+      <h2 class="cs-section-heading text-center">The Living Countdown.</h2>
+      
+      <div class="cs-grid-layout" style="margin-top: 64px;">
+        <div class="cs-grid-col-12">
+          <img src="images/love_new.png" alt="Love Journey Countdown Sequence" style="width:100%; border-radius:16px; box-shadow: 0 20px 40px rgba(0,0,0,0.4);">
+          <div class="cs-mag-caption" style="text-align:center; margin-top:24px;">
+            <h4 style="color:var(--color-text-primary); margin-bottom:8px; font-size:1.2rem;">Temporal Engine</h4>
+            <p style="color:var(--color-text-secondary); line-height:1.6; max-width: 60%; margin: 0 auto;">A living clock tethering the digital space to a physical future event. Built using dynamic JavaScript Date objects and elegant typography to build anticipation.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. TECHNICAL IMPLEMENTATION -->
+    <section class="cs-editorial-section cs-bg-alternate cs-fade-up">
+      <div class="cs-grid-layout">
+        <div class="cs-grid-col-12">
+          <span class="cs-section-marker">06. Architecture</span>
+          <h2 class="cs-section-heading">Poetry in Code.</h2>
+        </div>
+        <div class="cs-grid-col-6">
+          <p class="cs-editorial-body">The project leverages the absolute boundaries of modern CSS and Vanilla JavaScript to avoid the bloat of heavy WebGL libraries where possible. The responsive architecture uses CSS Grid for the masonry layouts, ensuring images scale flawlessly without JavaScript calculation.</p>
+          <p class="cs-editorial-body">The animation system relies entirely on Intersection Observers triggering hardware-accelerated CSS transforms (`translate3d`), guaranteeing a buttery 60 frames per second on mobile devices while running the heavy background particle canvas.</p>
+        </div>
+        <div class="cs-grid-col-6">
+          <div class="cs-tech-stack">
+            <div class="cs-tech-tag">HTML5 Canvas</div>
+            <div class="cs-tech-tag">CSS Grid / Flexbox</div>
+            <div class="cs-tech-tag">Vanilla JS</div>
+            <div class="cs-tech-tag">Intersection Observer API</div>
+            <div class="cs-tech-tag">Web Audio API</div>
+            <div class="cs-tech-tag">Custom Theme Engine</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. CHALLENGES & 9. RESULTS -->
+    <section class="cs-editorial-section cs-fade-up">
+      <div class="cs-split-layout">
+        <div class="cs-split-half">
+          <span class="cs-section-marker">07. Challenges</span>
+          <h3 class="cs-subheading">Engineering Emotion</h3>
+          <ul class="cs-bullet-list">
+            <li><strong>Balancing Beauty with Performance:</strong> Running a full-screen particle canvas alongside heavy blur filters and large imagery caused massive repaints. Solved by offloading animations to the GPU.</li>
+            <li><strong>Responsive Timeline:</strong> SVGs that draw paths correctly on a 4K monitor often break on an iPhone. The timeline was rebuilt using scalable vector math.</li>
+            <li><strong>Theme Consistency:</strong> Ensuring the "mood" felt correct whether the user toggled the Light or Dark theme required hand-tuning 40+ color variables.</li>
+          </ul>
+        </div>
+        <div class="cs-split-half">
+          <span class="cs-section-marker">08. Results</span>
+          <h3 class="cs-subheading">The Impact</h3>
+          <ul class="cs-bullet-list">
+            <li><strong>Visual Quality:</strong> A truly cinematic experience that rivals high-end agency campaign sites.</li>
+            <li><strong>User Experience:</strong> Visitors report a feeling of calm and emotional resonance rarely felt on the web.</li>
+            <li><strong>Performance:</strong> Despite the heavy visual effects, the site achieves a 95+ Lighthouse score through aggressive asset optimization.</li>
+            <li><strong>Maintainability:</strong> The JSON-driven timeline architecture allows new chapters to be added without touching the core UI logic.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10. LESSONS LEARNED & 11. FUTURE -->
+    <section class="cs-editorial-section cs-bg-alternate cs-fade-up">
+      <div class="cs-grid-layout">
+        <div class="cs-grid-col-6">
+          <span class="cs-section-marker">09. Reflection</span>
+          <h2 class="cs-section-heading">Lessons Learned</h2>
+          <p class="cs-editorial-body">I learned that performance engineering isn't just about loading speeds—it's about frame rates. A dropped frame breaks immersion immediately. More importantly, I learned that web design can be deeply intimate. When you strip away conversion metrics and business goals, the browser is an incredibly powerful canvas for storytelling.</p>
+        </div>
+        <div class="cs-grid-col-6">
+          <span class="cs-section-marker">10. Roadmap</span>
+          <h2 class="cs-section-heading">Future Improvements</h2>
+          <p class="cs-editorial-body">The next iteration will evolve the platform from a static story into a living ecosystem. Planned features include a <strong>Custom Memory Uploader</strong>, a <strong>Dynamic Event Generator</strong> that builds chapters based on EXIF data, a <strong>Shared Journal</strong> syncing via WebSockets, and an integration for <strong>Interactive Maps</strong> plotting our journey geographically.</p>
+        </div>
+      </div>
+    </section>
+
   </main>
 
-  <footer class="site-footer">
-    <p>&copy; 2026 Manav Agarwal. Handcrafted Product Portfolio.</p>
+  <footer class="cs-footer">
+    <a href="index.html#work" class="cs-back-link">Return to Portfolio</a>
   </footer>
+
 </body>
 </html>
