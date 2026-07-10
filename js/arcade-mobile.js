@@ -1,7 +1,6 @@
-const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
 const isCompactViewport = window.matchMedia('(max-width: 1024px)').matches;
 
-if (isCoarsePointer || isCompactViewport) {
+if (isCompactViewport) {
   document.documentElement.classList.add('arcade-mobile-mode');
 
   const ensureStyles = () => {
