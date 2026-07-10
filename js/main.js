@@ -38,8 +38,12 @@ initTilt();
 initParallax();
 initContactForm();
 
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js").catch(() => {});
+window.addEventListener("load", () => {
+  import("./arcade-qa-fixes.js").catch((error) => {
+    console.warn("Arcade stabilization module failed to load", error);
   });
-}
+
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./sw.js").catch(() => {});
+  }
+}, { once: true });
