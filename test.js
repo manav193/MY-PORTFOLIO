@@ -1,42 +1,32 @@
 const puppeteer = require('puppeteer');
-
 (async () => {
-  try {
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
-    await page.goto('http://127.0.0.1:4173', { waitUntil: 'networkidle2' });
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+  await page.setViewport({ width: 1280, height: 800 });
+  await page.goto('http://localhost:4173');
+  
+  // initial state
+  console.log('--- AT TOP ---');
+  let text = await page.evaluate(() => {
+    const el = document.getElementById('debug-overlay');
+    const outer = document.querySelector('.outer-center-wrapper');
+    const outRect = outer ? outer.getBoundingClientRect() : null;
+    return (el ? el.textContent : 'no overlay') + 
+           `\nBody height: ${document.body.scrollHeight}, window height: ${window.innerHeight}` +
+           `\nOuter rect: ${outRect ? JSON.stringify(outRect) : 'null'}`;
+  });
+  console.log(text);
 
-    console.log("INITIAL STATE:");
-    const initial = await page.evaluate(() => {
-      return {
-        htmlTheme: document.documentElement.getAttribute('data-theme'),
-        bodyBg: window.getComputedStyle(document.body).backgroundColor,
-        bodyText: window.getComputedStyle(document.body).color
-      };
-    });
-    console.log(initial);
-
-    console.log("CLICKING LIGHT-APPLE...");
-    await page.evaluate(() => {
-      const btn = document.querySelector('.theme-btn[data-theme-id="light-apple"]');
-      if (btn) btn.click();
-    });
-
-    await new Promise(r => setTimeout(r, 500)); // wait for transition
-
-    console.log("NEW STATE:");
-    const after = await page.evaluate(() => {
-      return {
-        htmlTheme: document.documentElement.getAttribute('data-theme'),
-        bodyBg: window.getComputedStyle(document.body).backgroundColor,
-        bodyText: window.getComputedStyle(document.body).color,
-        activeClass: document.querySelector('.theme-btn[data-theme-id="light-apple"]').className
-      };
-    });
-    console.log(after);
-
-    await browser.close();
-  } catch(e) {
-    console.error(e);
-  }
+  // scroll down
+  await page.evaluate(() => window.scrollTo(0, 1000));
+  await new Promise(r => setTimeout(r, 500));
+  
+  console.log('--- SCROLLED ---');
+  text = await page.evaluate(() => {
+    const el = document.getElementById('debug-overlay');
+    return el ? el.textContent : 'no overlay';
+  });
+  console.log(text);
+  
+  await browser.close();
 })();

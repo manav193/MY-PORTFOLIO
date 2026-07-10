@@ -487,6 +487,24 @@ a { text-decoration: none; color: inherit; }
 }
 .dock-item:hover::after { opacity: 1; transform: translateX(-50%) scale(1); }
 
+/* Dock Active State (Arcade section visible) */
+.dock-item.dock-active {
+  background: rgba(var(--highlight-rgb), 0.15);
+  border-color: rgba(var(--highlight-rgb), 0.3);
+  box-shadow: 0 0 12px rgba(var(--highlight-rgb), 0.2);
+}
+.dock-item.dock-active::before {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-highlight, #10b981);
+}
+
 /* ABSOLUTE CENTERED ARCHITECTURE (LUXURY PADDING) */
 .system-architecture {
   position: relative; width: 100%; overflow: hidden;
@@ -727,8 +745,8 @@ a { text-decoration: none; color: inherit; }
   .hidden-mobile { display: none !important; }
   .os-workspace { padding: 80px 0 120px 0; }
   .os-window { max-height: none; border-radius: 0; border-left: none; border-right: none; border-bottom: none; transform: none; animation: none; }
-  .os-dock-container { padding: 8px; gap: 8px; }
-  .dock-item { width: 48px; height: 48px; }
+  .os-dock-container { padding: 8px; gap: 6px; }
+  .dock-item { width: 44px; height: 44px; }
   .footer-container { flex-direction: column; gap: 24px; text-align: center; }
   .footer-left { flex-direction: column; gap: 12px; }
   .nav-links { display: none; }

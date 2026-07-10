@@ -16,15 +16,33 @@ body.intro-skipped #intro-sequence {
 .intro-sticky-container {
   position: sticky;
   top: 0;
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   overflow: hidden;
-  perspective: 2500px;
+  background-color: #030303;
+}
+
+.outer-center-wrapper {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 100vw;
+  height: 100vh;
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #030303;
+  perspective: 5000px;
   transform-style: preserve-3d;
+  pointer-events: none;
+}
+.outer-center-wrapper > * {
+  pointer-events: auto;
+}
+
+/* Hide ambient light in intro to avoid floating white circles */
+body:not(.intro-skipped) .living-ambient-light {
+  display: none !important;
 }
 
 /* ==========================================================================
@@ -44,6 +62,7 @@ body.intro-skipped #intro-sequence {
 [data-theme="monochrome"] { --cab-bg: #111111; --cab-highlight: rgba(255,255,255,0.03); --cab-led: #ffffff; }
 
 .mat-anodized {
+  /* Core base styles for 2D fallback or front face */
   background-color: var(--cab-bg);
   background-image: 
     url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E"),
@@ -54,6 +73,85 @@ body.intro-skipped #intro-sequence {
     inset 0 0 0 1px rgba(0,0,0,0.8),
     0 10px 30px rgba(0,0,0,0.5);
   transition: background-color 1.5s ease;
+}
+
+/* 3D overrides - make chassis transparent and move shadow, apply materials to panels */
+.cabinet-chassis:has(.cab-3d-volume) {
+  background: transparent !important;
+  box-shadow: 0 50px 100px -20px rgba(0,0,0,1), 0 20px 40px rgba(0,0,0,0.8);
+  /* The shadow will move based on variables */
+  transform: scale(1) translateZ(0) rotateX(0deg);
+}
+
+.cab-3d-volume {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
+  transform: rotateX(var(--cab-rot-x, 0deg)) rotateY(var(--cab-rot-y, 0deg));
+  border-radius: inherit;
+}
+
+.cab-panel {
+  position: absolute;
+  transform-style: preserve-3d;
+  background-color: var(--cab-bg);
+  background-image: 
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(0,0,0,0.4) 100%);
+  border-radius: inherit;
+  transition: background-color 1.5s ease;
+}
+
+.cab-front {
+  inset: 0;
+  transform: translateZ(100px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  background-image: 
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse at 50% 0%, var(--cab-highlight) 0%, transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(0,0,0,0.4) 100%);
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.15), inset 0 0 0 1px rgba(0,0,0,0.8);
+}
+
+.cab-left, .cab-right {
+  top: 0; bottom: 0;
+  width: 200px;
+  filter: brightness(0.6) contrast(1.2);
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.05), inset 0 0 0 1px rgba(0,0,0,0.9);
+  border-radius: 0;
+}
+.cab-left {
+  left: 0;
+  transform-origin: left center;
+  transform: rotateY(-90deg);
+}
+.cab-right {
+  right: 0;
+  transform-origin: right center;
+  transform: rotateY(90deg);
+}
+
+.cab-top {
+  left: 0; right: 0;
+  height: 200px;
+  top: 0;
+  transform-origin: top center;
+  transform: rotateX(90deg);
+  filter: brightness(1.2);
+  border-radius: 0;
+}
+.cab-bottom {
+  left: 0; right: 0;
+  height: 200px;
+  bottom: 0;
+  transform-origin: bottom center;
+  transform: rotateX(-90deg);
+  filter: brightness(0.2);
+  border-radius: 0;
 }
 
 .mat-machined {
@@ -72,12 +170,10 @@ body.intro-skipped #intro-sequence {
 .cabinet-chassis {
   width: 100vw;
   height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
+  /* Removed flex layout since cab-front handles inner layout now */
   position: relative;
   transform-style: preserve-3d;
+  transform-origin: 50% 50%;
   will-change: transform, opacity, border-radius, width, height;
   
   /* Initial full-screen state */
@@ -280,6 +376,62 @@ body.intro-skipped #intro-sequence {
   background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%);
   border: 1px solid rgba(0,0,0,0.8);
   transform: rotate(45deg);
+}/* ==========================================================================
+   TOP MARQUEE
+   ========================================================================== */
+.cab-marquee {
+  width: 84%;
+  height: 50px;
+  background: #0d0d0f;
+  border: 1px solid #1a1a1f;
+  border-bottom: 2px solid #050507;
+  box-shadow: 
+    inset 0 1px 2px rgba(255,255,255,0.05),
+    inset 0 -10px 20px rgba(0,0,0,0.8),
+    0 5px 15px rgba(0,0,0,0.5);
+  margin-top: 56px; /* Space for the top header & oled display */
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.cabinet-chassis.is-scaled .cab-marquee {
+  opacity: 1;
+}
+.cab-marquee-inner {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.02) 0%, transparent 80%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+.cab-marquee-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: bold;
+  letter-spacing: 0.5em;
+  color: #ffffff;
+  text-shadow: 
+    0 0 4px var(--cab-led),
+    0 0 12px var(--cab-led);
+  opacity: 0.9;
+  z-index: 2;
+}
+.cab-marquee-light {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, var(--cab-led) 0%, transparent 60%);
+  opacity: 0.12;
+  mix-blend-mode: color-dodge;
+  pointer-events: none;
+  z-index: 1;
 }
 
 /* ==========================================================================
@@ -296,23 +448,30 @@ body.intro-skipped #intro-sequence {
 }
 
 .cabinet-chassis.is-scaled .cabinet-screen-bezel {
-  width: 80%;
-  height: 65%;
-  margin-top: 50px;
+  width: 84%;
+  height: 52%;
+  margin-top: 16px;
   border-radius: 16px;
-  background-color: #050505;
-  box-shadow: inset 0 0 0 1px #222, inset 0 2px 8px rgba(0,0,0,0.9), 0 20px 40px rgba(0,0,0,0.8);
+  background-color: #0d0d0f;
+  border: 1px solid #1a1a1f;
+  box-shadow: 
+    inset 0 15px 35px rgba(0,0,0,0.95),
+    inset 0 1px 3px rgba(255,255,255,0.04),
+    0 15px 30px rgba(0,0,0,0.8),
+    0 0 25px rgba(165,243,252,0.015); /* Soft screen glow spill */
 }
 
 /* Smoked Glass Thickness & Bloom */
 .cab-glass-thickness {
   position: absolute;
-  inset: 4px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.04);
-  border-top: 1px solid rgba(255,255,255,0.15); /* Beveled glass top edge catch-light */
-  box-shadow: inset 0 1px 3px rgba(255,255,255,0.08), inset 0 0 20px rgba(0,0,0,0.8);
-
+  inset: 12px; /* Recessed depth spacing */
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,0.8);
+  border-top: 1px solid rgba(255,255,255,0.08); /* Catch-light edge */
+  box-shadow: 
+    inset 0 1px 3px rgba(255,255,255,0.03), 
+    inset 0 0 15px rgba(0,0,0,0.95),
+    0 1px 0 rgba(255,255,255,0.03);
   pointer-events: none;
   z-index: 10;
   opacity: 0;
@@ -320,18 +479,44 @@ body.intro-skipped #intro-sequence {
 }
 .cabinet-chassis.is-scaled .cab-glass-thickness { opacity: 1; }
 
+/* ==========================================================================
+   2D SCREEN ARCHITECTURE (FLAT RENDERING ISOLATION)
+   ========================================================================== */
+.screen-2d-anchor {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 15; /* Sits above 3D volume, below bezel/reflection if needed */
+}
+
 .cabinet-screen {
   width: 100%;
   height: 100%;
   background: #000;
-  position: relative;
   overflow: hidden;
 }
 
-.cabinet-chassis.is-scaled .cabinet-screen {
-  width: calc(100% - 32px);
-  height: calc(100% - 32px);
-  border-radius: 8px;
+.screen-content-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: auto;
+  transform-style: flat !important;
+  transform: translate3d(0, 0, 0); /* HW acceleration layer */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Aligned precisely with the bezel offsets when cabinet is scaled */
+.cabinet-chassis.is-scaled .screen-content-layer {
+  top: 32px; /* 16px bezel margin + 16px screen inset */
+  left: calc(8% + 16px); /* 8% bezel left offset + 16px screen inset */
+  width: calc(84% - 32px);
+  height: calc(52% - 32px);
+  border-radius: 6px;
 }
 
 /* Physical Screen Characteristics */
@@ -369,23 +554,58 @@ body.intro-skipped #intro-sequence {
    CONTROL DECK
    ========================================================================== */
 .cab-control-deck {
-  width: 80%;
-  height: 15%;
-  margin-top: 20px;
+  width: 84%;
+  height: 16%;
+  margin-top: 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 40px;
+  padding: 0 32px;
   opacity: 0;
   transition: opacity 0.5s ease;
+  background: #111113;
+  border: 1px solid #1c1c1f;
+  border-radius: 8px;
+  box-shadow: 
+    inset 0 1px 3px rgba(255,255,255,0.05),
+    inset 0 -12px 24px rgba(0,0,0,0.85),
+    0 10px 25px rgba(0,0,0,0.6);
+  position: relative;
 }
 .cabinet-chassis.is-scaled .cab-control-deck { opacity: 1; }
 
-.cab-deck-left, .cab-deck-right {
+.cab-deck-left {
   display: flex;
   align-items: center;
-  gap: 24px;
 }
+.cab-deck-right {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.cab-utility-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  justify-content: center;
+  align-items: center;
+}
+
+.cab-btn-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 30px);
+  grid-template-rows: repeat(2, 30px);
+  gap: 8px 14px;
+}
+
+/* Arrange visual layout dynamically: Y, X, L on row 1; B, A, R on row 2 */
+.action-y { grid-area: 1 / 1; }
+.action-x { grid-area: 1 / 2; }
+.action-l { grid-area: 1 / 3; }
+.action-b { grid-area: 2 / 1; }
+.action-a { grid-area: 2 / 2; }
+.action-r { grid-area: 2 / 3; }
 
 /* Precision Joystick */
 .cab-joystick {
@@ -401,9 +621,9 @@ body.intro-skipped #intro-sequence {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: #111;
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.9), 0 1px 0 rgba(255,255,255,0.1);
-  border: 1px solid #222;
+  background: #09090a;
+  box-shadow: inset 0 3px 6px rgba(0,0,0,1), 0 1px 0 rgba(255,255,255,0.05);
+  border: 1px solid #1a1a1c;
 }
 .cab-joy-stick {
   position: absolute;
@@ -419,7 +639,7 @@ body.intro-skipped #intro-sequence {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #444 0%, #111 80%);
+  background: radial-gradient(circle at 30% 30%, #444 0%, #0d0d0f 80%);
   box-shadow: 0 4px 8px rgba(0,0,0,0.8), inset -2px -2px 4px rgba(0,0,0,0.5);
   will-change: transform;
 }
@@ -428,97 +648,177 @@ body.intro-skipped #intro-sequence {
   top: 4px; left: 4px;
   width: 8px; height: 8px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.12);
   filter: blur(1px);
 }
 
-/* Convex Buttons with Hover Interaction */
+/* Convex Action Buttons */
 .cab-btn {
   position: relative;
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  background: #1a1a1a;
+  background: #161618;
   box-shadow: 
-    0 3px 5px rgba(0,0,0,0.8),
-    inset 0 1px 1px rgba(255,255,255,0.15),
+    0 3px 6px rgba(0,0,0,0.8),
+    inset 0 1px 1px rgba(255,255,255,0.12),
     inset 0 -1px 0 rgba(0,0,0,0.5);
-  border: 1px solid #111;
+  border: 1px solid #09090a;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
   cursor: pointer;
   pointer-events: auto;
   transition: transform 0.1s cubic-bezier(0.17, 0.84, 0.44, 1), box-shadow 0.1s cubic-bezier(0.17, 0.84, 0.44, 1);
 }
-.cab-btn:active {
-  transform: translateY(3px) scale(0.96); /* Heavy mechanical spring */
+/* Subtle LED Backglow effect around action buttons */
+.cab-btn::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  background: var(--cab-led);
+  opacity: 0.08;
+  filter: blur(1.5px);
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.cab-btn:hover::before, .cab-btn:focus-visible::before {
+  opacity: 0.22;
+}
+
+.cab-btn:active, .cab-btn.is-pressed {
+  transform: translateY(2px) scale(0.96); /* Mechanical push feel */
   box-shadow: 
     0 0 1px rgba(0,0,0,0.8),
-    inset 0 4px 8px rgba(0,0,0,0.9);
+    inset 0 3px 6px rgba(0,0,0,0.9);
 }
+/* Micro Button labels inside the button plungers */
 .cab-btn-inner {
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  background: radial-gradient(circle at 50% 100%, #222 0%, #111 80%);
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.05);
+  background: radial-gradient(circle at 50% 100%, #1e1e21 0%, #0d0d0f 85%);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.85), 0 1px 0 rgba(255,255,255,0.03);
   transition: background 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.4rem;
+  font-weight: bold;
+  color: rgba(255,255,255,0.45);
+  text-shadow: 0 -1px 0 rgba(0,0,0,0.8);
+  line-height: 1;
 }
 .cab-btn:hover .cab-btn-inner {
-  background: radial-gradient(circle at 50% 100%, #333 0%, #111 80%);
+  background: radial-gradient(circle at 50% 100%, #29292e 0%, #111113 85%);
+  color: rgba(255,255,255,0.75);
 }
 .cab-btn-specular {
   position: absolute;
-  top: 6px; left: 50%;
+  top: 5px; left: 50%;
   transform: translateX(-50%);
-  width: 12px; height: 3px;
+  width: 10px; height: 2px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.08);
   filter: blur(1px);
   will-change: transform, opacity;
 }
 
+/* Keyboard Outline Focus States */
+.cab-btn:focus-visible, .cab-btn-small:focus-visible {
+  outline: none;
+  box-shadow: 
+    0 0 0 2px #000, 
+    0 0 0 4px var(--cab-led),
+    0 5px 12px rgba(0,0,0,0.6);
+}
+
+.cab-btn-small {
+  position: relative;
+  width: 24px;
+  height: 10px;
+  border-radius: 5px;
+  background: #161618;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.5);
+  border: 1px solid #09090a;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: transform 0.1s;
+}
+.cab-btn-small::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.35rem;
+  color: rgba(255,255,255,0.3);
+  letter-spacing: 0.05em;
+  font-weight: bold;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.cab-btn-small:active, .cab-btn-small.is-pressed {
+  transform: translateY(1.5px) scale(0.95);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.9);
+}
+
 /* ==========================================================================
-   COIN SLOT & SERIAL
+   COIN SLOT & LOWER CABINET DETAILS
    ========================================================================== */
 .cab-bottom-details {
-  width: 80%;
+  width: 84%;
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
   margin-top: auto;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
   opacity: 0;
   transition: opacity 0.5s ease;
 }
 .cabinet-chassis.is-scaled .cab-bottom-details { opacity: 1; }
 
 .cab-coin-door {
-  width: 60px;
-  height: 80px;
-  background: #111;
+  width: 56px;
+  height: 72px;
+  background: #0d0d0f;
   border-radius: 4px;
-  box-shadow: inset 0 2px 6px rgba(0,0,0,0.9), 0 1px 0 rgba(255,255,255,0.1);
-  border: 1px solid #222;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.95), 0 1px 0 rgba(255,255,255,0.05);
+  border: 1px solid #1c1c1f;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 12px;
-  gap: 16px;
+  padding-top: 10px;
+  gap: 12px;
+  position: relative;
 }
+/* Orange backlit indicator slot */
 .cab-coin-slot {
   width: 6px;
-  height: 24px;
+  height: 20px;
   background: #000;
   border-radius: 3px;
-  box-shadow: inset 0 1px 2px rgba(0,0,0,1), 0 1px 0 rgba(255,255,255,0.1);
+  box-shadow: 
+    inset 0 1px 3px rgba(0,0,0,1), 
+    0 0 4px rgba(249,115,22,0.3);
+  position: relative;
+}
+.cab-coin-slot::after {
+  content: '';
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 2px; height: 8px;
+  background: #f97316; /* Glowing acceptor guide */
+  box-shadow: 0 0 6px #f97316;
+  border-radius: 1px;
 }
 .cab-coin-return {
-  width: 24px;
-  height: 16px;
-  background: #0a0a0a;
+  width: 22px;
+  height: 14px;
+  background: #050507;
   border-radius: 2px;
   box-shadow: inset 0 2px 4px rgba(0,0,0,1);
 }
@@ -526,37 +826,37 @@ body.intro-skipped #intro-sequence {
 .cab-serial {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.4rem;
-  color: rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.18);
   letter-spacing: 0.1em;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
   text-align: right;
   mix-blend-mode: overlay;
 }
 
 /* SERVICE HATCH & QR */
 .cab-service-hatch {
-  width: 48px;
-  height: 32px;
-  border: 1px solid rgba(0,0,0,0.8);
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  width: 44px;
+  height: 28px;
+  border: 1px solid rgba(0,0,0,0.85);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
   border-radius: 2px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 .cab-qr-code {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   background: #fff;
-  opacity: 0.1;
+  opacity: 0.08;
   background-image: repeating-linear-gradient(45deg, #000 0, #000 2px, transparent 2px, transparent 4px), repeating-linear-gradient(-45deg, #000 0, #000 2px, transparent 2px, transparent 4px);
   mix-blend-mode: overlay;
 }
 
 /* ==========================================================================
-   BASE & RUBBER FEET
+   BASE & LEVELING LEGS
    ========================================================================== */
 .cabinet-base {
   display: none;
@@ -565,15 +865,179 @@ body.intro-skipped #intro-sequence {
   display: flex;
   justify-content: space-between;
   position: absolute;
-  bottom: -20px;
-  width: 80%;
-  height: 20px;
+  bottom: -16px;
+  width: 84%;
+  height: 16px;
   background: transparent;
 }
 .cab-rubber-foot {
-  width: 60px;
+  width: 52px;
   height: 100%;
-  background: #0a0a0a;
-  border-radius: 0 0 8px 8px;
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 10px 20px rgba(0,0,0,0.9);
+  background: #09090b;
+  border-radius: 0 0 6px 6px;
+  box-shadow: 
+    inset 0 2px 3px rgba(0,0,0,0.9), 
+    0 8px 16px rgba(0,0,0,0.95),
+    inset 0 1px 0 rgba(255,255,255,0.03);
 }
+
+/* ==========================================================================
+   SIDE PANELS DEPTH INSERTS
+   ========================================================================== */
+.cab-left::after, .cab-right::after {
+  content: '';
+  position: absolute;
+  inset: 16px;
+  border-radius: 8px;
+  background: #0a0a0c;
+  border: 1px solid rgba(255,255,255,0.015);
+  box-shadow: inset 0 4px 12px rgba(0,0,0,0.95);
+}
+
+/* ==========================================================================
+   RESPONSIVE OVERRIDES
+   ========================================================================== */
+@media (max-width: 1024px) {
+  .cabinet-chassis.is-scaled {
+    width: 85vw;
+    height: 80vh;
+  }
+}
+
+@media (max-width: 768px) {
+  .cabinet-chassis.is-scaled {
+    width: 92vw;
+    height: 75vh;
+  }
+  .cabinet-chassis.is-scaled .cabinet-screen-bezel {
+    width: 86%;
+    height: 50%;
+  }
+  .cabinet-chassis.is-scaled .screen-content-layer {
+    top: 32px;
+    left: calc(7% + 16px);
+    width: calc(86% - 32px);
+    height: calc(50% - 32px);
+  }
+  .cab-marquee {
+    width: 86%;
+    height: 44px;
+    margin-top: 52px;
+  }
+  .cab-control-deck {
+    width: 86%;
+    padding: 0 24px;
+    height: 15%;
+  }
+  .cab-bottom-details {
+    width: 86%;
+    margin-bottom: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cabinet-chassis.is-scaled {
+    width: 95vw;
+    height: 72vh;
+    border-radius: 20px 20px 8px 8px;
+  }
+  /* Flat rendering optimization for mobile viewports to avoid perspective overflow */
+  .cab-left, .cab-right {
+    display: none !important;
+  }
+  .cab-front {
+    transform: translateZ(0) !important;
+  }
+  .cab-marquee {
+    width: 90%;
+    height: 40px;
+    margin-top: 48px;
+  }
+  .cab-marquee-text {
+    font-size: 0.55rem;
+    letter-spacing: 0.35em;
+  }
+  .cabinet-chassis.is-scaled .cabinet-screen-bezel {
+    width: 90%;
+    height: 46%;
+    border-radius: 12px;
+  }
+  .cabinet-chassis.is-scaled .screen-content-layer {
+    top: 26px; /* 16px bezel margin + 10px screen inset */
+    left: calc(5% + 10px);
+    width: calc(90% - 20px);
+    height: calc(46% - 20px);
+    border-radius: 6px;
+  }
+  .cab-glass-thickness {
+    inset: 8px;
+  }
+  .cab-control-deck {
+    width: 90%;
+    padding: 0 16px;
+    height: 80px;
+    margin-top: 12px;
+    border-radius: 6px;
+  }
+  .cab-joystick {
+    width: 44px;
+    height: 44px;
+  }
+  .cab-joy-base {
+    width: 32px;
+    height: 32px;
+  }
+  .cab-joy-stick {
+    height: 18px;
+    width: 6px;
+  }
+  .cab-joy-ball {
+    width: 20px;
+    height: 20px;
+  }
+  .cab-btn-grid {
+    grid-template-columns: repeat(3, 22px);
+    grid-template-rows: repeat(2, 22px);
+    gap: 6px 10px;
+  }
+  .cab-btn {
+    width: 22px;
+    height: 22px;
+  }
+  .cab-btn-inner {
+    width: 18px;
+    height: 18px;
+    font-size: 0.35rem;
+  }
+  .cab-btn-small {
+    width: 18px;
+    height: 8px;
+  }
+  .cab-btn-small::after {
+    bottom: -12px;
+    font-size: 0.3rem;
+  }
+  .cab-utility-group {
+    gap: 10px;
+  }
+  .cab-bottom-details {
+    width: 90%;
+    margin-bottom: 12px;
+  }
+  .cab-coin-door {
+    width: 44px;
+    height: 56px;
+  }
+  .cab-coin-slot {
+    width: 5px;
+    height: 16px;
+  }
+  .cab-coin-return {
+    width: 18px;
+    height: 10px;
+  }
+  .cab-serial, .cab-service-hatch {
+    display: none !important;
+  }
+}
+

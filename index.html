@@ -15,11 +15,18 @@
   <link rel="preload" href="css/styles.css" as="style">
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/intro.css">
+  <link rel="stylesheet" href="css/arcade-os.css">
   
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Scripts -->
+  <script src="js/main.js" type="module" defer></script>
+  <script src="js/intro.js" defer></script>
+  <script src="js/arcade-os.js" defer></script>
+  <script src="js/arcade-apps.js" defer></script>
 
   <!-- SEO / Open Graph -->
   <meta property="og:type" content="website">
@@ -68,36 +75,112 @@
   <!-- CINEMATIC 3D CABINET INTRO -->
   <div id="intro-sequence">
     <div class="intro-sticky-container">
-      <div class="cabinet-chassis mat-anodized">
+      <div class="outer-center-wrapper">
+        <div class="cabinet-chassis mat-anodized">
+          
+          <!-- 3D VOLUME WRAPPER (Handles Drag Rotation) -->
+          <div class="cab-3d-volume">
         
-        <!-- HARDWARE SEAMS & MICRO DETAILS -->
-        <div class="cab-hardware-layer">
-          <div class="cab-panel-seam-v left"></div>
-          <div class="cab-panel-seam-v right"></div>
-          
-          <div class="cab-branding-plate">MA-X01</div>
-          
-          <div class="cab-ventilation">
-            <div class="cab-vent-hole"></div><div class="cab-vent-hole"></div>
-            <div class="cab-vent-hole"></div><div class="cab-vent-hole"></div>
-          </div>
-          
-          <!-- TINY OLED STATUS DISPLAY -->
-          <div class="cab-oled-display">
-            <div class="oled-status">SYS: ONLINE</div>
-            <div class="oled-theme" id="oled-theme-text">MOD: GRAPHITE</div>
-          </div>
+          <!-- FRONT PANEL (Existing Screen & Controls) -->
+          <div class="cab-panel cab-front">
+            <!-- HARDWARE SEAMS & MICRO DETAILS -->
+            <div class="cab-hardware-layer">
+              <div class="cab-panel-seam-v left"></div>
+              <div class="cab-panel-seam-v right"></div>
+              
+              <div class="cab-branding-plate">MA-X01</div>
+              
+              <div class="cab-ventilation">
+                <div class="cab-vent-hole"></div><div class="cab-vent-hole"></div>
+                <div class="cab-vent-hole"></div><div class="cab-vent-hole"></div>
+              </div>
+              
+              <!-- TINY OLED STATUS DISPLAY -->
+              <div class="cab-oled-display">
+                <div class="oled-status">SYS: ONLINE</div>
+                <div class="oled-theme" id="oled-theme-text">MOD: GRAPHITE</div>
+              </div>
 
-          <div class="cab-power-btn" data-tooltip="System Power"><div class="cab-power-led"></div></div>
-          
-          <div class="cab-screw" style="top: 16px; left: 16px;"></div>
-          <div class="cab-screw" style="top: 16px; right: 16px;"></div>
-        </div>
+              <div class="cab-power-btn" data-tooltip="System Power"><div class="cab-power-led"></div></div>
+              
+              <div class="cab-screw" style="top: 16px; left: 16px;"></div>
+              <div class="cab-screw" style="top: 16px; right: 16px;"></div>
+            </div>
 
-        <!-- SCREEN BEZEL & LAMINATED GLASS -->
-        <div class="cabinet-screen-bezel mat-machined">
-          <div class="cab-glass-thickness"></div>
-          <div class="cabinet-screen">
+            <!-- TOP MARQUEE -->
+            <div class="cab-marquee">
+              <div class="cab-marquee-inner">
+                <div class="cab-marquee-text">A R C A D E</div>
+              </div>
+              <div class="cab-marquee-light"></div>
+            </div>
+
+            <!-- SCREEN BEZEL & LAMINATED GLASS -->
+            <div class="cabinet-screen-bezel mat-machined">
+              <div class="cab-glass-thickness"></div>
+              <div class="cab-glass-reflection"></div>
+            </div>
+            
+            <!-- CONTROL DECK -->
+            <div class="cab-control-deck">
+              <div class="cab-deck-left">
+                <div class="cab-joystick" id="cab-joystick" data-tooltip="Analog Input">
+                  <div class="cab-joy-base"></div>
+                  <div class="cab-joy-stick"></div>
+                  <div class="cab-joy-ball mat-rubber"><div class="cab-joy-specular"></div></div>
+                </div>
+              </div>
+              <div class="cab-deck-right">
+                <!-- Utility Select/Start group (mapped to smallBtns[0]/[1]) -->
+                <div class="cab-utility-group">
+                  <div class="cab-btn-small" data-tooltip="Select" tabindex="0" aria-label="Select Button"></div>
+                  <div class="cab-btn-small" data-tooltip="Start" tabindex="0" aria-label="Start Button"></div>
+                </div>
+                <!-- 6 Action button grid (A, B, L are first to preserve JS array bindings btns[0,1,2]) -->
+                <div class="cab-btn-grid">
+                  <div class="cab-btn action-a" data-tooltip="Action A" tabindex="0" aria-label="Action A"><div class="cab-btn-inner">A</div><div class="cab-btn-specular"></div></div>
+                  <div class="cab-btn action-b" data-tooltip="Action B" tabindex="0" aria-label="Action B"><div class="cab-btn-inner">B</div><div class="cab-btn-specular"></div></div>
+                  <div class="cab-btn action-l" data-tooltip="Options" tabindex="0" aria-label="Options"><div class="cab-btn-inner">L</div><div class="cab-btn-specular"></div></div>
+                  <div class="cab-btn action-x" data-tooltip="Action X" tabindex="0" aria-label="Action X"><div class="cab-btn-inner">X</div><div class="cab-btn-specular"></div></div>
+                  <div class="cab-btn action-y" data-tooltip="Action Y" tabindex="0" aria-label="Action Y"><div class="cab-btn-inner">Y</div><div class="cab-btn-specular"></div></div>
+                  <div class="cab-btn action-r" data-tooltip="Action R" tabindex="0" aria-label="Action R"><div class="cab-btn-inner">R</div><div class="cab-btn-specular"></div></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- COIN DOOR & MANUFACTURING MARKS -->
+            <div class="cab-bottom-details">
+              <div class="cab-service-hatch">
+                <div class="cab-qr-code"></div>
+              </div>
+              <div class="cab-coin-door">
+                <div class="cab-coin-slot"></div>
+                <div class="cab-coin-return"></div>
+              </div>
+              <div class="cab-serial">
+                <span>MFG: 2026.07</span>
+                <span>INSPECTED: PASS</span>
+                <span>VOLTAGE: 240V</span>
+              </div>
+            </div>
+            
+            <div class="cabinet-base">
+              <div class="cab-rubber-foot" style="left: 0;"></div>
+              <div class="cab-rubber-foot" style="right: 0;"></div>
+            </div>
+          </div> <!-- END FRONT PANEL -->
+
+          <!-- 3D SIDES -->
+          <div class="cab-panel cab-left"></div>
+          <div class="cab-panel cab-right"></div>
+          <div class="cab-panel cab-top"></div>
+          <div class="cab-panel cab-bottom"></div>
+
+        </div> <!-- END 3D VOLUME -->
+        
+        <!-- FLAT 2D SCREEN CONTENT LAYER -->
+        <div class="screen-2d-anchor">
+          <div id="cabinet-screen" class="cabinet-screen screen-content-layer">
             <div class="cab-vignette"></div>
             <div class="cab-scanlines"></div>
             
@@ -120,44 +203,8 @@
               </div>
             </div>
           </div>
-          <div class="cab-glass-reflection"></div>
         </div>
         
-        <!-- CONTROL DECK -->
-        <div class="cab-control-deck">
-          <div class="cab-deck-left">
-            <div class="cab-joystick" id="cab-joystick" data-tooltip="Analog Input">
-              <div class="cab-joy-base"></div>
-              <div class="cab-joy-stick"></div>
-              <div class="cab-joy-ball mat-rubber"><div class="cab-joy-specular"></div></div>
-            </div>
-          </div>
-          <div class="cab-deck-right">
-            <div class="cab-btn" data-tooltip="Action A"><div class="cab-btn-inner"></div><div class="cab-btn-specular"></div></div>
-            <div class="cab-btn" data-tooltip="Action B"><div class="cab-btn-inner"></div><div class="cab-btn-specular"></div></div>
-            <div class="cab-btn" data-tooltip="Options"><div class="cab-btn-inner"></div><div class="cab-btn-specular"></div></div>
-          </div>
-        </div>
-
-        <!-- COIN DOOR & MANUFACTURING MARKS -->
-        <div class="cab-bottom-details">
-          <div class="cab-service-hatch">
-            <div class="cab-qr-code"></div>
-          </div>
-          <div class="cab-coin-door">
-            <div class="cab-coin-slot"></div>
-            <div class="cab-coin-return"></div>
-          </div>
-          <div class="cab-serial">
-            <span>MFG: 2026.07</span>
-            <span>INSPECTED: PASS</span>
-            <span>VOLTAGE: 240V</span>
-          </div>
-        </div>
-
-        <div class="cabinet-base">
-          <div class="cab-rubber-foot"></div>
-          <div class="cab-rubber-foot"></div>
         </div>
       </div>
     </div>
@@ -409,6 +456,8 @@
         <a href="mailto:monographicalpixel@gmail.com" class="btn-primary btn-massive">Initiate Sequence</a>
       </div>
       
+
+      
       <div class="footer-bottom">
         <div class="footer-left">
           <span class="brand">M.A.</span>
@@ -426,7 +475,7 @@
   <!-- OS DOCK -->
   <div class="os-dock">
     <div class="os-dock-container">
-      <a href="#" class="dock-item" data-title="System Init" data-magnetic>
+      <a href="#" class="dock-item" id="dock-portfolio-btn" data-dock-action="portfolio-intro" data-title="Open Portfolio Intro" data-magnetic aria-label="Open Portfolio Intro">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
       </a>
       <a href="#work" class="dock-item" data-title="Architecture" data-magnetic>
@@ -434,6 +483,9 @@
       </a>
       <a href="#about" class="dock-item" data-title="Log Origin" data-magnetic>
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+      </a>
+      <a href="#intro-sequence" class="dock-item" id="dock-arcade-btn" data-dock-action="arcade" data-title="Open Arcade" data-magnetic aria-label="Open Arcade">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"></rect><line x1="6" y1="10" x2="6" y2="10.01"></line><line x1="10" y1="10" x2="10" y2="10.01"></line><circle cx="17" cy="12" r="2"></circle><line x1="8" y1="14" x2="8" y2="14.01"></line></svg>
       </a>
       <div class="dock-separator"></div>
       <a href="https://github.com/manav193" target="_blank" class="dock-item dock-external" data-title="GitHub Repo" data-magnetic>
