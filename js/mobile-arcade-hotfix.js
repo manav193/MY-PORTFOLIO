@@ -6,7 +6,6 @@ if (isMobileArcade) {
   };
 
   removeInjectedControls();
-
   const observer = new MutationObserver(removeInjectedControls);
   observer.observe(document.documentElement, { childList: true, subtree: true });
 
@@ -19,9 +18,12 @@ if (isMobileArcade) {
     if (target) target.classList.add('dock-active');
   };
 
+  let arcadeExplicitlySelected = false;
+
   const goPortfolio = (event) => {
     event?.preventDefault();
     event?.stopImmediatePropagation();
+    arcadeExplicitlySelected = false;
     window.ArcadeOS?.forceGoHome?.();
     setActiveDock(portfolioBtn);
     window.scrollTo({ top: 0, behavior: 'auto' });
@@ -30,6 +32,7 @@ if (isMobileArcade) {
   const goArcade = (event) => {
     event?.preventDefault();
     event?.stopImmediatePropagation();
+    arcadeExplicitlySelected = true;
     setActiveDock(arcadeBtn);
     window.scrollTo({ top: Math.max(1, window.innerHeight * 0.96), behavior: 'auto' });
   };
@@ -38,30 +41,12 @@ if (isMobileArcade) {
   arcadeBtn?.addEventListener('click', goArcade, true);
 
   document.querySelectorAll('.dock-item[href^="#"]').forEach((item) => {
-    if (item === arcadeBtn) return;
-    item.addEventListener('click', (event) => {
-      if (item === portfolioBtn) return;
+    if (item === arcadeBtn || item === portfolioBtn) return;
+    item.addEventListener('click', () => {
+      arcadeExplicitlySelected = false;
       setActiveDock(item);
       window.ArcadeOS?.forceGoHome?.();
     }, true);
-  });
-
-  let arcadeExplicitlySelected = false;
-
-  arcadeBtn?.addEventListener('click', () => {
-    arcadeExplicitlySelected = true;
-  }, true);
-
-  portfolioBtn?.addEventListener('click', () => {
-    arcadeExplicitlySelected = false;
-  }, true);
-
-  document.querySelectorAll('.dock-item[href^="#"]').forEach((item) => {
-    if (item !== arcadeBtn && item !== portfolioBtn) {
-      item.addEventListener('click', () => {
-        arcadeExplicitlySelected = false;
-      }, true);
-    }
   });
 
   const syncDockOnScroll = () => {
@@ -91,52 +76,37 @@ if (isMobileArcade) {
 
     if (arcadeExplicitlySelected && window.scrollY < window.innerHeight * 1.4) {
       setActiveDock(arcadeBtn);
+    } else if (!arcadeExplicitlySelected) {
+      arcadeBtn?.classList.remove('dock-active');
     }
   };
 
   window.addEventListener('scroll', syncDockOnScroll, { passive: true });
   syncDockOnScroll();
 
-  const patchArcadeLaunch = (attempt = 0) => {
+  const patchFastLaunch = (attempt = 0) => {
     const os = window.ArcadeOS;
-    const registry = window.ArcadeRegistry;
-    if ((!os || !registry) && attempt < 40) {
-      window.setTimeout(() => patchArcadeLaunch(attempt + 1), 100);
+    if (!os && attempt < 40) {
+      window.setTimeout(() => patchFastLaunch(attempt + 1), 100);
       return;
     }
-    if (!os || !registry || os.__mobileFastLaunch) return;
+    if (!os || os.__mobileFastLaunch) return;
 
     os.__mobileFastLaunch = true;
-    os.launchApp = function launchAppMobile(id) {
-      if (this.state !== 'HOME') return;
-      const appConfig = registry.getApp(id);
-      if (!appConfig) return;
-
-      this.state = 'LOADING';
-      document.getElementById('arcade-home')?.classList.remove('active');
-      document.getElementById('arcade-loading')?.classList.add('active');
-
-      window.setTimeout(() => {
-        if (this.state !== 'LOADING') return;
-        document.getElementById('arcade-loading')?.classList.remove('active');
-        document.getElementById('arcade-app-view')?.classList.add('active');
-
-        this.state = 'APP';
-        this.activeApp = new appConfig.component();
-        const view = document.getElementById('arcade-app-view');
-        if (!view) return;
-        view.innerHTML = '';
-
-        try {
-          this.activeApp.init(view, window.ArcadeEventBus, window.ArcadeStorage, window.ArcadeAudio);
-          this.activeApp.mount();
-        } catch (error) {
-          console.error('App Launch Failed', error);
-          this.forceGoHome();
-        }
-      }, 140);
+    const originalLaunchApp = os.launchApp.bind(os);
+    os.launchApp = function launchAppFast(id) {
+      const nativeSetTimeout = window.setTimeout;
+      window.setTimeout = (callback, delay, ...args) => {
+        const adjustedDelay = delay === 800 ? 140 : delay;
+        return nativeSetTimeout(callback, adjustedDelay, ...args);
+      };
+      try {
+        return originalLaunchApp(id);
+      } finally {
+        window.setTimeout = nativeSetTimeout;
+      }
     };
   };
 
-  patchArcadeLaunch();
+  patchFastLaunch();
 }
