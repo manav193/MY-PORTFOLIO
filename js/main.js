@@ -3,14 +3,11 @@ import { initReveal, initCounters, initScrollProgress, initBackToTop } from "./m
 import { initTyping } from "./modules/typing.js";
 import { initMagnetic, initCursor, initTilt, initParallax } from "./modules/motion.js";
 import { initContactForm } from "./modules/contact.js";
+import { initOS } from "./modules/os.js";
 
 document.body.classList.add("is-loading");
 
-window.addEventListener("load", () => {
-  document.querySelector("[data-loader]")?.classList.add("is-hidden");
-  document.body.classList.remove("is-loading");
-});
-
+initOS();
 initTheme();
 initReveal();
 initCounters();

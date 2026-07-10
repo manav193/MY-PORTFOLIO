@@ -15,34 +15,48 @@ export function initCursor() {
   });
 }
 
-export function initMagnetic() {
-  if (reduceMotion || !window.matchMedia("(pointer: fine)").matches) return;
-
-  document.querySelectorAll(".magnetic").forEach((item) => {
-    item.addEventListener("pointermove", (event) => {
-      const rect = item.getBoundingClientRect();
-      const x = event.clientX - rect.left - rect.width / 2;
-      const y = event.clientY - rect.top - rect.height / 2;
-      item.style.transform = `translate(${x * 0.12}px, ${y * 0.18}px)`;
+export function initTilt() {
+  const tiltElements = document.querySelectorAll('[data-tilt]');
+  
+  tiltElements.forEach(el => {
+    el.addEventListener('mousemove', (e) => {
+      const rect = el.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      const xPct = x / rect.width - 0.5;
+      const yPct = y / rect.height - 0.5;
+      
+      const rotateX = yPct * -15; // Max 15deg tilt
+      const rotateY = xPct * 15;
+      
+      el.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
     });
-    item.addEventListener("pointerleave", () => {
-      item.style.transform = "";
+    
+    el.addEventListener('mouseleave', () => {
+      el.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg)`;
     });
   });
 }
 
-export function initTilt() {
-  if (reduceMotion || !window.matchMedia("(pointer: fine)").matches) return;
-
-  document.querySelectorAll("[data-tilt]").forEach((card) => {
-    card.addEventListener("pointermove", (event) => {
-      const rect = card.getBoundingClientRect();
-      const x = (event.clientX - rect.left) / rect.width - 0.5;
-      const y = (event.clientY - rect.top) / rect.height - 0.5;
-      card.style.transform = `rotateX(${y * -8}deg) rotateY(${x * 10}deg) translateZ(0)`;
+export function initMagnetic() {
+  const magneticElements = document.querySelectorAll('[data-magnetic]');
+  
+  magneticElements.forEach(el => {
+    el.addEventListener('mousemove', (e) => {
+      const rect = el.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width / 2;
+      const y = e.clientY - rect.top - rect.height / 2;
+      
+      // Update background radial gradient position for hover glow
+      el.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+      el.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+      
+      el.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px)`;
     });
-    card.addEventListener("pointerleave", () => {
-      card.style.transform = "";
+    
+    el.addEventListener('mouseleave', () => {
+      el.style.transform = `translate(0px, 0px)`;
     });
   });
 }

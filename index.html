@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Manav Agarwal — Creative Technologist & Product Builder</title>
-  <meta name="description" content="Portfolio of Manav Agarwal. I specialize in frontend engineering, high-end UI/UX design, and AI-driven product building. Explore my case studies in web architecture and interface design.">
+  <meta name="description" content="Portfolio of Manav Agarwal. I specialize in frontend engineering, high-end UI/UX design, and premium product building. Explore my case studies in web architecture and interface design.">
   <meta name="author" content="Manav Agarwal">
   <meta name="theme-color" content="#000000">
   <link rel="canonical" href="https://my-portfolio-mu-jade-52.vercel.app/">
@@ -23,14 +23,26 @@
   <!-- SEO / Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="Manav Agarwal — Creative Technologist & Product Builder">
-  <meta property="og:description" content="I specialize in frontend engineering, high-end UI/UX design, and AI-driven product building. Explore my case studies in web architecture and interface design.">
+  <meta property="og:description" content="I specialize in frontend engineering, high-end UI/UX design, and premium product building. Explore my case studies in web architecture and interface design.">
   <meta property="og:url" content="https://my-portfolio-mu-jade-52.vercel.app/">
   <meta property="og:image" content="https://my-portfolio-mu-jade-52.vercel.app/assets/og-image.jpg">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Manav Agarwal — Creative Technologist">
-  <meta name="twitter:description" content="I design interfaces, build products, and ship ideas with AI.">
+  <meta name="twitter:description" content="I design interfaces, build products, and turn ideas into polished digital experiences.">
   <meta name="twitter:image" content="https://my-portfolio-mu-jade-52.vercel.app/assets/og-image.jpg">
   
+  <!-- Theme Initialization -->
+  <script>
+    (function() {
+      try {
+        var localTheme = localStorage.getItem('premium-theme');
+        var sysTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark-graphite' : 'light-apple';
+        var activeTheme = localTheme || sysTheme;
+        document.documentElement.setAttribute('data-theme', activeTheme);
+      } catch (e) {}
+    })();
+  </script>
+
   <!-- JSON-LD Schema -->
   <script type="application/ld+json">
   {
@@ -47,282 +59,245 @@
   </script>
 </head>
 <body>
-  <a class="skip-link" href="#main-content">Skip to content</a>
+  <div class="aurora-bg"></div>
+  
+  <!-- LIVING AMBIENT LIGHT -->
+  <div class="living-ambient-light" aria-hidden="true"></div>
 
-  <nav class="site-nav">
+  <!-- BOOT SEQUENCE LOADER -->
+  <div class="boot-loader" data-loader>
+    <div class="boot-terminal">
+      <p>> init system...</p>
+      <p>> loading UI components...</p>
+      <p>> establishing connection...</p>
+      <p class="boot-success">> System Ready.</p>
+    </div>
+  </div>
+
+  <!-- CUSTOM CURSOR -->
+  <div class="cursor-dot" data-cursor-dot></div>
+  <div class="cursor-ring" data-cursor-ring></div>
+
+  <!-- COMMAND PALETTE OVERLAY -->
+  <div class="cmd-palette-backdrop" data-cmd-backdrop>
+    <div class="cmd-palette">
+      <div class="cmd-search">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" id="cmd-input" placeholder="Type a command or search..." autocomplete="off">
+        <span class="cmd-shortcut">ESC</span>
+      </div>
+      <div class="cmd-results" id="cmd-results">
+        <div class="cmd-group">Navigation</div>
+        <a href="#work" class="cmd-item"><span>Go to Projects</span></a>
+        <a href="resume.pdf" class="cmd-item"><span>Download Resume</span></a>
+        <div class="cmd-group">System</div>
+        <button class="cmd-item" id="cmd-theme-toggle"><span>Toggle Theme</span></button>
+      </div>
+    </div>
+  </div>
+
+  <nav class="site-nav showroom-nav" id="main-nav">
     <div class="nav-container">
-      <a href="#" class="brand">Manav Agarwal</a>
+      <a href="#" class="brand" aria-label="Home">Manav Agarwal</a>
       <div class="nav-links">
         <a href="#work">Work</a>
         <a href="#about">About</a>
-        <a href="#contact">Contact</a>
-        <a href="resume.pdf" class="btn-nav" download>Resume</a>
+        <a href="resume.pdf" download class="nav-link-secondary">Resume</a>
+        <a href="https://github.com/manav193" target="_blank" rel="noopener" class="nav-link-secondary">GitHub</a>
+        <button class="cmd-trigger" aria-label="Command Palette" onclick="document.querySelector('[data-cmd-backdrop]').classList.add('active'); document.getElementById('cmd-input').focus();">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"></path></svg>
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;">⌘K</span>
+        </button>
       </div>
     </div>
+    <!-- Scroll Progress Indicator -->
+    <div class="nav-progress-bar" id="nav-progress"></div>
   </nav>
 
-  <main id="main-content">
-    
-    <!-- HERO SECTION -->
-    <section class="hero cinematic-section">
-      <div class="hero-bg-glow"></div>
-      <div class="hero-content">
-        <p class="hero-eyebrow">Creative Technologist.</p>
-        <h1 class="hero-title">
-          I design interfaces,<br>
-          build products, and<br>
-          <span class="gradient-text">ship ideas with AI.</span>
-        </h1>
-        <div class="hero-actions">
-          <a href="#work" class="btn-primary">View Selected Work</a>
-          <a href="https://github.com/manav193" class="btn-secondary" target="_blank" rel="noopener">GitHub</a>
+  <main class="system-architecture">
+    <!-- 00 // HERO -->
+    <section class="system-section hero-section">
+      <div class="container-centered">
+        <p class="hero-kicker reveal-up" style="transition-delay: 0.1s">Creative Technologist & Frontend Engineer</p>
+        <h1 class="hero-title reveal-up" style="transition-delay: 0.2s">Building Premium<br>Digital Products.</h1>
+        <p class="hero-subtitle reveal-up" style="transition-delay: 0.3s">I specialize in interaction design and high-performance frontend architecture. I turn complex problems into polished, intuitive, and highly capable web experiences.</p>
+        <div class="hero-actions reveal-up" style="transition-delay: 0.4s">
+          <a href="#work" class="btn-primary magnetic-btn" data-magnetic>View Work</a>
+          <a href="resume.pdf" download class="btn-secondary magnetic-btn" data-magnetic>Download Resume</a>
         </div>
       </div>
     </section>
 
-    <!-- SELECTED WORK (CASE STUDIES) -->
-    <section id="work" class="selected-work cinematic-section">
-      <div class="section-header">
-        <h2>Selected Work</h2>
-        <p>Featured products and architectures.</p>
-      </div>
-
-      <div class="case-studies">
-        <!-- TOOLVERSE -->
-        <article class="case-study-card">
-          <div class="case-study-visual">
-            <a href="project-toolverse.html"><img src="images/toolverse_4.png" alt="ToolVerse Progressive Web App Dashboard showcasing offline developer utility tools" loading="lazy"></a>
-          </div>
-          <div class="case-study-info">
-            <h3>ToolVerse</h3>
-            <p class="project-tagline">Client-side utility application.</p>
-            <div class="project-specs">
-              <div><strong>Problem:</strong> Utility tools are ad-heavy and require internet connectivity, compromising privacy.</div>
-              <div><strong>Solution:</strong> A highly optimized Progressive Web App (PWA) running completely in-browser with zero server uploads.</div>
-              <div><strong>Features:</strong> Service Worker caching, Playwright automated testing, 50+ offline tools.</div>
-            </div>
-            <div class="tech-stack">
-              <span>Node.js</span> <span>PWA</span> <span>Playwright</span> <span>Vanilla JS</span>
-            </div>
-            <div class="case-study-actions">
-              <a href="project-toolverse.html" class="btn-primary btn-sm" aria-label="View ToolVerse Case Study">View Case Study</a>
-            </div>
-          </div>
-        </article>
-
-        <!-- SELFYY -->
-        <article class="case-study-card reverse">
-          <div class="case-study-visual">
-            <a href="project-selfyy.html"><img src="images/project-nexus.svg" alt="Architectural diagram for the SELFYY modular application builder" class="fallback-svg" loading="lazy"></a>
-          </div>
-          <div class="case-study-info">
-            <h3>SELFYY</h3>
-            <p class="project-tagline">Modular edge-routed platform.</p>
-            <div class="project-specs">
-              <div><strong>Problem:</strong> Monolithic architectures slow down static delivery when integrating dynamic application builders.</div>
-              <div><strong>Solution:</strong> Leveraged Vercel edge routing to decouple the high-performance static frontend from the dynamic application layers.</div>
-              <div><strong>Features:</strong> Dynamic routing boundaries, component-based monorepo structure, edge caching.</div>
-            </div>
-            <div class="tech-stack">
-              <span>Vercel Edge</span> <span>Routing</span> <span>Monorepo</span>
-            </div>
-            <div class="case-study-actions">
-              <a href="project-selfyy.html" class="btn-primary btn-sm" aria-label="View SELFYY Case Study">View Case Study</a>
-            </div>
-          </div>
-        </article>
-
-        <!-- LOVE WEBSITE -->
-        <article class="case-study-card">
-          <div class="case-study-visual">
-            <a href="project-love-journey.html"><img src="images/love_1.png" alt="Immersive scrolling UI of the Love Journey interactive timeline" loading="lazy"></a>
-          </div>
-          <div class="case-study-info">
-            <h3>Manav & My Love Journey</h3>
-            <p class="project-tagline">Cinematic Canvas API storytelling.</p>
-            <div class="project-specs">
-              <div><strong>Problem:</strong> Standard web galleries lack the emotional resonance required for personal timeline storytelling.</div>
-              <div><strong>Solution:</strong> An immersive, 60fps scrolling experience driven by audio-reactive Canvas APIs and dynamic parallax effects.</div>
-              <div><strong>Features:</strong> Web Audio API visualizer, fluid masonry media layouts, custom Intersection Observers.</div>
-            </div>
-            <div class="tech-stack">
-              <span>Canvas API</span> <span>Web Audio API</span> <span>Intersection Observer</span>
-            </div>
-            <div class="case-study-actions">
-              <a href="project-love-journey.html" class="btn-primary btn-sm" aria-label="View Love Journey Case Study">View Case Study</a>
-            </div>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <!-- MORE WORK (EDITORIAL GRID) -->
-    <section class="more-work cinematic-section">
-      <div class="section-header">
-        <h2>Experiments & Concepts</h2>
-        <p>UI design, motion, and game interfaces.</p>
-      </div>
-
-      <div class="editorial-grid">
-        <a href="project-promptai.html" class="editorial-card" aria-label="View PromptAI Concept Case Study">
-          <div class="editorial-img"><img src="images/promptai_new.png" alt="PromptAI split-pane user interface designed for prompt engineering" loading="lazy"></div>
-          <div class="editorial-content">
-            <h4>PromptAI Concept</h4>
-            <p>High-density split-pane UI for multi-model AI orchestration and prompt testing.</p>
-          </div>
-        </a>
-
-        <a href="project-shift-zero.html" class="editorial-card">
-          <div class="editorial-img"><img src="images/sz_menu.png" alt="SHIFT ZERO high-contrast cyberpunk Heads-Up Display design" loading="lazy"></div>
-          <div class="editorial-content">
-            <h4>SHIFT ZERO UI</h4>
-            <p>Cyberpunk Heads-Up Display (HUD) prioritizing sub-second readability in chaotic game environments.</p>
-          </div>
-        </a>
-
-        <a href="project-shift-zero.html" class="editorial-card">
-          <div class="editorial-img"><img src="images/sz_screens.png" alt="SHIFT ZERO playable game prototype running in the Godot 4 engine" loading="lazy"></div>
-          <div class="editorial-content">
-            <h4>SHIFT-ZERO Game</h4>
-            <p>Action game prototype developed in Godot 4 featuring custom CRT shaders and GDScript logic.</p>
-          </div>
-        </a>
-
-        <a href="project-nintendo.html" class="editorial-card">
-          <div class="editorial-img"><img src="images/nintendo.jpg" alt="Conceptual redesign of the Nintendo console dashboard featuring adaptive blurring" loading="lazy"></div>
-          <div class="editorial-content">
-            <h4>Nintendo UI Redesign</h4>
-            <p>OS-level interface concept utilizing adaptive background blurs and 10-foot spatial navigation.</p>
-          </div>
-        </a>
-
-        <a href="project-velora-bites.html" class="editorial-card">
-          <div class="editorial-img"><img src="images/velora_2.png" alt="Velora Bites luxury restaurant landing page with high-end culinary typography" loading="lazy"></div>
-          <div class="editorial-content">
-            <h4>Velora Bites</h4>
-            <p>Luxury web design exploring extreme whitespace, classic serif pairings, and frictionless booking flows.</p>
-          </div>
-        </a>
-
-        <a href="project-nike.html" class="editorial-card">
-          <div class="editorial-img"><img src="images/nike.png" alt="Nike Air Zoom e-commerce landing page featuring grid-breaking parallax masking" loading="lazy"></div>
-          <div class="editorial-content">
-            <h4>Nike Air Zoom UI</h4>
-            <p>Immersive e-commerce concept leveraging grid-breaking 3D masking and kinetic typography.</p>
-          </div>
-        </a>
-
-        <a href="https://my-portfolio-mu-jade-52.vercel.app/" class="editorial-card" target="_blank" rel="noopener" aria-label="View Portfolio Source Code">
-          <div class="editorial-img"><img src="images/project-pulse.svg" alt="Abstract architectural diagram of the Vanilla JS portfolio system" class="fallback-svg" loading="lazy"></div>
-          <div class="editorial-content">
-            <h4>Modern Portfolio System</h4>
-            <p>The Vanilla JS architecture powering this site. Built with zero dependencies for a 100/100 Lighthouse score.</p>
-          </div>
-        </a>
-      </div>
-    </section>
-
-    <!-- PROOF / STATS -->
-    <section class="stats-section">
-      <div class="stats-grid">
-        <div class="stat-item">
-          <span class="stat-number"><span data-count="65">0</span>K+</span>
-          <span class="stat-label">Instagram Followers (Peak)</span>
+    <!-- 01 // PROJECTS -->
+    <section id="work" class="system-section work-section">
+      <div class="container-centered">
+        <div class="section-header reveal-up">
+          <h2>Selected Work</h2>
+          <p>Featured architectures and digital products.</p>
         </div>
-        <div class="stat-item">
-          <span class="stat-number"><span data-count="50">0</span>M+</span>
-          <span class="stat-label">Cumulative Views</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-number"><span data-count="20">0</span>+</span>
-          <span class="stat-label">Freelance Clients</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-number"><span data-count="2">0</span>+</span>
-          <span class="stat-label">Years of UI/UX Design</span>
+
+        <div class="showroom-exhibition">
+          <!-- TOOLVERSE: CINEMATIC FULL BLEED -->
+          <article class="exhibit-full-bleed reveal-scale">
+            <div class="exhibit-visual" data-tilt>
+              <img src="images/toolverse_4.png" alt="ToolVerse Progressive Web App" loading="lazy">
+            </div>
+            <div class="exhibit-content">
+              <h3 class="exhibit-title">ToolVerse</h3>
+              <p class="exhibit-desc">A highly optimized PWA running completely in-browser with zero server uploads. Focus on instantaneous UX.</p>
+              <a href="project-toolverse.html" class="btn-text">View Case Study &rarr;</a>
+            </div>
+          </article>
+
+          <!-- SELFYY: EDITORIAL DIPTYCH -->
+          <article class="exhibit-diptych reveal-up">
+            <div class="exhibit-content">
+              <h3 class="exhibit-title">SELFYY</h3>
+              <p class="exhibit-desc">Vercel edge routing decoupling a high-performance static frontend from dynamic layers for maximum Lighthouse scores.</p>
+              <div class="tech-stack"><span>React</span> <span>Edge</span> <span>Monorepo</span></div>
+              <a href="project-selfyy.html" class="btn-text">View Case Study &rarr;</a>
+            </div>
+            <div class="exhibit-visual diagram-visual" data-tilt>
+              <img src="images/project-nexus.svg" alt="Architectural diagram" loading="lazy">
+            </div>
+          </article>
+
+          <!-- LOVE JOURNEY: FLOATING CANVAS -->
+          <article class="exhibit-floating reveal-scale">
+            <div class="exhibit-visual" data-tilt>
+              <img src="images/love_1.png" alt="Interactive timeline" loading="lazy">
+            </div>
+            <div class="exhibit-content">
+              <h3 class="exhibit-title">Love Journey</h3>
+              <p class="exhibit-desc">An immersive, 60fps scrolling experience driven by audio-reactive Canvas APIs.</p>
+              <a href="project-love-journey.html" class="btn-text">View Case Study &rarr;</a>
+            </div>
+          </article>
         </div>
       </div>
     </section>
 
-    <!-- ABOUT / STORY -->
-    <section id="about" class="about-section cinematic-section">
-      <div class="about-container">
-        <div class="about-text">
-          <h2>Creator turned Product Builder.</h2>
-          <p>My journey began in visual storytelling. Over 6 years of video editing and creator growth taught me how to capture attention and scale retention, building an audience of over 65K followers and generating 50M+ views.</p>
-          <p>I transitioned that instinct for pacing and visual hierarchy into software. Today, I work as a Creative Technologist, combining sharp UI/UX design with clean frontend execution. I build digital products, AI workflows, and game interfaces that don't just function—they feel intentional and premium.</p>
+    <!-- 02 // R&D -->
+    <section class="system-section concepts-section">
+      <div class="container-centered">
+        <div class="section-header reveal-up">
+          <h2>Experiments & Concepts</h2>
+          <p>UI mechanics, motion, and interaction models.</p>
         </div>
-        
-        <div class="skills-card">
-          <h3>The Stack</h3>
-          <div class="skills-tags">
-            <span>Frontend Development</span>
-            <span>UI/UX Design</span>
-            <span>Figma</span>
-            <span>Vercel</span>
-            <span>Git / GitHub</span>
-            <span>AI Prompt Engineering</span>
-            <span>Video Editing</span>
-            <span>Graphic Design</span>
-          </div>
-          
-          <div class="timeline-compact">
-            <div class="tl-step">Video & Creator Scale</div>
-            <div class="tl-step">Graphic Design</div>
-            <div class="tl-step">UI/UX & Interfaces</div>
-            <div class="tl-step active">Frontend & AI Products</div>
-          </div>
+
+        <div class="asymmetric-editorial-grid">
+          <a href="project-promptai.html" class="editorial-card featured-editorial reveal-up" style="transition-delay: 0.1s" aria-label="View PromptAI Concept Case Study">
+            <div class="editorial-img"><img src="images/promptai_new.png" alt="PromptAI split-pane user interface" loading="lazy"></div>
+            <div class="editorial-content">
+              <div class="hud-tag">UI DESIGN</div>
+              <h4>PromptAI Interface</h4>
+              <p>High-density split-pane UI for multi-model orchestration and testing.</p>
+            </div>
+          </a>
+          <a href="project-shift-zero.html" class="editorial-card standard-editorial reveal-up" style="transition-delay: 0.2s">
+            <div class="editorial-img"><img src="images/sz_menu.png" alt="SHIFT ZERO HUD" loading="lazy"></div>
+            <div class="editorial-content">
+              <div class="hud-tag">HUD DESIGN</div>
+              <h4>SHIFT ZERO UI</h4>
+              <p>Game HUD prioritizing sub-second readability.</p>
+            </div>
+          </a>
+          <a href="project-nintendo.html" class="editorial-card standard-editorial reveal-up" style="transition-delay: 0.1s">
+            <div class="editorial-img"><img src="images/nintendo.jpg" alt="Nintendo UI Concept" loading="lazy"></div>
+            <div class="editorial-content">
+              <div class="hud-tag">OS EXPLORATION</div>
+              <h4>Nintendo OS</h4>
+              <p>10-foot spatial navigation with adaptive blurring.</p>
+            </div>
+          </a>
+          <a href="project-velora-bites.html" class="editorial-card wide-editorial reveal-up" style="transition-delay: 0.2s">
+            <div class="editorial-img"><img src="images/velora_2.png" alt="Velora Bites luxury web design" loading="lazy"></div>
+            <div class="editorial-content">
+              <div class="hud-tag">LUXURY WEB</div>
+              <h4>Velora Bites</h4>
+              <p>Exploring extreme whitespace, classic serif pairings, and frictionless booking flows.</p>
+            </div>
+          </a>
+          <a href="project-nike.html" class="editorial-card standard-editorial reveal-up" style="transition-delay: 0.1s">
+            <div class="editorial-img"><img src="images/nike.png" alt="Nike parallax masking" loading="lazy"></div>
+            <div class="editorial-content">
+              <div class="hud-tag">E-COMMERCE</div>
+              <h4>Nike Air Zoom</h4>
+              <p>Grid-breaking 3D masking and kinetic typography.</p>
+            </div>
+          </a>
         </div>
       </div>
     </section>
 
-    <!-- RESUME & CONTACT -->
-    <section id="contact" class="contact-section cinematic-section">
-      <div class="contact-header">
-        <h2>Let's build something exceptional.</h2>
-        <div class="contact-actions">
-          <a href="mailto:monographicalpixel@gmail.com" class="btn-primary">Email Me</a>
-          <a href="resume.pdf" class="btn-secondary" download>Download Resume</a>
-        </div>
-      </div>
-
-      <div class="contact-grid">
-        <div class="contact-info">
-          <h3>Direct Connections</h3>
-          <ul class="contact-links">
-            <li><a href="mailto:monographicalpixel@gmail.com">monographicalpixel@gmail.com</a></li>
-            <li><a href="https://github.com/manav193" target="_blank" rel="noopener">GitHub Profile</a></li>
-            <li><a href="https://www.linkedin.com/in/manav-agarwal-33581a41a" target="_blank" rel="noopener">LinkedIn</a></li>
-          </ul>
-          <div class="education-note">
-            <p><strong>Education:</strong> B.Tech Mechanical Engineering (1st Year)</p>
-            <p><em>GitHub Student Developer Pack · Adobe Creative Cloud Student License</em></p>
+    <!-- 03 // ORIGIN -->
+    <section id="about" class="system-section about-section reveal-up">
+      <div class="container-centered">
+        <section class="editorial-story-section">
+          <div class="story-container">
+            <div class="story-text">
+              <h2 class="reveal-up" style="transition-delay: 0.1s">Creator turned Product Builder.</h2>
+              <p class="story-p reveal-up" style="transition-delay: 0.2s">My journey began in visual storytelling. Over 6 years of video editing and creator growth taught me how to capture attention and scale retention, building an audience of over 65K followers and generating 50M+ views.</p>
+              <p class="story-p reveal-up" style="transition-delay: 0.3s">I transitioned that instinct for pacing and visual hierarchy directly into software execution. Today, I operate as a Creative Technologist, combining sharp interaction design with clean frontend deployment. I build digital products, complex workflows, and game interfaces that are fast, accessible, and intuitive.</p>
+            </div>
+            <div class="story-visual-clean reveal-up" style="transition-delay: 0.4s">
+              <h3>Capabilities</h3>
+              <ul class="clean-list">
+                <li>Frontend Engineering</li>
+                <li>UI / UX Design</li>
+                <li>System Architecture</li>
+                <li>Interaction Physics</li>
+              </ul>
+            </div>
           </div>
-        </div>
-
-        <form class="contact-form" action="mailto:manav@example.com" method="POST" enctype="text/plain">
-          <p style="color: var(--muted); margin-bottom: 24px;">Or email me directly at <strong>manav@example.com</strong></p>
-          <div class="form-group">
-            <label for="name">Name</label>
-            <input type="text" id="name" name="name" required placeholder="John Doe">
-          </div>
-          <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" name="_replyto" required placeholder="john@example.com">
-          </div>
-          <div class="form-group">
-            <label for="message">Project Brief</label>
-            <textarea id="message" name="message" required rows="4" placeholder="Tell me about your vision..."></textarea>
-          </div>
-          <button type="submit" class="btn-primary">Send Message</button>
-        </form>
+        </section>
       </div>
     </section>
 
+    <!-- 04 // CONTACT -->
+    <section id="contact" class="system-section contact-section reveal-up">
+      <div class="container-centered">
+        <section class="showroom-contact">
+          <div class="contact-pure">
+            <h2 class="reveal-up" style="transition-delay: 0.1s">Start a Conversation.</h2>
+            <div class="contact-actions-clean reveal-up" style="transition-delay: 0.3s">
+              <a href="mailto:monographicalpixel@gmail.com" class="btn-primary magnetic-btn" data-magnetic>Contact Me</a>
+              <div class="contact-links-clean">
+                <a href="resume.pdf" download>Resume</a>
+                <a href="https://linkedin.com/in/manavagarwal" target="_blank" rel="noopener">LinkedIn</a>
+                <a href="https://github.com/manav193" target="_blank" rel="noopener">GitHub</a>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
   </main>
 
-  <footer class="site-footer">
-    <p>&copy; 2026 Manav Agarwal. Handcrafted Product Portfolio.</p>
+  <!-- PREMIUM THEME SWITCHER DOCK -->
+  <div class="theme-dock glass" data-theme-dock>
+    <button class="theme-btn" data-theme-id="light-apple" aria-label="Light Theme" title="Apple Light"></button>
+    <button class="theme-btn" data-theme-id="dark-graphite" aria-label="Graphite Luxury" title="Graphite Luxury"></button>
+    <button class="theme-btn" data-theme-id="midnight-sapphire" aria-label="Midnight Sapphire" title="Midnight Sapphire"></button>
+    <button class="theme-btn" data-theme-id="aurora-violet" aria-label="Aurora Violet" title="Aurora Violet"></button>
+    <button class="theme-btn" data-theme-id="forest-premium" aria-label="Forest Premium" title="Forest Premium"></button>
+    <button class="theme-btn" data-theme-id="sunset-copper" aria-label="Sunset Copper" title="Sunset Copper"></button>
+    <button class="theme-btn" data-theme-id="monochrome" aria-label="Monochrome" title="Monochrome"></button>
+  </div>
+
+  <!-- SYSTEM STATUS FOOTER -->
+  <footer class="system-footer">
+    <div class="footer-container">
+      <div class="footer-left">
+        <span class="brand">M.A.</span>
+        <span class="footer-copy">© 2026 / All systems operational.</span>
+      </div>
+      <div class="footer-right">
+        <a href="#top" class="back-to-top magnetic-btn" data-magnetic>
+          <span class="hud-tag">SCROLL TO TOP</span>
+        </a>
+      </div>
+    </div>
   </footer>
 
   <script type="module" src="js/main.js"></script>
