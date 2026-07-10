@@ -1,4 +1,4 @@
-const cacheName = "manav-portfolio-v5";
+const cacheName = "manav-portfolio-v6";
 const assets = [
   "./",
   "./index.html",
@@ -13,7 +13,7 @@ const assets = [
   "./js/arcade-os.js",
   "./js/arcade-apps.js",
   "./js/arcade-qa-fixes.js",
-  "./js/arcade-mobile.js",
+  "./js/mobile-arcade-hotfix.js",
   "./js/machine-bg.js",
   "./js/modules/theme.js",
   "./js/modules/scroll.js",
