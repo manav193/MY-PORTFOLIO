@@ -36,23 +36,45 @@ const waitForArcade = (attempt = 0) => {
     os._qaLaunchGuard = null;
   };
 
+  const restoreHomeView = () => {
+    const loadingView = document.getElementById('arcade-loading');
+    const appView = document.getElementById('arcade-app-view');
+    const homeView = document.getElementById('arcade-home');
+
+    if (os.activeApp) {
+      try {
+        os.activeApp.destroy?.();
+      } catch (_) {}
+      os.activeApp = null;
+    }
+
+    if (loadingView) loadingView.classList.remove('active');
+    if (appView) {
+      appView.classList.remove('active');
+      appView.innerHTML = '';
+    }
+    if (homeView) homeView.classList.add('active');
+
+    os.state = 'HOME';
+    os.renderHome();
+  };
+
+  const suppressLateMount = () => {
+    window.clearTimeout(os._qaLateMountGuard);
+    os._qaLateMountGuard = window.setTimeout(() => {
+      if (os.state === 'APP' || os.state === 'LOADING' || os.activeApp) {
+        restoreHomeView();
+      }
+    }, 900);
+  };
+
   const originalGoHome = os.goHome.bind(os);
   os.goHome = function goHomeStable() {
     resetPendingLaunch();
 
     if (this.state === 'LOADING') {
-      const loadingView = document.getElementById('arcade-loading');
-      const appView = document.getElementById('arcade-app-view');
-      const homeView = document.getElementById('arcade-home');
-      if (loadingView) loadingView.classList.remove('active');
-      if (appView) {
-        appView.classList.remove('active');
-        appView.innerHTML = '';
-      }
-      if (homeView) homeView.classList.add('active');
-      this.state = 'HOME';
-      this.activeApp = null;
-      this.renderHome();
+      restoreHomeView();
+      suppressLateMount();
       return;
     }
 
@@ -62,7 +84,9 @@ const waitForArcade = (attempt = 0) => {
   const originalForceGoHome = os.forceGoHome.bind(os);
   os.forceGoHome = function forceGoHomeStable() {
     resetPendingLaunch();
-    return originalForceGoHome();
+    const result = originalForceGoHome();
+    suppressLateMount();
+    return result;
   };
 
   const screen = document.getElementById('cabinet-screen');
@@ -84,6 +108,7 @@ const waitForArcade = (attempt = 0) => {
 
   window.addEventListener('pagehide', () => {
     resetPendingLaunch();
+    window.clearTimeout(os._qaLateMountGuard);
     if (window.ArcadeOS && typeof window.ArcadeOS.forceGoHome === 'function') {
       window.ArcadeOS.forceGoHome();
     }
