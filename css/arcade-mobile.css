@@ -1,4 +1,4 @@
-@media (max-width: 1024px), (pointer: coarse) {
+@media (max-width: 1024px) {
   html, body { overflow-x: hidden; }
 
   .intro-sticky-container,
@@ -14,22 +14,16 @@
     box-shadow: 0 22px 70px rgba(0,0,0,.5) !important;
   }
 
-  .cab-3d-volume {
-    transform-style: flat !important;
-  }
+  .cab-3d-volume { transform-style: flat !important; }
 
   .cab-left,
   .cab-right,
   .cab-top,
   .cab-bottom,
   .cab-glass-reflection,
-  .living-ambient-light {
-    display: none !important;
-  }
+  .living-ambient-light { display: none !important; }
 
-  .screen-2d-anchor {
-    pointer-events: auto;
-  }
+  .screen-2d-anchor { pointer-events: auto; }
 
   #cabinet-screen,
   .cabinet-screen {
@@ -38,25 +32,17 @@
   }
 
   #arcade-status-bar,
-  #arcade-footer-controls {
-    font-size: clamp(10px, 1.7vw, 14px);
-  }
+  #arcade-footer-controls { font-size: clamp(10px, 1.7vw, 14px); }
 
   #arcade-app-view,
   #arcade-home,
-  #arcade-loading {
-    min-height: 0;
-  }
+  #arcade-loading { min-height: 0; }
 
-  .home-details .app-title {
-    font-size: clamp(18px, 3.2vw, 28px);
-  }
+  .home-details .app-title { font-size: clamp(18px, 3.2vw, 28px); }
 
   .home-details .app-desc,
   .app-hint,
-  .app-status-badge {
-    font-size: clamp(10px, 1.8vw, 14px);
-  }
+  .app-status-badge { font-size: clamp(10px, 1.8vw, 14px); }
 
   .app-card {
     min-width: 76px;
@@ -92,9 +78,7 @@
     min-height: 20px;
   }
 
-  .cab-btn-inner {
-    font-size: 14px !important;
-  }
+  .cab-btn-inner { font-size: 14px !important; }
 
   .arcade-touch-controls {
     position: absolute;
@@ -118,9 +102,7 @@
     grid-template-rows: repeat(3, 46px);
   }
 
-  .arcade-touch-actions {
-    grid-template-columns: repeat(2, 54px);
-  }
+  .arcade-touch-actions { grid-template-columns: repeat(2, 54px); }
 
   .arcade-touch-btn {
     display: grid;
@@ -202,9 +184,7 @@
     grid-template-rows: repeat(3, 42px);
   }
 
-  .arcade-touch-actions {
-    grid-template-columns: repeat(2, 48px);
-  }
+  .arcade-touch-actions { grid-template-columns: repeat(2, 48px); }
 
   .arcade-touch-btn {
     min-width: 42px;
@@ -215,6 +195,6 @@
   #arcade-footer-controls { display: none !important; }
 }
 
-@media (pointer: fine) and (min-width: 1025px) {
+@media (min-width: 1025px) {
   .arcade-touch-controls { display: none !important; }
 }
