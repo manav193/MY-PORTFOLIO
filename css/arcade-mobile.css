@@ -1,0 +1,220 @@
+@media (max-width: 1024px), (pointer: coarse) {
+  html, body { overflow-x: hidden; }
+
+  .intro-sticky-container,
+  .outer-center-wrapper {
+    min-height: 100svh;
+  }
+
+  .cabinet-chassis {
+    width: min(92vw, 760px) !important;
+    max-height: 76svh;
+    transform-origin: center center;
+    filter: none !important;
+    box-shadow: 0 22px 70px rgba(0,0,0,.5) !important;
+  }
+
+  .cab-3d-volume {
+    transform-style: flat !important;
+  }
+
+  .cab-left,
+  .cab-right,
+  .cab-top,
+  .cab-bottom,
+  .cab-glass-reflection,
+  .living-ambient-light {
+    display: none !important;
+  }
+
+  .screen-2d-anchor {
+    pointer-events: auto;
+  }
+
+  #cabinet-screen,
+  .cabinet-screen {
+    touch-action: manipulation;
+    overscroll-behavior: contain;
+  }
+
+  #arcade-status-bar,
+  #arcade-footer-controls {
+    font-size: clamp(10px, 1.7vw, 14px);
+  }
+
+  #arcade-app-view,
+  #arcade-home,
+  #arcade-loading {
+    min-height: 0;
+  }
+
+  .home-details .app-title {
+    font-size: clamp(18px, 3.2vw, 28px);
+  }
+
+  .home-details .app-desc,
+  .app-hint,
+  .app-status-badge {
+    font-size: clamp(10px, 1.8vw, 14px);
+  }
+
+  .app-card {
+    min-width: 76px;
+    min-height: 76px;
+  }
+
+  .cab-control-deck {
+    min-height: 146px;
+    padding: 18px 22px !important;
+  }
+
+  .cab-joystick {
+    transform: scale(1.28);
+    transform-origin: left center;
+    touch-action: none;
+  }
+
+  .cab-btn-grid {
+    gap: 12px !important;
+    transform: scale(1.18);
+    transform-origin: right center;
+  }
+
+  .cab-btn,
+  .cab-btn-small {
+    min-width: 44px;
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+
+  .cab-btn-small {
+    min-width: 38px;
+    min-height: 20px;
+  }
+
+  .cab-btn-inner {
+    font-size: 14px !important;
+  }
+
+  .arcade-touch-controls {
+    position: absolute;
+    inset: auto 10px 8px 10px;
+    z-index: 50;
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    pointer-events: none;
+  }
+
+  .arcade-touch-dpad,
+  .arcade-touch-actions {
+    pointer-events: auto;
+    display: grid;
+    gap: 8px;
+  }
+
+  .arcade-touch-dpad {
+    grid-template-columns: repeat(3, 46px);
+    grid-template-rows: repeat(3, 46px);
+  }
+
+  .arcade-touch-actions {
+    grid-template-columns: repeat(2, 54px);
+  }
+
+  .arcade-touch-btn {
+    display: grid;
+    place-items: center;
+    min-width: 46px;
+    min-height: 46px;
+    border: 1px solid rgba(255,255,255,.28);
+    border-radius: 14px;
+    background: rgba(8,10,16,.78);
+    color: #fff;
+    font: 700 15px/1 Inter, sans-serif;
+    box-shadow: inset 0 1px rgba(255,255,255,.12), 0 8px 24px rgba(0,0,0,.28);
+    backdrop-filter: blur(10px);
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  .arcade-touch-btn:active,
+  .arcade-touch-btn.is-pressed {
+    transform: scale(.92);
+    background: rgba(61,132,255,.92);
+  }
+
+  .arcade-touch-up { grid-column: 2; grid-row: 1; }
+  .arcade-touch-left { grid-column: 1; grid-row: 2; }
+  .arcade-touch-right { grid-column: 3; grid-row: 2; }
+  .arcade-touch-down { grid-column: 2; grid-row: 3; }
+
+  .arcade-touch-back {
+    grid-column: 1 / span 2;
+    min-width: 116px;
+  }
+
+  .theme-dock {
+    bottom: 76px !important;
+    right: 14px !important;
+    max-width: calc(100vw - 28px);
+    overflow-x: auto;
+  }
+
+  .os-dock {
+    width: calc(100vw - 24px);
+    left: 12px !important;
+    right: 12px !important;
+    transform: none !important;
+  }
+
+  .os-dock-container {
+    justify-content: center;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .os-dock-container::-webkit-scrollbar { display: none; }
+
+  .dock-item {
+    flex: 0 0 52px;
+    width: 52px;
+    height: 52px;
+  }
+}
+
+@media (max-width: 600px) {
+  .cabinet-chassis {
+    width: 96vw !important;
+    max-height: 72svh;
+  }
+
+  .cab-control-deck {
+    min-height: 132px;
+    padding: 14px 16px !important;
+  }
+
+  .cab-joystick { transform: scale(1.12); }
+  .cab-btn-grid { transform: scale(1.04); gap: 8px !important; }
+
+  .arcade-touch-dpad {
+    grid-template-columns: repeat(3, 42px);
+    grid-template-rows: repeat(3, 42px);
+  }
+
+  .arcade-touch-actions {
+    grid-template-columns: repeat(2, 48px);
+  }
+
+  .arcade-touch-btn {
+    min-width: 42px;
+    min-height: 42px;
+    border-radius: 12px;
+  }
+
+  #arcade-footer-controls { display: none !important; }
+}
+
+@media (pointer: fine) and (min-width: 1025px) {
+  .arcade-touch-controls { display: none !important; }
+}
