@@ -13,20 +13,20 @@ if (isCoarsePointer || isCompactViewport) {
     document.head.appendChild(link);
   };
 
-  const emit = (eventName) => {
-    const bus = window.ArcadeEventBus;
-    if (bus && typeof bus.emit === 'function') bus.emit(eventName);
+  const sendKey = (key) => {
+    document.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }));
+    window.setTimeout(() => {
+      document.dispatchEvent(new KeyboardEvent('keyup', { key, bubbles: true, cancelable: true }));
+    }, 70);
   };
 
-  const bindPress = (button, eventName) => {
+  const bindPress = (button, key) => {
     const press = (event) => {
       event.preventDefault();
       button.classList.add('is-pressed');
-      emit(eventName);
+      sendKey(key);
     };
-
     const release = () => button.classList.remove('is-pressed');
-
     button.addEventListener('pointerdown', press, { passive: false });
     button.addEventListener('pointerup', release);
     button.addEventListener('pointercancel', release);
@@ -55,25 +55,16 @@ if (isCoarsePointer || isCompactViewport) {
     `;
 
     screen.appendChild(controls);
-
-    bindPress(controls.querySelector('.arcade-touch-up'), 'ARCADE_UP');
-    bindPress(controls.querySelector('.arcade-touch-down'), 'ARCADE_DOWN');
-    bindPress(controls.querySelector('.arcade-touch-left'), 'ARCADE_LEFT');
-    bindPress(controls.querySelector('.arcade-touch-right'), 'ARCADE_RIGHT');
-    bindPress(controls.querySelector('.arcade-touch-a'), 'ARCADE_ACTION_A');
-    bindPress(controls.querySelector('.arcade-touch-b'), 'ARCADE_ACTION_B');
-    bindPress(controls.querySelector('.arcade-touch-back'), 'ARCADE_BACK');
-
-    controls.querySelector('.arcade-touch-a').addEventListener('pointerdown', (event) => {
-      event.preventDefault();
-      emit('ARCADE_CONFIRM');
-    }, { passive: false });
+    bindPress(controls.querySelector('.arcade-touch-up'), 'ArrowUp');
+    bindPress(controls.querySelector('.arcade-touch-down'), 'ArrowDown');
+    bindPress(controls.querySelector('.arcade-touch-left'), 'ArrowLeft');
+    bindPress(controls.querySelector('.arcade-touch-right'), 'ArrowRight');
+    bindPress(controls.querySelector('.arcade-touch-a'), 'Enter');
+    bindPress(controls.querySelector('.arcade-touch-b'), ' ');
+    bindPress(controls.querySelector('.arcade-touch-back'), 'Escape');
   };
 
   const optimizeMobileRuntime = () => {
-    const root = document.documentElement;
-    root.style.setProperty('--arcade-mobile-performance', '1');
-
     const screen = document.getElementById('cabinet-screen');
     if (screen) {
       screen.style.contain = 'layout paint size';
