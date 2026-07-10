@@ -1,12 +1,20 @@
 @media (max-width: 1024px) {
   html, body { overflow-x: hidden; }
 
-  .intro-sticky-container,
-  .outer-center-wrapper {
-    min-height: 100svh;
+  .cursor-dot,
+  .cursor-ring,
+  [data-cursor-dot],
+  [data-cursor-ring] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
   }
 
-  /* Preserve the original full-screen intro state so scroll animation stays intact. */
+  body { cursor: auto !important; }
+
+  .intro-sticky-container,
+  .outer-center-wrapper { min-height: 100svh; }
+
   .cabinet-chassis {
     width: 100vw;
     height: 100svh;
@@ -15,18 +23,32 @@
     transform-origin: center center;
   }
 
-  /* Only constrain the cabinet after the original animation enters compact mode. */
   .cabinet-chassis.is-scaled {
     width: min(92vw, 760px) !important;
     height: min(82svh, 860px) !important;
     max-width: 760px;
     max-height: 860px;
-    box-shadow: 0 22px 70px rgba(0,0,0,.55) !important;
+    box-shadow: 0 18px 45px rgba(0,0,0,.48) !important;
   }
 
-  /* Keep the real 3D cabinet animation and hardware faces enabled. */
   .cab-3d-volume {
     transform-style: preserve-3d !important;
+    will-change: auto !important;
+  }
+
+  .cab-glass-reflection,
+  .cab-scanlines,
+  .living-ambient-light,
+  #machine-bg,
+  .aurora-bg {
+    display: none !important;
+  }
+
+  .cab-panel,
+  .mat-anodized,
+  .mat-machined,
+  .mat-rubber {
+    filter: none !important;
   }
 
   .screen-2d-anchor { pointer-events: auto; }
@@ -35,6 +57,7 @@
   .cabinet-screen {
     touch-action: manipulation;
     overscroll-behavior: contain;
+    contain: layout paint;
   }
 
   #arcade-status-bar,
@@ -85,62 +108,7 @@
   }
 
   .cab-btn-inner { font-size: 14px !important; }
-
-  .arcade-touch-controls {
-    position: absolute;
-    inset: auto 10px 8px 10px;
-    z-index: 50;
-    display: flex;
-    justify-content: space-between;
-    align-items: end;
-    pointer-events: none;
-  }
-
-  .arcade-touch-dpad,
-  .arcade-touch-actions {
-    pointer-events: auto;
-    display: grid;
-    gap: 8px;
-  }
-
-  .arcade-touch-dpad {
-    grid-template-columns: repeat(3, 46px);
-    grid-template-rows: repeat(3, 46px);
-  }
-
-  .arcade-touch-actions { grid-template-columns: repeat(2, 54px); }
-
-  .arcade-touch-btn {
-    display: grid;
-    place-items: center;
-    min-width: 46px;
-    min-height: 46px;
-    border: 1px solid rgba(255,255,255,.28);
-    border-radius: 14px;
-    background: rgba(8,10,16,.78);
-    color: #fff;
-    font: 700 15px/1 Inter, sans-serif;
-    box-shadow: inset 0 1px rgba(255,255,255,.12), 0 8px 24px rgba(0,0,0,.28);
-    backdrop-filter: blur(10px);
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-  }
-
-  .arcade-touch-btn:active,
-  .arcade-touch-btn.is-pressed {
-    transform: scale(.92);
-    background: rgba(61,132,255,.92);
-  }
-
-  .arcade-touch-up { grid-column: 2; grid-row: 1; }
-  .arcade-touch-left { grid-column: 1; grid-row: 2; }
-  .arcade-touch-right { grid-column: 3; grid-row: 2; }
-  .arcade-touch-down { grid-column: 2; grid-row: 3; }
-
-  .arcade-touch-back {
-    grid-column: 1 / span 2;
-    min-width: 116px;
-  }
+  .arcade-touch-controls { display: none !important; }
 
   .theme-dock {
     bottom: 76px !important;
@@ -169,6 +137,11 @@
     width: 52px;
     height: 52px;
   }
+
+  canvas {
+    image-rendering: pixelated;
+    filter: none !important;
+  }
 }
 
 @media (max-width: 600px) {
@@ -184,20 +157,6 @@
 
   .cab-joystick { transform: scale(1.1); }
   .cab-btn-grid { transform: scale(1.02); gap: 8px !important; }
-
-  .arcade-touch-dpad {
-    grid-template-columns: repeat(3, 42px);
-    grid-template-rows: repeat(3, 42px);
-  }
-
-  .arcade-touch-actions { grid-template-columns: repeat(2, 48px); }
-
-  .arcade-touch-btn {
-    min-width: 42px;
-    min-height: 42px;
-    border-radius: 12px;
-  }
-
   #arcade-footer-controls { display: none !important; }
 }
 
