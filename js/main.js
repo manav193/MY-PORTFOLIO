@@ -7,7 +7,6 @@ import { initOS } from "./modules/os.js";
 
 document.body.classList.add("is-loading");
 
-// Chamber Entry Physics
 document.body.style.opacity = '0';
 document.body.style.transition = 'opacity 0.8s var(--motion-momentum)';
 
@@ -41,6 +40,10 @@ initContactForm();
 window.addEventListener("load", () => {
   import("./arcade-qa-fixes.js").catch((error) => {
     console.warn("Arcade stabilization module failed to load", error);
+  });
+
+  import("./arcade-mobile.js").catch((error) => {
+    console.warn("Arcade mobile module failed to load", error);
   });
 
   if ("serviceWorker" in navigator) {
