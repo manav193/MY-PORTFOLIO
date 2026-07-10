@@ -1,5 +1,5 @@
 /**
- * ARCADE OS PLATFORM - APPLICATIONS (Phase 1 Shell Placeholders)
+ * ARCADE OS PLATFORM - APPLICATIONS
  * Includes: Reaction Test, Neon Snake, Breakout, Pixel Pad, Palette Lab
  */
 
@@ -1676,11 +1676,11 @@ class PixelPadApp {
         <div class="placeholder-icon">🎨</div>
         <div class="placeholder-category">CREATIVE TOOL</div>
         <h2 class="placeholder-title">Pixel Pad</h2>
-        <div class="placeholder-status-badge coming-soon">COMING SOON</div>
+        <div class="placeholder-status-badge ready">READY</div>
         <p class="placeholder-desc">12x12 retro canvas sketching tool.</p>
         
         <div class="placeholder-message">
-          Coming Soon.
+          Tool ready.
         </div>
         
         <button class="placeholder-back-btn" id="placeholder-back-btn">
@@ -1719,11 +1719,11 @@ class PaletteLabApp {
         <div class="placeholder-icon">🧪</div>
         <div class="placeholder-category">CREATIVE TOOL</div>
         <h2 class="placeholder-title">Palette Lab</h2>
-        <div class="placeholder-status-badge coming-soon">COMING SOON</div>
+        <div class="placeholder-status-badge ready">READY</div>
         <p class="placeholder-desc">Interactive hexadecimal color palette generator.</p>
         
         <div class="placeholder-message">
-          Coming Soon.
+          Tool ready.
         </div>
         
         <button class="placeholder-back-btn" id="placeholder-back-btn">
@@ -1742,6 +1742,208 @@ class PaletteLabApp {
   
   destroy() {
     // Teardown logic
+  }
+}
+
+class PixelPadToolApp {
+  init(container, bus, storage, audio) {
+    this.container = container;
+    this.bus = bus;
+    this.storage = storage;
+    this.audio = audio;
+    this.size = 12;
+    this.activeColor = '#10b981';
+    this.palette = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#ffffff', '#0c0c0e'];
+    this.pixels = this.storage.get('pixelpad_pixels', Array(this.size * this.size).fill('#0c0c0e'));
+  }
+
+  mount() {
+    this.container.innerHTML = `
+      <div class="pixelpad-app">
+        <div class="tool-header">
+          <div>
+            <div class="tool-kicker">CREATIVE TOOL</div>
+            <h2>Pixel Pad</h2>
+          </div>
+          <button class="placeholder-back-btn" id="pixelpad-exit">EXIT</button>
+        </div>
+        <div class="pixelpad-grid" id="pixelpad-grid" aria-label="12 by 12 pixel canvas"></div>
+        <div class="pixelpad-controls">
+          <div class="pixelpad-swatches" id="pixelpad-swatches"></div>
+          <button class="tool-btn" id="pixelpad-clear">CLEAR</button>
+          <button class="tool-btn" id="pixelpad-save">SAVE</button>
+        </div>
+        <p class="tool-status" id="pixelpad-status">Tap a cell to paint.</p>
+      </div>
+    `;
+
+    this.grid = this.container.querySelector('#pixelpad-grid');
+    this.status = this.container.querySelector('#pixelpad-status');
+    this.renderGrid();
+    this.renderSwatches();
+
+    this.container.querySelector('#pixelpad-exit')?.addEventListener('click', () => this.bus.emit('ARCADE_BACK'));
+    this.container.querySelector('#pixelpad-clear')?.addEventListener('click', () => this.clear());
+    this.container.querySelector('#pixelpad-save')?.addEventListener('click', () => this.save('Saved to local storage.'));
+  }
+
+  renderGrid() {
+    this.grid.innerHTML = this.pixels.map((color, idx) => `
+      <button class="pixel-cell" data-idx="${idx}" style="background:${color}" aria-label="Pixel ${idx + 1}"></button>
+    `).join('');
+
+    this.grid.querySelectorAll('.pixel-cell').forEach(cell => {
+      cell.addEventListener('pointerdown', () => {
+        const idx = Number(cell.dataset.idx);
+        this.pixels[idx] = this.activeColor;
+        cell.style.background = this.activeColor;
+        this.audio.playTick();
+      });
+    });
+  }
+
+  renderSwatches() {
+    const swatches = this.container.querySelector('#pixelpad-swatches');
+    swatches.innerHTML = this.palette.map(color => `
+      <button class="pixel-swatch ${color === this.activeColor ? 'active' : ''}" data-color="${color}" style="background:${color}" aria-label="Select ${color}"></button>
+    `).join('');
+
+    swatches.querySelectorAll('.pixel-swatch').forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.activeColor = btn.dataset.color;
+        this.renderSwatches();
+        this.audio.playSelect();
+      });
+    });
+  }
+
+  clear() {
+    this.pixels = Array(this.size * this.size).fill('#0c0c0e');
+    this.renderGrid();
+    this.save('Canvas cleared.');
+    this.audio.playBack();
+  }
+
+  save(message) {
+    this.storage.set('pixelpad_pixels', this.pixels);
+    if (this.status) this.status.textContent = message;
+  }
+
+  destroy() {
+    this.save('Saved to local storage.');
+    this.container.innerHTML = '';
+  }
+}
+
+class PaletteLabToolApp {
+  init(container, bus, storage, audio) {
+    this.container = container;
+    this.bus = bus;
+    this.storage = storage;
+    this.audio = audio;
+    this.locks = this.storage.get('palettelab_locks', [false, false, false, false, false]);
+    this.colors = this.storage.get('palettelab_colors', this.generatePalette());
+  }
+
+  mount() {
+    this.container.innerHTML = `
+      <div class="palette-app">
+        <div class="tool-header">
+          <div>
+            <div class="tool-kicker">CREATIVE TOOL</div>
+            <h2>Palette Lab</h2>
+          </div>
+          <button class="placeholder-back-btn" id="palette-exit">EXIT</button>
+        </div>
+        <div class="palette-strip" id="palette-strip"></div>
+        <div class="palette-controls">
+          <button class="tool-btn" id="palette-generate">GENERATE</button>
+          <button class="tool-btn" id="palette-copy">COPY HEX</button>
+        </div>
+        <p class="tool-status" id="palette-status">Lock colors, then generate variants.</p>
+      </div>
+    `;
+
+    this.status = this.container.querySelector('#palette-status');
+    this.renderPalette();
+
+    this.container.querySelector('#palette-exit')?.addEventListener('click', () => this.bus.emit('ARCADE_BACK'));
+    this.container.querySelector('#palette-generate')?.addEventListener('click', () => this.regenerate());
+    this.container.querySelector('#palette-copy')?.addEventListener('click', () => this.copyPalette());
+  }
+
+  generatePalette() {
+    const base = Math.floor(Math.random() * 360);
+    return [0, 34, 78, 146, 212].map((offset, idx) => {
+      const hue = (base + offset) % 360;
+      const saturation = idx === 4 ? 12 : 62 + (idx * 5);
+      const lightness = idx === 0 ? 42 : 48 + (idx * 6);
+      return this.hslToHex(hue, saturation, Math.min(lightness, 82));
+    });
+  }
+
+  hslToHex(h, s, l) {
+    s /= 100;
+    l /= 100;
+    const k = n => (n + h / 30) % 12;
+    const a = s * Math.min(l, 1 - l);
+    const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+    return `#${[f(0), f(8), f(4)].map(x => Math.round(255 * x).toString(16).padStart(2, '0')).join('')}`;
+  }
+
+  renderPalette() {
+    const strip = this.container.querySelector('#palette-strip');
+    strip.innerHTML = this.colors.map((color, idx) => `
+      <div class="palette-color" style="background:${color}">
+        <button class="palette-lock ${this.locks[idx] ? 'active' : ''}" data-idx="${idx}" aria-label="Toggle lock for ${color}">${this.locks[idx] ? 'LOCK' : 'OPEN'}</button>
+        <button class="palette-hex" data-color="${color}">${color}</button>
+      </div>
+    `).join('');
+
+    strip.querySelectorAll('.palette-lock').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = Number(btn.dataset.idx);
+        this.locks[idx] = !this.locks[idx];
+        this.persist();
+        this.renderPalette();
+        this.audio.playTick();
+      });
+    });
+
+    strip.querySelectorAll('.palette-hex').forEach(btn => {
+      btn.addEventListener('click', () => this.copyText(btn.dataset.color, `Copied ${btn.dataset.color}.`));
+    });
+  }
+
+  regenerate() {
+    const next = this.generatePalette();
+    this.colors = this.colors.map((color, idx) => this.locks[idx] ? color : next[idx]);
+    this.persist();
+    this.renderPalette();
+    if (this.status) this.status.textContent = 'Generated a fresh palette.';
+    this.audio.playSelect();
+  }
+
+  copyPalette() {
+    this.copyText(this.colors.join(' '), 'Copied palette hex values.');
+  }
+
+  copyText(text, message) {
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(text).catch(() => {});
+    }
+    if (this.status) this.status.textContent = message;
+    this.audio.playSelect();
+  }
+
+  persist() {
+    this.storage.set('palettelab_colors', this.colors);
+    this.storage.set('palettelab_locks', this.locks);
+  }
+
+  destroy() {
+    this.persist();
+    this.container.innerHTML = '';
   }
 }
 
@@ -1787,8 +1989,8 @@ window.addEventListener('DOMContentLoaded', () => {
     category: 'CREATIVE TOOL',
     description: '12x12 retro canvas sketching tool.',
     icon: '🎨',
-    status: 'coming-soon',
-    component: PixelPadApp
+    status: 'ready',
+    component: PixelPadToolApp
   });
   
   ArcadeRegistry.register({
@@ -1797,7 +1999,7 @@ window.addEventListener('DOMContentLoaded', () => {
     category: 'CREATIVE TOOL',
     description: 'Interactive hexadecimal color palette generator.',
     icon: '🧪',
-    status: 'coming-soon',
-    component: PaletteLabApp
+    status: 'ready',
+    component: PaletteLabToolApp
   });
 });
