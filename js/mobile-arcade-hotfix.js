@@ -1,12 +1,12 @@
 const isMobileArcade = window.matchMedia('(max-width: 1024px)').matches;
 
 if (isMobileArcade) {
-  const removeInjectedControls = () => {
-    document.querySelectorAll('.arcade-touch-controls').forEach((node) => node.remove());
+  const removeMobileOnlyElements = () => {
+    document.querySelectorAll('.arcade-touch-controls, [data-cursor-dot], [data-cursor-ring], [data-cursor]').forEach((node) => node.remove());
   };
 
-  removeInjectedControls();
-  const observer = new MutationObserver(removeInjectedControls);
+  removeMobileOnlyElements();
+  const observer = new MutationObserver(removeMobileOnlyElements);
   observer.observe(document.documentElement, { childList: true, subtree: true });
 
   const dockItems = Array.from(document.querySelectorAll('.dock-item'));
