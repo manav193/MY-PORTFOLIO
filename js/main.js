@@ -4,6 +4,8 @@ import { initTyping } from "./modules/typing.js";
 import { initMagnetic, initCursor, initTilt, initParallax } from "./modules/motion.js";
 import { initContactForm } from "./modules/contact.js";
 import { initOS } from "./modules/os.js";
+import { initDockController } from "./modules/dock-controller.js?v=5";
+import { initCursorSystem } from "./modules/cursor-system.js?v=5";
 
 document.body.classList.add("is-loading");
 
@@ -26,6 +28,8 @@ requestAnimationFrame(() => {
 });
 
 initOS();
+initCursorSystem();
+initDockController();
 initReveal();
 initCounters();
 initScrollProgress();
@@ -39,7 +43,7 @@ initContactForm();
 
 window.addEventListener("load", () => {
   import("./arcade-qa-fixes.js").catch(() => {});
-  import("./mobile-arcade-hotfix.js").catch(() => {});
+  import("./mobile-arcade-hotfix.js?v=5").catch(() => {});
 
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("./sw.js").catch(() => {});

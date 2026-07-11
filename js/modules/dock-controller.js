@@ -1,0 +1,219 @@
+const VALID_ACTIONS = new Set(["portfolio-intro", "work", "about", "contact", "arcade", "none"]);
+const SECTION_ACTIONS = new Set(["work", "about", "contact"]);
+
+let dockItems = [];
+let dockByAction = new Map();
+let arcadeExplicitlySelected = false;
+let activeAction = "none";
+let observer = null;
+let userLock = { action: "none", until: 0 };
+let arcadeArrivedAtCabinet = false;
+
+export function initDockController() {
+  dockItems = Array.from(document.querySelectorAll(".dock-item"));
+  dockByAction = new Map(
+    dockItems
+      .filter((item) => item.dataset.dockAction && !item.classList.contains("dock-external"))
+      .map((item) => [item.dataset.dockAction, item])
+  );
+
+  if (!dockItems.length) return;
+
+  window.setActiveDock = setActiveDock;
+  bindDockClicks();
+  initSectionObserver();
+  syncDockFromViewport();
+}
+
+export function setActiveDock(action) {
+  const normalized = VALID_ACTIONS.has(action) ? action : "none";
+  activeAction = normalized;
+
+  dockItems.forEach((item) => item.classList.remove("dock-active"));
+
+  window.setCursorMode?.(normalized === "arcade" ? "arcade" : "portfolio");
+
+  if (normalized === "none") return;
+
+  const target = dockByAction.get(normalized);
+  if (target) target.classList.add("dock-active");
+}
+
+function bindDockClicks() {
+  dockItems.forEach((item) => {
+    const action = item.dataset.dockAction;
+
+    if (item.classList.contains("dock-external")) {
+      item.addEventListener("click", () => {
+        item.classList.remove("dock-active");
+      });
+      return;
+    }
+
+    if (!VALID_ACTIONS.has(action)) return;
+
+    item.addEventListener("click", (event) => routeDockAction(event, action));
+    item.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        routeDockAction(event, action);
+      }
+    });
+  });
+}
+
+function routeDockAction(event, action) {
+  event.preventDefault();
+
+  if (action === "portfolio-intro") {
+    arcadeExplicitlySelected = false;
+    arcadeArrivedAtCabinet = false;
+    cleanupArcade();
+    lockActiveDock("portfolio-intro", 1400);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    return;
+  }
+
+  if (SECTION_ACTIONS.has(action)) {
+    arcadeExplicitlySelected = false;
+    arcadeArrivedAtCabinet = false;
+    cleanupArcade();
+    lockActiveDock(action, 1800);
+    document.getElementById(action)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    return;
+  }
+
+  if (action === "arcade") {
+    arcadeExplicitlySelected = true;
+    arcadeArrivedAtCabinet = false;
+    lockActiveDock("arcade", 5200);
+    scrollToCabinetReadyPosition();
+  }
+}
+
+function lockActiveDock(action, duration) {
+  userLock = { action, until: Date.now() + duration };
+  setActiveDock(action);
+}
+
+function initSectionObserver() {
+  if (observer) observer.disconnect();
+
+  const targets = ["intro-sequence", "work", "about", "contact"]
+    .map((id) => document.getElementById(id))
+    .filter(Boolean);
+
+  observer = new IntersectionObserver((entries) => {
+    syncDockFromViewport();
+  }, {
+    root: null,
+    rootMargin: "-18% 0px -48% 0px",
+    threshold: [0, 0.1, 0.25, 0.5, 0.75, 1]
+  });
+
+  targets.forEach((target) => observer.observe(target));
+  window.addEventListener("scroll", syncDockFromViewport, { passive: true });
+  window.addEventListener("resize", syncDockFromViewport);
+}
+
+function syncDockFromViewport() {
+  const sectionAction = getMostVisibleSectionAction();
+  const cabinetViewportCurrent = isCabinetViewportCurrent();
+  if (arcadeExplicitlySelected && cabinetViewportCurrent) {
+    arcadeArrivedAtCabinet = true;
+  }
+
+  if (Date.now() < userLock.until && VALID_ACTIONS.has(userLock.action)) {
+    if (userLock.action === "arcade" && arcadeArrivedAtCabinet && !cabinetViewportCurrent && sectionAction) {
+      userLock = { action: "none", until: 0 };
+      arcadeExplicitlySelected = false;
+      arcadeArrivedAtCabinet = false;
+      if (activeAction !== sectionAction) setActiveDock(sectionAction);
+      return;
+    }
+
+    if (activeAction !== userLock.action) setActiveDock(userLock.action);
+    return;
+  }
+
+  if (arcadeExplicitlySelected && cabinetViewportCurrent) {
+    if (activeAction !== "arcade") setActiveDock("arcade");
+    return;
+  }
+
+  if (sectionAction) {
+    arcadeExplicitlySelected = false;
+    arcadeArrivedAtCabinet = false;
+    if (activeAction !== sectionAction) setActiveDock(sectionAction);
+    return;
+  }
+
+  if (isIntroAtTop()) {
+    arcadeExplicitlySelected = false;
+    arcadeArrivedAtCabinet = false;
+    if (activeAction !== "portfolio-intro") setActiveDock("portfolio-intro");
+    return;
+  }
+
+  if (activeAction === "arcade" && !cabinetViewportCurrent) {
+    setActiveDock("none");
+  }
+}
+
+function getMostVisibleSectionAction() {
+  const marker = window.innerHeight * 0.42;
+  const candidates = Array.from(SECTION_ACTIONS)
+    .map((action) => {
+      const section = document.getElementById(action);
+      if (!section) return null;
+      const rect = section.getBoundingClientRect();
+      const containsMarker = rect.top <= marker && rect.bottom >= marker;
+      const visibleHeight = Math.max(0, Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0));
+      const distance = Math.abs(rect.top - marker);
+      return { action, containsMarker, visibleHeight, distance };
+    })
+    .filter(Boolean);
+
+  const containing = candidates.find((candidate) => candidate.containsMarker);
+  if (containing) return containing.action;
+
+  const visible = candidates
+    .filter((candidate) => candidate.visibleHeight > window.innerHeight * 0.18)
+    .sort((a, b) => b.visibleHeight - a.visibleHeight || a.distance - b.distance);
+
+  if (visible[0]) {
+    return visible[0].action;
+  }
+
+  return null;
+}
+
+function isIntroAtTop() {
+  const intro = document.getElementById("intro-sequence");
+  if (!intro) return window.scrollY < 64;
+
+  const rect = intro.getBoundingClientRect();
+  return window.scrollY < 96 && rect.top <= 24 && rect.bottom > window.innerHeight * 0.5;
+}
+
+function isCabinetViewportCurrent() {
+  const intro = document.getElementById("intro-sequence");
+  if (!intro) return false;
+
+  const rect = intro.getBoundingClientRect();
+  const progress = Math.min(1, Math.max(0, -rect.top / Math.max(1, window.innerHeight)));
+  const cabinetVisible = rect.top < window.innerHeight * 0.45 && rect.bottom > window.innerHeight * 0.35;
+  return cabinetVisible && progress >= 0.42;
+}
+
+function scrollToCabinetReadyPosition() {
+  const intro = document.getElementById("intro-sequence");
+  const introTop = intro ? intro.getBoundingClientRect().top + window.scrollY : 0;
+  const targetY = introTop + window.innerHeight * 0.96;
+  window.scrollTo({ top: targetY, behavior: "smooth" });
+}
+
+function cleanupArcade() {
+  if (window.ArcadeOS && typeof window.ArcadeOS.forceGoHome === "function") {
+    window.ArcadeOS.forceGoHome();
+  }
+}

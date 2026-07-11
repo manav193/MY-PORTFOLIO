@@ -340,15 +340,21 @@
 }
 
 [data-project-theme="nintendo"] {
-  --p-accent: #ef4444;
-  --p-accent-glow: rgba(239, 68, 68, 0.2);
-  --p-ambient: radial-gradient(circle at 50% -20%, rgba(239, 68, 68, 0.1), transparent 60%);
-  --color-bg: #f8fafc;
-  --color-text-primary: #0f172a;
-  --color-text-secondary: #475569;
-  --color-surface: rgba(255,255,255,0.8);
-  --color-border: rgba(0,0,0,0.1);
-  --color-border-strong: rgba(0,0,0,0.2);
+  --p-accent: #e60012;
+  --p-accent-deep: #8f0010;
+  --p-paper: #f7f4ef;
+  --p-graphite: #151515;
+  --p-accent-glow: rgba(230, 0, 18, 0.2);
+  --p-ambient:
+    radial-gradient(circle at 15% -10%, rgba(230, 0, 18, 0.18), transparent 45%),
+    radial-gradient(circle at 85% 8%, rgba(143, 0, 16, 0.12), transparent 36%);
+  --color-bg: #f7f4ef;
+  --color-text-primary: #151515;
+  --color-text-secondary: #3c3434;
+  --color-text-muted: #746967;
+  --color-surface: rgba(255,255,255,0.82);
+  --color-border: rgba(143,0,16,0.14);
+  --color-border-strong: rgba(143,0,16,0.24);
 }
 
 [data-project-theme="nike"] {
@@ -389,6 +395,78 @@ body[data-project-theme="nintendo"] .cs-glass-panel,
 body[data-project-theme="nintendo"] .cs-split-visual,
 body[data-project-theme="nintendo"] .cs-full-bleed {
   box-shadow: 0 40px 100px -20px rgba(0,0,0,0.1), inset 0 1px 1px rgba(255,255,255,0.5);
+}
+
+body[data-project-theme="nintendo"] .showroom-nav {
+  background: rgba(247, 244, 239, 0.78);
+  border-bottom-color: rgba(230, 0, 18, 0.14);
+}
+
+body[data-project-theme="nintendo"] .project-actions .btn-primary,
+body[data-project-theme="nintendo"] .btn-primary {
+  background: var(--p-accent);
+  color: #fff;
+  border-color: var(--p-accent);
+  box-shadow: 0 18px 42px -18px rgba(230, 0, 18, 0.58), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+
+body[data-project-theme="nintendo"] .project-actions .btn-primary:hover,
+body[data-project-theme="nintendo"] .btn-primary:hover {
+  background: var(--p-accent-deep);
+  border-color: var(--p-accent-deep);
+}
+
+body[data-project-theme="nintendo"] .cs-hero-title {
+  background: linear-gradient(180deg, var(--p-graphite) 0%, var(--p-accent-deep) 120%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+body[data-project-theme="nintendo"] .cs-hero-img,
+body[data-project-theme="nintendo"] .cs-mag-card img,
+body[data-project-theme="nintendo"] .cs-mag-large img {
+  box-shadow: 0 36px 88px -28px rgba(21,21,21,0.32), 0 0 0 1px rgba(230,0,18,0.12);
+}
+
+body[data-project-theme="nintendo"] .cs-bg-alternate {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.72), rgba(247,244,239,0.92)),
+    radial-gradient(circle at 20% 0%, rgba(230,0,18,0.08), transparent 45%);
+  border-color: rgba(230, 0, 18, 0.14);
+}
+
+body[data-project-theme="nintendo"] .cs-section-marker,
+body[data-project-theme="nintendo"] .cs-meta {
+  color: var(--p-accent);
+}
+
+body[data-project-theme="nintendo"] .cs-stat-pill {
+  background: rgba(21, 21, 21, 0.9) !important;
+  color: var(--p-paper) !important;
+  border-color: rgba(230,0,18,0.34) !important;
+  box-shadow: 0 18px 36px -24px rgba(230,0,18,0.44), inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+body[data-project-theme="nintendo"] .cs-tech-tag {
+  border-color: rgba(230, 0, 18, 0.32);
+  background: rgba(230, 0, 18, 0.06);
+  color: var(--p-accent-deep);
+}
+
+body[data-project-theme="nintendo"] .cs-feature-grid li {
+  background: rgba(255,255,255,0.7);
+  border-color: rgba(230,0,18,0.13);
+}
+
+body[data-project-theme="nintendo"] .cs-bullet-list li::before {
+  background: var(--p-accent);
+  box-shadow: 0 0 12px rgba(230,0,18,0.42);
+}
+
+body[data-project-theme="nintendo"] .cs-back-link:hover {
+  background: var(--p-accent);
+  color: #fff;
+  border-color: var(--p-accent);
 }
 
 /* ==========================================================================

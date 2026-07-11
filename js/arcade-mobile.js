@@ -7,7 +7,7 @@ if (isCompactViewport) {
     if (document.querySelector('link[data-arcade-mobile]')) return;
     const link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = './css/arcade-mobile.css';
+    link.href = './css/arcade-mobile.css?v=6';
     link.dataset.arcadeMobile = 'true';
     document.head.appendChild(link);
   };

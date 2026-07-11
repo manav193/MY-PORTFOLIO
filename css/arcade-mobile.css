@@ -111,13 +111,14 @@
   .arcade-touch-controls { display: none !important; }
 
   .theme-dock {
-    bottom: 76px !important;
+    bottom: var(--theme-dock-bottom) !important;
     right: 14px !important;
     max-width: calc(100vw - 28px);
     overflow-x: auto;
   }
 
   .os-dock {
+    bottom: var(--os-dock-bottom) !important;
     width: calc(100vw - 24px);
     left: 12px !important;
     right: 12px !important;
@@ -142,9 +143,30 @@
     image-rendering: pixelated;
     filter: none !important;
   }
+
+  #arcade-footer-controls {
+    display: none !important;
+  }
+
+  .home-details {
+    padding-bottom: 8px !important;
+  }
+
+  .app-hint {
+    display: none !important;
+  }
 }
 
 @media (max-width: 600px) {
+  :root {
+    --os-dock-height: 66px;
+    --theme-dock-height: 48px;
+    --fixed-ui-gap: 12px;
+    --os-dock-bottom: 14px;
+    --theme-dock-bottom: calc(var(--os-dock-bottom) + var(--os-dock-height) + var(--fixed-ui-gap));
+    --footer-safe-bottom: calc(var(--os-dock-height) + var(--theme-dock-height) + (var(--fixed-ui-gap) * 5));
+  }
+
   .cabinet-chassis.is-scaled {
     width: 96vw !important;
     height: min(78svh, 760px) !important;

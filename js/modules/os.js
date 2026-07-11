@@ -80,45 +80,7 @@ export function initOS() {
     }
   }
 
-  // 3. MAGNETIC CURSOR
-  const cursorDot = document.querySelector('[data-cursor-dot]');
-  const cursorRing = document.querySelector('[data-cursor-ring]');
-  if (cursorDot && cursorRing) {
-    let mouseX = window.innerWidth / 2;
-    let mouseY = window.innerHeight / 2;
-    let ringX = mouseX;
-    let ringY = mouseY;
-    let isHovering = false;
-
-    window.addEventListener('mousemove', (e) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-      cursorDot.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
-      
-      // Living Interface Telemetry
-      document.documentElement.style.setProperty('--mouse-x', `${mouseX}px`);
-      document.documentElement.style.setProperty('--mouse-y', `${mouseY}px`);
-      
-      const target = e.target;
-      const isInteractable = target.closest('a, button, input, textarea, .cmd-item, .theme-btn, [data-magnetic]');
-      
-      if (isInteractable && !isHovering) {
-        document.body.classList.add('cursor-hover');
-        isHovering = true;
-      } else if (!isInteractable && isHovering) {
-        document.body.classList.remove('cursor-hover');
-        isHovering = false;
-      }
-    });
-
-    const loop = () => {
-      ringX += (mouseX - ringX) * 0.15;
-      ringY += (mouseY - ringY) * 0.15;
-      cursorRing.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
-      requestAnimationFrame(loop);
-    };
-    requestAnimationFrame(loop);
-  }
+  // 3. Cursor handling now lives in modules/cursor-system.js.
 
   // 4. COMMAND PALETTE (Ctrl+K or Cmd+K)
   const backdrop = document.querySelector('[data-cmd-backdrop]');
@@ -261,64 +223,6 @@ export function initOS() {
     }
   }, 3000);
 
-  // 11. OS DOCK ROUTING: PORTFOLIO INTRO VS. ARCADE CABINET
-  const portfolioDockBtn = document.getElementById('dock-portfolio-btn');
-  const arcadeDockBtn = document.getElementById('dock-arcade-btn');
-  const chassis = document.querySelector('.cabinet-chassis');
-  
-  const openPortfolioIntro = (e) => {
-    if (e) e.preventDefault();
-    
-    // 1. Force teardown of active games/OS to prevent lingering loops
-    if (window.ArcadeOS) {
-      window.ArcadeOS.forceGoHome();
-    }
-    
-    // 2. Smoothly scroll back to the original top profile intro
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-  
-  const openArcadeExperience = (e) => {
-    if (e) e.preventDefault();
-    
-    // 1. Smoothly scroll to the compact cabinet height
-    const targetY = window.innerHeight;
-    window.scrollTo({ top: targetY, behavior: 'smooth' });
-  };
-  
-  // Bind Computer icon (Portfolio Intro)
-  if (portfolioDockBtn) {
-    portfolioDockBtn.addEventListener('click', openPortfolioIntro);
-    portfolioDockBtn.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        openPortfolioIntro(e);
-      }
-    });
-  }
-  
-  // Bind Arcade icon (Arcade Cabinet)
-  if (arcadeDockBtn) {
-    arcadeDockBtn.addEventListener('click', openArcadeExperience);
-    arcadeDockBtn.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        openArcadeExperience(e);
-      }
-    });
-  }
-  
-  // Active State Synchronization
-  const updateDockActiveStates = () => {
-    const isScaled = chassis && chassis.classList.contains('is-scaled');
-    
-    if (isScaled) {
-      if (arcadeDockBtn) arcadeDockBtn.classList.add('dock-active');
-      if (portfolioDockBtn) portfolioDockBtn.classList.remove('dock-active');
-    } else {
-      if (arcadeDockBtn) arcadeDockBtn.classList.remove('dock-active');
-      if (portfolioDockBtn) portfolioDockBtn.classList.add('dock-active');
-    }
-  };
-  
-  window.addEventListener('scroll', updateDockActiveStates, { passive: true });
-  updateDockActiveStates(); // Check initial state
+  // 11. Dock routing now lives in modules/dock-controller.js.
+  // Keep this module focused on theme, cursor, command palette, reveals, and OS polish.
 }

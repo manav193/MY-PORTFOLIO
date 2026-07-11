@@ -9,80 +9,8 @@ if (isMobileArcade) {
   const observer = new MutationObserver(removeMobileOnlyElements);
   observer.observe(document.documentElement, { childList: true, subtree: true });
 
-  const dockItems = Array.from(document.querySelectorAll('.dock-item'));
-  const portfolioBtn = document.getElementById('dock-portfolio-btn');
-  const arcadeBtn = document.getElementById('dock-arcade-btn');
-
-  const setActiveDock = (target) => {
-    dockItems.forEach((item) => item.classList.remove('dock-active'));
-    if (target) target.classList.add('dock-active');
-  };
-
-  let arcadeExplicitlySelected = false;
-
-  const goPortfolio = (event) => {
-    event?.preventDefault();
-    event?.stopImmediatePropagation();
-    arcadeExplicitlySelected = false;
-    window.ArcadeOS?.forceGoHome?.();
-    setActiveDock(portfolioBtn);
-    window.scrollTo({ top: 0, behavior: 'auto' });
-  };
-
-  const goArcade = (event) => {
-    event?.preventDefault();
-    event?.stopImmediatePropagation();
-    arcadeExplicitlySelected = true;
-    setActiveDock(arcadeBtn);
-    window.scrollTo({ top: Math.max(1, window.innerHeight * 0.96), behavior: 'auto' });
-  };
-
-  portfolioBtn?.addEventListener('click', goPortfolio, true);
-  arcadeBtn?.addEventListener('click', goArcade, true);
-
-  document.querySelectorAll('.dock-item[href^="#"]').forEach((item) => {
-    if (item === arcadeBtn || item === portfolioBtn) return;
-    item.addEventListener('click', () => {
-      arcadeExplicitlySelected = false;
-      setActiveDock(item);
-      window.ArcadeOS?.forceGoHome?.();
-    }, true);
-  });
-
-  const syncDockOnScroll = () => {
-    if (window.scrollY < 24) {
-      arcadeExplicitlySelected = false;
-      setActiveDock(portfolioBtn);
-      return;
-    }
-
-    const sections = [
-      ['#work', document.querySelector('.dock-item[href="#work"]')],
-      ['#about', document.querySelector('.dock-item[href="#about"]')],
-      ['#contact', document.querySelector('.dock-item[href="#contact"]')]
-    ];
-
-    const marker = window.innerHeight * 0.42;
-    for (const [selector, dock] of sections) {
-      const section = document.querySelector(selector);
-      if (!section || !dock) continue;
-      const rect = section.getBoundingClientRect();
-      if (rect.top <= marker && rect.bottom >= marker) {
-        arcadeExplicitlySelected = false;
-        setActiveDock(dock);
-        return;
-      }
-    }
-
-    if (arcadeExplicitlySelected && window.scrollY < window.innerHeight * 1.4) {
-      setActiveDock(arcadeBtn);
-    } else if (!arcadeExplicitlySelected) {
-      arcadeBtn?.classList.remove('dock-active');
-    }
-  };
-
-  window.addEventListener('scroll', syncDockOnScroll, { passive: true });
-  syncDockOnScroll();
+  // Mobile dock state is handled by the shared dock controller.
+  // This file only removes heavy desktop-only effects and patches mobile arcade runtime speed.
 
   const patchMobileRuntime = (attempt = 0) => {
     const os = window.ArcadeOS;
