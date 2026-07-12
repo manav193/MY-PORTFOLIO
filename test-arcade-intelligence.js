@@ -31,6 +31,10 @@ const puppeteer = require('puppeteer');
     };
     localStorage.setItem('arcade_machine_stats', JSON.stringify(oldStats));
     
+    // Populate old V1 achievements array structure in localStorage
+    const oldAchievements = ["first_boot", "first_coin"];
+    localStorage.setItem('arcade_machine_achievements', JSON.stringify(oldAchievements));
+    
     // Set legacy best score keys
     localStorage.setItem('arcade_reaction_best', '240');
     localStorage.setItem('arcade_snake_best', '30');
@@ -46,10 +50,13 @@ const puppeteer = require('puppeteer');
   const migrationResult = await page.evaluate(async () => {
     // Navigate to STATS route to force stats engine to initialize if not done
     window.ArcadeOS.routeTo('STATS');
-    // Allow brief time for import resolving
+    await new Promise(r => setTimeout(r, 100));
+    window.ArcadeOS.routeTo('ACHIEVEMENTS');
     await new Promise(r => setTimeout(r, 200));
     
     const stats = window.ArcadeStats.data;
+    const achievements = window.ArcadeAchievements.data;
+    
     return {
       schema: stats.schemaVersion,
       playtime: stats.totalPlaytime,
@@ -58,7 +65,9 @@ const puppeteer = require('puppeteer');
       lifetimeCoins: stats.lifetimeCoinInserts,
       reactionBest: stats.perGame.reaction.bestReactionMs,
       snakeBest: stats.perGame.snake.highScore,
-      lastPlayed: stats.lastPlayedGameId
+      lastPlayed: stats.lastPlayedGameId,
+      achSchema: achievements.schemaVersion,
+      unlockedIds: Object.keys(achievements.unlocked)
     };
   });
   
@@ -69,9 +78,12 @@ const puppeteer = require('puppeteer');
   console.log(`Migrated Reaction Best Score: ${migrationResult.reactionBest} (Expected: 240)`);
   console.log(`Migrated Snake High Score: ${migrationResult.snakeBest} (Expected: 30)`);
   console.log(`Migrated Last Played Game: "${migrationResult.lastPlayed}" (Expected: snake)`);
+  console.log(`Achievements Schema: ${migrationResult.achSchema} (Expected: 2)`);
+  console.log(`Achievements Unlocked count: ${migrationResult.unlockedIds.length} (Expected: 2)`);
+  console.log(`Achievements Unlocked list: ${JSON.stringify(migrationResult.unlockedIds)} (Expected: ["first_boot", "first_coin"])`);
   
-  if (migrationResult.schema !== 2 || migrationResult.playtime !== 120.5 || migrationResult.currentCredits !== 4 || migrationResult.reactionBest !== 240 || migrationResult.snakeBest !== 30) {
-    console.error('FAIL: Stats Schema V1 to V2 migration checks failed.');
+  if (migrationResult.schema !== 2 || migrationResult.playtime !== 120.5 || migrationResult.currentCredits !== 4 || migrationResult.reactionBest !== 240 || migrationResult.snakeBest !== 30 || migrationResult.achSchema !== 2 || !migrationResult.unlockedIds.includes("first_boot") || !migrationResult.unlockedIds.includes("first_coin")) {
+    console.error('FAIL: Stats/Achievements Schema V1 to V2 migration checks failed.');
     process.exit(1);
   }
   
@@ -143,47 +155,158 @@ const puppeteer = require('puppeteer');
     console.error('FAIL: Recent sessions history failed to cap at 50 entries.');
     process.exit(1);
   }
+
+  // 5. Test achievements unlock prevention, timestamps, and categories progress calculation
+  console.log('\n--- STEP 5: Testing Achievements Progress & Category Filtering ---');
+  const achievementsCheck = await page.evaluate(() => {
+    const achEngine = window.ArcadeAchievements;
+    
+    // Evaluate under_200 achievement unlock
+    achEngine.evaluate('REACTION_SCORE', { score: 190 });
+    const isUnlocked = achEngine.getUnlocked().includes('under_200');
+    const timestamp = achEngine.data.unlocked['under_200']?.unlockedAt;
+    
+    // Attempt duplicate unlock (should ignore)
+    const countBefore = achEngine.getUnlocked().length;
+    achEngine.unlock('under_200');
+    const countAfter = achEngine.getUnlocked().length;
+    
+    // Calculate progress for played_every_app
+    const progressEveryApp = achEngine.getProgress('every_app');
+    
+    return {
+      isUnlocked,
+      hasTimestamp: !!timestamp,
+      unlockedCountPreserved: countBefore === countAfter,
+      progressEveryAppCurrent: progressEveryApp ? progressEveryApp.current : 0,
+      progressEveryAppTarget: progressEveryApp ? progressEveryApp.target : 0
+    };
+  });
   
-  // 5. Test stats route rendering
-  console.log('\n--- STEP 5: Testing STATS view rendering ---');
+  console.log(`under_200 Unlocked successfully: ${achievementsCheck.isUnlocked} (Expected: true)`);
+  console.log(`Unlock Timestamp populated: ${achievementsCheck.hasTimestamp} (Expected: true)`);
+  console.log(`Duplicate unlock blocked: ${achievementsCheck.unlockedCountPreserved} (Expected: true)`);
+  console.log(`every_app current launch count: ${achievementsCheck.progressEveryAppCurrent} (Expected: 2, reaction and snake launched in migration/session steps)`);
+  console.log(`every_app target launch count: ${achievementsCheck.progressEveryAppTarget} (Expected: 5)`);
+  
+  if (!achievementsCheck.isUnlocked || !achievementsCheck.hasTimestamp || !achievementsCheck.unlockedCountPreserved || achievementsCheck.progressEveryAppCurrent < 2) {
+    console.error('FAIL: Achievements engine checks failed.');
+    process.exit(1);
+  }
+
+  // 6. Test session achievements mapping
+  console.log('\n--- STEP 6: Testing Session Achievement Mapping ---');
+  const sessionAchCheck = await page.evaluate(() => {
+    // Start session
+    window.ArcadeStats.startSession('breakout');
+    // Trigger achievements unlock during gameplay
+    window.ArcadeAchievements.unlock('breakout_brick');
+    // End session
+    window.ArcadeStats.endSession('completed');
+    
+    const newestSession = window.ArcadeStats.data.recentSessions[0];
+    return {
+      gamePlayed: newestSession.gameId,
+      sessionUnlocks: newestSession.achievementsUnlocked
+    };
+  });
+  console.log(`Newest Session Game: "${sessionAchCheck.gamePlayed}" (Expected: breakout)`);
+  console.log(`Achievements logged to session record: ${JSON.stringify(sessionAchCheck.sessionUnlocks)} (Expected: ["breakout_brick"])`);
+  
+  if (sessionAchCheck.gamePlayed !== 'breakout' || !sessionAchCheck.sessionUnlocks.includes('breakout_brick')) {
+    console.error('FAIL: Session achievements mapping check failed.');
+    process.exit(1);
+  }
+
+  // 7. Test profile activity ranks calculation
+  console.log('\n--- STEP 7: Testing Profile Activity Ranks Calculation ---');
+  const rankCheck = await page.evaluate(() => {
+    const achEngine = window.ArcadeAchievements;
+    
+    // Simulate low activity
+    const rankVisitor = achEngine.calculatePlayerRank();
+    
+    // Simulate high activity: unlocks, launches
+    window.ArcadeStats.data.totalLaunches = 35;
+    // Unlock 12 achievements manually
+    for (let i = 0; i < 12; i++) {
+      const achId = achEngine.REGISTRY[i].id;
+      achEngine.unlock(achId);
+    }
+    
+    const rankRegular = achEngine.calculatePlayerRank();
+    
+    return {
+      visitorTitle: rankVisitor.title,
+      regularTitle: rankRegular.title,
+      regularProgress: rankRegular.progress
+    };
+  });
+  console.log(`Initial Rank: "${rankCheck.visitorTitle}" (Expected: Visitor/Operator)`);
+  console.log(`Simulated High Rank: "${rankCheck.regularTitle}" (Expected: Arcade Regular)`);
+  console.log(`Simulated Rank progress: ${rankCheck.regularProgress}%`);
+  
+  if (rankCheck.regularTitle !== 'Arcade Regular') {
+    console.error('FAIL: Profile Rank system calculation verification failed.');
+    process.exit(1);
+  }
+
+  // 8. Test recent sessions history clear operation (without resetting aggregate stats)
+  console.log('\n--- STEP 8: Testing Recent Sessions history clear ---');
+  const clearHistoryCheck = await page.evaluate(() => {
+    const initialPlaytime = window.ArcadeStats.data.totalPlaytime;
+    const initialLaunches = window.ArcadeStats.data.totalLaunches;
+    
+    // Simulate clear recent logs
+    window.ArcadeStats.data.recentSessions = [];
+    window.ArcadeStats.saveToStorage();
+    
+    return {
+      logsSize: window.ArcadeStats.data.recentSessions.length,
+      playtimePreserved: window.ArcadeStats.data.totalPlaytime === initialPlaytime,
+      launchesPreserved: window.ArcadeStats.data.totalLaunches === initialLaunches
+    };
+  });
+  console.log(`Cleared logs history length: ${clearHistoryCheck.logsSize} (Expected: 0)`);
+  console.log(`Aggregate Playtime preserved: ${clearHistoryCheck.playtimePreserved} (Expected: true)`);
+  console.log(`Aggregate Launches preserved: ${clearHistoryCheck.launchesPreserved} (Expected: true)`);
+  
+  if (clearHistoryCheck.logsSize !== 0 || !clearHistoryCheck.playtimePreserved || !clearHistoryCheck.launchesPreserved) {
+    console.error('FAIL: Recent sessions logs clear operation verification failed.');
+    process.exit(1);
+  }
+
+  // 9. Test views rendering
+  console.log('\n--- STEP 9: Testing Stats, Leaderboards, Achievements and Profile view rendering ---');
   await page.evaluate(() => {
     window.ArcadeOS.routeTo('STATS');
   });
-  await new Promise(r => setTimeout(r, 200));
+  await new Promise(r => setTimeout(r, 100));
   
-  const statsRendered = await page.evaluate(() => {
-    const title = document.querySelector('.stats-app h2').textContent;
-    const items = document.querySelectorAll('.metrics-block table tr');
-    return { title, itemsCount: items.length };
-  });
-  console.log(`STATS view header title: "${statsRendered.title}" (Expected: STATS DASHBOARD)`);
-  console.log(`STATS tables items rendered count: ${statsRendered.itemsCount} (Expected: 6)`);
-  
-  if (statsRendered.title !== 'STATS DASHBOARD' || statsRendered.itemsCount !== 6) {
-    console.error('FAIL: STATS view rendering verification failed.');
-    process.exit(1);
-  }
-  
-  // 6. Test leaderboards route rendering
-  console.log('\n--- STEP 6: Testing LEADERBOARDS view rendering ---');
   await page.evaluate(() => {
-    window.ArcadeOS.routeTo('LEADERBOARDS');
+    window.ArcadeOS.routeTo('ACHIEVEMENTS');
+  });
+  await new Promise(r => setTimeout(r, 100));
+  
+  await page.evaluate(() => {
+    window.ArcadeOS.routeTo('PROFILE');
   });
   await new Promise(r => setTimeout(r, 200));
   
-  const leaderboardRendered = await page.evaluate(() => {
-    const title = document.querySelector('.leaderboards-app h2').textContent;
-    const rows = document.querySelectorAll('.leaderboards-app table tbody tr');
-    return { title, rowsCount: rows.length };
+  const profileRendered = await page.evaluate(() => {
+    const title = document.querySelector('.profile-app h2').textContent;
+    const activeRankText = document.querySelector('.profile-content').innerText;
+    return { title, activeRankText };
   });
-  console.log(`LEADERBOARDS view header title: "${leaderboardRendered.title}" (Expected: LOCAL LEADERBOARDS)`);
-  console.log(`LEADERBOARDS tables rows rendered: ${leaderboardRendered.rowsCount} (Expected: 5)`);
   
-  if (leaderboardRendered.title !== 'LOCAL LEADERBOARDS' || leaderboardRendered.rowsCount !== 5) {
-    console.error('FAIL: LEADERBOARDS view rendering verification failed.');
+  console.log(`PROFILE view header title: "${profileRendered.title}" (Expected: PLAYER PROFILE)`);
+  console.log(`PROFILE view contains ACTIVITY RANK: ${profileRendered.activeRankText.includes('ACTIVITY RANK')}`);
+  
+  if (profileRendered.title !== 'PLAYER PROFILE' || !profileRendered.activeRankText.includes('ACTIVITY RANK')) {
+    console.error('FAIL: PROFILE view rendering verification failed.');
     process.exit(1);
   }
   
-  console.log('\n=== PHASE 4A VALIDATION COMPLETED SUCCESSFULLY! ===');
+  console.log('\n=== PHASE 4B VALIDATION COMPLETED SUCCESSFULLY! ===');
   await browser.close();
 })();

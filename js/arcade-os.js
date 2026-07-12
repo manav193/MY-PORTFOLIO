@@ -745,20 +745,7 @@ window.ArcadeOS = {
   state: 'BOOT', // BOOT, HOME, SETTINGS, PROFILE, ACHIEVEMENTS, LOADING, APP
   osVisible: false,
   
-  ACHIEVEMENTS_REGISTRY: [
-    { id: 'first_boot', title: 'First Boot', desc: 'Welcome to the Grid.', icon: '🖥️' },
-    { id: 'first_coin', title: 'Insert Coin', desc: 'Insert your first arcade coin credit.', icon: '🪙' },
-    { id: 'first_game', title: 'First Game', desc: 'Launch any game or creative tool.', icon: '🎮' },
-    { id: 'reaction_rookie', title: 'Reaction Rookie', desc: 'Complete a reaction test.', icon: '⚡' },
-    { id: 'reaction_master', title: 'Reaction Master', desc: 'Achieve a score under 200ms.', icon: '⚡' },
-    { id: 'snake_survivor', title: 'Snake Survivor', desc: 'Score 15 points or more in Neon Snake.', icon: '🐍' },
-    { id: 'breakout_beginner', title: 'Breakout Beginner', desc: 'Score 500 points in Breakout.', icon: '🔵' },
-    { id: 'breakout_champion', title: 'Breakout Champion', desc: 'Clear a level in Breakout.', icon: '🏆' },
-    { id: 'pixel_artist', title: 'Pixel Artist', desc: 'Save a canvas sketch in Pixel Pad.', icon: '🎨' },
-    { id: 'palette_explorer', title: 'Palette Explorer', desc: 'Export a color scheme in Palette Lab.', icon: '🧪' },
-    { id: 'arcade_regular', title: 'Arcade Regular', desc: 'Play 5 games in total.', icon: '👾' },
-    { id: 'playtime_veteran', title: 'Playtime Veteran', desc: 'Accumulate 5 minutes of total playtime.', icon: '⏱️' }
-  ],
+
 
   toastQueue: [],
   toastActive: false,
@@ -999,94 +986,34 @@ window.ArcadeOS = {
   },
 
   checkAchievements(event, data) {
-    if (event === 'GAME_LAUNCHED' && data?.id === 'os') {
-      this.unlockAchievement('first_boot');
-    }
-    
-    if (event === 'GAME_LAUNCHED' && data?.id && data.id !== 'os') {
-      this.unlockAchievement('first_game');
-    }
-    
-    if (event === 'COIN_INSERTED') {
-      this.unlockAchievement('first_coin');
-    }
-    
     if (event === 'REACTION_SCORE' && data?.score) {
-      this.unlockAchievement('reaction_rookie');
-      if (data.score < 200) {
-        this.unlockAchievement('reaction_master');
-      }
-      
       this.saveGameState('reaction_best', data.score);
       localStorage.setItem('reaction_best', data.score);
     }
-    
     if (event === 'SNAKE_SCORE' && typeof data?.score === 'number') {
-      if (data.score >= 15) {
-        this.unlockAchievement('snake_survivor');
-      }
       let saves = ArcadeStorage.get(ArcadeStorage.KEYS.SAVES) || {};
       if (data.score > (saves.snake_best || 0)) {
         this.saveGameState('snake_best', data.score);
       }
       localStorage.setItem('arcade_snake_best', data.score);
     }
-    
     if (event === 'BREAKOUT_SCORE' && typeof data?.score === 'number') {
-      if (data.score >= 500) {
-        this.unlockAchievement('breakout_beginner');
-      }
       let saves = ArcadeStorage.get(ArcadeStorage.KEYS.SAVES) || {};
       if (data.score > (saves.breakout_best || 0)) {
         this.saveGameState('breakout_best', data.score);
       }
       localStorage.setItem('arcade_breakout_best', data.score);
     }
-    
-    if (event === 'GAME_COMPLETED' && data?.id === 'breakout') {
-      this.unlockAchievement('breakout_champion');
-    }
-    
-    if (event === 'PIXELPAD_SAVED') {
-      this.unlockAchievement('pixel_artist');
-    }
-    
-    if (event === 'PALETTE_EXPORTED') {
-      this.unlockAchievement('palette_explorer');
-    }
-    
-    if (event === 'PLAYTIME_UPDATED') {
-      const stats = ArcadeStorage.get(ArcadeStorage.KEYS.STATS);
-      if (stats && stats.totalPlaytime >= 300) {
-        this.unlockAchievement('playtime_veteran');
-      }
-    }
-    
-    const stats = ArcadeStorage.get(ArcadeStorage.KEYS.STATS);
-    if (stats && stats.launches) {
-      let sum = 0;
-      Object.keys(stats.launches).forEach(k => sum += stats.launches[k]);
-      if (sum >= 5) {
-        this.unlockAchievement('arcade_regular');
-      }
-    }
+
+    this.loadAchievementsEngine(engine => {
+      engine.evaluate(event, data);
+    });
   },
 
   unlockAchievement(id) {
-    let achState = ArcadeStorage.get(ArcadeStorage.KEYS.ACHIEVEMENTS);
-    if (!achState) return;
-    
-    if (achState.unlocked.includes(id)) return;
-    
-    achState.unlocked.push(id);
-    this.saveAchievements(achState);
-    
-    const achievement = this.ACHIEVEMENTS_REGISTRY.find(a => a.id === id);
-    if (achievement) {
-      this.showToast(achievement);
-      // Play achievement synth sound
-      ArcadeAudio.playAchievementUnlock();
-    }
+    this.loadAchievementsEngine(engine => {
+      engine.unlock(id);
+    });
   },
 
   showToast(achievement) {
@@ -1269,7 +1196,12 @@ window.ArcadeOS = {
     } else if (routeState === 'PROFILE') {
       this.renderProfile(view);
     } else if (routeState === 'ACHIEVEMENTS') {
-      this.renderAchievements(view);
+      view.innerHTML = '<div class="sys-app"><h2>LOADING ACHIEVEMENTS...</h2></div>';
+      this.loadAchievementsEngine(engine => {
+        if (this.state === 'ACHIEVEMENTS') {
+          engine.renderAchievements(view);
+        }
+      });
     } else if (routeState === 'STATS' || routeState === 'LEADERBOARDS') {
       view.innerHTML = '<div class="sys-app"><h2>LOADING SYSTEM ENGINE...</h2></div>';
       this.loadStatsEngine(statsEngine => {
@@ -1558,6 +1490,20 @@ window.ArcadeOS = {
     });
   },
 
+  loadAchievementsEngine(callback) {
+    if (window.ArcadeAchievements) {
+      if (callback) callback(window.ArcadeAchievements);
+      return;
+    }
+    import('./modules/arcade-achievements.js').then(module => {
+      window.ArcadeAchievements = module.ArcadeAchievements;
+      window.ArcadeAchievements.init();
+      if (callback) callback(window.ArcadeAchievements);
+    }).catch(err => {
+      console.error("Failed to load achievements engine dynamically", err);
+    });
+  },
+
   renderSettings(view) {
     const settings = ArcadeStorage.get(ArcadeStorage.KEYS.SETTINGS) || {};
     const stats = ArcadeStorage.get(ArcadeStorage.KEYS.STATS) || {};
@@ -1674,118 +1620,118 @@ window.ArcadeOS = {
   },
 
   renderProfile(view) {
-    const profile = ArcadeStorage.get(ArcadeStorage.KEYS.PROFILE) || {};
-    const stats = ArcadeStorage.get(ArcadeStorage.KEYS.STATS) || {};
-    const saves = ArcadeStorage.get(ArcadeStorage.KEYS.SAVES) || {};
-    const achievements = ArcadeStorage.get(ArcadeStorage.KEYS.ACHIEVEMENTS) || { unlocked: [] };
-    
-    let totalLaunches = 0;
-    if (stats.launches) {
-      Object.keys(stats.launches).forEach(key => {
-        totalLaunches += stats.launches[key];
-      });
-    }
-    
-    let favoriteGame = 'None';
-    let maxLaunches = 0;
-    if (stats.launches) {
-      Object.keys(stats.launches).forEach(key => {
-        if (stats.launches[key] > maxLaunches) {
-          maxLaunches = stats.launches[key];
-          const app = ArcadeRegistry.getApp(key);
-          if (app) favoriteGame = app.title;
+    view.innerHTML = '<div class="sys-app"><h2>LOADING PLAYER PROFILE...</h2></div>';
+    this.loadAchievementsEngine(achievementsEngine => {
+      this.loadStatsEngine(statsEngine => {
+        const profile = ArcadeStorage.get(ArcadeStorage.KEYS.PROFILE) || {};
+        const stats = statsEngine.data;
+        const rankInfo = achievementsEngine.calculatePlayerRank();
+        const unlockedList = achievementsEngine.getUnlocked();
+        const achievementsCount = achievementsEngine.REGISTRY.length;
+        const achievementsPct = Math.round((unlockedList.length / achievementsCount) * 100);
+        
+        const gameTitles = {
+          reaction: "Reaction Test",
+          snake: "Neon Snake",
+          breakout: "Breakout",
+          pixelpad: "Pixel Pad",
+          palettelab: "Palette Lab"
+        };
+        const favGameName = gameTitles[stats.favoriteGameId] || "None Yet";
+        
+        const avatars = ['🕹️', '👽', '👾', '🚀', '⭐', '💀'];
+        
+        // Find recent achievement badge
+        let recentBadgeHtml = '<span style="opacity:0.4;">None yet</span>';
+        if (unlockedList.length > 0) {
+          const sorted = Object.keys(achievementsEngine.data.unlocked).sort((a,b) => {
+            return new Date(achievementsEngine.data.unlocked[b].unlockedAt) - new Date(achievementsEngine.data.unlocked[a].unlockedAt);
+          });
+          const newestId = sorted[0];
+          const newestAch = achievementsEngine.REGISTRY.find(a => a.id === newestId);
+          if (newestAch) {
+            recentBadgeHtml = `<span title="${newestAch.desc}" style="background: rgba(53, 208, 186, 0.1); border: 1px solid rgba(53, 208, 186, 0.3); padding: 2px 4px; border-radius: 3px; font-size: 8px; color: var(--machine-accent, #35d0ba);">${newestAch.icon} ${newestAch.title}</span>`;
+          }
         }
-      });
-    }
+        
+        // Find last session details
+        let lastSessionHtml = '<span style="opacity:0.4;">No recent sessions</span>';
+        if (stats.recentSessions && stats.recentSessions.length > 0) {
+          const ls = stats.recentSessions[0];
+          lastSessionHtml = `<span style="font-size:8px;">${gameTitles[ls.gameId] || ls.gameId} (${ls.durationSeconds}s, ${ls.result})</span>`;
+        }
 
-    const playtimeMin = Math.floor((stats.totalPlaytime || 0) / 60);
-    const playtimeSec = Math.floor((stats.totalPlaytime || 0) % 60);
-    const avatars = ['🕹️', '👽', '👾', '🚀', '⭐', '💀'];
+        // Get current cabinet preset theme
+        const config = ArcadeStorage.get('arcade_machine_customization') || {};
+        const activeTheme = config.activeTheme || 'Default';
 
-    view.innerHTML = `
-      <div class="sys-app profile-app">
-        <div class="sys-header">
-          <h2>PLAYER PROFILE</h2>
-          <button class="sys-back-btn" id="profile-back-btn">BACK (ESC)</button>
-        </div>
-        <div class="profile-content">
-          <div class="profile-card">
-            <div class="profile-avatar" id="active-avatar">${profile.avatar}</div>
-            <div class="profile-details">
-              <input type="text" id="profile-name-input" value="${profile.name}" class="sys-input" maxLength="12">
-              <p class="profile-help-text">Click avatar below to change:</p>
-              <div class="avatar-selector">
-                ${avatars.map(av => `<span class="avatar-option ${av === profile.avatar ? 'active' : ''}">${av}</span>`).join('')}
+        view.innerHTML = `
+          <div class="sys-app profile-app" style="display:flex; flex-direction:column; height:100%;">
+            <div class="sys-header" style="flex-shrink:0;">
+              <h2>PLAYER PROFILE</h2>
+              <button class="sys-back-btn" id="profile-back-btn">BACK (ESC)</button>
+            </div>
+            
+            <div class="profile-content" style="flex:1; display:flex; flex-direction:column; gap:8px; overflow-y:auto; max-height:220px; font-size:9px; padding:2px;">
+              <div class="profile-card" style="display:flex; gap:10px; align-items:center; background:rgba(255,255,255,0.02); padding:6px; border-radius:4px; border:1px solid rgba(255,255,255,0.05);">
+                <div class="profile-avatar" id="active-avatar" style="font-size:24px;">${profile.avatar}</div>
+                <div class="profile-details" style="flex:1;">
+                  <input type="text" id="profile-name-input" value="${profile.name}" class="sys-input" maxLength="12" style="font-size:10px; font-weight:bold; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.1); border-radius:2px; padding:2px 4px; color:#fff; width:100px;">
+                  <p class="profile-help-text" style="font-size:7px; opacity:0.5; margin:4px 0 2px 0;">Click avatar below to change:</p>
+                  <div class="avatar-selector" style="display:flex; gap:4px;">
+                    ${avatars.map(av => `<span class="avatar-option ${av === profile.avatar ? 'active' : ''}" style="cursor:pointer; font-size:12px; padding:2px; border-radius:2px; border:1px solid transparent; transition:0.2s;">${av}</span>`).join('')}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Rank progress panel -->
+              <div style="background:rgba(255,255,255,0.02); padding:6px; border-radius:4px; border:1px solid rgba(255,255,255,0.05);">
+                <div style="display:flex; justify-content:space-between; align-items:center; font-weight:bold;">
+                  <span>ACTIVITY RANK:</span>
+                  <span style="color:var(--machine-accent, #35d0ba);">${rankInfo.title.toUpperCase()}</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:6px; margin-top:4px;">
+                  <div style="flex:1; background:rgba(255,255,255,0.1); height:4px; border-radius:2px;">
+                    <div style="background:var(--machine-accent, #35d0ba); height:100%; width:${rankInfo.progress}%; border-radius:2px;"></div>
+                  </div>
+                  <span style="font-size:8px; opacity:0.6;">${rankInfo.progress}% to ${rankInfo.nextTitle}</span>
+                </div>
+              </div>
+              
+              <!-- Quick Stats Details -->
+              <div class="stats-panel" style="background:rgba(255,255,255,0.02); padding:6px; border-radius:4px; border:1px solid rgba(255,255,255,0.05);">
+                <table class="stats-table" style="width:100%; border-collapse:collapse;">
+                  <tr style="height:18px; border-bottom: 1px solid rgba(255,255,255,0.03);"><td style="opacity:0.6;">Favorite Game</td><td style="text-align:right; font-weight:bold;">${favGameName}</td></tr>
+                  <tr style="height:18px; border-bottom: 1px solid rgba(255,255,255,0.03);"><td style="opacity:0.6;">Cabinet Theme</td><td style="text-align:right; font-weight:bold; color:var(--machine-secondary,#ff365d);">${activeTheme}</td></tr>
+                  <tr style="height:18px; border-bottom: 1px solid rgba(255,255,255,0.03);"><td style="opacity:0.6;">Achievements Unlocked</td><td style="text-align:right; font-weight:bold;">${unlockedList.length} / ${achievementsCount} (${achievementsPct}%)</td></tr>
+                  <tr style="height:18px; border-bottom: 1px solid rgba(255,255,255,0.03);"><td style="opacity:0.6;">Recent Unlock</td><td style="text-align:right;">${recentBadgeHtml}</td></tr>
+                  <tr style="height:18px;"><td style="opacity:0.6;">Last Played Session</td><td style="text-align:right; font-weight:bold;">${lastSessionHtml}</td></tr>
+                </table>
               </div>
             </div>
           </div>
-          
-          <div class="stats-panel">
-            <h3>STATISTICS</h3>
-            <table class="stats-table">
-              <tr><td>Total Playtime</td><td>${playtimeMin}m ${playtimeSec}s</td></tr>
-              <tr><td>Game Launches</td><td>${totalLaunches} times</td></tr>
-              <tr><td>Favorite Game</td><td>${favoriteGame}</td></tr>
-              <tr><td>Reaction Best</td><td>${saves.reaction_best ? saves.reaction_best + ' ms' : 'N/A'}</td></tr>
-              <tr><td>Snake High Score</td><td>${saves.snake_best || '0'} pts</td></tr>
-              <tr><td>Breakout High Score</td><td>${saves.breakout_best || '0'} pts</td></tr>
-              <tr><td>Achievements Unlocked</td><td>${achievements.unlocked.length} / ${this.ACHIEVEMENTS_REGISTRY.length}</td></tr>
-            </table>
-          </div>
-        </div>
-      </div>
-    `;
+        `;
 
-    view.querySelector('#profile-back-btn').addEventListener('click', () => this.goHome());
+        view.querySelector('#profile-back-btn').addEventListener('click', () => this.goHome());
 
-    const nameInput = view.querySelector('#profile-name-input');
-    nameInput.addEventListener('change', () => {
-      profile.name = nameInput.value.trim() || 'Player 1';
-      this.saveProfile(profile);
-    });
+        const nameInput = view.querySelector('#profile-name-input');
+        nameInput.addEventListener('change', () => {
+          profile.name = nameInput.value.trim() || 'Player 1';
+          this.saveProfile(profile);
+        });
 
-    view.querySelectorAll('.avatar-option').forEach(opt => {
-      opt.addEventListener('click', () => {
-        profile.avatar = opt.textContent;
-        view.querySelector('#active-avatar').textContent = profile.avatar;
-        view.querySelectorAll('.avatar-option').forEach(o => o.classList.remove('active'));
-        opt.classList.add('active');
-        this.saveProfile(profile);
-        ArcadeAudio.playTick();
+        view.querySelectorAll('.avatar-option').forEach(opt => {
+          opt.addEventListener('click', () => {
+            profile.avatar = opt.textContent;
+            view.querySelector('#active-avatar').textContent = profile.avatar;
+            view.querySelectorAll('.avatar-option').forEach(o => o.classList.remove('active'));
+            opt.classList.add('active');
+            this.saveProfile(profile);
+            ArcadeAudio.playTick();
+          });
+        });
       });
     });
-  },
-
-  renderAchievements(view) {
-    const achState = ArcadeStorage.get(ArcadeStorage.KEYS.ACHIEVEMENTS) || { unlocked: [] };
-    const unlockedList = achState.unlocked;
-
-    view.innerHTML = `
-      <div class="sys-app achievements-app">
-        <div class="sys-header">
-          <h2>ACHIEVEMENTS</h2>
-          <button class="sys-back-btn" id="achievements-back-btn">BACK (ESC)</button>
-        </div>
-        <div class="achievements-content">
-          <div class="achievements-grid">
-            ${this.ACHIEVEMENTS_REGISTRY.map(ach => {
-              const isUnlocked = unlockedList.includes(ach.id);
-              return `
-                <div class="achievement-card ${isUnlocked ? 'unlocked' : 'locked'}">
-                  <div class="ach-icon">${isUnlocked ? ach.icon : '🔒'}</div>
-                  <div class="ach-details">
-                    <div class="ach-title">${ach.title}</div>
-                    <div class="ach-desc">${ach.desc}</div>
-                  </div>
-                </div>
-              `;
-            }).join('')}
-          </div>
-        </div>
-      </div>
-    `;
-
-    view.querySelector('#achievements-back-btn').addEventListener('click', () => this.goHome());
   },
 
   showConfirmModal(message, onConfirm, onCancel) {

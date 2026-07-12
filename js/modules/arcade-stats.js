@@ -280,6 +280,7 @@ export const ArcadeStats = {
     this.data.favoriteGameId = favId;
     
     // Append to recent sessions (cap at 50, newest first)
+    const sessionAchievements = this.activeSession.unlockedThisSession || [];
     const sessionItem = {
       id: `session_${Date.now()}`,
       gameId: gameId,
@@ -288,12 +289,16 @@ export const ArcadeStats = {
       durationSeconds: formattedDuration,
       score: this.activeSession.pendingScore || 0,
       result: result || 'exited',
-      achievementsUnlocked: []
+      achievementsUnlocked: [...sessionAchievements]
     };
     
     this.data.recentSessions.unshift(sessionItem);
     if (this.data.recentSessions.length > 50) {
       this.data.recentSessions.pop();
+    }
+    
+    if (window.ArcadeAchievements) {
+      window.ArcadeAchievements.sessionUnlocked = [];
     }
     
     this.activeSession = null;
@@ -482,14 +487,26 @@ export const ArcadeStats = {
         
         <!-- Bottom Recent Sessions History Logger -->
         <div style="margin-top: 8px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 6px;">
-          <h3 style="margin: 0 0 4px 0; font-size:9px; color: var(--machine-accent, #35d0ba);">RECENT GAME LOGS</h3>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 4px;">
+            <h3 style="margin: 0; font-size:9px; color: var(--machine-accent, #35d0ba);">RECENT GAME LOGS</h3>
+            <button class="sys-btn" id="clear-history-btn" style="font-size:7px; padding:1px 4px; margin:0; line-height:1;">CLEAR HISTORY</button>
+          </div>
           <div style="max-height:60px; overflow-y:auto; display:flex; flex-direction:column; gap:3px;">
             ${d.recentSessions.length === 0 ? '<div style="font-size:8px; opacity:0.5; text-align:center;">No recent game sessions recorded.</div>' : 
               d.recentSessions.slice(0, 15).map(s => {
                 const date = new Date(s.startedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const badges = (s.achievementsUnlocked || []).map(aid => {
+                  let icon = '🏆';
+                  if (window.ArcadeAchievements) {
+                    const ach = window.ArcadeAchievements.REGISTRY.find(r => r.id === aid);
+                    if (ach) icon = ach.icon;
+                  }
+                  return `<span title="${aid}">${icon}</span>`;
+                }).join(' ');
+                
                 return `
                   <div style="display:flex; justify-content:space-between; font-size:8px; background: rgba(0,0,0,0.15); padding:3px 5px; border-radius:2px;">
-                    <span>[${date}] <strong>${gameTitles[s.gameId]}</strong></span>
+                    <span>[${date}] <strong>${gameTitles[s.gameId]}</strong> ${badges}</span>
                     <span>${s.durationSeconds}s (${s.result}) &bull; score: ${s.score}</span>
                   </div>
                 `;
@@ -498,6 +515,17 @@ export const ArcadeStats = {
         </div>
       </div>
     `;
+
+    const clearBtn = view.querySelector('#clear-history-btn');
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        window.ArcadeOS.showConfirmModal("Clear recent session logs? aggregate stats will be preserved.", () => {
+          this.data.recentSessions = [];
+          this.saveToStorage();
+          this.renderStats(view);
+        });
+      });
+    }
   },
 
   renderLeaderboards(view) {
