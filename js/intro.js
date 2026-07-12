@@ -106,6 +106,13 @@
     }
 
     const scrollY = window.scrollY;
+    
+    // Skip heavy DOM updates and style manipulation when the cabinet is completely off-screen
+    if (scrollY > window.innerHeight * 2.0) {
+      rAF = requestAnimationFrame(updateIntro);
+      return;
+    }
+    
     // Track height is 200vh. The sticky container takes 100vh. 
     // We have exactly 100vh (window.innerHeight) to map our progress.
     const maxScroll = window.innerHeight * 1.0;

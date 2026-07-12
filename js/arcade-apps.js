@@ -146,7 +146,7 @@ class ReactionTestApp {
         <div class="rt-wait-screen">
           <div class="rt-wait-indicator"></div>
           <h2 class="rt-wait-msg">WAIT...</h2>
-          <p class="rt-wait-tip">Keep your fingers ready</p>
+          <p class="rt-wait-tip">WAIT FOR GREEN</p>
         </div>
       `;
       
@@ -165,7 +165,7 @@ class ReactionTestApp {
       this.contentEl.innerHTML = `
         <div class="rt-ready-screen">
           <h2 class="rt-ready-msg">NOW!</h2>
-          <p class="rt-ready-tip">HIT IT!</p>
+          <p class="rt-ready-tip">TAP SCREEN / PRESS ENTER / ACTION A</p>
         </div>
       `;
     } 

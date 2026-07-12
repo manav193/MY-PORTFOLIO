@@ -438,6 +438,30 @@ window.ArcadeOS = {
     const apps = ArcadeRegistry.getAll();
     const foundIdx = apps.findIndex(app => app.id === lastSelectedId);
     this.selectedIndex = foundIdx !== -1 ? foundIdx : 0;
+    
+    this.launchPending = false;
+    this.launchTimeoutId = null;
+
+    // Touch swipe support (bind once)
+    const carousel = document.getElementById('home-carousel');
+    if (carousel) {
+      let touchStartX = 0;
+      carousel.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].clientX;
+      }, { passive: true });
+      
+      carousel.addEventListener('touchend', (e) => {
+        const touchEndX = e.changedTouches[0].clientX;
+        const diffX = touchEndX - touchStartX;
+        if (Math.abs(diffX) > 40) {
+          if (diffX > 0) {
+            ArcadeEventBus.emit('ARCADE_LEFT');
+          } else {
+            ArcadeEventBus.emit('ARCADE_RIGHT');
+          }
+        }
+      }, { passive: true });
+    }
   },
   
   registerCoreEvents() {
@@ -531,24 +555,6 @@ window.ArcadeOS = {
         }
       });
     });
-
-    // Touch swipe support
-    let touchStartX = 0;
-    carousel.addEventListener('touchstart', (e) => {
-      touchStartX = e.changedTouches[0].clientX;
-    }, { passive: true });
-    
-    carousel.addEventListener('touchend', (e) => {
-      const touchEndX = e.changedTouches[0].clientX;
-      const diffX = touchEndX - touchStartX;
-      if (Math.abs(diffX) > 40) {
-        if (diffX > 0) {
-          ArcadeEventBus.emit('ARCADE_LEFT');
-        } else {
-          ArcadeEventBus.emit('ARCADE_RIGHT');
-        }
-      }
-    }, { passive: true });
     
     // Carousel Translation (centering active item)
     const cardWidth = 70;
@@ -573,18 +579,29 @@ window.ArcadeOS = {
   },
   
   launchApp(id) {
-    if (this.state !== 'HOME') return;
+    if (this.launchPending || this.state !== 'HOME') return;
     
     const appConfig = ArcadeRegistry.getApp(id);
     if (!appConfig) return;
+
+    if (this.launchTimeoutId) {
+      clearTimeout(this.launchTimeoutId);
+      this.launchTimeoutId = null;
+    }
     
+    this.launchPending = true;
     ArcadeAudio.playSelect();
     this.state = 'LOADING';
     
     document.getElementById('arcade-home').classList.remove('active');
     document.getElementById('arcade-loading').classList.add('active');
     
-    setTimeout(() => {
+    const isMobile = window.matchMedia('(max-width: 1024px)').matches;
+    const delay = isMobile ? 100 : 800;
+
+    this.launchTimeoutId = setTimeout(() => {
+      this.launchTimeoutId = null;
+      this.launchPending = false;
       document.getElementById('arcade-loading').classList.remove('active');
       document.getElementById('arcade-app-view').classList.add('active');
       
@@ -600,10 +617,28 @@ window.ArcadeOS = {
         console.error('App Launch Failed', e);
         this.goHome();
       }
-    }, 800); // 800ms loading transition
+    }, delay);
   },
   
   goHome() {
+    if (this.launchTimeoutId) {
+      clearTimeout(this.launchTimeoutId);
+      this.launchTimeoutId = null;
+    }
+    this.launchPending = false;
+
+    if (this.state === 'LOADING') {
+      const appView = document.getElementById('arcade-app-view');
+      const loadingView = document.getElementById('arcade-loading');
+      const homeView = document.getElementById('arcade-home');
+      if (appView) { appView.classList.remove('active'); appView.innerHTML = ''; }
+      if (loadingView) loadingView.classList.remove('active');
+      if (homeView) homeView.classList.add('active');
+      this.state = 'HOME';
+      this.renderHome();
+      return;
+    }
+
     if (this.state !== 'APP') return;
     
     ArcadeAudio.playBack();
@@ -632,6 +667,12 @@ window.ArcadeOS = {
    * Does NOT emit events or play audio to avoid side effects during scroll.
    */
   forceGoHome() {
+    if (this.launchTimeoutId) {
+      clearTimeout(this.launchTimeoutId);
+      this.launchTimeoutId = null;
+    }
+    this.launchPending = false;
+
     // Destroy active app if running
     if (this.activeApp) {
       try {

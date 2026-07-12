@@ -1,7 +1,7 @@
 import { initTheme } from "./modules/theme.js";
 import { initReveal, initCounters, initScrollProgress, initBackToTop } from "./modules/scroll.js";
 import { initTyping } from "./modules/typing.js";
-import { initMagnetic, initCursor, initTilt, initParallax } from "./modules/motion.js";
+import { initMagnetic, initTilt, initParallax } from "./modules/motion.js";
 import { initContactForm } from "./modules/contact.js";
 import { initOS } from "./modules/os.js";
 import { initDockController } from "./modules/dock-controller.js";
@@ -36,15 +36,11 @@ initScrollProgress();
 initBackToTop();
 initTyping();
 initMagnetic();
-initCursor();
 initTilt();
 initParallax();
 initContactForm();
 
 window.addEventListener("load", () => {
-  import("./arcade-qa-fixes.js").catch(() => {});
-  import("./mobile-arcade-hotfix.js").catch(() => {});
-
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("./sw.js").catch(() => {});
   }
