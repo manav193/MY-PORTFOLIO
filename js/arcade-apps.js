@@ -282,6 +282,7 @@ class ReactionTestApp {
     }
     this.storage.set('arcade_reaction_latest', this.latestScore);
     this.storage.set('arcade_reaction_attempts', this.attempts);
+    this.bus.emit('REACTION_SCORE', { score: reactionTime });
     
     // Ratings
     let rating = '';
@@ -639,6 +640,7 @@ class NeonSnakeApp {
         this.bus.emit('SNAKE_NEW_BEST', { score: this.score });
       }
       this.storage.set('arcade_snake_latest', this.score);
+      this.bus.emit('SNAKE_SCORE', { score: this.score });
       
       if (this.gamesPlayed === 1) this.bus.emit('SNAKE_FIRST_GAME');
       if (this.score >= 50) this.bus.emit('SNAKE_SCORE_50');
@@ -1172,6 +1174,8 @@ class BreakoutApp {
       }
       this.storage.set('arcade_breakout_latest', this.score);
       this.storage.set('arcade_breakout_level', Math.max(this.level, this.highestLevel));
+      this.bus.emit('BREAKOUT_SCORE', { score: this.score });
+      this.bus.emit('GAME_COMPLETED', { id: 'breakout' });
       
       this.announce(`Congratulations! You cleared all levels. Final Score: ${this.score}.`);
       this.audio.playTone(523.25, 'sine', 0.1, 0.08);
@@ -1207,6 +1211,7 @@ class BreakoutApp {
       }
       this.storage.set('arcade_breakout_latest', this.score);
       this.storage.set('arcade_breakout_level', Math.max(this.level, this.highestLevel));
+      this.bus.emit('BREAKOUT_SCORE', { score: this.score });
       
       this.announce(`Game Over. Score is ${this.score}. ${newBest ? 'New record!' : ''}`);
       this.audio.playTone(180, 'sawtooth', 0.4, 0.1);
@@ -1844,6 +1849,7 @@ class PixelPadToolApp {
   save(message) {
     this.storage.set('pixelpad_pixels', this.pixels);
     if (this.status) this.status.textContent = message;
+    this.bus.emit('PIXELPAD_SAVED');
   }
 
   destroy() {
@@ -1943,6 +1949,7 @@ class PaletteLabToolApp {
 
   copyPalette() {
     this.copyText(this.colors.join(' '), 'Copied palette hex values.');
+    this.bus.emit('PALETTE_EXPORTED');
   }
 
   copyText(text, message) {

@@ -1613,3 +1613,415 @@
   0%, 100% { transform: scale(1); opacity: 1; }
   50% { transform: scale(1.05); opacity: 0.85; }
 }
+
+/* ==========================================================================
+   HARDWARE PERSISTENCE OVERRIDES & EFFECT CASCADES
+   ========================================================================== */
+#cabinet-screen {
+  filter: brightness(var(--arcade-brightness, 1.0));
+}
+
+.cabinet-chassis.is-scaled {
+  /* Backlight neon glow mapped to settings */
+  box-shadow: 0 50px 100px -20px rgba(0,0,0,1), 
+              0 20px 40px rgba(0,0,0,0.8),
+              0 0 calc(var(--arcade-glow, 0.8) * 45px) calc(var(--arcade-glow, 0.8) * -8px) var(--cab-led);
+}
+
+.cab-power-led, .cab-marquee-light, .cab-marquee-text {
+  opacity: calc(var(--arcade-glow, 0.8) * 0.9) !important;
+}
+
+/* ==========================================================================
+   SYSTEM ROUTES VIEWPORT (SETTINGS, PROFILE, ACHIEVEMENTS)
+   ========================================================================== */
+.sys-app {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 14px;
+  font-family: 'JetBrains Mono', monospace;
+  box-sizing: border-box;
+  color: #e2e8f0;
+  overflow-y: auto;
+}
+
+.sys-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+
+.sys-header h2 {
+  font-size: 14px;
+  margin: 0;
+  color: var(--cab-led);
+  letter-spacing: 0.1em;
+  text-shadow: 0 0 8px rgba(252, 211, 77, 0.2);
+}
+
+.sys-back-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 9px;
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.sys-back-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* 1. Settings View */
+.settings-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.settings-group {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 6px;
+  padding: 10px;
+}
+
+.settings-group h3 {
+  font-size: 10px;
+  margin: 0 0 10px 0;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.05em;
+}
+
+.setting-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 11px;
+}
+
+.setting-item:last-child {
+  margin-bottom: 0;
+}
+
+.setting-item label {
+  flex: 1;
+}
+
+.setting-item input[type="range"] {
+  flex: 0 0 100px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.setting-item input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--cab-led);
+  box-shadow: 0 0 4px var(--cab-led);
+}
+
+.setting-item span {
+  font-size: 10px;
+  width: 32px;
+  text-align: right;
+}
+
+.sys-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 10px;
+  padding: 4px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.sys-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.sys-btn.danger-btn {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+  width: 100%;
+  padding: 8px;
+  font-weight: bold;
+}
+
+.sys-btn.danger-btn:hover {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+/* 2. Profile View */
+.profile-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.profile-card {
+  display: flex;
+  gap: 14px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 6px;
+  padding: 12px;
+  align-items: center;
+}
+
+.profile-avatar {
+  font-size: 32px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  width: 54px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+.profile-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sys-input {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-family: inherit;
+  font-size: 12px;
+  outline: none;
+}
+
+.sys-input:focus {
+  border-color: var(--cab-led);
+}
+
+.profile-help-text {
+  font-size: 8px;
+  color: rgba(255,255,255,0.4);
+  margin: 0;
+}
+
+.avatar-selector {
+  display: flex;
+  gap: 6px;
+}
+
+.avatar-option {
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  transition: all 0.15s;
+}
+
+.avatar-option:hover {
+  background: rgba(255,255,255,0.08);
+}
+
+.avatar-option.active {
+  border-color: var(--cab-led);
+  background: rgba(252, 211, 77, 0.1);
+}
+
+.stats-panel {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 6px;
+  padding: 10px;
+}
+
+.stats-panel h3 {
+  font-size: 10px;
+  margin: 0 0 10px 0;
+  color: rgba(255,255,255,0.4);
+}
+
+.stats-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.stats-table td {
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+.stats-table tr:last-child td {
+  border-bottom: none;
+}
+
+.stats-table td:last-child {
+  text-align: right;
+  font-weight: bold;
+  color: #fff;
+}
+
+/* 3. Achievements View */
+.achievements-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.achievement-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 6px;
+  padding: 8px 10px;
+  transition: all 0.2s ease;
+}
+
+.achievement-card.unlocked {
+  background: rgba(16, 185, 129, 0.03);
+  border-color: rgba(16, 185, 129, 0.15);
+}
+
+.achievement-card.locked {
+  opacity: 0.6;
+}
+
+.ach-icon {
+  font-size: 20px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.03);
+  border-radius: 4px;
+}
+
+.achievement-card.unlocked .ach-icon {
+  background: rgba(16, 185, 129, 0.1);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.2);
+}
+
+.ach-details {
+  flex: 1;
+}
+
+.ach-title {
+  font-size: 11px;
+  font-weight: bold;
+  color: #fff;
+}
+
+.ach-desc {
+  font-size: 8px;
+  color: rgba(255,255,255,0.4);
+  margin-top: 2px;
+}
+
+/* ==========================================================================
+   TOAST NOTIFICATION SYSTEM
+   ========================================================================== */
+#arcade-toast-host {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.arcade-toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 8px;
+  padding: 10px 14px;
+  width: 260px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 
+              0 0 15px rgba(16, 185, 129, 0.15);
+  transform: translateY(30px) scale(0.9);
+  opacity: 0;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+              opacity 0.4s ease;
+  pointer-events: auto;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.arcade-toast.visible {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+.toast-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.toast-body {
+  flex: 1;
+}
+
+.toast-title {
+  font-size: 8px;
+  color: #10b981;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: bold;
+}
+
+.toast-name {
+  font-size: 11px;
+  font-weight: bold;
+  color: #fff;
+  margin-top: 1px;
+}
+
+.toast-desc {
+  font-size: 8px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 2px;
+  line-height: 1.2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arcade-toast {
+    transition: opacity 0.2s ease !important;
+    transform: none !important;
+  }
+}
