@@ -35,6 +35,7 @@
   --motion-anticipation: cubic-bezier(0.55, 0.055, 0.675, 0.19); /* Wind-up before explosive exit */
   --motion-smooth: cubic-bezier(0.25, 0.1, 0.25, 1);        /* Elegant constant velocity */
 
+  /* CENTRALIZED LAYOUT GRID & FIXED UI DOCK DIMENSIONS */
   --os-dock-height: 86px;
   --theme-dock-height: 56px;
   --fixed-ui-gap: 16px;
