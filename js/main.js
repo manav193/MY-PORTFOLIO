@@ -42,6 +42,7 @@ initContactForm();
 
 window.addEventListener("load", () => {
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./sw.js").catch(() => {});
+    const base = process.env.DEPLOY_BASE || '/';
+    navigator.serviceWorker.register(`${base}sw.js`, { scope: base }).catch(() => {});
   }
 }, { once: true });
