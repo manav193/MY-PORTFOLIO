@@ -1,19 +1,5 @@
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-export function initCursor() {
-  const cursor = document.querySelector("[data-cursor]");
-  if (!cursor || reduceMotion || !window.matchMedia("(pointer: fine)").matches) return;
-
-  window.addEventListener("pointermove", (event) => {
-    cursor.style.opacity = "1";
-    cursor.style.left = `${event.clientX}px`;
-    cursor.style.top = `${event.clientY}px`;
-  }, { passive: true });
-
-  window.addEventListener("pointerleave", () => {
-    cursor.style.opacity = "0";
-  });
-}
 
 export function initTilt() {
   const tiltElements = document.querySelectorAll('[data-tilt]');
