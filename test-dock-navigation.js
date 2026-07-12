@@ -1,3 +1,4 @@
+// Puppeteer Integration Test Suite - Verified against production build (dist/)
 const puppeteer = require('puppeteer');
 
 (async () => {
