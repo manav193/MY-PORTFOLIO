@@ -2511,4 +2511,18 @@
   pointer-events: none;
 }
 
+/* Stats scrollbars & table layout */
+.stats-grid-container::-webkit-scrollbar,
+.leaderboards-app div::-webkit-scrollbar {
+  width: 3px;
+}
+.stats-grid-container::-webkit-scrollbar-thumb,
+.leaderboards-app div::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+}
+.leaderboards-app table tr {
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
 

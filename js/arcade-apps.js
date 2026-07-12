@@ -1151,6 +1151,7 @@ class BreakoutApp {
       this.audio.playTone(523.25, 'sine', 0.1, 0.08); // C5
       setTimeout(() => this.audio.playTone(659.25, 'sine', 0.1, 0.08), 80); // E5
       setTimeout(() => this.audio.playTone(783.99, 'sine', 0.2, 0.1), 160); // G5
+      this.bus.emit('BREAKOUT_LEVEL_CLEARED', { level: this.level });
       
       this.overlay.innerHTML = `
         <div class="breakout-menu-levelclear">
@@ -1165,6 +1166,7 @@ class BreakoutApp {
     else if (nextState === 'VICTORY') {
       this.gamesPlayed++;
       this.storage.set('arcade_breakout_games', this.gamesPlayed);
+      this.bus.emit('BREAKOUT_LONGEST_STREAK', { streak: this.longestStreak });
       
       const newBest = this.score > this.highScore;
       if (newBest) {
@@ -1202,6 +1204,7 @@ class BreakoutApp {
     else if (nextState === 'GAME_OVER') {
       this.gamesPlayed++;
       this.storage.set('arcade_breakout_games', this.gamesPlayed);
+      this.bus.emit('BREAKOUT_LONGEST_STREAK', { streak: this.longestStreak });
       
       const newBest = this.score > this.highScore;
       if (newBest) {
@@ -1237,6 +1240,8 @@ class BreakoutApp {
     this.score = 0;
     this.lives = 3;
     this.level = 1;
+    this.streak = 0;
+    this.longestStreak = 0;
     
     this.initLevel();
     this.transitionToState('PLAYING');
@@ -1414,6 +1419,7 @@ class BreakoutApp {
     // 5. Out of bounds (lose life)
     if (this.ball.y + this.ball.radius > this.playfieldHeight) {
       this.lives--;
+      this.streak = 0;
       this.audio.playTone(150, 'sawtooth', 0.25, 0.08);
       this.updateHud();
       
@@ -1463,6 +1469,8 @@ class BreakoutApp {
         if (b.hp <= 0) {
           b.active = false;
           this.score += b.points;
+          this.streak = (this.streak || 0) + 1;
+          this.longestStreak = Math.max(this.longestStreak || 0, this.streak);
           this.updateHud();
         } else {
           b.color = '#71717a'; // cracked styling
@@ -1945,6 +1953,7 @@ class PaletteLabToolApp {
     this.renderPalette();
     if (this.status) this.status.textContent = 'Generated a fresh palette.';
     this.audio.playSelect();
+    this.bus.emit('PALETTE_GENERATED', { colors: [...this.colors] });
   }
 
   copyPalette() {

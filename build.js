@@ -92,7 +92,7 @@ async function buildJS() {
   }
 
   // 3. Bundle dynamic ES Modules
-  const dynamicModules = ['modules/arcade-customizer.js'];
+  const dynamicModules = ['modules/arcade-customizer.js', 'modules/arcade-stats.js'];
   for (const mod of dynamicModules) {
     const srcPath = path.join(__dirname, 'js', mod);
     if (fs.existsSync(srcPath)) {

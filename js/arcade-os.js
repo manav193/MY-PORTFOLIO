@@ -714,15 +714,9 @@ const ArcadeHardware = {
     }
 
     // 4. Update and persist credit stats
-    let stats = ArcadeStorage.get(ArcadeStorage.KEYS.STATS) || {};
-    stats.currentCredits = (stats.currentCredits || 0) + 1;
-    stats.lifetimeCoinInserts = (stats.lifetimeCoinInserts || 0) + 1;
-    
-    // Call saveStats to persist and pulse the Storage LED explicitly!
-    ArcadeOS.saveStats(stats);
-
-    // 5. Emit COIN_INSERTED event and check achievements
-    ArcadeEventBus.emit('COIN_INSERTED', stats);
+    ArcadeOS.loadStatsEngine(statsEngine => {
+      statsEngine.recordCoinInsert();
+    });
   }
 };
 
@@ -1176,6 +1170,8 @@ window.ArcadeOS = {
     const systemItems = [
       { id: 'customize', title: 'Machine Customizer', category: 'SYSTEM', description: 'Visually configure your premium cabinet.', icon: '🎨', isSystem: true, route: 'CUSTOMIZE' },
       { id: 'achievements', title: 'Achievements', category: 'SYSTEM', description: 'View unlocked trophies.', icon: '🏆', isSystem: true, route: 'ACHIEVEMENTS' },
+      { id: 'stats', title: 'Stats Dashboard', category: 'SYSTEM', description: 'Detailed play statistics and logs.', icon: '📊', isSystem: true, route: 'STATS' },
+      { id: 'leaderboards', title: 'Local Records', category: 'SYSTEM', description: 'Cabinet high scores and ratings.', icon: '🏆', isSystem: true, route: 'LEADERBOARDS' },
       { id: 'settings', title: 'Settings', category: 'SYSTEM', description: 'Configure display, sound, and system settings.', icon: '⚙️', isSystem: true, route: 'SETTINGS' },
       { id: 'profile', title: 'Player Profile', category: 'SYSTEM', description: 'View stats and playtime summary.', icon: '👤', isSystem: true, route: 'PROFILE' }
     ];
@@ -1274,6 +1270,15 @@ window.ArcadeOS = {
       this.renderProfile(view);
     } else if (routeState === 'ACHIEVEMENTS') {
       this.renderAchievements(view);
+    } else if (routeState === 'STATS' || routeState === 'LEADERBOARDS') {
+      view.innerHTML = '<div class="sys-app"><h2>LOADING SYSTEM ENGINE...</h2></div>';
+      this.loadStatsEngine(statsEngine => {
+        if (this.state === 'STATS') {
+          statsEngine.renderStats(view);
+        } else if (this.state === 'LEADERBOARDS') {
+          statsEngine.renderLeaderboards(view);
+        }
+      });
     } else if (routeState === 'CUSTOMIZE') {
       if (window.ArcadeCustomizer) {
         window.ArcadeCustomizer.open(view);
@@ -1340,13 +1345,12 @@ window.ArcadeOS = {
         
         ArcadeHardware.setState('APP');
         
-        let stats = ArcadeStorage.get(ArcadeStorage.KEYS.STATS) || {};
-        if (!stats.launches) stats.launches = {};
-        stats.launches[id] = (stats.launches[id] || 0) + 1;
-        this.saveStats(stats);
-        
         this.sessionAccumulatedTime = 0;
         this.startPlaytimeSession(id);
+        
+        this.loadStatsEngine(statsEngine => {
+          statsEngine.startSession(id);
+        });
         
         ArcadeEventBus.emit('GAME_LAUNCHED', { id });
       } catch (e) {
@@ -1530,22 +1534,28 @@ window.ArcadeOS = {
   
   stopPlaytimeSession() {
     this.pausePlaytimeSession();
-    
-    if (this.sessionAppId && this.sessionAccumulatedTime > 0) {
-      let stats = ArcadeStorage.get(ArcadeStorage.KEYS.STATS);
-      if (stats) {
-        stats.totalPlaytime = (stats.totalPlaytime || 0) + this.sessionAccumulatedTime;
-        if (!stats.playtimes) stats.playtimes = {};
-        stats.playtimes[this.sessionAppId] = (stats.playtimes[this.sessionAppId] || 0) + this.sessionAccumulatedTime;
-        this.saveStats(stats);
-        
-        ArcadeEventBus.emit('PLAYTIME_UPDATED', { totalPlaytime: stats.totalPlaytime });
-      }
+    if (this.sessionAppId) {
+      this.loadStatsEngine(statsEngine => {
+        statsEngine.endSession('completed');
+      });
     }
-    
     this.sessionAppId = null;
     this.sessionStartTime = null;
     this.sessionAccumulatedTime = 0;
+  },
+
+  loadStatsEngine(callback) {
+    if (window.ArcadeStats) {
+      if (callback) callback(window.ArcadeStats);
+      return;
+    }
+    import('./modules/arcade-stats.js').then(module => {
+      window.ArcadeStats = module.ArcadeStats;
+      window.ArcadeStats.init();
+      if (callback) callback(window.ArcadeStats);
+    }).catch(err => {
+      console.error("Failed to load stats engine dynamically", err);
+    });
   },
 
   renderSettings(view) {
