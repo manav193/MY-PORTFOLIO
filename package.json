@@ -1,15 +1,17 @@
 {
+  "name": "portfolio",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "node build.js",
+    "preview": "npx vite preview --port 4173",
+    "verify": "node test-dock-navigation.js"
+  },
   "dependencies": {
     "canvas": "^3.2.3",
-    "pdf-export-images": "^1.2.0",
-    "pdfjs-dist": "^6.1.200"
-  },
-  "devDependencies": {
     "clean-css": "^5.3.3",
     "esbuild": "^0.28.1",
-    "html-minifier-terser": "^7.2.0"
-  },
-  "allowScripts": {
-    "esbuild@0.28.1": true
+    "html-minifier-terser": "^7.2.0",
+    "pdf-export-images": "^1.2.0",
+    "pdfjs-dist": "^6.1.200"
   }
 }
