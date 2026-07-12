@@ -211,7 +211,7 @@ export function initOS() {
   
   setInterval(() => {
     // 8% chance to update OLED status every 3 seconds (avg ~40 seconds)
-    if (livingOledStatus && Math.random() < 0.08) {
+    if (livingOledStatus && Math.random() < 0.08 && window.ArcadeOS && window.ArcadeOS.state === 'HOME') {
       const randomState = livingStates[Math.floor(Math.random() * livingStates.length)];
       if (livingOledStatus.textContent !== randomState) {
         livingOledStatus.style.opacity = '0.4';

@@ -1,5 +1,5 @@
-// Arcade Machine Customization Module
-// Handcrafted ES Module for Cabinet Visual State customization
+// Arcade Machine Customization Module (Phase 3B)
+// Handcrafted ES Module for Cabinet Customization & Preset Management
 
 export const ArcadeCustomizer = {
   persistedConfig: null,
@@ -7,6 +7,13 @@ export const ArcadeCustomizer = {
   snapshotConfig: null,
   initialized: false,
   activeCategory: "cabinet",
+  presets: [],
+  activePresetId: "builtin:graphite",
+  
+  // History State stack
+  history: [],
+  historyIndex: -1,
+  marqueeTimeoutId: null,
   
   DEFAULT_CONFIG: {
     chassisTheme: "graphite",
@@ -217,8 +224,18 @@ export const ArcadeCustomizer = {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (parsed && parsed.config && this.validateConfig(parsed.config)) {
-          this.persistedConfig = parsed.config;
+        if (parsed) {
+          if (parsed.config && this.validateConfig(parsed.config)) {
+            this.persistedConfig = parsed.config;
+          }
+          if (Array.isArray(parsed.presets)) {
+            this.presets = parsed.presets.filter(p => {
+              return p && typeof p === 'object' && p.id && p.name && p.config && this.validateConfig(p.config);
+            }).slice(0, 20);
+          }
+          if (parsed.activePresetId) {
+            this.activePresetId = parsed.activePresetId;
+          }
         }
       } catch (e) {
         console.warn('Failed to parse customization schema, resetting to default', e);
@@ -321,7 +338,7 @@ export const ArcadeCustomizer = {
     this.draftConfig[key] = value;
     this.applyConfig(this.draftConfig);
     
-    // Refresh dirty validation HUD check
+    // If setting has changed, adjust dirty active indicator
     const applyBtn = document.getElementById('builder-apply-btn');
     if (applyBtn) {
       const isDirty = this.isDirty();
@@ -336,9 +353,9 @@ export const ArcadeCustomizer = {
   saveToStorage() {
     const payload = {
       schemaVersion: 1,
-      activePresetId: "custom",
+      activePresetId: this.activePresetId,
       config: this.persistedConfig,
-      presets: []
+      presets: this.presets
     };
     localStorage.setItem('arcade_machine_customization', JSON.stringify(payload));
   },
@@ -348,6 +365,8 @@ export const ArcadeCustomizer = {
     this.draftConfig = { ...this.persistedConfig };
     this.applyConfig(this.draftConfig);
     
+    // Initialize history baseline
+    this.resetHistory();
     this.renderBuilderUI(view);
   },
   
@@ -360,8 +379,8 @@ export const ArcadeCustomizer = {
     this.persistedConfig = { ...this.draftConfig };
     this.saveToStorage();
     this.applyConfig(this.persistedConfig);
+    this.snapshotConfig = { ...this.persistedConfig };
     
-    // Pulse storage LED explicitly
     if (window.ArcadeHardware) {
       window.ArcadeHardware.pulseStorage();
     }
@@ -369,7 +388,9 @@ export const ArcadeCustomizer = {
   
   resetToDefault() {
     this.draftConfig = { ...this.DEFAULT_CONFIG };
+    this.activePresetId = "builtin:graphite";
     this.applyConfig(this.draftConfig);
+    this.pushHistory();
     this.renderBuilderUI(document.getElementById('arcade-app-view'));
   },
   
@@ -377,33 +398,449 @@ export const ArcadeCustomizer = {
     const theme = this.BUILTIN_THEMES[themeId];
     if (theme) {
       this.draftConfig = { ...this.draftConfig, ...theme };
+      this.activePresetId = `builtin:${themeId}`;
       this.applyConfig(this.draftConfig);
+      this.resetHistory(); // start a clear boundary
       this.renderBuilderUI(document.getElementById('arcade-app-view'));
     }
   },
+
+  // ============================================================================
+  // PRESETS MANAGEMENT
+  // ============================================================================
+  saveUserPreset(name) {
+    name = name.toUpperCase().replace(/[^A-Z0-9 ]/g, '').trim().substring(0, 20);
+    if (!name) return false;
+    
+    if (this.presets.length >= 20) {
+      return { error: "Maximum limit of 20 user presets reached." };
+    }
+    
+    const presetId = `user:preset_${Date.now()}`;
+    const newPreset = {
+      id: presetId,
+      name: name,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      config: JSON.parse(JSON.stringify(this.draftConfig))
+    };
+    
+    this.presets.push(newPreset);
+    this.activePresetId = presetId;
+    this.saveToStorage();
+    return true;
+  },
+
+  duplicatePreset(id) {
+    const preset = this.presets.find(p => p.id === id);
+    if (!preset) return false;
+    
+    if (this.presets.length >= 20) {
+      return { error: "Maximum limit of 20 user presets reached." };
+    }
+
+    const dupPreset = {
+      id: `user:preset_${Date.now()}`,
+      name: `${preset.name} DUP`.substring(0, 20),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      config: JSON.parse(JSON.stringify(preset.config))
+    };
+    
+    this.presets.push(dupPreset);
+    this.saveToStorage();
+    return true;
+  },
+
+  renamePreset(id, newName) {
+    newName = newName.toUpperCase().replace(/[^A-Z0-9 ]/g, '').trim().substring(0, 20);
+    if (!newName) return false;
+
+    const preset = this.presets.find(p => p.id === id);
+    if (preset) {
+      preset.name = newName;
+      preset.updatedAt = new Date().toISOString();
+      this.saveToStorage();
+      return true;
+    }
+    return false;
+  },
+
+  overwritePreset(id) {
+    const preset = this.presets.find(p => p.id === id);
+    if (preset) {
+      preset.config = JSON.parse(JSON.stringify(this.draftConfig));
+      preset.updatedAt = new Date().toISOString();
+      this.saveToStorage();
+      return true;
+    }
+    return false;
+  },
+
+  deletePreset(id) {
+    const idx = this.presets.findIndex(p => p.id === id);
+    if (idx !== -1) {
+      this.presets.splice(idx, 1);
+      if (this.activePresetId === id) {
+        this.activePresetId = "custom";
+      }
+      this.saveToStorage();
+      return true;
+    }
+    return false;
+  },
+
+  loadPreset(id) {
+    const preset = this.presets.find(p => p.id === id);
+    if (preset) {
+      this.draftConfig = JSON.parse(JSON.stringify(preset.config));
+      this.activePresetId = id;
+      this.applyConfig(this.draftConfig);
+      this.resetHistory(); // start a clear boundary
+      return true;
+    }
+    return false;
+  },
+
+  // ============================================================================
+  // HISTORY STATES (UNDO / REDO)
+  // ============================================================================
+  resetHistory() {
+    this.history = [JSON.parse(JSON.stringify(this.draftConfig))];
+    this.historyIndex = 0;
+    this.updateUndoRedoButtons();
+  },
+
+  pushHistory() {
+    const currentStr = JSON.stringify(this.draftConfig);
+    if (this.historyIndex >= 0 && JSON.stringify(this.history[this.historyIndex]) === currentStr) {
+      return;
+    }
+    
+    // Slice off redo futures
+    this.history = this.history.slice(0, this.historyIndex + 1);
+    this.history.push(JSON.parse(currentStr));
+    
+    if (this.history.length > 20) {
+      this.history.shift();
+    }
+    this.historyIndex = this.history.length - 1;
+    this.updateUndoRedoButtons();
+  },
+
+  canUndo() {
+    return this.historyIndex > 0;
+  },
+
+  canRedo() {
+    return this.historyIndex < this.history.length - 1;
+  },
+
+  undo() {
+    if (!this.canUndo()) return;
+    this.historyIndex--;
+    this.draftConfig = JSON.parse(JSON.stringify(this.history[this.historyIndex]));
+    this.applyConfig(this.draftConfig);
+    this.renderBuilderUI(document.getElementById('arcade-app-view'));
+  },
+
+  redo() {
+    if (!this.canRedo()) return;
+    this.historyIndex++;
+    this.draftConfig = JSON.parse(JSON.stringify(this.history[this.historyIndex]));
+    this.applyConfig(this.draftConfig);
+    this.renderBuilderUI(document.getElementById('arcade-app-view'));
+  },
+
+  updateUndoRedoButtons() {
+    const undoBtn = document.getElementById('builder-undo-btn');
+    const redoBtn = document.getElementById('builder-redo-btn');
+    if (undoBtn) {
+      undoBtn.disabled = !this.canUndo();
+      undoBtn.classList.toggle('disabled', !this.canUndo());
+    }
+    if (redoBtn) {
+      redoBtn.disabled = !this.canRedo();
+      redoBtn.classList.toggle('disabled', !this.canRedo());
+    }
+  },
+
+  // ============================================================================
+  // CURATED RANDOMIZER
+  // ============================================================================
+  randomize() {
+    const premiumColors = [
+      "#35d0ba", "#ff365d", "#e60012", "#ffffff", "#1e3a8a", "#f59e0b",
+      "#3b82f6", "#d97706", "#7c2d12", "#8b5cf6", "#ec4899", "#a78bfa",
+      "#059669", "#ea580c", "#1e1b4b", "#10b981", "#f97316"
+    ];
+    const allowedFilters = ["standard", "sharp", "warm", "crt-soft", "crt-strong", "mono-green", "mono-amber"];
+    const allowedFinishes = ["anodized", "matte", "metallic", "textured"];
+    const allowedSideArt = ["none", "lines", "stripes", "grid", "waves", "circuit"];
+    const allowedThemes = ["graphite", "red", "blue", "cream", "violet", "forest", "copper", "mono"];
+    
+    // Curated randomization to prevent unreadable clashing contrasts
+    const accent = premiumColors[Math.floor(Math.random() * premiumColors.length)];
+    let secondary = premiumColors[Math.floor(Math.random() * premiumColors.length)];
+    while (secondary === accent) {
+      secondary = premiumColors[Math.floor(Math.random() * premiumColors.length)];
+    }
+    
+    this.draftConfig.chassisTheme = allowedThemes[Math.floor(Math.random() * allowedThemes.length)];
+    this.draftConfig.accentColor = accent;
+    this.draftConfig.secondaryColor = secondary;
+    this.draftConfig.buttonColorA = premiumColors[Math.floor(Math.random() * premiumColors.length)];
+    this.draftConfig.buttonColorB = premiumColors[Math.floor(Math.random() * premiumColors.length)];
+    this.draftConfig.joystickColor = ["#151515", "#ffffff", "#111827", "#d97706", "#1f2937"][Math.floor(Math.random() * 5)];
+    this.draftConfig.ledColor = accent;
+    this.draftConfig.coinLightColor = secondary;
+    this.draftConfig.screenFilter = allowedFilters[Math.floor(Math.random() * allowedFilters.length)];
+    this.draftConfig.sideArt = allowedSideArt[Math.floor(Math.random() * allowedSideArt.length)];
+    this.draftConfig.hardwareFinish = allowedFinishes[Math.floor(Math.random() * allowedFinishes.length)];
+    this.draftConfig.scanlineIntensity = parseFloat((Math.random() * 0.5 + 0.1).toFixed(2));
+    this.draftConfig.screenGlow = parseFloat((Math.random() * 0.6 + 0.2).toFixed(2));
+    this.draftConfig.cabinetGlow = parseFloat((Math.random() * 0.6 + 0.2).toFixed(2));
+    
+    this.activePresetId = "custom";
+    this.applyConfig(this.draftConfig);
+    this.pushHistory();
+    this.renderBuilderUI(document.getElementById('arcade-app-view'));
+  },
+
+  // ============================================================================
+  // CONTRAST AUDIT HELPERS
+  // ============================================================================
+  checkContrast() {
+    const warnings = [];
+    const ledLuma = this.getLuminance(this.draftConfig.ledColor);
+    
+    if (ledLuma < 40) {
+      warnings.push("Status LEDs are too dark. OLED text might be unreadable.");
+    }
+    
+    const btnALuma = this.getLuminance(this.draftConfig.buttonColorA);
+    if (btnALuma > 220) {
+      warnings.push("Button A color is too bright. Plunger label might clash.");
+    }
+    
+    const btnBLuma = this.getLuminance(this.draftConfig.buttonColorB);
+    if (btnBLuma > 220) {
+      warnings.push("Button B color is too bright. Plunger label might clash.");
+    }
+    
+    return warnings;
+  },
   
+  getLuminance(hex) {
+    const c = hex.replace('#', '');
+    const rgb = parseInt(c, 16);
+    const r = (rgb >> 16) & 0xff;
+    const g = (rgb >> 8) & 0xff;
+    const b = (rgb >> 0) & 0xff;
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  },
+
+  // ============================================================================
+  // IMPORT / EXPORT WORKFLOWS
+  // ============================================================================
+  exportConfig() {
+    const activeName = this.activePresetId.startsWith('user:')
+      ? (this.presets.find(p => p.id === this.activePresetId)?.name || 'User Preset')
+      : (this.activePresetId.startsWith('builtin:') ? this.BUILTIN_THEMES[this.activePresetId.split(':')[1]]?.name : 'Custom Config');
+      
+    const payload = {
+      schemaVersion: 1,
+      exportedAt: new Date().toISOString(),
+      presetName: activeName,
+      config: this.draftConfig
+    };
+    
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `arcade-config-${activeName.toLowerCase().replace(/[^a-z0-9]/g, '-')}.json`;
+    document.body.appendChild(a);
+    a.click();
+    
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  },
+
+  importConfig(file) {
+    if (!file) return;
+    
+    if (file.size > 64 * 1024) {
+      this.showImportError("Import rejected: File size exceeds 64 KB limit.");
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const payload = JSON.parse(e.target.result);
+        if (!payload || typeof payload !== 'object' || payload.schemaVersion !== 1) {
+          throw new Error("Invalid schemaVersion or payload shape.");
+        }
+        
+        if (!payload.config || !this.validateConfig(payload.config)) {
+          throw new Error("Configuration properties validation failed.");
+        }
+        
+        // Show diff check dialog
+        this.showDiffSummaryModal(payload.config);
+      } catch (err) {
+        console.error(err);
+        this.showImportError(`Import Failed: ${err.message || 'Malformed JSON config file.'}`);
+      }
+    };
+    reader.readAsText(file);
+  },
+
+  showImportError(msg) {
+    const view = document.getElementById('arcade-app-view');
+    let errHud = document.getElementById('builder-import-err');
+    if (!errHud) {
+      errHud = document.createElement('div');
+      errHud.id = 'builder-import-err';
+      errHud.className = 'import-err-msg';
+      errHud.setAttribute('aria-live', 'polite');
+      view.appendChild(errHud);
+    }
+    errHud.textContent = msg;
+    if (window.ArcadeAudio) window.ArcadeAudio.playWarning();
+    setTimeout(() => { if (errHud) errHud.remove(); }, 4000);
+  },
+
+  showDiffSummaryModal(importedConfig) {
+    const changes = [];
+    const active = this.draftConfig;
+    
+    const keysToCheck = [
+      { key: "chassisTheme", label: "Theme" },
+      { key: "accentColor", label: "Accent Color" },
+      { key: "secondaryColor", label: "Secondary Color" },
+      { key: "marqueeText", label: "Marquee Header" },
+      { key: "buttonColorA", label: "Button A" },
+      { key: "buttonColorB", label: "Button B" },
+      { key: "joystickColor", label: "Joystick" },
+      { key: "ledColor", label: "Status LED" },
+      { key: "screenFilter", label: "CRT Filter" },
+      { key: "scanlineIntensity", label: "Scanlines" },
+      { key: "screenGlow", label: "Screen Glow" },
+      { key: "cabinetGlow", label: "Cabinet Glow" },
+      { key: "sideArt", label: "Side Decal" },
+      { key: "hardwareFinish", label: "Finish" }
+    ];
+
+    keysToCheck.forEach(item => {
+      if (active[item.key] !== importedConfig[item.key]) {
+        changes.push({
+          label: item.label,
+          old: active[item.key],
+          new: importedConfig[item.key]
+        });
+      }
+    });
+
+    let diffModal = document.getElementById('builder-import-diff-modal');
+    if (!diffModal) {
+      diffModal = document.createElement('div');
+      diffModal.id = 'builder-import-diff-modal';
+      diffModal.className = 'confirm-modal active';
+      document.body.appendChild(diffModal);
+    }
+    
+    diffModal.innerHTML = `
+      <div class="confirm-modal-box diff-modal-box" style="width: 290px;">
+        <h3 style="font-size: 11px; margin-top: 0; color: var(--machine-accent, #35d0ba);">IMPORT CONFIG PREVIEW</h3>
+        <div class="diff-content" style="max-height: 120px; overflow-y: auto; text-align: left; font-size: 9px; margin: 12px 0; border: 1px dashed rgba(255,255,255,0.1); padding: 8px;">
+          ${changes.length === 0 ? '<div style="text-align:center;">No changes detected.</div>' : 
+            changes.map(ch => `
+              <div style="margin-bottom: 4px;">
+                <strong>${ch.label}:</strong> <span style="opacity:0.5;">${ch.old}</span> &rarr; <span style="color:var(--machine-accent, #35d0ba);">${ch.new}</span>
+              </div>
+            `).join('')}
+        </div>
+        <div class="confirm-actions">
+          <button id="import-apply-btn" class="sys-btn active-btn ${changes.length === 0 ? '' : 'active'}">APPLY</button>
+          <button id="import-cancel-btn" class="sys-btn">CANCEL</button>
+        </div>
+      </div>
+    `;
+
+    diffModal.querySelector('#import-cancel-btn').addEventListener('click', () => {
+      diffModal.remove();
+      if (window.ArcadeAudio) window.ArcadeAudio.playBack();
+    });
+
+    diffModal.querySelector('#import-apply-btn').addEventListener('click', () => {
+      if (changes.length > 0) {
+        this.draftConfig = { ...this.draftConfig, ...importedConfig };
+        this.activePresetId = "custom";
+        this.applyConfig(this.draftConfig);
+        this.pushHistory();
+        this.renderBuilderUI(document.getElementById('arcade-app-view'));
+      }
+      diffModal.remove();
+      if (window.ArcadeAudio) window.ArcadeAudio.playSelect();
+    });
+  },
+
+  // ============================================================================
+  // RESET SECTION
+  // ============================================================================
+  resetSection() {
+    const defaults = this.DEFAULT_CONFIG;
+    const cat = this.activeCategory;
+    
+    const keysMap = {
+      cabinet: ["chassisTheme", "hardwareFinish"],
+      colors: ["accentColor", "secondaryColor"],
+      marquee: ["marqueeText"],
+      controls: ["buttonColorA", "buttonColorB", "joystickColor"],
+      screen: ["screenFilter", "scanlineIntensity"],
+      lighting: ["ledColor", "coinLightColor", "screenGlow", "cabinetGlow"]
+    };
+    
+    const keys = keysMap[cat] || [];
+    keys.forEach(k => {
+      this.draftConfig[k] = defaults[k];
+    });
+    
+    this.applyConfig(this.draftConfig);
+    this.pushHistory();
+    this.renderBuilderUI(document.getElementById('arcade-app-view'));
+  },
+
+  // ============================================================================
+  // UI RENDERERS
+  // ============================================================================
   renderBuilderUI(view) {
     if (!view) return;
     
-    // UI Layout categories list
     const categories = [
       { id: "cabinet", label: "Cabinet" },
       { id: "colors", label: "Colors" },
       { id: "marquee", label: "Marquee" },
       { id: "controls", label: "Controls" },
       { id: "screen", label: "Screen" },
-      { id: "lighting", label: "Lighting" }
+      { id: "lighting", label: "Lighting" },
+      { id: "presets", label: "Presets" },
+      { id: "import-export", label: "Import/Export" }
     ];
+    
+    const warnings = this.checkContrast();
     
     view.innerHTML = `
       <div class="sys-app customizer-app">
         <div class="sys-header">
-          <h2>MACHINE CUSTOMIZER</h2>
+          <h2>MACHINE BUILDER</h2>
           <button class="sys-back-btn" id="builder-back-btn">BACK (ESC)</button>
         </div>
         
         <div class="builder-layout">
-          <!-- Left Categories list -->
+          <!-- Left Categories Tabs Horizontal scrollable Horizontal Horizontal Horizontal horizontal -->
           <div class="builder-nav-tabs">
             ${categories.map(cat => `
               <button class="builder-tab-btn ${cat.id === this.activeCategory ? 'active' : ''}" data-cat-id="${cat.id}">
@@ -414,22 +851,33 @@ export const ArcadeCustomizer = {
           
           <!-- Right Properties Controls Panel -->
           <div class="builder-panel" id="builder-controls-panel">
+            ${warnings.length > 0 ? `
+              <div class="contrast-warning-banner" style="background: rgba(217, 119, 6, 0.15); border: 1px solid #d97706; padding: 6px 10px; border-radius: 4px; font-size: 8px; color: #fbbf24; margin-bottom: 4px;">
+                ⚠️ CONTRAST WARNING: ${warnings[0]}
+              </div>
+            ` : ''}
             ${this.renderActiveCategoryControls()}
           </div>
         </div>
         
-        <!-- Bottom Action bar -->
+        <!-- Bottom Action Bar containing Undo/Redo/Randomize/Cancel/Apply -->
         <div class="builder-actions-bar">
-          <button id="builder-reset-btn" class="sys-btn">RESET DEFAULT</button>
+          <div class="actions-left" style="display:flex; gap:6px;">
+            <button id="builder-reset-btn" class="sys-btn" title="Reset Current Section">RESET SECTION</button>
+            <button id="builder-undo-btn" class="sys-btn" title="Undo Last Action">UNDO</button>
+            <button id="builder-redo-btn" class="sys-btn" title="Redo Last Action">REDO</button>
+          </div>
           <div class="actions-right">
+            <button id="builder-randomize-btn" class="sys-btn" style="border-color: #a78bfa; color: #a78bfa;" title="Generate Curated Variant">RANDOMIZE</button>
             <button id="builder-cancel-btn" class="sys-btn">CANCEL</button>
-            <button id="builder-apply-btn" class="sys-btn active-btn">APPLY CONFIG</button>
+            <button id="builder-apply-btn" class="sys-btn active-btn">APPLY</button>
           </div>
         </div>
       </div>
     `;
     
     this.bindEvents(view);
+    this.updateUndoRedoButtons();
   },
   
   renderActiveCategoryControls() {
@@ -567,6 +1015,57 @@ export const ArcadeCustomizer = {
       `;
     }
     
+    if (this.activeCategory === "presets") {
+      return `
+        <div class="controls-group">
+          <h3>SAVE DRAFT TO USER PRESET</h3>
+          <div class="setting-item" style="display:flex; gap:8px;">
+            <input type="text" id="input-preset-name" placeholder="PRESET NAME" class="sys-input" maxLength="20" style="flex:1;">
+            <button id="btn-save-preset" class="sys-btn active-btn active" style="margin:0;">SAVE NEW</button>
+          </div>
+        </div>
+        
+        <div class="controls-group" style="margin-top:8px;">
+          <h3>MANAGE SAVED USER PRESETS (${this.presets.length}/20)</h3>
+          ${this.presets.length === 0 ? '<div style="font-size:9px; opacity:0.5; padding:8px 0;">No custom user presets saved yet.</div>' : `
+            <div class="presets-list" style="display:flex; flex-direction:column; gap:6px; max-height:110px; overflow-y:auto;">
+              ${this.presets.map(p => `
+                <div class="preset-item-card ${this.activePresetId === p.id ? 'active' : ''}" style="display:flex; align-items:center; justify-content:space-between; background:#1b1b21; border:1px solid rgba(255,255,255,0.06); padding:6px; border-radius:4px;" data-preset-id="${p.id}">
+                  <span class="preset-item-name" style="font-weight:bold; font-size:9px;">${p.name}</span>
+                  <div style="display:flex; gap:4px;">
+                    <button class="preset-load-btn sys-btn" style="font-size:7px; padding:3px 6px;">LOAD</button>
+                    <button class="preset-dup-btn sys-btn" style="font-size:7px; padding:3px 6px;">DUP</button>
+                    <button class="preset-del-btn sys-btn danger-btn" style="font-size:7px; padding:3px 6px; border-color:#ef4444; color:#ef4444;">DEL</button>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          `}
+        </div>
+      `;
+    }
+    
+    if (this.activeCategory === "import-export") {
+      const activeName = this.activePresetId.startsWith('user:')
+        ? (this.presets.find(p => p.id === this.activePresetId)?.name || 'User Preset')
+        : (this.activePresetId.startsWith('builtin:') ? this.BUILTIN_THEMES[this.activePresetId.split(':')[1]]?.name : 'Custom Config');
+        
+      return `
+        <div class="controls-group">
+          <h3>EXPORT CONFIG</h3>
+          <p style="font-size:9px; opacity:0.5; margin:0 0 6px 0;">Active profile config: <strong>${activeName}</strong></p>
+          <button id="btn-export-config" class="sys-btn active-btn active" style="width:100%; margin:0;">DOWNLOAD CONFIG (JSON)</button>
+        </div>
+        
+        <div class="controls-group" style="margin-top:12px;">
+          <h3>IMPORT CONFIG</h3>
+          <p style="font-size:9px; opacity:0.5; margin:0 0 6px 0;">Select a configuration file (.json) to import into the builder draft.</p>
+          <input type="file" id="import-file-input" accept=".json" style="display:none;">
+          <button id="btn-trigger-import" class="sys-btn" style="width:100%; margin:0;">CHOOSE FILE</button>
+        </div>
+      `;
+    }
+    
     return "";
   },
   
@@ -600,6 +1099,7 @@ export const ArcadeCustomizer = {
     if (finishSel) {
       finishSel.addEventListener('change', () => {
         this.updateSetting('hardwareFinish', finishSel.value);
+        this.pushHistory();
       });
     }
     
@@ -618,6 +1118,10 @@ export const ArcadeCustomizer = {
         
         hexInput.value = picker.value.toUpperCase();
         this.updateSetting(key, picker.value);
+      });
+
+      picker.addEventListener('change', () => {
+        this.pushHistory(); // push to history on release
       });
     });
     
@@ -640,8 +1144,8 @@ export const ArcadeCustomizer = {
           if (key === 'coin') key = 'coinLightColor';
           
           this.updateSetting(key, val);
+          this.pushHistory();
         } else {
-          // Reset to current draft config
           let key = picker.id.replace('picker-', '');
           if (key === 'btn-a') key = 'buttonColorA';
           if (key === 'btn-b') key = 'buttonColorB';
@@ -654,13 +1158,18 @@ export const ArcadeCustomizer = {
       });
     });
     
-    // Marquee text input
+    // Marquee text input (debounced history snapshot)
     const marqueeInput = view.querySelector('#input-marquee-text');
     if (marqueeInput) {
       marqueeInput.addEventListener('input', () => {
         let clean = marqueeInput.value.toUpperCase().replace(/[^A-Z0-9 ]/g, '').substring(0, 15);
         marqueeInput.value = clean;
         this.updateSetting('marqueeText', clean);
+        
+        if (this.marqueeTimeoutId) clearTimeout(this.marqueeTimeoutId);
+        this.marqueeTimeoutId = setTimeout(() => {
+          this.pushHistory();
+        }, 500);
       });
     }
     
@@ -669,10 +1178,11 @@ export const ArcadeCustomizer = {
     if (filterSel) {
       filterSel.addEventListener('change', () => {
         this.updateSetting('screenFilter', filterSel.value);
+        this.pushHistory();
       });
     }
     
-    // Sliders (Scanlines, Screen glow, Cabinet glow)
+    // Sliders
     const scanlineSlider = view.querySelector('#range-scanline');
     if (scanlineSlider) {
       scanlineSlider.addEventListener('input', () => {
@@ -680,6 +1190,7 @@ export const ArcadeCustomizer = {
         scanlineSlider.nextElementSibling.textContent = `${Math.round(val * 100)}%`;
         this.updateSetting('scanlineIntensity', val);
       });
+      scanlineSlider.addEventListener('change', () => this.pushHistory());
     }
     
     const sgSlider = view.querySelector('#range-screen-glow');
@@ -689,6 +1200,7 @@ export const ArcadeCustomizer = {
         sgSlider.nextElementSibling.textContent = `${Math.round(val * 100)}%`;
         this.updateSetting('screenGlow', val);
       });
+      sgSlider.addEventListener('change', () => this.pushHistory());
     }
     
     const cgSlider = view.querySelector('#range-cabinet-glow');
@@ -698,14 +1210,96 @@ export const ArcadeCustomizer = {
         cgSlider.nextElementSibling.textContent = `${Math.round(val * 100)}%`;
         this.updateSetting('cabinetGlow', val);
       });
+      cgSlider.addEventListener('change', () => this.pushHistory());
     }
     
-    // Footer button click bindings
-    view.querySelector('#builder-reset-btn').addEventListener('click', () => {
-      window.ArcadeOS.showConfirmModal("Restore chassis configuration back to factory default?", () => {
-        this.resetToDefault();
+    // Presets actions triggers
+    const btnSavePreset = view.querySelector('#btn-save-preset');
+    if (btnSavePreset) {
+      btnSavePreset.addEventListener('click', () => {
+        const nameInput = view.querySelector('#input-preset-name');
+        const res = this.saveUserPreset(nameInput.value);
+        if (res === true) {
+          nameInput.value = '';
+          this.renderBuilderUI(view);
+          if (window.ArcadeAudio) window.ArcadeAudio.playSelect();
+        } else if (res && res.error) {
+          this.showImportError(res.error);
+        }
+      });
+    }
+    
+    view.querySelectorAll('.preset-item-card').forEach(card => {
+      const pid = card.getAttribute('data-preset-id');
+      
+      card.querySelector('.preset-load-btn').addEventListener('click', () => {
+        this.loadPreset(pid);
+        this.renderBuilderUI(view);
         if (window.ArcadeAudio) window.ArcadeAudio.playSelect();
       });
+      
+      card.querySelector('.preset-dup-btn').addEventListener('click', () => {
+        const res = this.duplicatePreset(pid);
+        if (res === true) {
+          this.renderBuilderUI(view);
+          if (window.ArcadeAudio) window.ArcadeAudio.playSelect();
+        } else if (res && res.error) {
+          this.showImportError(res.error);
+        }
+      });
+      
+      card.querySelector('.preset-del-btn').addEventListener('click', () => {
+        window.ArcadeOS.showConfirmModal("Are you sure you want to delete this custom user preset?", () => {
+          this.deletePreset(pid);
+          this.renderBuilderUI(view);
+          if (window.ArcadeAudio) window.ArcadeAudio.playSelect();
+        });
+      });
+    });
+    
+    // Import / Export trigger bindings
+    const btnExport = view.querySelector('#btn-export-config');
+    if (btnExport) {
+      btnExport.addEventListener('click', () => {
+        this.exportConfig();
+        if (window.ArcadeAudio) window.ArcadeAudio.playSelect();
+      });
+    }
+    
+    const btnTriggerImport = view.querySelector('#btn-trigger-import');
+    const importFileInput = view.querySelector('#import-file-input');
+    if (btnTriggerImport && importFileInput) {
+      btnTriggerImport.addEventListener('click', () => {
+        importFileInput.click();
+      });
+      importFileInput.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) {
+          this.importConfig(e.target.files[0]);
+          // Reset file input value so it can be re-imported
+          importFileInput.value = '';
+        }
+      });
+    }
+    
+    // Bottom actions footer click bindings
+    view.querySelector('#builder-reset-btn').addEventListener('click', () => {
+      this.resetSection();
+      if (window.ArcadeAudio) window.ArcadeAudio.playSelect();
+    });
+
+    view.querySelector('#builder-undo-btn').addEventListener('click', () => {
+      this.undo();
+      if (window.ArcadeAudio) window.ArcadeAudio.playTick();
+    });
+
+    view.querySelector('#builder-redo-btn').addEventListener('click', () => {
+      this.redo();
+      if (window.ArcadeAudio) window.ArcadeAudio.playTick();
+    });
+
+    view.querySelector('#builder-randomize-btn').addEventListener('click', () => {
+      this.randomize();
+      if (window.ArcadeAudio) window.ArcadeAudio.playSelect();
     });
     
     view.querySelector('#builder-cancel-btn').addEventListener('click', () => {
@@ -720,7 +1314,6 @@ export const ArcadeCustomizer = {
         this.apply();
         applyBtn.classList.remove('active');
         if (window.ArcadeAudio) window.ArcadeAudio.playSelect();
-        // Return to home screen upon apply
         window.ArcadeOS.goHome();
       });
     }

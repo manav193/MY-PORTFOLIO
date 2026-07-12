@@ -2469,4 +2469,46 @@
   }
 }
 
+/* Customizer validation banner and error overlays */
+.import-err-msg {
+  position: absolute;
+  top: 36px;
+  left: 10px;
+  right: 10px;
+  background: rgba(239, 68, 68, 0.95);
+  border: 1px solid #ef4444;
+  border-radius: 4px;
+  padding: 8px 12px;
+  color: #fff;
+  font-weight: bold;
+  font-size: 8px;
+  z-index: 10001;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  animation: slide-down 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes slide-down {
+  from { transform: translateY(-10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.preset-item-card.active {
+  border-color: var(--machine-accent, #35d0ba) !important;
+  box-shadow: 0 0 4px rgba(53, 208, 186, 0.2);
+}
+
+.preset-item-name {
+  color: rgba(255,255,255,0.85);
+}
+.preset-item-card.active .preset-item-name {
+  color: var(--machine-accent, #35d0ba);
+}
+
+.builder-actions-bar .sys-btn:disabled,
+.builder-actions-bar .sys-btn.disabled {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
 
