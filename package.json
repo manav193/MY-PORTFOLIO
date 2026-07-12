@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "build": "node build.js",
+    "build:root": "node build.js --base /",
+    "build:subdir": "node build.js --base /portfolio/",
     "preview": "npx vite preview --port 4173",
     "verify": "node test-dock-navigation.js"
   },
