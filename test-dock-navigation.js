@@ -10,8 +10,14 @@ const puppeteer = require('puppeteer');
     errors.push('[PAGE ERROR] ' + err.toString());
   });
   page.on('console', msg => {
+    console.log(`[PAGE CONSOLE] [${msg.type()}] ${msg.text()}`);
     if (msg.type() === 'error') {
       errors.push('[CONSOLE ERROR] ' + msg.text());
+    }
+  });
+  page.on('response', response => {
+    if (response.status() >= 400) {
+      console.log(`[HTTP ERROR ${response.status()}] ${response.url()}`);
     }
   });
 
@@ -62,8 +68,30 @@ const puppeteer = require('puppeteer');
     const osState1 = await page.evaluate(() => window.ArcadeOS ? window.ArcadeOS.state : 'N/A');
     console.log('OS state after Arcade click:', osState1);
 
+    const appsInReg = await page.evaluate(() => window.ArcadeRegistry ? window.ArcadeRegistry.getAll().map(a => ({ id: a.id, title: a.title, status: a.status })) : []);
+    console.log('Apps in registry:', appsInReg);
+
     console.log('\n=== TEST 3: LAUNCH REACTION TEST APP ===');
-    await page.keyboard.press('Enter');
+    const listeners = await page.evaluate(() => {
+      // Find where ArcadeEventBus is exposed, or evaluate its listeners
+      return window.ArcadeOS ? Object.keys(window.ArcadeOS.state) : null;
+    });
+    const busInfo = await page.evaluate(() => {
+      // Let's inspect the actual global/local event bus if possible
+      // Wait, is ArcadeEventBus exposed globally? Let's check!
+      return {
+        hasGlobalBus: typeof window.ArcadeEventBus !== 'undefined',
+        busKeys: typeof window.ArcadeEventBus !== 'undefined' ? Object.keys(window.ArcadeEventBus.listeners) : []
+      };
+    });
+    console.log('Event bus info:', busInfo);
+
+    const cardExists = await page.evaluate(() => !!document.querySelector('.app-card.focused'));
+    console.log('Focused app card exists:', cardExists);
+    await page.evaluate(() => {
+      const card = document.querySelector('.app-card.focused');
+      if (card) card.click();
+    });
     await new Promise(r => setTimeout(r, 1500)); // wait for launch transition
 
     const osState2 = await page.evaluate(() => window.ArcadeOS ? window.ArcadeOS.state : 'N/A');
@@ -80,6 +108,18 @@ const puppeteer = require('puppeteer');
       return c ? c.classList.contains('is-scaled') : false;
     });
     console.log('Cabinet is-scaled after Portfolio click:', isScaled2);
+
+    const debugInfo = await page.evaluate(() => {
+      const intro = document.getElementById("intro-sequence");
+      const rect = intro ? intro.getBoundingClientRect() : null;
+      return {
+        scrollY: window.scrollY,
+        innerHeight: window.innerHeight,
+        introExists: !!intro,
+        rect: rect ? { top: rect.top, bottom: rect.bottom, height: rect.height } : null
+      };
+    });
+    console.log('Debug Intro sequence positioning:', debugInfo);
 
     const portfolioActive2 = await page.evaluate(() => {
       const btn = document.getElementById('dock-portfolio-btn');

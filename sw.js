@@ -1,27 +1,27 @@
-const cacheName = "manav-portfolio-v11";
+const cacheName = "manav-portfolio-v12";
 const assets = [
   "./",
   "./index.html",
   "./404.html",
-  "./css/styles.css?v=5",
+  "./css/styles.css",
   "./css/intro.css",
   "./css/arcade-os.css",
-  "./css/arcade-mobile.css?v=6",
-  "./css/project-page.css?v=5",
-  "./js/main.js?v=5",
+  "./css/arcade-mobile.css",
+  "./css/project-page.css",
+  "./js/main.js",
   "./js/intro.js",
   "./js/arcade-os.js",
   "./js/arcade-apps.js",
   "./js/arcade-qa-fixes.js",
-  "./js/mobile-arcade-hotfix.js?v=5",
+  "./js/mobile-arcade-hotfix.js",
   "./js/machine-bg.js",
   "./js/modules/theme.js",
   "./js/modules/scroll.js",
   "./js/modules/typing.js",
   "./js/modules/motion.js",
   "./js/modules/os.js",
-  "./js/modules/dock-controller.js?v=5",
-  "./js/modules/cursor-system.js?v=5",
+  "./js/modules/dock-controller.js",
+  "./js/modules/cursor-system.js",
   "./js/modules/contact.js",
   "./project-toolverse.html",
   "./project-selfyy.html",
@@ -67,6 +67,6 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
   event.respondWith(
-    caches.match(event.request).then((cached) => cached || fetch(event.request).catch(() => caches.match("./404.html")))
+    caches.match(event.request, { ignoreSearch: true }).then((cached) => cached || fetch(event.request).catch(() => caches.match("./404.html")))
   );
 });

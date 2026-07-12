@@ -20,7 +20,13 @@ const waitForArcade = (attempt = 0) => {
 
   const originalLaunchApp = os.launchApp.bind(os);
   os.launchApp = function launchAppStable(id) {
-    if (this._qaLaunchPending || this.state !== 'HOME') return;
+    if (this._qaLateMountGuard) {
+      window.clearTimeout(this._qaLateMountGuard);
+      this._qaLateMountGuard = null;
+    }
+    if (this._qaLaunchPending || this.state !== 'HOME') {
+      return;
+    }
     this._qaLaunchPending = true;
     originalLaunchApp(id);
 

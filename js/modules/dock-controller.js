@@ -192,7 +192,7 @@ function isIntroAtTop() {
   if (!intro) return window.scrollY < 64;
 
   const rect = intro.getBoundingClientRect();
-  return window.scrollY < 96 && rect.top <= 24 && rect.bottom > window.innerHeight * 0.5;
+  return window.scrollY < 96 && rect.top <= 64 && rect.bottom > window.innerHeight * 0.5;
 }
 
 function isCabinetViewportCurrent() {

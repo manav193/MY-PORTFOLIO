@@ -31,25 +31,7 @@ if (isMobileArcade) {
       };
 
       try {
-        const result = originalLaunchApp(id);
-
-        nativeSetTimeout(() => {
-          const app = this.activeApp;
-          if (!app || app.__mobileSpeedPatched) return;
-          app.__mobileSpeedPatched = true;
-
-          if (app.constructor?.name === 'BreakoutApp' && typeof app.update === 'function') {
-            const originalUpdate = app.update.bind(app);
-            app.update = function mobileBreakoutUpdate() {
-              originalUpdate();
-              if (this.active && this.state === 'PLAYING' && this.ball?.active) {
-                originalUpdate();
-              }
-            };
-          }
-        }, 160);
-
-        return result;
+        return originalLaunchApp(id);
       } finally {
         window.setTimeout = nativeSetTimeout;
       }

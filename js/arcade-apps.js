@@ -47,7 +47,7 @@ class ReactionTestApp {
     this.announcer = this.container.querySelector('#rt-aria-announcer');
     
     // Focus game area for keyboard accessibility
-    this.gameArea.focus();
+    this.gameArea.focus({ preventScroll: true });
 
     // Centralized event listener bindings
     this.confirmHandler = () => this.handleInputConfirm();
@@ -371,7 +371,7 @@ class ReactionTestApp {
 
   resume() {
     this.active = true;
-    this.gameArea.focus();
+    this.gameArea.focus({ preventScroll: true });
   }
 
   destroy() {
@@ -466,7 +466,7 @@ class NeonSnakeApp {
     this.announcer = this.container.querySelector('#snake-aria-announcer');
     this.dpad = this.container.querySelector('#snake-dpad');
     
-    this.gameContainer.focus();
+    this.gameContainer.focus({ preventScroll: true });
     
     // Set up ResizeObserver
     this.resizeObserver = new ResizeObserver(() => this.resizeCanvas());
@@ -1005,7 +1005,7 @@ class BreakoutApp {
     this.overlay = this.container.querySelector('#breakout-overlay-view');
     this.announcer = this.container.querySelector('#breakout-aria-announcer');
     
-    this.gameContainer.focus();
+    this.gameContainer.focus({ preventScroll: true });
     
     // Set up ResizeObserver
     this.resizeObserver = new ResizeObserver(() => this.resizeCanvas());
@@ -1242,6 +1242,7 @@ class BreakoutApp {
     
     this.cancelLoop();
     this.lastTime = 0;
+    this.accumulator = 0;
     this.rafId = requestAnimationFrame((t) => this.gameLoop(t));
   }
   
@@ -1341,7 +1342,23 @@ class BreakoutApp {
     if (!this.active || this.state !== 'PLAYING') return;
     
     this.rafId = requestAnimationFrame((t) => this.gameLoop(t));
-    this.update();
+    
+    if (!this.lastTime) {
+      this.lastTime = timestamp;
+    }
+    
+    let dt = timestamp - this.lastTime;
+    if (dt > 100) dt = 100; // avoid spiral of death
+    this.lastTime = timestamp;
+    
+    this.accumulator = (this.accumulator || 0) + dt;
+    const timeStep = 1000 / 60; // 16.67ms update steps
+    
+    while (this.accumulator >= timeStep) {
+      this.update();
+      this.accumulator -= timeStep;
+    }
+    
     this.draw();
   }
   

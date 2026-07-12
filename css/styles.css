@@ -997,7 +997,6 @@ body.cursor-pressed .cursor-ring {
   .footer-left { flex-direction: column; gap: 12px; }
   .nav-links { display: none; }
 }
-}
 @media (max-width: 600px) {
   :root {
     --os-dock-height: 66px;
