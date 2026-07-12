@@ -102,6 +102,14 @@
                 <div class="oled-theme" id="oled-theme-text">MOD: GRAPHITE</div>
               </div>
 
+              <!-- SYSTEM LED INDICATORS -->
+              <div class="cab-led-indicators">
+                <div class="cab-indicator-led led-power" id="led-power" aria-hidden="true" data-tooltip="Power Status"></div>
+                <div class="cab-indicator-led led-input" id="led-input" aria-hidden="true" data-tooltip="Input Signal"></div>
+                <div class="cab-indicator-led led-storage" id="led-storage" aria-hidden="true" data-tooltip="Disk I/O"></div>
+                <div class="cab-indicator-led led-network" id="led-network" aria-hidden="true" data-tooltip="Net Link"></div>
+              </div>
+
               <div class="cab-power-btn" data-tooltip="System Power"><div class="cab-power-led"></div></div>
               
               <div class="cab-screw" style="top: 16px; left: 16px;"></div>
@@ -155,7 +163,7 @@
                 <div class="cab-qr-code"></div>
               </div>
               <div class="cab-coin-door">
-                <div class="cab-coin-slot"></div>
+                <div class="cab-coin-slot" tabindex="0" role="button" aria-label="Insert Coin"></div>
                 <div class="cab-coin-return"></div>
               </div>
               <div class="cab-serial">

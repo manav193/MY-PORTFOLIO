@@ -446,12 +446,302 @@ window.ArcadeEventBus = ArcadeEventBus;
 // ============================================================================
 // 6. OS ROUTER & LIFECYCLE MANAGER
 // ============================================================================
+const ArcadeHardware = {
+  initialized: false,
+  timers: {},
+  chassis: null,
+  oledStatus: null,
+  marqueeText: null,
+  powerLed: null,
+  inputLed: null,
+  storageLed: null,
+  networkLed: null,
+  
+  init() {
+    if (this.initialized) return;
+    this.initialized = true;
+    
+    this.chassis = document.querySelector('.cabinet-chassis');
+    this.oledStatus = document.querySelector('.oled-status');
+    this.marqueeText = document.querySelector('.cab-marquee-text');
+    this.powerLed = document.getElementById('led-power');
+    this.inputLed = document.getElementById('led-input');
+    this.storageLed = document.getElementById('led-storage');
+    this.networkLed = document.getElementById('led-network');
+    
+    // Set network status initially
+    this.setNetworkStatus(navigator.onLine);
+    window.addEventListener('online', () => this.setNetworkStatus(true));
+    window.addEventListener('offline', () => this.setNetworkStatus(false));
+    
+    // Bind click / keydown to coin slot
+    const coinSlot = document.querySelector('.cab-coin-slot');
+    if (coinSlot) {
+      const insertCoinHandler = (e) => {
+        e.preventDefault();
+        this.insertCoin();
+      };
+      coinSlot.addEventListener('click', insertCoinHandler);
+      coinSlot.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          insertCoinHandler(e);
+        }
+      });
+    }
+
+    // Input events feedback (reusing central ArcadeInput events)
+    const inputs = ['ARCADE_UP', 'ARCADE_DOWN', 'ARCADE_LEFT', 'ARCADE_RIGHT'];
+    inputs.forEach(evt => {
+      ArcadeEventBus.on(evt, () => this.pulseInput());
+    });
+
+    ArcadeEventBus.on('ARCADE_CONFIRM', () => {
+      this.pulseInput();
+      const startBtn = document.querySelector('.cab-btn-small[data-tooltip="Start"]');
+      if (startBtn) {
+        startBtn.classList.add('is-pressed');
+        this.setHardwareTimer('confirm_btn', () => startBtn.classList.remove('is-pressed'), 100);
+      }
+    });
+
+    ArcadeEventBus.on('ARCADE_BACK', () => {
+      this.pulseInput();
+      const selectBtn = document.querySelector('.cab-btn-small[data-tooltip="Select"]');
+      if (selectBtn) {
+        selectBtn.classList.add('is-pressed');
+        this.setHardwareTimer('back_btn', () => selectBtn.classList.remove('is-pressed'), 100);
+      }
+    });
+
+    ArcadeEventBus.on('ARCADE_ACTION_A', () => {
+      this.pulseInput();
+      const actionA = document.querySelector('.cab-btn.action-a');
+      if (actionA) {
+        actionA.classList.add('is-pressed');
+        this.setHardwareTimer('action_a_btn', () => actionA.classList.remove('is-pressed'), 100);
+      }
+    });
+
+    // Custom pointer click feedback for cabinet controls
+    document.querySelectorAll('.cab-btn, .cab-btn-small').forEach(btn => {
+      btn.addEventListener('pointerdown', () => {
+        this.pulseInput();
+        btn.classList.add('is-pressed');
+      });
+      const release = () => btn.classList.remove('is-pressed');
+      btn.addEventListener('pointerup', release);
+      btn.addEventListener('pointercancel', release);
+    });
+  },
+
+  setHardwareTimer(key, callback, delay) {
+    if (this.timers[key]) {
+      clearTimeout(this.timers[key]);
+      clearInterval(this.timers[key]);
+      this.timers[key] = null;
+    }
+    this.timers[key] = setTimeout(callback, delay);
+  },
+
+  clearAllTimers() {
+    Object.keys(this.timers).forEach(key => {
+      if (this.timers[key]) {
+        clearTimeout(this.timers[key]);
+        clearInterval(this.timers[key]);
+        this.timers[key] = null;
+      }
+    });
+  },
+
+  setState(state) {
+    if (!this.chassis) return;
+    
+    // Set custom state attribute
+    this.chassis.setAttribute('data-machine-state', state.toLowerCase());
+    
+    this.setPowerLedState(state);
+    this.updateMarquee(state);
+    this.updateOled(state);
+  },
+
+  setPowerLedState(state) {
+    if (!this.powerLed) return;
+    this.powerLed.className = 'cab-indicator-led led-power';
+    
+    if (state === 'BOOT') {
+      this.powerLed.classList.add('amber');
+    } else if (state === 'LOADING') {
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      this.powerLed.classList.add(prefersReducedMotion ? 'green' : 'pulse-cyan');
+    } else if (state === 'ERROR') {
+      this.powerLed.classList.add('red');
+    } else {
+      this.powerLed.classList.add('green');
+    }
+  },
+
+  updateMarquee(state) {
+    if (!this.marqueeText) return;
+    if (state === 'HOME') {
+      this.marqueeText.textContent = 'A R C A D E';
+    } else if (state === 'APP') {
+      const activeApp = ArcadeOS.activeApp;
+      const appConfig = activeApp ? ArcadeRegistry.getApp(ArcadeOS.selectedIndex >= 0 ? ArcadeOS.getHomeItems()[ArcadeOS.selectedIndex].id : '') : null;
+      this.marqueeText.textContent = appConfig ? appConfig.title.toUpperCase() : 'RUNNING';
+    } else if (state === 'SETTINGS') {
+      this.marqueeText.textContent = 'SETTINGS';
+    } else if (state === 'PROFILE') {
+      this.marqueeText.textContent = 'PROFILE';
+    } else if (state === 'ACHIEVEMENTS') {
+      this.marqueeText.textContent = 'AWARDS';
+    } else if (state === 'LOADING') {
+      this.marqueeText.textContent = 'LOADING...';
+    }
+  },
+
+  updateOled(state) {
+    if (this.timers.oled_loop) {
+      clearInterval(this.timers.oled_loop);
+      this.timers.oled_loop = null;
+    }
+    if (this.timers.oled_temp) {
+      clearTimeout(this.timers.oled_temp);
+      this.timers.oled_temp = null;
+    }
+    if (!this.oledStatus) return;
+
+    // Visibility check optimization
+    if (window.ArcadeOS && window.ArcadeOS.osVisible === false && !window.__TEST_MODE__) {
+      this.oledStatus.textContent = 'SYS: IDLE';
+      return;
+    }
+
+    if (state === 'BOOT') {
+      let step = 0;
+      const phases = ['SYS CHECK', 'INPUT CHECK', 'STORAGE CHECK'];
+      this.oledStatus.textContent = phases[0];
+      this.timers.oled_loop = setInterval(() => {
+        step++;
+        if (step < phases.length) {
+          this.oledStatus.textContent = phases[step];
+        } else {
+          clearInterval(this.timers.oled_loop);
+          this.timers.oled_loop = null;
+          this.oledStatus.textContent = 'SYS: ONLINE';
+        }
+      }, 600);
+    } else if (state === 'HOME') {
+      const items = ArcadeOS.getHomeItems();
+      const activeItem = items[ArcadeOS.selectedIndex];
+      this.oledStatus.textContent = activeItem ? activeItem.title.toUpperCase() : 'READY';
+    } else if (state === 'LOADING') {
+      const items = ArcadeOS.getHomeItems();
+      const activeItem = items[ArcadeOS.selectedIndex];
+      this.oledStatus.textContent = `LOAD: ${activeItem ? activeItem.title.substring(0, 8).toUpperCase() : 'APP'}`;
+    } else if (state === 'APP') {
+      const activeApp = ArcadeOS.activeApp;
+      const appId = activeApp ? (ArcadeOS.getHomeItems()[ArcadeOS.selectedIndex]?.id || 'APP') : 'APP';
+      const label = appId.toUpperCase();
+      
+      const startTime = performance.now();
+      const tick = () => {
+        if (window.ArcadeOS && window.ArcadeOS.osVisible === false) return; // skip if off-screen
+        const elapsed = Math.floor((performance.now() - startTime) / 1000);
+        this.oledStatus.textContent = `${label} ${elapsed}S`;
+      };
+      tick();
+      this.timers.oled_loop = setInterval(tick, 1000);
+    } else if (state === 'SETTINGS') {
+      this.oledStatus.textContent = 'SYS CONFIG';
+    } else if (state === 'PROFILE') {
+      this.oledStatus.textContent = 'PLAYER DATA';
+    } else if (state === 'ACHIEVEMENTS') {
+      this.oledStatus.textContent = 'TROPHY LOG';
+    }
+  },
+
+  pulseInput() {
+    if (!this.inputLed) return;
+    this.inputLed.classList.add('blink');
+    this.setHardwareTimer('input_led', () => this.inputLed.classList.remove('blink'), 80);
+  },
+
+  pulseStorage() {
+    if (!this.storageLed) return;
+    this.storageLed.classList.add('blink');
+    this.setHardwareTimer('storage_led', () => this.storageLed.classList.remove('blink'), 120);
+  },
+
+  setNetworkStatus(online) {
+    if (!this.networkLed) return;
+    this.networkLed.className = 'cab-indicator-led led-network';
+    this.networkLed.classList.add(online ? 'green' : 'amber');
+  },
+
+  insertCoin() {
+    // 1. Play coin synth sequence
+    ArcadeAudio.playCoinInsert();
+    
+    // 2. Pulse slot coin return backlight
+    const returnBtn = document.querySelector('.cab-coin-return');
+    if (returnBtn) {
+      returnBtn.classList.add('pulse-light');
+      this.setHardwareTimer('coin_slot', () => returnBtn.classList.remove('pulse-light'), 400);
+    }
+
+    // 3. Temporarily display CREDIT +1 on OLED status
+    if (this.oledStatus) {
+      if (this.timers.oled_loop) {
+        clearInterval(this.timers.oled_loop);
+        this.timers.oled_loop = null;
+      }
+      this.oledStatus.textContent = 'CREDIT +1';
+      this.setHardwareTimer('oled_temp', () => {
+        this.updateOled(ArcadeOS.state);
+      }, 1200);
+    }
+
+    // 4. Update and persist credit stats
+    let stats = ArcadeStorage.get(ArcadeStorage.KEYS.STATS) || {};
+    stats.currentCredits = (stats.currentCredits || 0) + 1;
+    stats.lifetimeCoinInserts = (stats.lifetimeCoinInserts || 0) + 1;
+    
+    // Call saveStats to persist and pulse the Storage LED explicitly!
+    ArcadeOS.saveStats(stats);
+
+    // 5. Emit COIN_INSERTED event and check achievements
+    ArcadeEventBus.emit('COIN_INSERTED', stats);
+  }
+};
+
+window.ArcadeHardware = ArcadeHardware;
+
+// Expose synthetics on ArcadeAudio
+ArcadeAudio.playCoinInsert = function() {
+  this.playTone(987.77, 'sine', 0.06, 0.08);
+  setTimeout(() => this.playTone(1318.51, 'sine', 0.18, 0.1), 60);
+};
+ArcadeAudio.playAchievementUnlock = function() {
+  this.playTone(523.25, 'triangle', 0.08, 0.08);
+  setTimeout(() => this.playTone(659.25, 'triangle', 0.08, 0.08), 60);
+  setTimeout(() => this.playTone(783.99, 'triangle', 0.08, 0.08), 120);
+  setTimeout(() => this.playTone(1046.50, 'triangle', 0.25, 0.1), 180);
+};
+ArcadeAudio.playWarning = function() {
+  this.playTone(220, 'sawtooth', 0.25, 0.12);
+};
+
+// ============================================================================
+// 6. OS ROUTER & LIFECYCLE MANAGER
+// ============================================================================
 window.ArcadeOS = {
   activeApp: null,
   state: 'BOOT', // BOOT, HOME, SETTINGS, PROFILE, ACHIEVEMENTS, LOADING, APP
+  osVisible: false,
   
   ACHIEVEMENTS_REGISTRY: [
     { id: 'first_boot', title: 'First Boot', desc: 'Welcome to the Grid.', icon: '🖥️' },
+    { id: 'first_coin', title: 'Insert Coin', desc: 'Insert your first arcade coin credit.', icon: '🪙' },
     { id: 'first_game', title: 'First Game', desc: 'Launch any game or creative tool.', icon: '🎮' },
     { id: 'reaction_rookie', title: 'Reaction Rookie', desc: 'Complete a reaction test.', icon: '⚡' },
     { id: 'reaction_master', title: 'Reaction Master', desc: 'Achieve a score under 200ms.', icon: '⚡' },
@@ -479,6 +769,7 @@ window.ArcadeOS = {
     if (!this.container) return;
     
     ArcadeInput.init();
+    ArcadeHardware.init();
     this.registerCoreEvents();
     this.applyHardwareEffects();
     
@@ -607,7 +898,8 @@ window.ArcadeOS = {
       'BREAKOUT_SCORE',
       'PIXELPAD_SAVED',
       'PALETTE_EXPORTED',
-      'PLAYTIME_UPDATED'
+      'PLAYTIME_UPDATED',
+      'COIN_INSERTED'
     ];
     achievementEvents.forEach(evt => {
       ArcadeEventBus.on(evt, (data) => {
@@ -665,6 +957,34 @@ window.ArcadeOS = {
     }
   },
 
+  // State Persistence Helpers with explicit Storage LED Pulses
+  saveSettings(settings) {
+    ArcadeStorage.set(ArcadeStorage.KEYS.SETTINGS, settings);
+    ArcadeHardware.pulseStorage();
+  },
+  saveStats(stats) {
+    ArcadeStorage.set(ArcadeStorage.KEYS.STATS, stats);
+    ArcadeHardware.pulseStorage();
+  },
+  saveAchievements(achievements) {
+    ArcadeStorage.set(ArcadeStorage.KEYS.ACHIEVEMENTS, achievements);
+    ArcadeHardware.pulseStorage();
+  },
+  saveProfile(profile) {
+    ArcadeStorage.set(ArcadeStorage.KEYS.PROFILE, profile);
+    ArcadeHardware.pulseStorage();
+  },
+  saveGameState(keyOrAppId, state) {
+    let saves = ArcadeStorage.get(ArcadeStorage.KEYS.SAVES) || {};
+    if (typeof state === 'object' && state !== null) {
+      saves[`state_${keyOrAppId}`] = state;
+    } else {
+      saves[keyOrAppId] = state;
+    }
+    ArcadeStorage.set(ArcadeStorage.KEYS.SAVES, saves);
+    ArcadeHardware.pulseStorage();
+  },
+
   checkAchievements(event, data) {
     if (event === 'GAME_LAUNCHED' && data?.id === 'os') {
       this.unlockAchievement('first_boot');
@@ -674,19 +994,17 @@ window.ArcadeOS = {
       this.unlockAchievement('first_game');
     }
     
+    if (event === 'COIN_INSERTED') {
+      this.unlockAchievement('first_coin');
+    }
+    
     if (event === 'REACTION_SCORE' && data?.score) {
       this.unlockAchievement('reaction_rookie');
       if (data.score < 200) {
         this.unlockAchievement('reaction_master');
       }
       
-      let saves = ArcadeStorage.get(ArcadeStorage.KEYS.SAVES);
-      if (saves) {
-        if (!saves.reaction_best || data.score < saves.reaction_best) {
-          saves.reaction_best = data.score;
-          ArcadeStorage.set(ArcadeStorage.KEYS.SAVES, saves);
-        }
-      }
+      this.saveGameState('reaction_best', data.score);
       localStorage.setItem('reaction_best', data.score);
     }
     
@@ -694,12 +1012,9 @@ window.ArcadeOS = {
       if (data.score >= 15) {
         this.unlockAchievement('snake_survivor');
       }
-      let saves = ArcadeStorage.get(ArcadeStorage.KEYS.SAVES);
-      if (saves) {
-        if (data.score > (saves.snake_best || 0)) {
-          saves.snake_best = data.score;
-          ArcadeStorage.set(ArcadeStorage.KEYS.SAVES, saves);
-        }
+      let saves = ArcadeStorage.get(ArcadeStorage.KEYS.SAVES) || {};
+      if (data.score > (saves.snake_best || 0)) {
+        this.saveGameState('snake_best', data.score);
       }
       localStorage.setItem('arcade_snake_best', data.score);
     }
@@ -708,12 +1023,9 @@ window.ArcadeOS = {
       if (data.score >= 500) {
         this.unlockAchievement('breakout_beginner');
       }
-      let saves = ArcadeStorage.get(ArcadeStorage.KEYS.SAVES);
-      if (saves) {
-        if (data.score > (saves.breakout_best || 0)) {
-          saves.breakout_best = data.score;
-          ArcadeStorage.set(ArcadeStorage.KEYS.SAVES, saves);
-        }
+      let saves = ArcadeStorage.get(ArcadeStorage.KEYS.SAVES) || {};
+      if (data.score > (saves.breakout_best || 0)) {
+        this.saveGameState('breakout_best', data.score);
       }
       localStorage.setItem('arcade_breakout_best', data.score);
     }
@@ -754,11 +1066,13 @@ window.ArcadeOS = {
     if (achState.unlocked.includes(id)) return;
     
     achState.unlocked.push(id);
-    ArcadeStorage.set(ArcadeStorage.KEYS.ACHIEVEMENTS, achState);
+    this.saveAchievements(achState);
     
     const achievement = this.ACHIEVEMENTS_REGISTRY.find(a => a.id === id);
     if (achievement) {
       this.showToast(achievement);
+      // Play achievement synth sound
+      ArcadeAudio.playAchievementUnlock();
     }
   },
 
@@ -814,6 +1128,7 @@ window.ArcadeOS = {
   
   boot() {
     this.init();
+    ArcadeHardware.setState('BOOT');
     this.renderHome();
     
     setTimeout(() => {
@@ -830,6 +1145,7 @@ window.ArcadeOS = {
         homeView.classList.add('active');
       }
       this.state = 'HOME';
+      ArcadeHardware.setState('HOME');
       
       // Fire first boot event trigger
       ArcadeEventBus.emit('GAME_LAUNCHED', { id: 'os' });
@@ -880,9 +1196,13 @@ window.ArcadeOS = {
           const selectedItem = items[this.selectedIndex];
           if (selectedItem) {
             ArcadeStorage.set(ArcadeStorage.KEYS.LAST_SELECTED, selectedItem.id);
+            // Flash storage LED briefly on last_selected persist
+            ArcadeHardware.pulseStorage();
           }
           ArcadeAudio.playTick();
           this.renderHome();
+          // Keep hardware status in sync
+          ArcadeHardware.updateOled(this.state);
         }
       });
     });
@@ -903,9 +1223,11 @@ window.ArcadeOS = {
     const selectedItem = items[this.selectedIndex];
     if (selectedItem) {
       ArcadeStorage.set(ArcadeStorage.KEYS.LAST_SELECTED, selectedItem.id);
+      ArcadeHardware.pulseStorage();
     }
     ArcadeAudio.playTick();
     this.renderHome();
+    ArcadeHardware.updateOled(this.state);
   },
 
   routeTo(routeState) {
@@ -916,6 +1238,7 @@ window.ArcadeOS = {
     this.launchPending = false;
     
     this.state = routeState;
+    ArcadeHardware.setState(routeState);
     ArcadeAudio.playSelect();
     
     document.getElementById('arcade-home').classList.remove('active');
@@ -947,6 +1270,7 @@ window.ArcadeOS = {
     this.launchPending = true;
     ArcadeAudio.playSelect();
     this.state = 'LOADING';
+    ArcadeHardware.setState('LOADING');
     
     document.getElementById('arcade-home').classList.remove('active');
     document.getElementById('arcade-loading').classList.add('active');
@@ -964,6 +1288,10 @@ window.ArcadeOS = {
       
       try {
         const rawApp = new appConfig.component();
+        // Decorate app metadata for marquee updates
+        rawApp._rawAppTitle = appConfig.title;
+        rawApp._rawAppId = appConfig.id;
+
         this.activeApp = this.createLifecycleAdapter(rawApp, id);
         
         const view = document.getElementById('arcade-app-view');
@@ -972,12 +1300,12 @@ window.ArcadeOS = {
         this.activeApp.init(view, ArcadeEventBus, ArcadeStorage, ArcadeAudio);
         this.activeApp.mount();
         
-        let stats = ArcadeStorage.get(ArcadeStorage.KEYS.STATS);
-        if (stats) {
-          if (!stats.launches) stats.launches = {};
-          stats.launches[id] = (stats.launches[id] || 0) + 1;
-          ArcadeStorage.set(ArcadeStorage.KEYS.STATS, stats);
-        }
+        ArcadeHardware.setState('APP');
+        
+        let stats = ArcadeStorage.get(ArcadeStorage.KEYS.STATS) || {};
+        if (!stats.launches) stats.launches = {};
+        stats.launches[id] = (stats.launches[id] || 0) + 1;
+        this.saveStats(stats);
         
         this.sessionAccumulatedTime = 0;
         this.startPlaytimeSession(id);
@@ -991,7 +1319,7 @@ window.ArcadeOS = {
   },
 
   createLifecycleAdapter(app, appId) {
-    return {
+    const adapter = {
       init(container, bus, storage, audio) {
         if (typeof app.init === 'function') {
           app.init(container, bus, storage, audio);
@@ -1026,11 +1354,7 @@ window.ArcadeOS = {
           try {
             const state = app.saveState();
             if (state) {
-              let saves = ArcadeStorage.get(ArcadeStorage.KEYS.SAVES);
-              if (saves) {
-                saves[`state_${appId}`] = state;
-                ArcadeStorage.set(ArcadeStorage.KEYS.SAVES, saves);
-              }
+              window.ArcadeOS.saveGameState(appId, state);
             }
           } catch (err) {
             console.warn('Adapter: saveState failed', err);
@@ -1048,6 +1372,11 @@ window.ArcadeOS = {
         }
       }
     };
+    
+    // Copy decorated metadata values
+    adapter._rawAppTitle = app._rawAppTitle;
+    adapter._rawAppId = app._rawAppId;
+    return adapter;
   },
   
   goHome() {
@@ -1065,6 +1394,7 @@ window.ArcadeOS = {
       if (loadingView) loadingView.classList.remove('active');
       if (homeView) homeView.classList.add('active');
       this.state = 'HOME';
+      ArcadeHardware.setState('HOME');
       this.renderHome();
       return;
     }
@@ -1076,6 +1406,7 @@ window.ArcadeOS = {
       if (appView) { appView.classList.remove('active'); appView.innerHTML = ''; }
       if (homeView) homeView.classList.add('active');
       this.state = 'HOME';
+      ArcadeHardware.setState('HOME');
       this.renderHome();
       return;
     }
@@ -1100,6 +1431,7 @@ window.ArcadeOS = {
     document.getElementById('arcade-app-view').classList.remove('active');
     document.getElementById('arcade-home').classList.add('active');
     this.state = 'HOME';
+    ArcadeHardware.setState('HOME');
     this.renderHome();
   },
   
@@ -1121,6 +1453,7 @@ window.ArcadeOS = {
     }
     
     ArcadeEventBus.clearAll();
+    ArcadeHardware.clearAllTimers();
     
     const appView = document.getElementById('arcade-app-view');
     const loadingView = document.getElementById('arcade-loading');
@@ -1131,6 +1464,7 @@ window.ArcadeOS = {
     if (homeView) homeView.classList.add('active');
     
     this.state = 'HOME';
+    ArcadeHardware.setState('HOME');
     this.renderHome();
   },
 
@@ -1163,7 +1497,7 @@ window.ArcadeOS = {
         stats.totalPlaytime = (stats.totalPlaytime || 0) + this.sessionAccumulatedTime;
         if (!stats.playtimes) stats.playtimes = {};
         stats.playtimes[this.sessionAppId] = (stats.playtimes[this.sessionAppId] || 0) + this.sessionAccumulatedTime;
-        ArcadeStorage.set(ArcadeStorage.KEYS.STATS, stats);
+        this.saveStats(stats);
         
         ArcadeEventBus.emit('PLAYTIME_UPDATED', { totalPlaytime: stats.totalPlaytime });
       }
@@ -1176,6 +1510,7 @@ window.ArcadeOS = {
 
   renderSettings(view) {
     const settings = ArcadeStorage.get(ArcadeStorage.KEYS.SETTINGS) || {};
+    const stats = ArcadeStorage.get(ArcadeStorage.KEYS.STATS) || {};
     
     view.innerHTML = `
       <div class="sys-app settings-app">
@@ -1210,6 +1545,14 @@ window.ArcadeOS = {
             </div>
           </div>
           <div class="settings-group">
+            <h3>COIN SYSTEM</h3>
+            <div class="setting-item">
+              <label>Current Credits</label>
+              <span id="val-credits">${stats.currentCredits || 0} CREDITS</span>
+            </div>
+            <button id="setting-reset-credits-btn" class="sys-btn">RESET CREDITS</button>
+          </div>
+          <div class="settings-group">
             <h3>SYSTEM RESET</h3>
             <button id="setting-reset-btn" class="sys-btn danger-btn">RESET MACHINE DATA</button>
           </div>
@@ -1223,7 +1566,7 @@ window.ArcadeOS = {
     bSlider.addEventListener('input', () => {
       settings.brightness = parseFloat(bSlider.value);
       view.querySelector('#val-brightness').textContent = `${Math.round(settings.brightness * 100)}%`;
-      ArcadeStorage.set(ArcadeStorage.KEYS.SETTINGS, settings);
+      this.saveSettings(settings);
       this.applyHardwareEffects();
     });
     
@@ -1231,7 +1574,7 @@ window.ArcadeOS = {
     gSlider.addEventListener('input', () => {
       settings.glow = parseFloat(gSlider.value);
       view.querySelector('#val-glow').textContent = `${Math.round(settings.glow * 100)}%`;
-      ArcadeStorage.set(ArcadeStorage.KEYS.SETTINGS, settings);
+      this.saveSettings(settings);
       this.applyHardwareEffects();
     });
     
@@ -1243,7 +1586,7 @@ window.ArcadeOS = {
         settings.soundEnabled = true;
         view.querySelector('#setting-audio-toggle').textContent = 'ENABLED';
       }
-      ArcadeStorage.set(ArcadeStorage.KEYS.SETTINGS, settings);
+      this.saveSettings(settings);
       this.applyHardwareEffects();
     });
     
@@ -1251,11 +1594,18 @@ window.ArcadeOS = {
     aBtn.addEventListener('click', () => {
       settings.soundEnabled = !settings.soundEnabled;
       aBtn.textContent = settings.soundEnabled ? 'ENABLED' : 'MUTED';
-      ArcadeStorage.set(ArcadeStorage.KEYS.SETTINGS, settings);
+      this.saveSettings(settings);
       this.applyHardwareEffects();
       const muteBtn = document.getElementById('os-mute-btn');
       if (muteBtn) muteBtn.textContent = settings.soundEnabled ? '🔊' : '🔇';
       ArcadeAudio.playTick();
+    });
+
+    view.querySelector('#setting-reset-credits-btn').addEventListener('click', () => {
+      stats.currentCredits = 0;
+      this.saveStats(stats);
+      view.querySelector('#val-credits').textContent = '0 CREDITS';
+      ArcadeAudio.playBack();
     });
     
     view.querySelector('#setting-reset-btn').addEventListener('click', () => {
@@ -1341,7 +1691,7 @@ window.ArcadeOS = {
     const nameInput = view.querySelector('#profile-name-input');
     nameInput.addEventListener('change', () => {
       profile.name = nameInput.value.trim() || 'Player 1';
-      ArcadeStorage.set(ArcadeStorage.KEYS.PROFILE, profile);
+      this.saveProfile(profile);
     });
 
     view.querySelectorAll('.avatar-option').forEach(opt => {
@@ -1350,7 +1700,7 @@ window.ArcadeOS = {
         view.querySelector('#active-avatar').textContent = profile.avatar;
         view.querySelectorAll('.avatar-option').forEach(o => o.classList.remove('active'));
         opt.classList.add('active');
-        ArcadeStorage.set(ArcadeStorage.KEYS.PROFILE, profile);
+        this.saveProfile(profile);
         ArcadeAudio.playTick();
       });
     });

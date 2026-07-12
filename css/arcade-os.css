@@ -2025,3 +2025,156 @@
     transform: none !important;
   }
 }
+
+/* ==========================================================================
+   CABINET HARDWARE DIAGNOSTIC LEDS & SLOTS
+   ========================================================================== */
+.cab-led-indicators {
+  position: absolute;
+  top: 20px;
+  left: 174px;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.cab-indicator-led {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #111827; /* dark off state */
+  box-shadow: inset 0 1px 1px rgba(0,0,0,0.8);
+  transition: background 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+  opacity: 0.5;
+}
+
+/* 1. Power Indicator */
+.led-power.green {
+  background: #10b981;
+  box-shadow: 0 0 6px #10b981, inset 0 1px rgba(255,255,255,0.4);
+  opacity: 1;
+}
+.led-power.amber {
+  background: #f59e0b;
+  box-shadow: 0 0 6px #f59e0b, inset 0 1px rgba(255,255,255,0.4);
+  opacity: 1;
+}
+.led-power.red {
+  background: #ef4444;
+  box-shadow: 0 0 6px #ef4444, inset 0 1px rgba(255,255,255,0.4);
+  opacity: 1;
+}
+.led-power.pulse-cyan {
+  background: #06b6d4;
+  box-shadow: 0 0 6px #06b6d4, inset 0 1px rgba(255,255,255,0.4);
+  opacity: 1;
+  animation: led-glow-pulse 1.2s infinite ease-in-out;
+}
+
+@keyframes led-glow-pulse {
+  0%, 100% { opacity: 0.6; box-shadow: 0 0 3px #06b6d4; }
+  50% { opacity: 1; box-shadow: 0 0 8px #06b6d4; }
+}
+
+/* 2. Input Indicator (pulsed on event) */
+.led-input.blink {
+  background: #3b82f6;
+  box-shadow: 0 0 7px #3b82f6, inset 0 1px rgba(255,255,255,0.4);
+  opacity: 1;
+}
+
+/* 3. Storage Indicator (pulsed on write) */
+.led-storage.blink {
+  background: #a855f7;
+  box-shadow: 0 0 7px #a855f7, inset 0 1px rgba(255,255,255,0.4);
+  opacity: 1;
+}
+
+/* 4. Network Indicator */
+.led-network.green {
+  background: #10b981;
+  box-shadow: 0 0 6px #10b981, inset 0 1px rgba(255,255,255,0.4);
+  opacity: 0.8;
+}
+.led-network.amber {
+  background: #d97706;
+  box-shadow: 0 0 6px #d97706, inset 0 1px rgba(255,255,255,0.4);
+  opacity: 0.8;
+}
+
+/* ==========================================================================
+   COIN ENTRY SLOT EFFECTS
+   ========================================================================== */
+.cab-coin-slot {
+  cursor: pointer;
+  outline: none;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.cab-coin-slot:hover {
+  background: #ef4444; /* orange-red glow in slot */
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+}
+
+.cab-coin-slot:active {
+  transform: scale(0.95);
+  background: #f87171;
+}
+
+/* Dynamic coin door return feedback */
+.cab-coin-return {
+  transition: background-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.cab-coin-return.pulse-light {
+  background-color: rgba(239, 68, 68, 0.4) !important;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.8), inset 0 0 4px rgba(239, 68, 68, 0.4);
+}
+
+/* ==========================================================================
+   PHYSICAL BUTTON FEEDBACK
+   ========================================================================== */
+.cab-btn, .cab-btn-small {
+  transition: transform 0.08s cubic-bezier(0.25, 0.8, 0.25, 1), 
+              box-shadow 0.08s ease;
+  cursor: pointer;
+  outline: none;
+}
+
+/* Simulating structural button travel */
+.cab-btn:active, .cab-btn.is-pressed {
+  transform: translateY(1.5px) scale(0.97);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.6), 
+              inset 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.cab-btn-small:active, .cab-btn-small.is-pressed {
+  transform: translateY(1px) scale(0.96);
+  box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.6), 
+              inset 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+/* Specular shift on button press */
+.cab-btn:active .cab-btn-specular, .cab-btn.is-pressed .cab-btn-specular {
+  opacity: 0.15;
+  transform: translate(1px, 1px) scale(0.9);
+}
+
+.cab-btn-inner {
+  transition: transform 0.08s ease;
+}
+
+.cab-btn:active .cab-btn-inner, .cab-btn.is-pressed .cab-btn-inner {
+  transform: translateY(0.5px);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ==========================================================================
+   JOYSTICK DYNAMIC TRANSITIONS
+   ========================================================================== */
+.cab-joy-stick, .cab-joy-ball {
+  transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+}
+

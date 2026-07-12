@@ -136,6 +136,7 @@
         hasBootedOS = true;
         window.ArcadeOS.boot();
         osVisible = true;
+        window.ArcadeOS.osVisible = true;
       }
     } else {
       chassis.classList.remove('is-scaled');
@@ -166,6 +167,11 @@
           }
           
           osVisible = false;
+          window.ArcadeOS.osVisible = false;
+          if (window.ArcadeHardware) {
+            window.ArcadeHardware.clearAllTimers();
+            window.ArcadeHardware.updateOled('OFF');
+          }
         }
       } else {
         // Check if we should reopen the OS
@@ -194,6 +200,10 @@
           }
           
           osVisible = true;
+          window.ArcadeOS.osVisible = true;
+          if (window.ArcadeHardware) {
+            window.ArcadeHardware.setState(window.ArcadeOS.state);
+          }
         }
       }
     }
