@@ -2178,3 +2178,295 @@
   transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.15);
 }
 
+/* ==========================================================================
+   CABINET MACHINE BUILDER CUSTOMIZATION STYLES (PHASE 3)
+   ========================================================================== */
+.cabinet-chassis {
+  /* Default customizer color states */
+  --machine-accent: #35d0ba;
+  --machine-secondary: #ff365d;
+  --machine-button-a: #35d0ba;
+  --machine-button-b: #ff365d;
+  --machine-joystick-color: #151515;
+  --machine-led-color: #35d0ba;
+  --machine-marquee-color: #35d0ba;
+  --machine-screen-glow: 0.5;
+  --machine-cabinet-glow: 0.5;
+  --machine-scanline-opacity: 0.35;
+  --machine-coin-light: #ff365d;
+}
+
+/* Explicit scopes mapping */
+.cabinet-chassis {
+  --cab-led: var(--machine-led-color) !important;
+}
+
+/* Screen filter presets style */
+.cabinet-screen {
+  filter: var(--machine-screen-filter, none) !important;
+}
+
+/* Scanline intensity control mapped to existing screen overlay */
+#arcade-os::after {
+  opacity: var(--machine-scanline-opacity, 0.35) !important;
+}
+
+/* Button A customizer colors overrides */
+.cab-btn.action-a {
+  --cab-led: var(--machine-button-a) !important;
+}
+.cab-btn.action-a .cab-btn-inner {
+  border: 1px solid var(--machine-button-a) !important;
+  color: var(--machine-button-a) !important;
+  text-shadow: 0 0 4px var(--machine-button-a) !important;
+}
+
+/* Button B customizer colors overrides */
+.cab-btn.action-b {
+  --cab-led: var(--machine-button-b) !important;
+}
+.cab-btn.action-b .cab-btn-inner {
+  border: 1px solid var(--machine-button-b) !important;
+  color: var(--machine-button-b) !important;
+  text-shadow: 0 0 4px var(--machine-button-b) !important;
+}
+
+/* Joystick customize overrides */
+.cab-joy-ball {
+  background: radial-gradient(circle at 30% 30%, var(--machine-joystick-color) 0%, #0d0d0f 80%) !important;
+}
+
+/* Marquee light glow custom overrides */
+.cab-marquee-text {
+  text-shadow: 0 0 8px var(--machine-led-color), 0 0 16px var(--machine-led-color) !important;
+}
+
+/* Coin Light Color custom overrides */
+.cab-coin-slot {
+  box-shadow: inset 0 1px 3px rgba(0,0,0,1), 0 0 6px var(--machine-coin-light) !important;
+}
+.cab-coin-slot::after {
+  background: var(--machine-coin-light) !important;
+  box-shadow: 0 0 6px var(--machine-coin-light) !important;
+}
+
+/* System Warning/Error states override custom colors */
+.cabinet-chassis[data-machine-state="offline"] {
+  --cab-led: #d97706 !important;
+}
+.cabinet-chassis[data-machine-state="warning"] {
+  --cab-led: #ef4444 !important;
+}
+
+/* Customizer UI App Layout */
+.customizer-app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  color: #fff;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+}
+
+.builder-layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.builder-nav-tabs {
+  width: 120px;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  background: rgba(0,0,0,0.15);
+}
+
+.builder-tab-btn {
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  border-left: 2px solid transparent;
+  color: rgba(255, 255, 255, 0.6);
+  font-family: inherit;
+  font-size: 8px;
+  font-weight: bold;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  outline: none;
+}
+
+.builder-tab-btn:hover {
+  background: rgba(255,255,255,0.02);
+  color: #fff;
+}
+
+.builder-tab-btn.active {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--machine-accent, #35d0ba);
+  border-left-color: var(--machine-accent, #35d0ba);
+}
+
+.builder-panel {
+  flex: 1;
+  padding: 14px;
+  overflow-y: auto;
+  background: rgba(0,0,0,0.20);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.controls-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.controls-group h3 {
+  font-size: 9px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.swatches-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 6px;
+}
+
+.theme-swatch-btn {
+  padding: 8px;
+  background: #1e1e24;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 4px;
+  color: #fff;
+  font-family: inherit;
+  font-size: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  outline: none;
+}
+
+.theme-swatch-btn:hover {
+  background: #272730;
+  border-color: rgba(255,255,255,0.2);
+}
+
+.theme-swatch-btn.active {
+  background: rgba(53, 208, 186, 0.15);
+  border-color: var(--machine-accent, #35d0ba);
+  color: var(--machine-accent, #35d0ba);
+}
+
+.builder-actions-bar {
+  height: 44px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(0,0,0,0.3);
+}
+
+.actions-right {
+  display: flex;
+  gap: 8px;
+}
+
+.builder-actions-bar .sys-btn {
+  font-size: 9px;
+  padding: 6px 12px;
+}
+
+.builder-actions-bar .active-btn {
+  background: rgba(53, 208, 186, 0.2);
+  border-color: var(--machine-accent, #35d0ba);
+  color: var(--machine-accent, #35d0ba);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.builder-actions-bar .active-btn.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Virtual Confirmation Dialog styles */
+#arcade-confirm-modal {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+#arcade-confirm-modal.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.confirm-modal-box {
+  background: #111113;
+  border: 1px solid #35d0ba;
+  border-radius: 6px;
+  width: 250px;
+  padding: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.9), 0 0 12px rgba(53, 208, 186, 0.2);
+  text-align: center;
+}
+
+.confirm-message {
+  font-size: 11px;
+  color: #fff;
+  line-height: 1.4;
+  margin: 0 0 16px 0;
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* Mobile & Touch safety */
+@media (max-width: 1024px) {
+  .builder-layout {
+    flex-direction: column;
+  }
+  .builder-nav-tabs {
+    width: 100%;
+    height: 36px;
+    flex-direction: row;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+  .builder-tab-btn {
+    border-left: none;
+    border-bottom: 2px solid transparent;
+    padding: 8px 12px;
+    white-space: nowrap;
+  }
+  .builder-tab-btn.active {
+    border-bottom-color: var(--machine-accent, #35d0ba);
+  }
+  .builder-panel {
+    padding: 10px;
+  }
+}
+
+

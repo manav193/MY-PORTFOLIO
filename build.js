@@ -90,6 +90,22 @@ async function buildJS() {
       });
     }
   }
+
+  // 3. Bundle dynamic ES Modules
+  const dynamicModules = ['modules/arcade-customizer.js'];
+  for (const mod of dynamicModules) {
+    const srcPath = path.join(__dirname, 'js', mod);
+    if (fs.existsSync(srcPath)) {
+      await esbuild.build({
+        entryPoints: [srcPath],
+        bundle: true,
+        minify: true,
+        outfile: path.join(DIST_DIR, 'js', mod),
+        target: ['es2020'],
+        format: 'esm'
+      });
+    }
+  }
 }
 
 function buildCSS() {

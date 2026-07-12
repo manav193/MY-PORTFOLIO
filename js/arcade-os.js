@@ -582,8 +582,14 @@ const ArcadeHardware = {
 
   updateMarquee(state) {
     if (!this.marqueeText) return;
+    
+    // Check if Customizer has custom text
+    const customText = (window.ArcadeCustomizer && window.ArcadeCustomizer.persistedConfig) 
+      ? window.ArcadeCustomizer.persistedConfig.marqueeText.toUpperCase()
+      : 'A R C A D E';
+      
     if (state === 'HOME') {
-      this.marqueeText.textContent = 'A R C A D E';
+      this.marqueeText.textContent = customText;
     } else if (state === 'APP') {
       const activeApp = ArcadeOS.activeApp;
       const appConfig = activeApp ? ArcadeRegistry.getApp(ArcadeOS.selectedIndex >= 0 ? ArcadeOS.getHomeItems()[ArcadeOS.selectedIndex].id : '') : null;
@@ -594,6 +600,10 @@ const ArcadeHardware = {
       this.marqueeText.textContent = 'PROFILE';
     } else if (state === 'ACHIEVEMENTS') {
       this.marqueeText.textContent = 'AWARDS';
+    } else if (state === 'CUSTOMIZE') {
+      this.marqueeText.textContent = (window.ArcadeCustomizer && window.ArcadeCustomizer.draftConfig)
+        ? window.ArcadeCustomizer.draftConfig.marqueeText.toUpperCase()
+        : 'CUSTOMIZE';
     } else if (state === 'LOADING') {
       this.marqueeText.textContent = 'LOADING...';
     }
@@ -657,6 +667,8 @@ const ArcadeHardware = {
       this.oledStatus.textContent = 'PLAYER DATA';
     } else if (state === 'ACHIEVEMENTS') {
       this.oledStatus.textContent = 'TROPHY LOG';
+    } else if (state === 'CUSTOMIZE') {
+      this.oledStatus.textContent = 'DESIGN LAB';
     }
   },
 
@@ -772,6 +784,13 @@ window.ArcadeOS = {
     ArcadeHardware.init();
     this.registerCoreEvents();
     this.applyHardwareEffects();
+    
+    import('./modules/arcade-customizer.js').then(module => {
+      window.ArcadeCustomizer = module.ArcadeCustomizer;
+      window.ArcadeCustomizer.init();
+    }).catch(err => {
+      console.warn('Lazy-load customizer failed initially', err);
+    });
     
     // Build Base OS HTML Structure strictly utilizing requested IDs
     const ui = document.createElement('div');
@@ -916,7 +935,7 @@ window.ArcadeOS = {
         } else {
           this.goHome();
         }
-      } else if (['SETTINGS', 'PROFILE', 'ACHIEVEMENTS'].includes(this.state)) {
+      } else if (['SETTINGS', 'PROFILE', 'ACHIEVEMENTS', 'CUSTOMIZE'].includes(this.state)) {
         this.goHome();
       }
     });
@@ -1155,6 +1174,7 @@ window.ArcadeOS = {
   getHomeItems() {
     const apps = ArcadeRegistry.getAll().map(a => ({ ...a, isSystem: false }));
     const systemItems = [
+      { id: 'customize', title: 'Machine Customizer', category: 'SYSTEM', description: 'Visually configure your premium cabinet.', icon: '🎨', isSystem: true, route: 'CUSTOMIZE' },
       { id: 'achievements', title: 'Achievements', category: 'SYSTEM', description: 'View unlocked trophies.', icon: '🏆', isSystem: true, route: 'ACHIEVEMENTS' },
       { id: 'settings', title: 'Settings', category: 'SYSTEM', description: 'Configure display, sound, and system settings.', icon: '⚙️', isSystem: true, route: 'SETTINGS' },
       { id: 'profile', title: 'Player Profile', category: 'SYSTEM', description: 'View stats and playtime summary.', icon: '👤', isSystem: true, route: 'PROFILE' }
@@ -1230,7 +1250,8 @@ window.ArcadeOS = {
     ArcadeHardware.updateOled(this.state);
   },
 
-  routeTo(routeState) {
+  routeTo(routeState, bypass = false) {
+    if (this.checkUnsavedChanges(() => this.routeTo(routeState, true), bypass)) return;
     if (this.launchTimeoutId) {
       clearTimeout(this.launchTimeoutId);
       this.launchTimeoutId = null;
@@ -1253,10 +1274,27 @@ window.ArcadeOS = {
       this.renderProfile(view);
     } else if (routeState === 'ACHIEVEMENTS') {
       this.renderAchievements(view);
+    } else if (routeState === 'CUSTOMIZE') {
+      if (window.ArcadeCustomizer) {
+        window.ArcadeCustomizer.open(view);
+      } else {
+        view.innerHTML = '<div class="sys-app"><h2>LOADING CUSTOMIZER...</h2></div>';
+        import('./modules/arcade-customizer.js').then(module => {
+          window.ArcadeCustomizer = module.ArcadeCustomizer;
+          window.ArcadeCustomizer.init();
+          if (this.state === 'CUSTOMIZE') {
+            window.ArcadeCustomizer.open(view);
+          }
+        }).catch(err => {
+          console.error(err);
+          view.innerHTML = '<div class="sys-app"><h2>ERROR LOADING CUSTOMIZER</h2></div>';
+        });
+      }
     }
   },
   
-  launchApp(id) {
+  launchApp(id, bypass = false) {
+    if (this.checkUnsavedChanges(() => this.launchApp(id, true), bypass)) return;
     if (this.launchPending || this.state !== 'HOME') return;
     
     const appConfig = ArcadeRegistry.getApp(id);
@@ -1379,7 +1417,8 @@ window.ArcadeOS = {
     return adapter;
   },
   
-  goHome() {
+  goHome(bypass = false) {
+    if (this.checkUnsavedChanges(() => this.goHome(true), bypass)) return;
     if (this.launchTimeoutId) {
       clearTimeout(this.launchTimeoutId);
       this.launchTimeoutId = null;
@@ -1399,7 +1438,7 @@ window.ArcadeOS = {
       return;
     }
 
-    if (['SETTINGS', 'PROFILE', 'ACHIEVEMENTS'].includes(this.state)) {
+    if (['SETTINGS', 'PROFILE', 'ACHIEVEMENTS', 'CUSTOMIZE'].includes(this.state)) {
       ArcadeAudio.playBack();
       const appView = document.getElementById('arcade-app-view');
       const homeView = document.getElementById('arcade-home');
@@ -1435,7 +1474,8 @@ window.ArcadeOS = {
     this.renderHome();
   },
   
-  forceGoHome() {
+  forceGoHome(bypass = false) {
+    if (this.checkUnsavedChanges(() => this.forceGoHome(true), bypass)) return;
     if (this.launchTimeoutId) {
       clearTimeout(this.launchTimeoutId);
       this.launchTimeoutId = null;
@@ -1736,5 +1776,53 @@ window.ArcadeOS = {
     `;
 
     view.querySelector('#achievements-back-btn').addEventListener('click', () => this.goHome());
+  },
+
+  showConfirmModal(message, onConfirm, onCancel) {
+    let modal = document.getElementById('arcade-confirm-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'arcade-confirm-modal';
+      modal.className = 'confirm-modal';
+      document.body.appendChild(modal);
+    }
+    modal.innerHTML = `
+      <div class="confirm-modal-box">
+        <p class="confirm-message">${message}</p>
+        <div class="confirm-actions">
+          <button id="modal-confirm-btn" class="sys-btn danger-btn active">CONFIRM</button>
+          <button id="modal-cancel-btn" class="sys-btn">CANCEL</button>
+        </div>
+      </div>
+    `;
+    modal.classList.add('active');
+    if (window.ArcadeAudio) window.ArcadeAudio.playWarning();
+
+    const close = () => {
+      modal.classList.remove('active');
+    };
+
+    modal.querySelector('#modal-confirm-btn').addEventListener('click', () => {
+      close();
+      if (onConfirm) onConfirm();
+    });
+
+    modal.querySelector('#modal-cancel-btn').addEventListener('click', () => {
+      close();
+      if (onCancel) onCancel();
+    });
+  },
+
+  checkUnsavedChanges(onConfirm, bypass = false) {
+    if (!bypass && this.state === 'CUSTOMIZE' && window.ArcadeCustomizer && window.ArcadeCustomizer.isDirty()) {
+      this.showConfirmModal("Unsaved machine builder changes will be lost. Discard and continue?", () => {
+        if (window.ArcadeCustomizer) {
+          window.ArcadeCustomizer.cancel();
+        }
+        onConfirm();
+      });
+      return true; // Intercepted
+    }
+    return false; // Not intercepted
   }
 };
