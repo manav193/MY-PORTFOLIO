@@ -1,4 +1,4 @@
-const cacheName = "manav-portfolio-v13";
+const cacheName = "manav-portfolio-v18";
 const assets = [
   "./",
   "./index.html",
@@ -9,9 +9,19 @@ const assets = [
   "./css/project-page.css",
   "./js/main.js",
   "./js/intro.js",
+  "./js/arcade-module-loader.js",
   "./js/arcade-os.js",
   "./js/arcade-apps.js",
+  "./js/modules/arcade-audio.js",
+  "./js/modules/arcade-soundlab.js",
+  "./js/modules/arcade-diagnostics.js",
+  "./js/modules/arcade-reset-safety.js",
+  "./js/modules/arcade-system-ui.js",
+  "./js/modules/arcade-stats.js",
+  "./js/modules/arcade-achievements.js",
+  "./js/modules/arcade-customizer.js",
   "./js/machine-bg.js",
+  "./project-arcade-os.html",
   "./project-toolverse.html",
   "./project-selfyy.html",
   "./project-love-journey.html",
@@ -33,12 +43,19 @@ const assets = [
   "./images/nike.png",
   "./images/project-nexus.svg",
   "./images/project-pulse.svg",
+  "./images/arcade-home.webp",
+  "./images/arcade-customize.webp",
+  "./images/arcade-stats.webp",
+  "./images/arcade-achievements.webp",
+  "./images/arcade-soundlab.webp",
+  "./images/arcade-diagnostics.webp",
+  "./images/selfyy-preview.webp",
   "./icons/favicon.svg",
   "./icons/apple-touch-icon.svg",
   "./assets/og-image.jpg",
   "./assets/og-image.svg",
   "./site.webmanifest",
-  "./resume.pdf"
+  "./Manav-Agarwal-Resume.pdf"
 ];
 
 self.addEventListener("install", (event) => {
@@ -48,14 +65,73 @@ self.addEventListener("install", (event) => {
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => Promise.all(keys.filter((key) => key !== cacheName).map((key) => caches.delete(key))))
+    caches.keys().then((keys) => Promise.all(keys
+      .filter((key) => key.startsWith("manav-portfolio-") && key !== cacheName)
+      .map((key) => caches.delete(key))))
   );
   self.clients.claim();
 });
 
+function validateAssetResponse(request, response) {
+  if (!response.ok) return response;
+
+  const pathname = new URL(request.url).pathname.toLowerCase();
+  const contentType = (response.headers.get("content-type") || "").toLowerCase();
+  const expectsScript = request.destination === "script" || pathname.endsWith(".js");
+  const expectsStyle = request.destination === "style" || pathname.endsWith(".css");
+  const scriptTypeValid = /javascript|ecmascript/.test(contentType);
+  const styleTypeValid = contentType.includes("text/css");
+
+  if ((expectsScript && !scriptTypeValid) || (expectsStyle && !styleTypeValid)) {
+    return new Response("Resource returned an invalid content type.", {
+      status: 502,
+      headers: { "Content-Type": "text/plain; charset=utf-8" }
+    });
+  }
+
+  return response;
+}
+
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
+  const requestUrl = new URL(event.request.url);
+  if (requestUrl.origin !== self.location.origin) return;
+
+  if (event.request.mode === "navigate") {
+    event.respondWith((async () => {
+      try {
+        const response = await fetch(event.request);
+        if (response.ok) {
+          const cache = await caches.open(cacheName);
+          await cache.put(event.request, response.clone());
+        }
+        return response;
+      } catch (error) {
+        return (await caches.match(event.request, { ignoreSearch: true }))
+          || (await caches.match("./index.html"))
+          || (await caches.match("./404.html"));
+      }
+    })());
+    return;
+  }
+
+  const network = fetch(event.request).then(async (networkResponse) => {
+    const response = validateAssetResponse(event.request, networkResponse);
+    if (response.ok) {
+      const cache = await caches.open(cacheName);
+      await cache.put(event.request, response.clone());
+    }
+    return response;
+  }).catch(() => null);
+
+  event.waitUntil(network.then(() => undefined));
   event.respondWith(
-    caches.match(event.request, { ignoreSearch: true }).then((cached) => cached || fetch(event.request).catch(() => caches.match("./404.html")))
+    caches.match(event.request, { ignoreSearch: true }).then(async (cached) => {
+      if (cached) return cached;
+      return (await network) || new Response("Offline and resource is not cached.", {
+        status: 503,
+        headers: { "Content-Type": "text/plain; charset=utf-8" }
+      });
+    })
   );
 });

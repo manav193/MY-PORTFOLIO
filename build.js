@@ -3,13 +3,14 @@ const path = require('path');
 const esbuild = require('esbuild');
 const CleanCSS = require('clean-css');
 const HtmlMinifier = require('html-minifier-terser');
+const portfolioConfig = require('./js/portfolio-config.js');
 
 const DIST_DIR = path.join(__dirname, 'dist');
 
 // Read command line arguments or environment variables
 const args = process.argv.slice(2);
 let DEPLOY_BASE = process.env.DEPLOY_BASE || '/';
-let SITE_URL = process.env.SITE_URL || 'https://my-portfolio-mu-jade-52.vercel.app';
+let SITE_URL = process.env.SITE_URL || portfolioConfig.deployedPortfolioUrl;
 
 for (let i = 0; i < args.length; i++) {
   if (args[i] === '--base' && args[i+1]) {
@@ -68,7 +69,7 @@ async function buildJS() {
     entryPoints: [path.join(__dirname, 'js/main.js')],
     bundle: true,
     minify: true,
-    sourcemap: true,
+    sourcemap: false,
     outfile: path.join(DIST_DIR, 'js/main.js'),
     target: ['es2020'],
     define: {
@@ -77,7 +78,7 @@ async function buildJS() {
   });
 
   // 2. Minify deferred classic global scripts
-  const classicScripts = ['intro.js', 'arcade-os.js', 'arcade-apps.js', 'machine-bg.js'];
+  const classicScripts = ['intro.js', 'arcade-os.js', 'arcade-apps.js', 'machine-bg.js', 'arcade-module-loader.js'];
   for (const script of classicScripts) {
     const srcPath = path.join(__dirname, 'js', script);
     if (fs.existsSync(srcPath)) {
@@ -92,7 +93,16 @@ async function buildJS() {
   }
 
   // 3. Bundle dynamic ES Modules
-  const dynamicModules = ['modules/arcade-customizer.js', 'modules/arcade-stats.js', 'modules/arcade-achievements.js'];
+  const dynamicModules = [
+    'modules/arcade-customizer.js',
+    'modules/arcade-stats.js',
+    'modules/arcade-achievements.js',
+    'modules/arcade-system-ui.js',
+    'modules/arcade-audio.js',
+    'modules/arcade-soundlab.js',
+    'modules/arcade-diagnostics.js',
+    'modules/arcade-reset-safety.js'
+  ];
   for (const mod of dynamicModules) {
     const srcPath = path.join(__dirname, 'js', mod);
     if (fs.existsSync(srcPath)) {
@@ -128,6 +138,32 @@ function buildCSS() {
 
 function processHTMLContent(content, base, siteUrl, fileName) {
   let processed = content;
+
+  const configTokens = {
+    'portfolio.name': portfolioConfig.name,
+    'portfolio.role': portfolioConfig.role,
+    'portfolio.location': portfolioConfig.location,
+    'portfolio.availability': portfolioConfig.availability,
+    'portfolio.githubUrl': portfolioConfig.githubUrl,
+    'portfolio.email': portfolioConfig.email,
+    'portfolio.emailMailto': `mailto:${portfolioConfig.email}?subject=Project%20inquiry`,
+    'portfolio.resumePath': `${base}${portfolioConfig.resumePath}`,
+    'portfolio.siteUrl': siteUrl,
+    'portfolio.socialImageUrl': `${siteUrl}${base}${portfolioConfig.socialImagePath}`
+  };
+
+  for (const [projectId, project] of Object.entries(portfolioConfig.projects)) {
+    configTokens[`projects.${projectId}.githubUrl`] = project.githubUrl;
+    configTokens[`projects.${projectId}.liveUrl`] = project.liveUrl || '';
+    configTokens[`projects.${projectId}.caseStudyPath`] = `${base}${project.caseStudyPath}`;
+  }
+
+  processed = processed.replace(/\{\{([\w.-]+)\}\}/g, (match, key) => {
+    if (!(key in configTokens)) {
+      throw new Error(`Unknown portfolio config token in ${fileName}: ${match}`);
+    }
+    return configTokens[key];
+  });
   
   // 1. Replace hardcoded Vercel URL with dynamic SITE_URL + DEPLOY_BASE
   processed = processed.replace(/https:\/\/my-portfolio-mu-jade-52\.vercel\.app\//g, `${siteUrl}${base}`);
@@ -142,7 +178,7 @@ function processHTMLContent(content, base, siteUrl, fileName) {
     { regex: /href="project-/g, replacement: `href="${base}project-` },
     { regex: /href="index\.html/g, replacement: `href="${base}index.html` },
     { regex: /href="site\.webmanifest"/g, replacement: `href="${base}site.webmanifest"` },
-    { regex: /href="resume\.pdf"/g, replacement: `href="${base}resume.pdf"` }
+    { regex: /href="Manav-Agarwal-Resume\.pdf"/g, replacement: `href="${base}${portfolioConfig.resumePath}"` }
   ];
 
   for (const pattern of relativeAssetPatterns) {
@@ -165,6 +201,7 @@ async function buildHTML() {
   const htmlFiles = [
     'index.html',
     '404.html',
+    'project-arcade-os.html',
     'project-toolverse.html',
     'project-selfyy.html',
     'project-love-journey.html',
@@ -217,7 +254,7 @@ function processSWContent(content, base) {
   let processed = content;
   
   // Bump version to trigger fresh caching on update
-  processed = processed.replace(/manav-portfolio-v13/g, 'manav-portfolio-v14');
+  processed = processed.replace(/manav-portfolio-v18/g, 'manav-portfolio-v19');
   
   // Prepend base path to cached assets
   processed = processed.replace(/"\.\/"/g, `"${base}"`);
@@ -241,6 +278,24 @@ function processSitemapContent(content, base, siteUrl) {
 
 function validateBuild(base, siteUrl) {
   console.log('Validating build outputs and paths...');
+
+  const requiredConfig = ['name', 'role', 'availability', 'email', 'githubUrl', 'resumePath', 'deployedPortfolioUrl', 'socialImagePath'];
+  for (const key of requiredConfig) {
+    if (!portfolioConfig[key] || typeof portfolioConfig[key] !== 'string') {
+      throw new Error(`Build Validation Failed: portfolio config value is missing: ${key}`);
+    }
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(portfolioConfig.email)) {
+    throw new Error('Build Validation Failed: portfolio config email is invalid.');
+  }
+  if (!Array.isArray(portfolioConfig.featuredProjectIds) || portfolioConfig.featuredProjectIds.length === 0) {
+    throw new Error('Build Validation Failed: featuredProjectIds must contain at least one project.');
+  }
+  for (const id of portfolioConfig.featuredProjectIds) {
+    if (!portfolioConfig.projects[id]) {
+      throw new Error(`Build Validation Failed: featured project is missing from config: ${id}`);
+    }
+  }
   
   // 1. Verify expected files exist in dist/
   const expectedFiles = [
@@ -250,9 +305,26 @@ function validateBuild(base, siteUrl) {
     'js/intro.js',
     'js/arcade-os.js',
     'js/arcade-apps.js',
+    'js/arcade-module-loader.js',
     'css/styles.css',
     'css/intro.css',
     'css/arcade-os.css',
+    'project-arcade-os.html',
+    portfolioConfig.resumePath,
+    portfolioConfig.socialImagePath,
+    'images/arcade-home.webp',
+    'images/arcade-customize.webp',
+    'images/arcade-stats.webp',
+    'images/arcade-achievements.webp',
+    'images/arcade-soundlab.webp',
+    'images/arcade-diagnostics.webp',
+    'images/selfyy-preview.webp',
+    'js/modules/arcade-system-ui.js',
+    'js/modules/arcade-customizer.js',
+    'js/modules/arcade-stats.js',
+    'js/modules/arcade-achievements.js',
+    'js/modules/arcade-soundlab.js',
+    'js/modules/arcade-diagnostics.js',
     'sw.js',
     'site.webmanifest'
   ];
@@ -309,6 +381,41 @@ function validateBuild(base, siteUrl) {
   const htmlFiles = fs.readdirSync(DIST_DIR).filter(file => file.endsWith('.html'));
   for (const file of htmlFiles) {
     const htmlContent = fs.readFileSync(path.join(DIST_DIR, file), 'utf8');
+
+    if (/\{\{[\w.-]+\}\}/.test(htmlContent)) {
+      throw new Error(`Build Validation Failed: unresolved config token in ${file}.`);
+    }
+    if (/[A-Za-z]:\\\\Users\\\\|[A-Za-z]:\/Users\//i.test(htmlContent)) {
+      throw new Error(`Build Validation Failed: absolute local machine path leaked into ${file}.`);
+    }
+
+    const ids = [...htmlContent.matchAll(/\sid="([^"]+)"/g)].map(match => match[1]);
+    const duplicateIds = ids.filter((id, index) => ids.indexOf(id) !== index);
+    if (duplicateIds.length > 0) {
+      throw new Error(`Build Validation Failed: duplicate HTML IDs in ${file}: ${[...new Set(duplicateIds)].join(', ')}`);
+    }
+
+    if (/href="(?:#|\s*)"|href="javascript:/i.test(htmlContent)) {
+      throw new Error(`Build Validation Failed: placeholder or empty href in ${file}.`);
+    }
+
+    if (file === 'index.html') {
+      const requiredMetadata = [
+        '<title>',
+        'name="description"',
+        'rel="canonical"',
+        'property="og:title"',
+        'property="og:description"',
+        'property="og:image"',
+        'name="twitter:card"',
+        'type="application/ld+json"'
+      ];
+      for (const marker of requiredMetadata) {
+        if (!htmlContent.includes(marker)) {
+          throw new Error(`Build Validation Failed: required metadata missing from index.html: ${marker}`);
+        }
+      }
+    }
     
     const urlMatches = [
       ...htmlContent.matchAll(/href="([^"]+)"/g),
@@ -377,7 +484,7 @@ async function main() {
     copyStatic('assets', 'assets');
     copyStatic('robots.txt', 'robots.txt');
     copyStatic('sitemap.xml', 'sitemap.xml');
-    copyStatic('resume.pdf', 'resume.pdf');
+    copyStatic(portfolioConfig.resumePath, portfolioConfig.resumePath);
 
     // Process manifest
     const manifestPath = path.join(__dirname, 'site.webmanifest');

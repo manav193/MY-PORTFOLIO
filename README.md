@@ -1,39 +1,56 @@
-# Modern Portfolio System
+# Manav Agarwal Portfolio
 
-## Short Overview
-A premium, production-ready creative technologist portfolio designed and built from scratch. It serves as the central hub for my digital identity, showcasing my capabilities in high-end UI/UX design, frontend development, and visual storytelling without relying on generic templates or heavy JavaScript frameworks.
+A production portfolio for Manav Agarwal, a creative technologist in Hyderabad who designs and develops apps, websites, product interfaces, and game UI.
 
-## Problem
-Most developer portfolios rely heavily on pre-built templates or bloated frameworks (like heavy React/Next.js setups) just to display static content. This results in slow load times, generic "developer" aesthetics, and a lack of authentic personal branding. 
+## Highlights
 
-## My Approach
-I engineered this portfolio with a "Vanilla First" philosophy. My goal was to achieve the ultra-premium aesthetic of world-class tech companies (Linear, Vercel, Apple) using only pure HTML, CSS, and lightweight Vanilla JavaScript. I wanted to prove that high-end design does not require a heavy tech stack.
+- Recruiter-first portfolio with featured work, case studies, resume, and contact actions
+- ArcadeOS, an interactive cabinet experience with games, profiles, achievements, statistics, customization, SoundLab, diagnostics, and reset safety
+- Responsive layouts for desktop, tablet, and mobile input
+- Keyboard navigation, focus management, reduced-motion support, and semantic landmarks
+- Static production build with minified HTML, CSS, and JavaScript
+- Offline support through a versioned service worker
+- Canonical, Open Graph, Twitter, sitemap, robots, and structured-data metadata
 
-## Design Decisions
-- **Cinematic Typography:** Utilized massive, tightly kerned typography (Inter) combined with deep blacks and subtle gradients to create a highly sophisticated, cinematic feel.
-- **Editorial Layouts:** Abandoned the standard "grid of identical cards" in favor of an editorial, case-study-driven layout. This forces the user to focus on the story behind the work, not just the thumbnail.
-- **Motion Identity:** Implemented custom cubic-bezier spring animations, continuous gradient flows, and intersection-observer reveals to make the site feel alive without sacrificing 60fps performance.
+## Stack
 
-## Technical Implementation
-Built with semantic HTML5 and native CSS variables (`var(--accent)`). The JavaScript architecture is highly modular, using native ES modules to handle specific micro-interactions (like the scroll progress bar, intersection reveals, and number counters). 
+- HTML5
+- CSS3
+- Vanilla JavaScript and ES modules
+- esbuild, CleanCSS, and html-minifier-terser for production builds
+- Puppeteer-based release checks
 
-## Challenges
-Achieving complex UI behaviors—such as the continuous gradient text animation, precise aspect-ratio image locks to prevent Cumulative Layout Shift (CLS), and keyboard-accessible focus states—without importing external libraries like Framer Motion or Tailwind CSS.
+## Local Development
 
-## Result
-A blazingly fast, highly accessible, and visually stunning digital identity that achieves a 100/100 Lighthouse Performance score. It successfully repositions my brand from a student to a professional Product Builder.
+```bash
+npm ci
+npm run build
+npm run preview -- --host 0.0.0.0
+```
 
-## Tech Stack
-- **Design:** Figma
-- **Frontend:** HTML5, CSS3, Vanilla ES6 JavaScript
-- **Deployment:** Vercel / GitHub Pages
+The preview is available at `http://localhost:4173` by default. Run `npm run verify` while the preview server is active.
 
-## Key Features
-- Zero dependencies, Vanilla Architecture
-- 100/100 Lighthouse Performance
-- Full keyboard accessibility and focus management
-- Modular ES6 JavaScript structure
-- Zero Cumulative Layout Shift (CLS) image loading
+## Production
 
-## Lessons Learned
-Building this portfolio from scratch reinforced my mastery of native web technologies. It proved that deeply understanding CSS Grid, Flexbox, and native browser APIs is far more valuable than simply knowing how to install a UI library.
+The primary deployment target is Vercel. `vercel.json` runs `npm run build` and publishes `dist`.
+
+- Production: [my-portfolio-mu-jade-52.vercel.app](https://my-portfolio-mu-jade-52.vercel.app)
+- Source: [github.com/manav193/MY-PORTFOLIO](https://github.com/manav193/MY-PORTFOLIO)
+
+The release process and verified checks are recorded in [LAUNCH_CHECKLIST.md](LAUNCH_CHECKLIST.md). No performance score is claimed without a recorded audit.
+
+## Project Structure
+
+```text
+assets/          Social and metadata assets
+case-studies/    Case-study source content
+css/             Portfolio, intro, ArcadeOS, and project styles
+images/          Project and ArcadeOS screenshots
+icons/           Favicons and app icons
+js/              Application code and modules
+dist/            Generated production output (ignored)
+```
+
+## License
+
+See [LICENSE](LICENSE).

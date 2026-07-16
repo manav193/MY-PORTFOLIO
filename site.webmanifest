@@ -1,7 +1,7 @@
 {
   "name": "Manav Agarwal Portfolio",
   "short_name": "Manav",
-  "description": "Creative technologist, UI/UX designer and frontend enthusiast portfolio.",
+  "description": "Creative frontend developer and UI/UX designer portfolio featuring browser products, game interfaces, and ArcadeOS.",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#070914",

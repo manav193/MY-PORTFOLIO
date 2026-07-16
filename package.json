@@ -15,5 +15,8 @@
     "html-minifier-terser": "^7.2.0",
     "pdf-export-images": "^1.2.0",
     "pdfjs-dist": "^6.1.200"
+  },
+  "devDependencies": {
+    "puppeteer": "^25.3.0"
   }
 }
