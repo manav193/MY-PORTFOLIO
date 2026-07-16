@@ -73,8 +73,6 @@ self.addEventListener("activate", (event) => {
 });
 
 function validateAssetResponse(request, response) {
-  if (!response.ok) return response;
-
   const pathname = new URL(request.url).pathname.toLowerCase();
   const contentType = (response.headers.get("content-type") || "").toLowerCase();
   const expectsScript = request.destination === "script" || pathname.endsWith(".js");
@@ -88,6 +86,8 @@ function validateAssetResponse(request, response) {
       headers: { "Content-Type": "text/plain; charset=utf-8" }
     });
   }
+
+  if (!response.ok) return response;
 
   return response;
 }

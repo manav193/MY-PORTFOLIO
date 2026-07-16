@@ -83,18 +83,29 @@ const { BASE_URL, assert } = require('./test-helpers');
       uploadThroughput: -1
     });
 
-    const bypassContext = await browser.createBrowserContext();
-    const bypassPage = await bypassContext.newPage();
-    await bypassPage.goto(`${origin}/`, { waitUntil: 'load' });
+    const freshContext = await browser.createBrowserContext();
+    const freshPage = await freshContext.newPage();
+    await freshPage.goto(`${origin}/`, { waitUntil: 'load' });
     await new Promise(resolve => setTimeout(resolve, 500));
-    const bypass = await bypassPage.evaluate(async () => ({
+    const freshState = await freshPage.evaluate(async () => ({
       registrations: (await navigator.serviceWorker.getRegistrations()).length,
       portfolioCaches: (await caches.keys()).filter(key => key.startsWith('manav-portfolio-')).length
     }));
-    assert(bypass.registrations === 0 && bypass.portfolioCaches === 0, 'Local preview bypass leaves service-worker state behind.');
-    await bypassContext.close();
 
-    console.log(`PASS service worker release: ${cacheVersion}, update cleanup, hard reload, offline fallback, failure handling, and local bypass.`);
+    if (['localhost', '127.0.0.1'].includes(base.hostname)) {
+      assert(
+        freshState.registrations === 0 && freshState.portfolioCaches === 0,
+        'Local preview bypass leaves service-worker state behind.'
+      );
+    } else {
+      assert(
+        freshState.registrations > 0 && freshState.portfolioCaches > 0,
+        'Production did not retain its service-worker registration and cache.'
+      );
+    }
+    await freshContext.close();
+
+    console.log(`PASS service worker release: ${cacheVersion}, update cleanup, hard reload, offline fallback, failure handling, and environment policy.`);
   } finally {
     await context.close();
     await browser.close();
