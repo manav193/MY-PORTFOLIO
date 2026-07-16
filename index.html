@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Manav Agarwal | Creative Technologist & Product Builder</title>
-  <meta name="description" content="Portfolio of Manav Agarwal. I specialize in frontend engineering, high-end UI/UX design, and premium product building. Explore my case studies in web architecture and interface design.">
+  <title>Manav Agarwal | Creative Frontend Developer & UI/UX Designer</title>
+  <meta name="description" content="Manav Agarwal is a creative frontend developer and UI/UX designer in Hyderabad building fast web products, browser apps, game interfaces, and interaction systems.">
   <meta name="author" content="Manav Agarwal">
   <meta name="theme-color" content="#000000">
-  <link rel="canonical" href="https://my-portfolio-mu-jade-52.vercel.app/">
+  <link rel="canonical" href="{{portfolio.siteUrl}}/">
   <link rel="manifest" href="site.webmanifest">
   <link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.svg">
@@ -23,6 +23,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
   <!-- Scripts -->
+  <script src="js/arcade-module-loader.js" defer></script>
   <script src="js/main.js" type="module" defer></script>
   <script src="js/intro.js" defer></script>
   <script src="js/arcade-os.js" defer></script>
@@ -30,14 +31,18 @@
 
   <!-- SEO / Open Graph -->
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Manav Agarwal | Creative Technologist & Product Builder">
-  <meta property="og:description" content="I specialize in frontend engineering, high-end UI/UX design, and premium product building. Explore my case studies in web architecture and interface design.">
-  <meta property="og:url" content="https://my-portfolio-mu-jade-52.vercel.app/">
-  <meta property="og:image" content="https://my-portfolio-mu-jade-52.vercel.app/assets/og-image.jpg">
+  <meta property="og:title" content="Manav Agarwal | Creative Frontend Developer & UI/UX Designer">
+  <meta property="og:description" content="Creative frontend development, UI/UX design, browser products, game interfaces, and production-focused case studies.">
+  <meta property="og:url" content="{{portfolio.siteUrl}}/">
+  <meta property="og:image" content="{{portfolio.socialImageUrl}}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Manav Agarwal, Creative Frontend Developer, with the ArcadeOS portfolio interface">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Manav Agarwal — Creative Technologist">
-  <meta name="twitter:description" content="I design interfaces, build products, and turn ideas into polished digital experiences.">
-  <meta name="twitter:image" content="https://my-portfolio-mu-jade-52.vercel.app/assets/og-image.jpg">
+  <meta name="twitter:title" content="Manav Agarwal - Creative Frontend Developer">
+  <meta name="twitter:description" content="I design interfaces and ship fast browser products, web experiences, and game UI.">
+  <meta name="twitter:image" content="{{portfolio.socialImageUrl}}">
+  <meta name="twitter:image:alt" content="Manav Agarwal, Creative Frontend Developer, with the ArcadeOS portfolio interface">
   
   <!-- Theme Initialization -->
   <script>
@@ -55,13 +60,48 @@
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "Person",
-    "name": "Manav Agarwal",
-    "jobTitle": "Creative Technologist, Product Builder, UI/UX Designer",
-    "url": "https://my-portfolio-mu-jade-52.vercel.app/",
-    "sameAs": [
-      "https://github.com/manav193",
-      "https://www.linkedin.com/in/manav-agarwal-33581a41a"
+    "@graph": [
+      {
+        "@type": "ProfilePage",
+        "@id": "{{portfolio.siteUrl}}/#portfolio",
+        "url": "{{portfolio.siteUrl}}/",
+        "name": "Manav Agarwal - Creative Frontend Developer Portfolio",
+        "mainEntity": { "@id": "{{portfolio.siteUrl}}/#manav" }
+      },
+      {
+        "@type": "Person",
+        "@id": "{{portfolio.siteUrl}}/#manav",
+        "name": "{{portfolio.name}}",
+        "jobTitle": "{{portfolio.role}}",
+        "homeLocation": { "@type": "Place", "name": "{{portfolio.location}}" },
+        "url": "{{portfolio.siteUrl}}/",
+        "sameAs": ["{{portfolio.githubUrl}}"],
+        "knowsAbout": ["Frontend development", "UI/UX design", "Browser games", "Graphic design", "Video editing"]
+      },
+      {
+        "@type": "WebSite",
+        "@id": "{{portfolio.siteUrl}}/#website",
+        "url": "{{portfolio.siteUrl}}/",
+        "name": "Manav Agarwal Portfolio",
+        "author": { "@id": "{{portfolio.siteUrl}}/#manav" }
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "ArcadeOS",
+        "applicationCategory": "WebApplication",
+        "operatingSystem": "Modern web browser",
+        "url": "{{portfolio.siteUrl}}/project-arcade-os.html",
+        "author": { "@id": "{{portfolio.siteUrl}}/#manav" }
+      },
+      {
+        "@type": "ItemList",
+        "name": "Selected projects",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "url": "{{portfolio.siteUrl}}/project-arcade-os.html", "name": "ArcadeOS" },
+          { "@type": "ListItem", "position": 2, "url": "https://tool-verse-theta.vercel.app/", "name": "ToolVerse" },
+          { "@type": "ListItem", "position": 3, "url": "https://selfyy.vercel.app/", "name": "SELFYY" }
+        ]
+      }
     ]
   }
   </script>
@@ -142,17 +182,17 @@
               <div class="cab-deck-right">
                 <!-- Utility Select/Start group (mapped to smallBtns[0]/[1]) -->
                 <div class="cab-utility-group">
-                  <div class="cab-btn-small" data-tooltip="Select" tabindex="0" aria-label="Select Button"></div>
-                  <div class="cab-btn-small" data-tooltip="Start" tabindex="0" aria-label="Start Button"></div>
+                  <button class="cab-btn-small" type="button" data-tooltip="Select" aria-label="Select Button"></button>
+                  <button class="cab-btn-small" type="button" data-tooltip="Start" aria-label="Start Button"></button>
                 </div>
                 <!-- 6 Action button grid (A, B, L are first to preserve JS array bindings btns[0,1,2]) -->
                 <div class="cab-btn-grid">
-                  <div class="cab-btn action-a" data-tooltip="Action A" tabindex="0" aria-label="Action A"><div class="cab-btn-inner">A</div><div class="cab-btn-specular"></div></div>
-                  <div class="cab-btn action-b" data-tooltip="Action B" tabindex="0" aria-label="Action B"><div class="cab-btn-inner">B</div><div class="cab-btn-specular"></div></div>
-                  <div class="cab-btn action-l" data-tooltip="Options" tabindex="0" aria-label="Options"><div class="cab-btn-inner">L</div><div class="cab-btn-specular"></div></div>
-                  <div class="cab-btn action-x" data-tooltip="Action X" tabindex="0" aria-label="Action X"><div class="cab-btn-inner">X</div><div class="cab-btn-specular"></div></div>
-                  <div class="cab-btn action-y" data-tooltip="Action Y" tabindex="0" aria-label="Action Y"><div class="cab-btn-inner">Y</div><div class="cab-btn-specular"></div></div>
-                  <div class="cab-btn action-r" data-tooltip="Action R" tabindex="0" aria-label="Action R"><div class="cab-btn-inner">R</div><div class="cab-btn-specular"></div></div>
+                  <button class="cab-btn action-a" type="button" data-tooltip="Action A" aria-label="Action A"><span class="cab-btn-inner">A</span><span class="cab-btn-specular"></span></button>
+                  <button class="cab-btn action-b" type="button" data-tooltip="Action B" aria-label="Action B"><span class="cab-btn-inner">B</span><span class="cab-btn-specular"></span></button>
+                  <button class="cab-btn action-l" type="button" data-tooltip="Options" aria-label="Options"><span class="cab-btn-inner">L</span><span class="cab-btn-specular"></span></button>
+                  <button class="cab-btn action-x" type="button" data-tooltip="Action X" aria-label="Action X"><span class="cab-btn-inner">X</span><span class="cab-btn-specular"></span></button>
+                  <button class="cab-btn action-y" type="button" data-tooltip="Action Y" aria-label="Action Y"><span class="cab-btn-inner">Y</span><span class="cab-btn-specular"></span></button>
+                  <button class="cab-btn action-r" type="button" data-tooltip="Action R" aria-label="Action R"><span class="cab-btn-inner">R</span><span class="cab-btn-specular"></span></button>
                 </div>
               </div>
             </div>
@@ -202,13 +242,18 @@
                   <div class="boot-line" style="animation-delay: 0.4s">INPUT READY</div>
                 </div>
                 <div class="boot-identity">
-                  <h1 class="boot-line" style="animation-delay: 0.7s">MANAV AGARWAL</h1>
-                  <p class="boot-line" style="animation-delay: 0.8s">CREATIVE TECHNOLOGIST</p>
+                  <p class="boot-name boot-line" style="animation-delay: 0.7s">MANAV AGARWAL</p>
+                  <p class="boot-line" style="animation-delay: 0.8s">CREATIVE FRONTEND DEVELOPER</p>
                 </div>
-                <div class="boot-action boot-line" style="animation-delay: 1.1s">
-                  <span class="boot-pulse"></span>
-                  SCROLL TO ENTER
-                </div>
+                 <div class="boot-action boot-line" style="animation-delay: 1.1s">
+                   <span class="boot-pulse"></span>
+                   JAVASCRIPT PRODUCTS // RESPONSIVE UI // BROWSER SYSTEMS
+                 </div>
+                 <div class="boot-choice boot-line" style="animation-delay: 1.2s">
+                   <button type="button" data-intro-action="work">VIEW MY WORK</button>
+                   <button type="button" data-intro-action="enter">ENTER ARCADE</button>
+                   <a href="{{portfolio.resumePath}}" target="_blank" rel="noopener noreferrer">VIEW RESUME</a>
+                 </div>
               </div>
             </div>
           </div>
@@ -237,7 +282,7 @@
         <a href="#skills" class="cmd-item"><span>View Skills</span></a>
         <a href="#experience" class="cmd-item"><span>Open Timeline</span></a>
         <a href="#contact" class="cmd-item"><span>Start Contact</span></a>
-        <a href="resume.pdf" class="cmd-item"><span>Download Resume</span></a>
+        <a href="{{portfolio.resumePath}}" class="cmd-item"><span>Download Resume</span></a>
         <div class="cmd-group">System</div>
         <button class="cmd-item" id="cmd-theme-toggle"><span>Toggle Theme</span></button>
       </div>
@@ -245,15 +290,15 @@
   </div>
   <nav class="site-nav showroom-nav" id="main-nav">
     <div class="nav-container">
-      <a href="#" class="brand" aria-label="Home">Manav Agarwal</a>
+      <a href="#main-content" class="brand" aria-label="Portfolio home">{{portfolio.name}}</a>
       <div class="nav-links">
         <a href="#work">Work</a>
         <a href="#skills">Skills</a>
         <a href="#experience">Experience</a>
         <a href="#about">About</a>
         <a href="#contact">Contact</a>
-        <a href="resume.pdf" download class="nav-link-secondary">Resume</a>
-        <a href="https://github.com/manav193" target="_blank" rel="noopener" class="nav-link-secondary">GitHub</a>
+        <a href="{{portfolio.resumePath}}" target="_blank" rel="noopener noreferrer" class="nav-link-secondary">Resume</a>
+        <a href="{{portfolio.githubUrl}}" target="_blank" rel="noopener noreferrer" class="nav-link-secondary">GitHub</a>
         <button class="cmd-trigger" aria-label="Command Palette" onclick="document.querySelector('[data-cmd-backdrop]').classList.add('active'); document.getElementById('cmd-input').focus();">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"></path></svg>
           <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;">Ctrl K</span>
@@ -267,149 +312,126 @@
     <!-- 00 // HERO -->
     <section class="system-section hero-section">
       <div class="container-centered">
-        <p class="hero-kicker reveal-up" style="transition-delay: 0.1s">WHO AM I?</p>
-        <h1 class="hero-title reveal-up" style="transition-delay: 0.2s">Engineering<br>The Future.</h1>
-        <p class="hero-subtitle reveal-up" style="transition-delay: 0.3s">I am a Creative Technologist and Frontend Engineer. I turn complex problems into polished, intuitive, and highly capable web experiences.</p>
+        <p class="hero-kicker reveal-up" style="transition-delay: 0.1s">{{portfolio.role}} // {{portfolio.location}}</p>
+        <h1 class="hero-title reveal-up" style="transition-delay: 0.2s">Manav<br>Agarwal.</h1>
+        <p class="hero-subtitle reveal-up" style="transition-delay: 0.3s">Creative Frontend Developer building interactive, high-performance web products and browser-based experiences with JavaScript, responsive UI, and AI-assisted development workflows.</p>
+        <p class="availability-label reveal-up" style="transition-delay: 0.35s"><span aria-hidden="true"></span>{{portfolio.availability}}</p>
         <div class="hero-actions reveal-up" style="transition-delay: 0.4s">
-          <a href="#work" class="btn-primary magnetic-btn" data-magnetic>View Work</a>
-          <a href="resume.pdf" download class="btn-secondary magnetic-btn" data-magnetic>Download Resume</a>
+          <a href="#work" class="btn-primary magnetic-btn" data-magnetic>View My Work</a>
+          <a href="{{portfolio.resumePath}}" target="_blank" rel="noopener noreferrer" class="btn-secondary magnetic-btn" data-magnetic>View Resume</a>
+          <a href="#intro-sequence" class="btn-secondary magnetic-btn" data-enter-arcade data-magnetic>Enter Arcade</a>
         </div>
       </div>
     </section>
 
-    <!-- 01 // FEATURED SPOTLIGHT -->
+    <section class="credibility-strip" aria-label="Portfolio credibility">
+      <div class="container-centered credibility-grid">
+        <div><strong>3</strong><span>Verified live deployments</span></div>
+        <div><strong>Public</strong><span>Project repositories on GitHub</span></div>
+        <div><strong>Tested</strong><span>Automated regression coverage</span></div>
+        <div><strong>Responsive</strong><span>Desktop, tablet, and mobile QA</span></div>
+      </div>
+    </section>
+
+    <!-- 01 // SELECTED WORK -->
     <section id="work" class="system-section work-section">
       <div class="container-centered">
         <div class="section-header reveal-up">
-          <p class="hero-kicker">[ SEC-01 ] // ENGINEERING ARCHITECTURE</p>
-          <h2>Selected Hardware</h2>
+          <p class="hero-kicker">[ SEC-01 ] // SELECTED PRODUCTS</p>
+          <h2>Designed, engineered, and shipped.</h2>
+          <p class="section-intro">A focused set of browser products, interface systems, and game work. Every development project links to its real repository.</p>
         </div>
 
-        <div class="showroom-exhibition">
-          <!-- FEATURED SPOTLIGHT: TOOLVERSE -->
-          <article class="featured-spotlight reveal-scale">
-            <div class="spotlight-header">
-              <h2 class="spotlight-title">ToolVerse</h2>
+        <div class="project-showcase" data-project-showcase>
+          <article class="project-card project-card-featured reveal-up" data-project-id="arcade-os" data-project-status="live">
+            <div class="project-media" data-tilt>
+              <img src="images/arcade-home.webp" alt="ArcadeOS home launcher running inside the custom portfolio cabinet" width="1600" height="1000" loading="lazy">
             </div>
-            <div class="spotlight-visual" data-tilt>
-              <img src="images/toolverse_4.png" alt="ToolVerse Progressive Web App" loading="lazy">
-            </div>
-            <div class="spotlight-content">
-              <p class="spotlight-desc">A highly optimized PWA delivering 50+ utilities completely in-browser with zero server uploads.</p>
-              <div class="spotlight-actions">
-                <a href="project-toolverse.html" class="btn-primary">Read Case Study</a>
-                <a href="https://tool-verse-theta.vercel.app/" class="btn-secondary" target="_blank" rel="noopener">Live Demo</a>
+            <div class="project-body">
+              <div class="project-heading-row"><span class="project-index">01</span><span class="project-type">Interactive portfolio system</span><span class="project-status status-live">Live</span></div>
+              <h3>MY-PORTFOLIO / ArcadeOS</h3>
+              <p class="project-value">A modular browser-based operating system with playable games, creative tools, persistent profiles, cabinet customization, diagnostics, and unified input.</p>
+              <dl class="project-evidence">
+                <div><dt>Role</dt><dd>Product design, frontend systems, interaction engineering</dd></div>
+                <div><dt>Challenge</dt><dd>Unify keyboard, pointer, touch, cabinet, and gamepad input without stale listeners or trapped navigation.</dd></div>
+                <div><dt>Result</dt><dd>Three games, two creative tools, eight system routes, offline support, and focused regression coverage in a dependency-light build.</dd></div>
+              </dl>
+              <div class="project-tech" aria-label="Technologies"><span>Vanilla JS</span><span>Canvas</span><span>Web Audio</span><span>PWA</span><span>Gamepad API</span></div>
+              <div class="project-actions">
+                <a href="#intro-sequence" class="btn-primary" data-enter-arcade>Live Demo</a>
+                <a href="{{projects.arcade-os.githubUrl}}" class="btn-secondary" target="_blank" rel="noopener noreferrer">GitHub</a>
+                <a href="{{projects.arcade-os.caseStudyPath}}" class="btn-secondary">Case Study</a>
               </div>
             </div>
           </article>
 
-          <!-- SELFYY: EDITORIAL DIPTYCH -->
-          <article class="exhibit-diptych reveal-up">
-            <div class="exhibit-content">
-              <h3 class="exhibit-title">SELFYY</h3>
-              <p class="exhibit-desc">Vercel edge routing decoupling a high-performance static frontend from dynamic layers for maximum Lighthouse scores.</p>
-              <div class="tech-stack"><span>React</span> <span>Edge</span> <span>Monorepo</span></div>
-              <a href="project-selfyy.html" class="btn-text">View Case Study &rarr;</a>
+          <article class="project-card reveal-up" data-project-id="toolverse" data-project-status="live">
+            <div class="project-media"><img src="images/toolverse_4.png" alt="ToolVerse privacy-first browser tools dashboard" width="1600" height="900" loading="lazy"></div>
+            <div class="project-body">
+              <div class="project-heading-row"><span class="project-index">02</span><span class="project-type">Web application / PWA</span><span class="project-status status-live">Live</span></div>
+              <h3>ToolVerse</h3>
+              <p class="project-value">A privacy-first PWA delivering 70+ PDF, image, text, developer, student, and calculator tools with local browser processing.</p>
+              <dl class="project-evidence"><div><dt>Role</dt><dd>Product architecture and frontend engineering</dd></div><div><dt>Challenge</dt><dd>Scale dozens of utilities while keeping file processing private, fast, searchable, and offline-capable.</dd></div><div><dt>Capability</dt><dd>Custom static-site generation, modular tools, PWA caching, accessibility work, and automated browser testing.</dd></div></dl>
+              <div class="project-tech"><span>HTML</span><span>CSS</span><span>Vanilla JS</span><span>Node SSG</span><span>Playwright</span></div>
+              <div class="project-actions"><a href="{{projects.toolverse.liveUrl}}" class="btn-primary" target="_blank" rel="noopener noreferrer">Live Demo</a><a href="{{projects.toolverse.githubUrl}}" class="btn-secondary" target="_blank" rel="noopener noreferrer">GitHub</a><a href="{{projects.toolverse.caseStudyPath}}" class="btn-secondary">Case Study</a></div>
             </div>
-            <div class="exhibit-visual diagram-visual" data-tilt>
-              <img src="images/project-nexus.svg" alt="Architectural diagram" loading="lazy">
+          </article>
+
+          <article class="project-card reveal-up" data-project-id="selfyy" data-project-status="live">
+            <div class="project-media"><img src="images/selfyy-preview.webp" alt="SELFYY cinematic memory website on desktop" width="1600" height="900" loading="lazy"></div>
+            <div class="project-body">
+              <div class="project-heading-row"><span class="project-index">03</span><span class="project-type">Personal web platform</span><span class="project-status status-live">Live</span></div>
+              <h3>SELFYY</h3>
+              <p class="project-value">A cinematic memory website platform for building personal birthday, wedding, invitation, and portfolio experiences.</p>
+              <dl class="project-evidence"><div><dt>Role</dt><dd>Product design, UI systems, and frontend development</dd></div><div><dt>Challenge</dt><dd>Deliver emotional storytelling, personalization, themes, sharing, and gallery interactions without a heavyweight framework.</dd></div><div><dt>Capability</dt><dd>Responsive production deployment with theme automation, Web Share, lightbox, keyboard support, and reduced motion.</dd></div></dl>
+              <div class="project-tech"><span>Vanilla JS</span><span>CSS Grid</span><span>LocalStorage</span><span>Web Share</span><span>Vercel</span></div>
+              <div class="project-actions"><a href="{{projects.selfyy.liveUrl}}" class="btn-primary" target="_blank" rel="noopener noreferrer">Live Demo</a><a href="{{projects.selfyy.githubUrl}}" class="btn-secondary" target="_blank" rel="noopener noreferrer">GitHub</a><a href="{{projects.selfyy.caseStudyPath}}" class="btn-secondary">Case Study</a></div>
             </div>
           </article>
 
-          <!-- LOVE JOURNEY: FLOATING CANVAS -->
-          <article class="exhibit-floating reveal-scale">
-            <div class="exhibit-visual" data-tilt>
-              <img src="images/love_1.png" alt="Interactive timeline" loading="lazy">
+          <article class="project-card reveal-up" data-project-id="shift-zero" data-project-status="in-development">
+            <div class="project-media"><img src="images/sz_screens.png" alt="SHIFT ZERO game interface and system screens" width="1600" height="900" loading="lazy"></div>
+            <div class="project-body">
+              <div class="project-heading-row"><span class="project-index">04</span><span class="project-type">Game architecture</span><span class="project-status status-progress">In Development</span></div>
+              <h3>SHIFT-ZERO</h3>
+              <p class="project-value">A mobile-first Godot game foundation for one-touch gravity shifting and rule-changing modifiers.</p>
+              <dl class="project-evidence"><div><dt>Role</dt><dd>Game systems planning, UI direction, and architecture</dd></div><div><dt>Challenge</dt><dd>Prepare a maintainable game foundation for modifiers, offline play, accessibility, services, and ethical monetization.</dd></div><div><dt>Current result</dt><dd>M0 foundation complete with five dependency-checked layers, data-driven configuration, service interfaces, documentation, and CI. Core gameplay is the next milestone.</dd></div></dl>
+              <div class="project-tech"><span>Godot 4</span><span>GDScript</span><span>Python</span><span>CI</span><span>Architecture</span></div>
+              <div class="project-actions"><a href="{{projects.shift-zero.githubUrl}}" class="btn-primary" target="_blank" rel="noopener noreferrer">GitHub</a><a href="{{projects.shift-zero.caseStudyPath}}" class="btn-secondary">Case Study</a></div>
             </div>
-            <div class="exhibit-content">
-              <h3 class="exhibit-title">Love Journey</h3>
-              <p class="exhibit-desc">An immersive, 60fps scrolling experience driven by audio-reactive Canvas APIs.</p>
-              <a href="project-love-journey.html" class="btn-text">View Case Study &rarr;</a>
+          </article>
+
+          <article class="project-card reveal-up" data-project-id="love" data-project-status="archived">
+            <div class="project-media"><img src="images/love_new.png" alt="LOVE interactive memory timeline interface" width="1600" height="900" loading="lazy"></div>
+            <div class="project-body">
+              <div class="project-heading-row"><span class="project-index">05</span><span class="project-type">Narrative web experiment</span><span class="project-status">Archived</span></div>
+              <h3>LOVE</h3>
+              <p class="project-value">An immersive narrative website exploring paced scrolling, photography, ambient audio, and personal timeline storytelling.</p>
+              <dl class="project-evidence"><div><dt>Role</dt><dd>Creative direction, motion design, and frontend development</dd></div><div><dt>Challenge</dt><dd>Create emotional pacing while keeping media, motion, and responsive galleries usable across devices.</dd></div><div><dt>Capability</dt><dd>Canvas details, CSS Grid galleries, native audio controls, date-driven content, and motion-aware interaction.</dd></div></dl>
+              <div class="project-tech"><span>HTML</span><span>CSS Grid</span><span>Canvas</span><span>Web Audio</span></div>
+              <div class="project-actions"><a href="{{projects.love.githubUrl}}" class="btn-primary" target="_blank" rel="noopener noreferrer">GitHub</a><a href="{{projects.love.caseStudyPath}}" class="btn-secondary">Case Study</a></div>
+            </div>
+          </article>
+
+          <article class="project-card reveal-up" data-project-id="velora-bites" data-project-status="prototype">
+            <div class="project-media"><img src="images/velora_desktop.png" alt="Velora Bites responsive fine-dining interface prototype" width="1200" height="800" loading="lazy"></div>
+            <div class="project-body">
+              <div class="project-heading-row"><span class="project-index">06</span><span class="project-type">UI/UX design prototype</span><span class="project-status status-progress">Prototype</span></div>
+              <h3>Velora Bites</h3>
+              <p class="project-value">A responsive fine-dining interface concept that translates luxury hospitality into a clear editorial reservation journey.</p>
+              <dl class="project-evidence"><div><dt>Role</dt><dd>UI/UX design, responsive system, interaction direction</dd></div><div><dt>Challenge</dt><dd>Preserve an editorial luxury tone without sacrificing hierarchy, mobile readability, or conversion clarity.</dd></div><div><dt>Capability</dt><dd>Reusable visual tokens, responsive layouts, menu storytelling, and polished interaction states.</dd></div></dl>
+              <div class="project-tech"><span>Figma</span><span>Responsive UI</span><span>Design Systems</span><span>Prototyping</span></div>
+              <div class="project-actions"><a href="{{projects.velora-bites.githubUrl}}" class="btn-primary" target="_blank" rel="noopener noreferrer">GitHub</a><a href="{{projects.velora-bites.caseStudyPath}}" class="btn-secondary">Case Study</a></div>
             </div>
           </article>
         </div>
-      </div>
-    </section>
 
-    <!-- 02 // R&D / PROJECTS -->
-    <section class="system-section concepts-section">
-      <div class="container-centered">
-        <div class="section-header reveal-up">
-          <p class="hero-kicker">WHAT HAVE I SHIPPED?</p>
-          <h2>Architectures & Interfaces.</h2>
-        </div>
-
-        <div class="asymmetric-editorial-grid">
-          
-          <!-- ROW 1 -->
-          <a href="project-promptai.html" class="editorial-card col-8 reveal-up" style="transition-delay: 0.1s" aria-label="View PromptAI Concept Case Study" data-tilt>
-            <div class="world-calibration world-cal-tl"></div><div class="world-calibration world-cal-tr"></div>
-            <div class="world-calibration world-cal-bl"></div><div class="world-calibration world-cal-br"></div>
-            <div class="editorial-img"><img src="images/promptai_new.png" alt="PromptAI split-pane user interface" loading="lazy"></div>
-            <div class="editorial-content">
-              <div class="hud-tag">UI DESIGN</div>
-              <h4>PromptAI Interface</h4>
-              <p>High-density split-pane UI for multi-model orchestration and testing.</p>
-            </div>
-          </a>
-          
-          <a href="project-shift-zero.html" class="editorial-card col-4 reveal-up" style="transition-delay: 0.2s" data-tilt>
-            <div class="world-calibration world-cal-tl"></div><div class="world-calibration world-cal-tr"></div>
-            <div class="world-calibration world-cal-bl"></div><div class="world-calibration world-cal-br"></div>
-            <div class="editorial-img"><img src="images/sz_menu.png" alt="SHIFT ZERO HUD" loading="lazy"></div>
-            <div class="editorial-content">
-              <div class="hud-tag">HUD DESIGN</div>
-              <h4>SHIFT ZERO UI</h4>
-              <p>Game HUD prioritizing sub-second readability.</p>
-            </div>
-          </a>
-
-          <!-- ROW 2 -->
-          <a href="project-nintendo.html" class="editorial-card col-8 reveal-up" style="transition-delay: 0.1s" data-tilt>
-            <div class="world-calibration world-cal-tl"></div><div class="world-calibration world-cal-tr"></div>
-            <div class="world-calibration world-cal-bl"></div><div class="world-calibration world-cal-br"></div>
-            <div class="editorial-img"><img src="images/nintendo.jpg" alt="Nintendo UI Concept" loading="lazy"></div>
-            <div class="editorial-content">
-              <div class="hud-tag">OS EXPLORATION</div>
-              <h4>Nintendo OS</h4>
-              <p>10-foot spatial navigation with adaptive blurring.</p>
-            </div>
-          </a>
-
-          <a href="project-velora-bites.html" class="editorial-card col-4 reveal-up" style="transition-delay: 0.2s" data-tilt>
-            <div class="world-calibration world-cal-tl"></div><div class="world-calibration world-cal-tr"></div>
-            <div class="world-calibration world-cal-bl"></div><div class="world-calibration world-cal-br"></div>
-            <div class="editorial-img" style="background: #111;"><img src="images/velora_mobile.png" alt="Velora Bites Mobile UX" loading="lazy"></div>
-            <div class="editorial-content">
-              <div class="hud-tag">MOBILE UX</div>
-              <h4>Velora Mobile</h4>
-              <p>Luxury dining experience optimized for mobile screens.</p>
-            </div>
-          </a>
-
-          <!-- ROW 3 -->
-          <a href="project-velora-bites.html" class="editorial-card col-8 reveal-up" style="transition-delay: 0.1s" data-tilt>
-            <div class="world-calibration world-cal-tl"></div><div class="world-calibration world-cal-tr"></div>
-            <div class="world-calibration world-cal-bl"></div><div class="world-calibration world-cal-br"></div>
-            <div class="editorial-img"><img src="images/velora_desktop.png" alt="Velora Bites luxury web design" loading="lazy"></div>
-            <div class="editorial-content">
-              <div class="hud-tag">LUXURY WEB</div>
-              <h4>Velora Bites</h4>
-              <p>Exploring extreme whitespace, classic serif pairings, and frictionless booking flows.</p>
-            </div>
-          </a>
-          
-          <a href="project-nike.html" class="editorial-card col-8 reveal-up" style="transition-delay: 0.2s" data-tilt>
-            <div class="world-calibration world-cal-tl"></div><div class="world-calibration world-cal-tr"></div>
-            <div class="world-calibration world-cal-bl"></div><div class="world-calibration world-cal-br"></div>
-            <div class="editorial-img"><img src="images/nike.png" alt="Nike parallax masking" loading="lazy"></div>
-            <div class="editorial-content">
-              <div class="hud-tag">E-COMMERCE</div>
-              <h4>Nike Air Zoom</h4>
-              <p>Grid-breaking 3D masking and kinetic typography.</p>
-            </div>
-          </a>
-          
+        <div class="design-work reveal-up" aria-labelledby="design-work-title">
+          <div class="section-header compact-header"><p class="hero-kicker">MORE EXPERIMENTS</p><h3 id="design-work-title">Additional interface explorations</h3></div>
+          <div class="design-work-grid">
+            <article class="design-project"><img src="images/sz_menu.png" alt="SHIFT-ZERO high-contrast game HUD design" width="1200" height="800" loading="lazy"><div><span class="project-status status-progress">Design Prototype</span><h4>SHIFT-ZERO UI</h4><p>High-contrast HUD and menu language designed for rapid gameplay readability.</p><a href="https://github.com/manav193/SHIFT-ZERO-UI" target="_blank" rel="noopener noreferrer">View GitHub</a></div></article>
+            <article class="design-project"><img src="images/promptai_new.png" alt="PromptAI multi-model orchestration interface" width="1200" height="800" loading="lazy"><div><span class="project-status status-progress">UI Concept</span><h4>PromptAI</h4><p>A dense split-pane workspace for comparing prompts, models, outputs, and test context.</p><a href="project-promptai.html">View Case Study</a></div></article>
+          </div>
         </div>
       </div>
     </section>
@@ -523,9 +545,10 @@
         <div class="showroom-contact">
           <div class="contact-pure reveal-up">
             <p class="contact-kicker">[ SEC-05 ] // TRANSMISSION CHANNEL</p>
-            <h2>Have a product, interface, or system that needs sharp execution?</h2>
+            <h2>Have a project or opportunity in mind? Let&rsquo;s talk.</h2>
+            <p class="contact-intro">I&rsquo;m {{portfolio.availability}}. Share the role, product, or interface you are working on and this form will prepare a message in your email app.</p>
             <div class="contact-layout">
-              <form class="contact-form" data-contact-form>
+              <form class="contact-form" data-contact-form data-contact-email="{{portfolio.email}}">
                 <label>
                   <span>Name</span>
                   <input name="name" type="text" autocomplete="name" required>
@@ -542,11 +565,10 @@
                 <p class="form-status" data-form-status aria-live="polite"></p>
               </form>
               <div class="contact-actions-clean">
-                <a href="mailto:monographicalpixel@gmail.com" class="btn-secondary">Email Directly</a>
+                <a href="{{portfolio.emailMailto}}" class="btn-secondary">Email Me</a>
                 <div class="contact-links-clean">
-                  <a href="https://linkedin.com/in/manavagarwal" target="_blank" rel="noopener">LinkedIn</a>
-                  <a href="https://github.com/manav193" target="_blank" rel="noopener">GitHub</a>
-                  <a href="resume.pdf" download>Resume</a>
+                  <a href="{{portfolio.githubUrl}}" target="_blank" rel="noopener noreferrer">View GitHub</a>
+                  <a href="{{portfolio.resumePath}}" target="_blank" rel="noopener noreferrer">View Resume</a>
                 </div>
               </div>
             </div>
@@ -563,7 +585,7 @@
       <div class="footer-hero reveal-up">
         <p class="hero-kicker" style="margin-bottom: 32px; text-align: center;">[ END OF RECORD ] // AWAITING INPUT</p>
         <h2 class="footer-title">Ready to compile something extraordinary?</h2>
-        <a href="mailto:monographicalpixel@gmail.com" class="btn-primary btn-massive">Initiate Sequence</a>
+        <a href="{{portfolio.emailMailto}}" class="btn-primary btn-massive">Start a Conversation</a>
       </div>
       
 
@@ -574,9 +596,8 @@
           <span class="footer-copy">&copy; 2026 Manav Agarwal. Designed & engineered for the open web.</span>
         </div>
         <div class="footer-links">
-          <a href="resume.pdf" download>Resume</a>
-          <a href="https://linkedin.com/in/manavagarwal" target="_blank" rel="noopener">LinkedIn</a>
-          <a href="https://github.com/manav193" target="_blank" rel="noopener">GitHub</a>
+          <a href="{{portfolio.resumePath}}" target="_blank" rel="noopener noreferrer">View Resume</a>
+          <a href="{{portfolio.githubUrl}}" target="_blank" rel="noopener noreferrer">View GitHub</a>
         </div>
       </div>
     </div>
@@ -585,7 +606,7 @@
   <!-- OS DOCK -->
   <div class="os-dock">
     <div class="os-dock-container">
-      <a href="#" class="dock-item" id="dock-portfolio-btn" data-dock-action="portfolio-intro" data-title="Open Portfolio Intro" data-magnetic aria-label="Open Portfolio Intro">
+      <a href="#main-content" class="dock-item" id="dock-portfolio-btn" data-dock-action="portfolio-intro" data-title="Open Portfolio" data-magnetic aria-label="Open Portfolio">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
       </a>
       <a href="#work" class="dock-item" data-dock-action="work" data-title="Architecture" data-magnetic aria-label="View Projects">
@@ -601,10 +622,10 @@
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"></rect><line x1="6" y1="10" x2="6" y2="10.01"></line><line x1="10" y1="10" x2="10" y2="10.01"></line><circle cx="17" cy="12" r="2"></circle><line x1="8" y1="14" x2="8" y2="14.01"></line></svg>
       </a>
       <div class="dock-separator"></div>
-      <a href="https://github.com/manav193" target="_blank" class="dock-item dock-external" data-title="GitHub Repo" data-magnetic aria-label="GitHub Repository">
+      <a href="{{portfolio.githubUrl}}" target="_blank" rel="noopener noreferrer" class="dock-item dock-external" data-title="GitHub Profile" data-magnetic aria-label="View GitHub profile">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
       </a>
-      <a href="resume.pdf" download class="dock-item dock-external" data-title="Download Data.PDF" data-magnetic aria-label="Download Resume">
+      <a href="{{portfolio.resumePath}}" target="_blank" rel="noopener noreferrer" class="dock-item dock-external" data-title="View Resume" data-magnetic aria-label="View Resume">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
       </a>
     </div>

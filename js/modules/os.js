@@ -112,7 +112,11 @@ export function initOS() {
     if (e.key === konami[konamiIndex]) {
       konamiIndex++;
       if (konamiIndex === konami.length) {
-        alert("ACCESS GRANTED: You found the developer easter egg. This portfolio was handcrafted with 100% Vanilla JS.");
+        if (window.ArcadeOS && typeof window.ArcadeOS.showConfirmModal === 'function') {
+          window.ArcadeOS.showConfirmModal("ACCESS GRANTED: You found the developer easter egg. This portfolio was handcrafted with 100% Vanilla JS.", null, null);
+        } else {
+          console.log("ACCESS GRANTED: You found the developer easter egg. This portfolio was handcrafted with 100% Vanilla JS.");
+        }
         document.documentElement.style.setProperty('--aurora-1', '#ff00ff'); 
         document.documentElement.style.setProperty('--aurora-2', '#00ffff'); 
         konamiIndex = 0;

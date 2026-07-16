@@ -371,6 +371,40 @@
   --color-bg: #090616;
 }
 
+[data-project-theme="arcade-os"] {
+  --p-accent: #35d0ba;
+  --p-accent-rgb: 53, 208, 186;
+  background: #07090a;
+}
+
+.arcade-architecture {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  margin: 48px 0;
+  background: var(--color-border);
+  border: 1px solid var(--color-border);
+}
+
+.arcade-architecture div { min-width: 0; background: var(--color-bg); padding: 22px; }
+.arcade-architecture strong,
+.arcade-architecture span { display: block; }
+.arcade-architecture strong { color: var(--p-accent); margin-bottom: 8px; font: 600 0.8rem/1.2 var(--font-mono); text-transform: uppercase; }
+.arcade-architecture span { color: var(--color-text-secondary); font-size: 0.82rem; line-height: 1.5; }
+.arcade-shot-grid figure { margin: 0; }
+.arcade-shot-grid figcaption { padding: 12px 2px 0; color: var(--color-text-secondary); font-size: 0.78rem; line-height: 1.5; }
+.project-footer { display: flex; justify-content: space-between; gap: 24px; padding: 48px max(24px, 5vw); border-top: 1px solid var(--color-border); color: var(--color-text-muted); }
+.project-footer a { color: var(--color-text-primary); }
+
+@media (max-width: 800px) {
+  .arcade-architecture { grid-template-columns: 1fr 1fr; }
+  .project-footer { flex-direction: column; }
+}
+
+@media (max-width: 520px) {
+  .arcade-architecture { grid-template-columns: 1fr; }
+}
+
 /* THEME APPLICATION */
 body[data-project-theme] {
   background-color: var(--color-bg);

@@ -20,14 +20,39 @@ export function initDockController() {
   if (!dockItems.length) return;
 
   window.setActiveDock = setActiveDock;
+  window.enterArcade = enterArcade;
+  window.exitArcadeToPortfolio = exitArcadeToPortfolio;
+  document.querySelectorAll("[data-enter-arcade]").forEach((link) => {
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      enterArcade();
+    });
+  });
   bindDockClicks();
   initSectionObserver();
   syncDockFromViewport();
 }
 
+export function enterArcade() {
+  arcadeExplicitlySelected = true;
+  arcadeArrivedAtCabinet = false;
+  lockActiveDock("arcade", 5200);
+  scrollToCabinetReadyPosition();
+}
+
+export function exitArcadeToPortfolio(targetId = "main-content") {
+  arcadeExplicitlySelected = false;
+  arcadeArrivedAtCabinet = false;
+  cleanupArcade();
+  const target = document.getElementById(targetId) || document.getElementById("main-content");
+  lockActiveDock(targetId === "work" ? "work" : "portfolio-intro", 1400);
+  target?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 export function setActiveDock(action) {
   const normalized = VALID_ACTIONS.has(action) ? action : "none";
   activeAction = normalized;
+  document.body.classList.toggle("arcade-active", normalized === "arcade");
 
   dockItems.forEach((item) => item.classList.remove("dock-active"));
 
@@ -83,10 +108,7 @@ function routeDockAction(event, action) {
   }
 
   if (action === "arcade") {
-    arcadeExplicitlySelected = true;
-    arcadeArrivedAtCabinet = false;
-    lockActiveDock("arcade", 5200);
-    scrollToCabinetReadyPosition();
+    enterArcade();
   }
 }
 

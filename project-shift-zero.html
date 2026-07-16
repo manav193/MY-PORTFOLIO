@@ -36,10 +36,10 @@
   <main>
     <header class="project-hero">
       <h1>SHIFT ZERO</h1>
-      <p class="tagline">Game HUD Design</p>
+      <p class="tagline">Game Architecture & HUD Direction - M0 Foundation</p>
       <div class="project-actions">
         
-        <a href="https://github.com/manav193" class="btn-secondary" target="_blank" rel="noopener">GitHub Repo</a>
+        <a href="{{projects.shift-zero.githubUrl}}" class="btn-secondary" target="_blank" rel="noopener noreferrer">GitHub Repo</a>
       </div>
       <div class="project-hero-image">
         <img src="images/sz_menu.png" alt="SHIFT ZERO Showcase">
@@ -52,7 +52,7 @@
         <div class="cs-split-content">
           <span class="cs-meta">01 // OVERVIEW</span>
           <h2 class="cs-section-title">Short Overview</h2>
-          <p class="cs-body">SHIFT ZERO is a multi-disciplinary project encompassing both a premium Cyberpunk Heads-Up Display (HUD) interface design and a fully playable collaborative game prototype built in the Godot 4 engine.</p>
+          <p class="cs-body">SHIFT ZERO is a mobile-first Godot 4 game project built around one-touch gravity shifting and rule-changing modifiers. The M0 architecture foundation is complete; the core gameplay prototype is the next milestone.</p>
         </div>
         <div class="cs-split-visual" style="padding: 40px; display:flex; align-items:center; justify-content:center;">
           <img src="images/sz_screens.png" alt="SHIFT ZERO Overview">
@@ -79,7 +79,7 @@
         <div class="cs-grid">
 
           <div class="cs-glass-panel" style="grid-column: span 3;">
-            <p class="cs-body">The UI mockups were translated into the Godot 4 engine. I utilized Godot's Control nodes and custom shaders to replicate the CRT scanline effects and chromatic aberration seen in the Figma designs.</p>
+            <p class="cs-body">The Godot foundation uses five dependency-checked layers: Presentation, Gameplay, Systems, Services, and Core. External integrations sit behind interfaces, gameplay configuration is data-driven, and CI checks linting, forbidden dependencies, and architecture boundaries.</p>
           </div>
 
         </div>
@@ -89,7 +89,7 @@
         <div class="cs-split-content" style="grid-column: span 2;">
           <span class="cs-meta">04 // MY APPROACH</span>
           <h2 class="cs-section-title">My Approach</h2>
-          <p class="cs-body">I separated the project into two distinct phases: UI/UX conceptualization in Figma, and technical implementation in Godot. I approached the UI by studying military aviation HUDs, focusing on angular geometries, high-contrast neon accents against dark transparencies, and kinetic motion.</p>
+          <p class="cs-body">I separated visual direction from game architecture. The HUD work studies aviation interfaces and high-contrast state changes, while the Godot project establishes services, configuration, logging, event flow, test structure, and decision records before gameplay complexity is added.</p>
         </div>
       </section>
 
@@ -97,7 +97,7 @@
         <div class="cs-split-content" style="grid-column: span 2;">
           <span class="cs-meta">05 // DESIGN DECISIONS</span>
           <h2 class="cs-section-title">Design Decisions</h2>
-          <ul class="cs-body" style="padding-left:24px; margin-bottom:24px; font-size:1.05rem; line-height:1.8; color:var(--color-text-secondary);"><li>**Typography:** Selected a highly legible, aggressive sans-serif typeface to convey technical precision.</li><li>**Color Theory:** Utilized a stark monochromatic base with highly saturated, singular accent colors (e.g., electric cyan or alert red) strictly reserved for critical status changes.</li><li>**Diegetic Elements:** Designed components that look like they exist within the game world (angled projections, scanlines) rather than flat overlays.</li></ul>
+          <ul class="cs-body" style="padding-left:24px; margin-bottom:24px; font-size:1.05rem; line-height:1.8; color:var(--color-text-secondary);"><li><strong>Typography:</strong> A highly legible, aggressive sans-serif direction conveys technical precision.</li><li><strong>Color:</strong> Saturated accents are reserved for critical state changes against a restrained monochrome base.</li><li><strong>Diegetic elements:</strong> Angled projections and scanline details connect the interface to the game world without obscuring core information.</li></ul>
         </div>
       </section>
 
@@ -105,7 +105,7 @@
         <div class="cs-split-content" style="grid-column: span 2;">
           <span class="cs-meta">06 // CHALLENGES</span>
           <h2 class="cs-section-title">Challenges</h2>
-          <p class="cs-body">The hardest technical challenge was ensuring the UI shaders in Godot did not severely impact the game's framerate. The design challenge lay in balancing the "cool factor" of a cluttered cyberpunk interface with the strict usability requirements of an action game.</p>
+          <p class="cs-body">The central challenge is designing a modifier-driven game that can evolve without coupling gameplay to analytics, billing, remote configuration, saves, haptics, or presentation. The UI challenge is preserving rapid readability inside a visually aggressive direction.</p>
         </div>
       </section>
 
@@ -113,7 +113,7 @@
         <div class="cs-split-content" style="grid-column: span 2;">
           <span class="cs-meta">07 // RESULT</span>
           <h2 class="cs-section-title">Result</h2>
-          <p class="cs-body">A cohesive game prototype featuring a highly praised, visually striking UI that successfully communicates complex game states in a chaotic environment without breaking immersion.</p>
+          <p class="cs-body">M0 delivers the documented, testable production foundation: strict dependency layers, service interfaces, seeded randomness, configuration, feature flags, input recording, CI scripts, and a complete roadmap. Gameplay remains in development and is not represented as shipped.</p>
         </div>
       </section>
 
@@ -121,7 +121,7 @@
         <div class="cs-split-content" style="grid-column: span 2;">
           <span class="cs-meta">08 // KEY FEATURES</span>
           <h2 class="cs-section-title">Key Features</h2>
-          <ul class="cs-body" style="padding-left:24px; margin-bottom:24px; font-size:1.05rem; line-height:1.8; color:var(--color-text-secondary);"><li>High-contrast, readability-focused HUD</li><li>Custom CRT and chromatic aberration shaders</li><li>Playable prototype mechanics</li></ul>
+          <ul class="cs-body" style="padding-left:24px; margin-bottom:24px; font-size:1.05rem; line-height:1.8; color:var(--color-text-secondary);"><li>High-contrast, readability-focused HUD direction</li><li>Five-layer Godot architecture with CI boundary checks</li><li>Data-driven configuration and replaceable service interfaces</li><li>Offline-first, accessibility, and ethical monetization requirements documented up front</li></ul>
         </div>
       </section>
 
@@ -129,7 +129,7 @@
         <div class="cs-split-content" style="grid-column: span 2;">
           <span class="cs-meta">09 // LESSONS LEARNED</span>
           <h2 class="cs-section-title">Lessons Learned</h2>
-          <p class="cs-body">This project was a masterclass in bridging the gap between static design and real-time rendering. It taught me how to optimize visual effects for game engines and the importance of playtesting UI designs in motion.</p>
+          <p class="cs-body">The work reinforced the value of defining architecture boundaries and accessibility constraints before a game loop grows. The next milestone is validating those decisions in a playable core-loop prototype.</p>
         </div>
       </section>
 
