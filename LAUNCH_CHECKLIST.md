@@ -15,7 +15,7 @@ Release candidate: `v1.0.0`
 
 - [x] `npm run verify`
 - [x] Complete ArcadeOS and portfolio test inventory: 18/18 files passing
-- [ ] Production deployment tests against the live URL
+- [x] Production deployment tests against the live URL
 
 ## Browser QA
 
@@ -28,9 +28,9 @@ Release candidate: `v1.0.0`
 
 ## Release
 
-- [ ] Release commits pushed to `main`
-- [ ] Vercel deployment completed
-- [ ] Live production verification passed
-- [ ] Annotated release tag pushed
+- [x] Release commits pushed to `main`
+- [x] Vercel deployment completed
+- [x] Live production verification passed
+- [x] Annotated release tag pushed
 
 Production URL: `https://my-portfolio-mu-jade-52.vercel.app`
