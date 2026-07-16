@@ -22,7 +22,7 @@
 
   const chassis = document.querySelector('.cabinet-chassis');
   const cabVolume = document.querySelector('.cab-3d-volume');
-  let rAF;
+  let rAF = null;
   
   // Interactive Hardware Nodes
   const glassReflect = document.querySelector('.cab-glass-reflection');
@@ -40,7 +40,6 @@
   let rotX = 0, rotY = 0;
   let targetRotX = 0, targetRotY = 0;
   let velX = 0, velY = 0;
-  let lastIdleTime = performance.now();
   let hasBootedOS = false;
   let currentProgress = 0; // SINGLE SOURCE OF TRUTH
   let osVisible = false;   // Track OS visibility for hysteresis
@@ -54,13 +53,15 @@
     chassis.addEventListener('pointerdown', (e) => {
       // Only allow drag if cabinet is in scaled/compact state
       if (!chassis.classList.contains('is-scaled')) return;
+      // Do not capture drag if user is clicking inside interactive areas (screen, control deck, hatch, return, marquee, power, serial)
+      if (e.target.closest('.screen-2d-anchor') || e.target.closest('.cab-control-deck') || e.target.closest('.cab-bottom-details') || e.target.closest('.cab-oled-display') || e.target.closest('.cab-power-btn') || e.target.closest('.cab-marquee') || e.target.closest('.cab-power-led')) return;
       isDragging = true;
       startX = e.clientX;
       startY = e.clientY;
       chassis.setPointerCapture(e.pointerId);
       velX = 0; 
       velY = 0;
-      lastIdleTime = performance.now();
+      queueIntroUpdate();
     });
 
     chassis.addEventListener('pointermove', (e) => {
@@ -79,21 +80,42 @@
       
       startX = e.clientX;
       startY = e.clientY;
-      lastIdleTime = performance.now();
+      queueIntroUpdate();
     });
 
     const stopDrag = (e) => {
       if (!isDragging) return;
       isDragging = false;
       chassis.releasePointerCapture(e.pointerId);
+      queueIntroUpdate();
     };
 
     chassis.addEventListener('pointerup', stopDrag);
     chassis.addEventListener('pointercancel', stopDrag);
   }
 
+  document.querySelectorAll('[data-intro-action]').forEach((button) => {
+    button.addEventListener('click', () => {
+      if (button.dataset.introAction === 'enter') {
+        if (typeof window.enterArcade === 'function') window.enterArcade();
+        else window.scrollTo({ top: window.innerHeight * 0.96, behavior: 'smooth' });
+      } else if (button.dataset.introAction === 'work') {
+        if (typeof window.exitArcadeToPortfolio === 'function') window.exitArcadeToPortfolio('work');
+        else document.getElementById('work')?.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        if (typeof window.exitArcadeToPortfolio === 'function') window.exitArcadeToPortfolio();
+        else document.getElementById('main-content')?.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  });
+
+  const queueIntroUpdate = () => {
+    if (rAF === null && !document.hidden) rAF = requestAnimationFrame(updateIntro);
+  };
+
   // 3. PURE SCRUBBABLE SCROLL MAPPING
   const updateIntro = (time) => {
+    rAF = null;
     // Monitor FPS
     frameCount++;
     if (frameCount % 10 === 0 && !isLowPerf) {
@@ -109,7 +131,6 @@
     
     // Skip heavy DOM updates and style manipulation when the cabinet is completely off-screen
     if (scrollY > window.innerHeight * 2.0) {
-      rAF = requestAnimationFrame(updateIntro);
       return;
     }
     
@@ -231,16 +252,8 @@
       
       // Handle premium spring behavior when not dragging
       if (!isDragging) {
-        if (time - lastIdleTime > 3000 && !prefersReducedMotion) {
-          // Idle floating motion
-          const idleTime = (time - lastIdleTime - 3000) * 0.001; // seconds
-          targetRotY = Math.sin(idleTime) * 1.5;
-          targetRotX = Math.cos(idleTime * 0.8) * 1.0;
-        } else {
-          // Smooth spring back to perfect center
-          targetRotY += (0 - targetRotY) * 0.08;
-          targetRotX += (0 - targetRotX) * 0.08;
-        }
+        targetRotY += (0 - targetRotY) * 0.08;
+        targetRotX += (0 - targetRotX) * 0.08;
       }
 
       // Smooth interpolation for fluid rendering
@@ -281,17 +294,24 @@
         cabVolume.style.setProperty('--cab-rot-x', `${rotX}deg`);
         cabVolume.style.setProperty('--cab-rot-y', `${rotY}deg`);
       }
-      lastIdleTime = time;
     }
 
-    rAF = requestAnimationFrame(updateIntro);
+    const progressSettled = Math.abs(targetProgress - currentProgress) < 0.001;
+    const rotationSettled = Math.abs(rotX) < 0.01 && Math.abs(rotY) < 0.01 && Math.abs(targetRotX) < 0.01 && Math.abs(targetRotY) < 0.01;
+    if (isDragging || !progressSettled || !rotationSettled) queueIntroUpdate();
   };
 
-  // Start loop
-  rAF = requestAnimationFrame(updateIntro);
+  window.addEventListener('scroll', queueIntroUpdate, { passive: true });
+  window.addEventListener('resize', queueIntroUpdate);
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) queueIntroUpdate();
+  });
+
+  queueIntroUpdate();
 
   // If user unloads the page, scroll to 0 to be double sure
   window.addEventListener('beforeunload', () => {
+    if (rAF !== null) cancelAnimationFrame(rAF);
     window.scrollTo(0, 0);
   });
 

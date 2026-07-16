@@ -836,14 +836,14 @@ export const ArcadeCustomizer = {
       <div class="sys-app customizer-app">
         <div class="sys-header">
           <h2>MACHINE BUILDER</h2>
-          <button class="sys-back-btn" id="builder-back-btn">BACK (ESC)</button>
+          <button class="sys-back-btn" id="builder-back-btn" data-arcade-focusable data-arcade-action="back">BACK (ESC)</button>
         </div>
         
         <div class="builder-layout">
           <!-- Left Categories Tabs Horizontal scrollable Horizontal Horizontal Horizontal horizontal -->
           <div class="builder-nav-tabs">
             ${categories.map(cat => `
-              <button class="builder-tab-btn ${cat.id === this.activeCategory ? 'active' : ''}" data-cat-id="${cat.id}">
+              <button class="builder-tab-btn ${cat.id === this.activeCategory ? 'active' : ''}" data-cat-id="${cat.id}" data-arcade-focusable data-arcade-action="tab" data-arcade-value="${cat.id}">
                 ${cat.label.toUpperCase()}
               </button>
             `).join('')}
@@ -863,14 +863,14 @@ export const ArcadeCustomizer = {
         <!-- Bottom Action Bar containing Undo/Redo/Randomize/Cancel/Apply -->
         <div class="builder-actions-bar">
           <div class="actions-left" style="display:flex; gap:6px;">
-            <button id="builder-reset-btn" class="sys-btn" title="Reset Current Section">RESET SECTION</button>
-            <button id="builder-undo-btn" class="sys-btn" title="Undo Last Action">UNDO</button>
-            <button id="builder-redo-btn" class="sys-btn" title="Redo Last Action">REDO</button>
+            <button id="builder-reset-btn" class="sys-btn" title="Reset Current Section" data-arcade-focusable data-arcade-action="reset">RESET SECTION</button>
+            <button id="builder-undo-btn" class="sys-btn" title="Undo Last Action" data-arcade-focusable data-arcade-action="undo">UNDO</button>
+            <button id="builder-redo-btn" class="sys-btn" title="Redo Last Action" data-arcade-focusable data-arcade-action="redo">REDO</button>
           </div>
           <div class="actions-right">
-            <button id="builder-randomize-btn" class="sys-btn" style="border-color: #a78bfa; color: #a78bfa;" title="Generate Curated Variant">RANDOMIZE</button>
-            <button id="builder-cancel-btn" class="sys-btn">CANCEL</button>
-            <button id="builder-apply-btn" class="sys-btn active-btn">APPLY</button>
+            <button id="builder-randomize-btn" class="sys-btn" style="border-color: #a78bfa; color: #a78bfa;" title="Generate Curated Variant" data-arcade-focusable data-arcade-action="randomize">RANDOMIZE</button>
+            <button id="builder-cancel-btn" class="sys-btn" data-arcade-focusable data-arcade-action="cancel">CANCEL</button>
+            <button id="builder-apply-btn" class="sys-btn active-btn" data-arcade-focusable data-arcade-action="apply">APPLY</button>
           </div>
         </div>
       </div>
@@ -878,6 +878,10 @@ export const ArcadeCustomizer = {
     
     this.bindEvents(view);
     this.updateUndoRedoButtons();
+    if (window.ArcadeSystemUI) {
+      window.ArcadeSystemUI.refreshFocusableElements();
+      window.ArcadeSystemUI.focusFirst();
+    }
   },
   
   renderActiveCategoryControls() {
@@ -890,7 +894,7 @@ export const ArcadeCustomizer = {
           <h3>CHASSIS PRESETS</h3>
           <div class="swatches-grid">
             ${themes.map(t => `
-              <button class="theme-swatch-btn ${cfg.chassisTheme === t ? 'active' : ''}" data-theme-id="${t}">
+              <button class="theme-swatch-btn ${cfg.chassisTheme === t ? 'active' : ''}" data-theme-id="${t}" data-arcade-focusable data-arcade-action="theme" data-arcade-value="${t}">
                 ${this.BUILTIN_THEMES[t].name}
               </button>
             `).join('')}
@@ -899,7 +903,7 @@ export const ArcadeCustomizer = {
         
         <div class="controls-group">
           <h3>HARDWARE FINISH</h3>
-          <select id="select-hardware-finish" class="sys-input">
+          <select id="select-hardware-finish" class="sys-input" data-arcade-focusable data-arcade-control="select">
             <option value="anodized" ${cfg.hardwareFinish === "anodized" ? "selected" : ""}>Anodized Steel</option>
             <option value="matte" ${cfg.hardwareFinish === "matte" ? "selected" : ""}>Matte Powdercoat</option>
             <option value="metallic" ${cfg.hardwareFinish === "metallic" ? "selected" : ""}>Specular Metallic</option>
@@ -915,13 +919,13 @@ export const ArcadeCustomizer = {
           <h3>accent colors</h3>
           <div class="setting-item">
             <label for="picker-accent">Primary Accent</label>
-            <input type="color" id="picker-accent" value="${cfg.accentColor}" class="sys-input color-target">
-            <input type="text" id="hex-accent" value="${cfg.accentColor.toUpperCase()}" class="sys-input hex-target" maxLength="7">
+            <input type="color" id="picker-accent" value="${cfg.accentColor}" class="sys-input color-target" data-arcade-focusable data-arcade-control="color">
+            <input type="text" id="hex-accent" value="${cfg.accentColor.toUpperCase()}" class="sys-input hex-target" maxLength="7" data-arcade-focusable data-arcade-control="text" data-arcade-value="hex-accent">
           </div>
           <div class="setting-item">
             <label for="picker-secondary">Secondary color</label>
-            <input type="color" id="picker-secondary" value="${cfg.secondaryColor}" class="sys-input color-target">
-            <input type="text" id="hex-secondary" value="${cfg.secondaryColor.toUpperCase()}" class="sys-input hex-target" maxLength="7">
+            <input type="color" id="picker-secondary" value="${cfg.secondaryColor}" class="sys-input color-target" data-arcade-focusable data-arcade-control="color">
+            <input type="text" id="hex-secondary" value="${cfg.secondaryColor.toUpperCase()}" class="sys-input hex-target" maxLength="7" data-arcade-focusable data-arcade-control="text" data-arcade-value="hex-secondary">
           </div>
         </div>
       `;
@@ -933,7 +937,7 @@ export const ArcadeCustomizer = {
           <h3>MARQUEE HEADER</h3>
           <div class="setting-item">
             <label for="input-marquee-text">Marquee Text</label>
-            <input type="text" id="input-marquee-text" value="${cfg.marqueeText}" class="sys-input" maxLength="15">
+            <input type="text" id="input-marquee-text" value="${cfg.marqueeText}" class="sys-input" maxLength="15" data-arcade-focusable data-arcade-control="text" data-arcade-value="marquee-text">
           </div>
         </div>
       `;
@@ -945,18 +949,18 @@ export const ArcadeCustomizer = {
           <h3>DECK LAYOUT COLORS</h3>
           <div class="setting-item">
             <label for="picker-btn-a">Action Button A</label>
-            <input type="color" id="picker-btn-a" value="${cfg.buttonColorA}" class="sys-input color-target">
-            <input type="text" id="hex-btn-a" value="${cfg.buttonColorA.toUpperCase()}" class="sys-input hex-target" maxLength="7">
+            <input type="color" id="picker-btn-a" value="${cfg.buttonColorA}" class="sys-input color-target" data-arcade-focusable data-arcade-control="color">
+            <input type="text" id="hex-btn-a" value="${cfg.buttonColorA.toUpperCase()}" class="sys-input hex-target" maxLength="7" data-arcade-focusable data-arcade-control="text" data-arcade-value="hex-btn-a">
           </div>
           <div class="setting-item">
             <label for="picker-btn-b">Action Button B</label>
-            <input type="color" id="picker-btn-b" value="${cfg.buttonColorB}" class="sys-input color-target">
-            <input type="text" id="hex-btn-b" value="${cfg.buttonColorB.toUpperCase()}" class="sys-input hex-target" maxLength="7">
+            <input type="color" id="picker-btn-b" value="${cfg.buttonColorB}" class="sys-input color-target" data-arcade-focusable data-arcade-control="color">
+            <input type="text" id="hex-btn-b" value="${cfg.buttonColorB.toUpperCase()}" class="sys-input hex-target" maxLength="7" data-arcade-focusable data-arcade-control="text" data-arcade-value="hex-btn-b">
           </div>
           <div class="setting-item">
             <label for="picker-joystick">Joystick Ball</label>
-            <input type="color" id="picker-joystick" value="${cfg.joystickColor}" class="sys-input color-target">
-            <input type="text" id="hex-joystick" value="${cfg.joystickColor.toUpperCase()}" class="sys-input hex-target" maxLength="7">
+            <input type="color" id="picker-joystick" value="${cfg.joystickColor}" class="sys-input color-target" data-arcade-focusable data-arcade-control="color">
+            <input type="text" id="hex-joystick" value="${cfg.joystickColor.toUpperCase()}" class="sys-input hex-target" maxLength="7" data-arcade-focusable data-arcade-control="text" data-arcade-value="hex-joystick">
           </div>
         </div>
       `;
@@ -968,7 +972,7 @@ export const ArcadeCustomizer = {
           <h3>FILTERS & CRT EFFECTS</h3>
           <div class="setting-item">
             <label for="select-screen-filter">CRT Filter Preset</label>
-            <select id="select-screen-filter" class="sys-input">
+            <select id="select-screen-filter" class="sys-input" data-arcade-focusable data-arcade-control="select">
               <option value="standard" ${cfg.screenFilter === "standard" ? "selected" : ""}>Standard LCD</option>
               <option value="sharp" ${cfg.screenFilter === "sharp" ? "selected" : ""}>Pixel Sharp</option>
               <option value="warm" ${cfg.screenFilter === "warm" ? "selected" : ""}>Warm Retro Arcade</option>
@@ -980,7 +984,7 @@ export const ArcadeCustomizer = {
           </div>
           <div class="setting-item">
             <label for="range-scanline">Scanline Intensity</label>
-            <input type="range" id="range-scanline" min="0.0" max="0.8" step="0.05" value="${cfg.scanlineIntensity}">
+            <input type="range" id="range-scanline" min="0.0" max="0.8" step="0.05" value="${cfg.scanlineIntensity}" data-arcade-focusable data-arcade-control="range" data-arcade-value="scanline-intensity">
             <span>${Math.round(cfg.scanlineIntensity * 100)}%</span>
           </div>
         </div>
@@ -993,22 +997,22 @@ export const ArcadeCustomizer = {
           <h3>CABINET LIGHTING & GLOW</h3>
           <div class="setting-item">
             <label for="picker-led">Status LED Color</label>
-            <input type="color" id="picker-led" value="${cfg.ledColor}" class="sys-input color-target">
-            <input type="text" id="hex-led" value="${cfg.ledColor.toUpperCase()}" class="sys-input hex-target" maxLength="7">
+            <input type="color" id="picker-led" value="${cfg.ledColor}" class="sys-input color-target" data-arcade-focusable data-arcade-control="color">
+            <input type="text" id="hex-led" value="${cfg.ledColor.toUpperCase()}" class="sys-input hex-target" maxLength="7" data-arcade-focusable data-arcade-control="text" data-arcade-value="hex-led">
           </div>
           <div class="setting-item">
             <label for="picker-coin">Coin Slot LED</label>
-            <input type="color" id="picker-coin" value="${cfg.coinLightColor}" class="sys-input color-target">
-            <input type="text" id="hex-coin" value="${cfg.coinLightColor.toUpperCase()}" class="sys-input hex-target" maxLength="7">
+            <input type="color" id="picker-coin" value="${cfg.coinLightColor}" class="sys-input color-target" data-arcade-focusable data-arcade-control="color">
+            <input type="text" id="hex-coin" value="${cfg.coinLightColor.toUpperCase()}" class="sys-input hex-target" maxLength="7" data-arcade-focusable data-arcade-control="text" data-arcade-value="hex-coin">
           </div>
           <div class="setting-item">
             <label for="range-screen-glow">Screen Glow</label>
-            <input type="range" id="range-screen-glow" min="0.0" max="1.0" step="0.05" value="${cfg.screenGlow}">
+            <input type="range" id="range-screen-glow" min="0.0" max="1.0" step="0.05" value="${cfg.screenGlow}" data-arcade-focusable data-arcade-control="range" data-arcade-value="screen-glow">
             <span>${Math.round(cfg.screenGlow * 100)}%</span>
           </div>
           <div class="setting-item">
             <label for="range-cabinet-glow">Cabinet Ambient Glow</label>
-            <input type="range" id="range-cabinet-glow" min="0.0" max="1.0" step="0.05" value="${cfg.cabinetGlow}">
+            <input type="range" id="range-cabinet-glow" min="0.0" max="1.0" step="0.05" value="${cfg.cabinetGlow}" data-arcade-focusable data-arcade-control="range" data-arcade-value="cabinet-glow">
             <span>${Math.round(cfg.cabinetGlow * 100)}%</span>
           </div>
         </div>
@@ -1020,22 +1024,22 @@ export const ArcadeCustomizer = {
         <div class="controls-group">
           <h3>SAVE DRAFT TO USER PRESET</h3>
           <div class="setting-item" style="display:flex; gap:8px;">
-            <input type="text" id="input-preset-name" placeholder="PRESET NAME" class="sys-input" maxLength="20" style="flex:1;">
-            <button id="btn-save-preset" class="sys-btn active-btn active" style="margin:0;">SAVE NEW</button>
+            <input type="text" id="input-preset-name" placeholder="PRESET NAME" class="sys-input" maxLength="20" style="flex:1;" data-arcade-focusable data-arcade-control="text" data-arcade-value="preset-name">
+            <button id="btn-save-preset" class="sys-btn active-btn active" style="margin:0;" data-arcade-focusable data-arcade-action="save-preset">SAVE NEW</button>
           </div>
         </div>
         
         <div class="controls-group" style="margin-top:8px;">
           <h3>MANAGE SAVED USER PRESETS (${this.presets.length}/20)</h3>
-          ${this.presets.length === 0 ? '<div style="font-size:9px; opacity:0.5; padding:8px 0;">No custom user presets saved yet.</div>' : `
+          ${this.presets.length === 0 ? '<div style="font-size:9px; opacity:0.6; padding:8px 0;">No saved presets yet. Name your current setup above, then choose Save New.</div>' : `
             <div class="presets-list" style="display:flex; flex-direction:column; gap:6px; max-height:110px; overflow-y:auto;">
               ${this.presets.map(p => `
                 <div class="preset-item-card ${this.activePresetId === p.id ? 'active' : ''}" style="display:flex; align-items:center; justify-content:space-between; background:#1b1b21; border:1px solid rgba(255,255,255,0.06); padding:6px; border-radius:4px;" data-preset-id="${p.id}">
                   <span class="preset-item-name" style="font-weight:bold; font-size:9px;">${p.name}</span>
                   <div style="display:flex; gap:4px;">
-                    <button class="preset-load-btn sys-btn" style="font-size:7px; padding:3px 6px;">LOAD</button>
-                    <button class="preset-dup-btn sys-btn" style="font-size:7px; padding:3px 6px;">DUP</button>
-                    <button class="preset-del-btn sys-btn danger-btn" style="font-size:7px; padding:3px 6px; border-color:#ef4444; color:#ef4444;">DEL</button>
+                    <button class="preset-load-btn sys-btn" style="font-size:7px; padding:3px 6px;" data-arcade-focusable data-arcade-action="load-preset" data-arcade-value="${p.id}">LOAD</button>
+                    <button class="preset-dup-btn sys-btn" style="font-size:7px; padding:3px 6px;" data-arcade-focusable data-arcade-action="dup-preset" data-arcade-value="${p.id}">DUP</button>
+                    <button class="preset-del-btn sys-btn danger-btn" style="font-size:7px; padding:3px 6px; border-color:#ef4444; color:#ef4444;" data-arcade-focusable data-arcade-action="del-preset" data-arcade-value="${p.id}">DEL</button>
                   </div>
                 </div>
               `).join('')}
@@ -1054,14 +1058,14 @@ export const ArcadeCustomizer = {
         <div class="controls-group">
           <h3>EXPORT CONFIG</h3>
           <p style="font-size:9px; opacity:0.5; margin:0 0 6px 0;">Active profile config: <strong>${activeName}</strong></p>
-          <button id="btn-export-config" class="sys-btn active-btn active" style="width:100%; margin:0;">DOWNLOAD CONFIG (JSON)</button>
+          <button id="btn-export-config" class="sys-btn active-btn active" style="width:100%; margin:0;" data-arcade-focusable data-arcade-action="export-config">DOWNLOAD CONFIG (JSON)</button>
         </div>
         
         <div class="controls-group" style="margin-top:12px;">
           <h3>IMPORT CONFIG</h3>
           <p style="font-size:9px; opacity:0.5; margin:0 0 6px 0;">Select a configuration file (.json) to import into the builder draft.</p>
           <input type="file" id="import-file-input" accept=".json" style="display:none;">
-          <button id="btn-trigger-import" class="sys-btn" style="width:100%; margin:0;">CHOOSE FILE</button>
+          <button id="btn-trigger-import" class="sys-btn" style="width:100%; margin:0;" data-arcade-focusable data-arcade-action="import-config">CHOOSE FILE</button>
         </div>
       `;
     }

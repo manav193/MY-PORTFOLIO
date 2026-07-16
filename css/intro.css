@@ -8,6 +8,8 @@
   height: 200vh;
   position: relative;
   z-index: 9999;
+  overflow-x: clip;
+  contain: paint;
 }
 body.intro-skipped #intro-sequence {
   display: none !important;
@@ -654,6 +656,9 @@ body:not(.intro-skipped) .living-ambient-light {
 
 /* Convex Action Buttons */
 .cab-btn {
+  appearance: none;
+  font: inherit;
+  padding: 0;
   position: relative;
   width: 30px;
   height: 30px;
@@ -736,6 +741,9 @@ body:not(.intro-skipped) .living-ambient-light {
 }
 
 .cab-btn-small {
+  appearance: none;
+  font: inherit;
+  padding: 0;
   position: relative;
   width: 24px;
   height: 10px;
@@ -1000,7 +1008,10 @@ body:not(.intro-skipped) .living-ambient-light {
     grid-template-rows: repeat(2, 22px);
     gap: 6px 10px;
   }
-  .cab-btn {
+.cab-btn {
+  appearance: none;
+  font: inherit;
+  padding: 0;
     width: 22px;
     height: 22px;
   }
@@ -1041,3 +1052,49 @@ body:not(.intro-skipped) .living-ambient-light {
   }
 }
 
+.boot-choice {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.boot-choice button,
+.boot-choice a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #f4f4f5;
+  padding: 6px 9px;
+  font: 600 8px/1 'JetBrains Mono', monospace;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.boot-choice :first-child {
+  border-color: rgba(53, 208, 186, 0.65);
+  color: #7ce6d6;
+}
+
+.boot-choice button:hover,
+.boot-choice button:focus-visible,
+.boot-choice a:hover,
+.boot-choice a:focus-visible {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+@media (max-height: 480px) {
+  .boot-terminal {
+    gap: 8px;
+  }
+
+  .boot-action,
+  .boot-choice {
+    margin-top: 6px;
+  }
+}

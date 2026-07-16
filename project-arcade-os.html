@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en" data-theme="dark-graphite">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ArcadeOS Case Study | Manav Agarwal</title>
+  <meta name="description" content="How Manav Agarwal designed and built a modular browser ArcadeOS with games, unified input, persistence, customization, diagnostics, accessibility, and production testing.">
+  <link rel="canonical" href="{{portfolio.siteUrl}}/project-arcade-os.html">
+  <link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/project-page.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body data-project-theme="arcade-os">
+  <a href="#case-study" class="skip-link">Skip to case study</a>
+  <header class="showroom-nav">
+    <a href="index.html#work" class="cs-back-link">Back to selected work</a>
+    <div class="project-nav-actions">
+      <a href="index.html#intro-sequence">Live Demo</a>
+      <a href="{{projects.arcade-os.githubUrl}}" target="_blank" rel="noopener noreferrer">GitHub</a>
+    </div>
+  </header>
+
+  <main id="case-study">
+    <section class="cs-hero-cinematic">
+      <div class="cs-hero-content">
+        <p class="cs-meta">FLAGSHIP PRODUCT // LIVE</p>
+        <h1 class="cs-hero-title">ArcadeOS</h1>
+        <p class="cs-hero-subtitle">A browser operating system hidden inside a custom arcade cabinet, engineered as the interactive centerpiece of this portfolio.</p>
+        <div class="project-actions">
+          <a href="index.html#intro-sequence" class="btn-primary">Enter Arcade</a>
+          <a href="{{projects.arcade-os.githubUrl}}" class="btn-secondary" target="_blank" rel="noopener noreferrer">View GitHub</a>
+        </div>
+      </div>
+      <div class="cs-hero-visual"><img class="cs-hero-img" src="images/arcade-home.webp" alt="ArcadeOS home launcher inside the hardware cabinet" width="1600" height="1000"></div>
+      <div class="cs-hero-stats">
+        <div><strong>3</strong><span>Playable games</span></div>
+        <div><strong>8</strong><span>System routes</span></div>
+        <div><strong>5</strong><span>Input modes</span></div>
+      </div>
+    </section>
+
+    <section class="cs-section cs-bg-alternate">
+      <div class="cs-container">
+        <span class="cs-section-marker">01. Overview</span>
+        <h2 class="cs-section-title">A portfolio feature built like a product.</h2>
+        <div class="cs-split-layout">
+          <div class="cs-glass-panel"><h3>Challenge</h3><p>Build a memorable interactive system without turning the portfolio into an inaccessible demo, loading a large framework, trapping users, or letting game state and listeners leak between routes.</p></div>
+          <div class="cs-glass-panel"><h3>Solution</h3><p>A small platform layer coordinates storage, routing, app lifecycle, audio, hardware feedback, and unified input. Games and system tools mount into one controlled screen and are destroyed when the user returns home.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cs-section">
+      <div class="cs-container">
+        <span class="cs-section-marker">02. Architecture</span>
+        <h2 class="cs-section-title">One shell, isolated feature engines.</h2>
+        <div class="arcade-architecture" aria-label="ArcadeOS architecture flow">
+          <div><strong>Input</strong><span>Keyboard / pointer / touch / cabinet / gamepad</span></div>
+          <div><strong>ArcadeOS</strong><span>Router / lifecycle / focus / announcements</span></div>
+          <div><strong>Modules</strong><span>Games / system routes / customizer / diagnostics</span></div>
+          <div><strong>Persistence</strong><span>Versioned settings / stats / achievements / saves</span></div>
+        </div>
+        <ul class="cs-bullet-list">
+          <li><strong>Module loading:</strong> system tools are dynamically imported and cached after first use.</li>
+          <li><strong>Game lifecycle:</strong> every app receives a shared event bus, mounts into one view, and tears down timers, listeners, and animation frames on exit.</li>
+          <li><strong>Input model:</strong> all hardware and browser inputs emit normalized Arcade events, so routes and games do not depend on a specific device.</li>
+          <li><strong>Persistence:</strong> settings, saves, stats, achievements, profile, sound, and customizer presets live in explicit local storage domains with migration and backup safety.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="cs-section cs-bg-alternate">
+      <div class="cs-container">
+        <span class="cs-section-marker">03. Key Features</span>
+        <h2 class="cs-section-title">Play, create, inspect, customize.</h2>
+        <div class="cs-magazine-grid arcade-shot-grid">
+          <figure class="cs-mag-card cs-mag-large"><img src="images/arcade-customize.webp" alt="ArcadeOS machine customizer with cabinet controls" width="1200" height="750" loading="lazy"><figcaption>Machine Customizer - presets, import/export, undo, redo, and safe draft state.</figcaption></figure>
+          <figure class="cs-mag-card"><img src="images/arcade-stats.webp" alt="ArcadeOS statistics dashboard" width="1200" height="750" loading="lazy"><figcaption>Stats - aggregate playtime, per-game records, and session history.</figcaption></figure>
+          <figure class="cs-mag-card"><img src="images/arcade-achievements.webp" alt="ArcadeOS achievements screen" width="1200" height="750" loading="lazy"><figcaption>Achievements - event-driven unlocks, progress, rank, and hidden states.</figcaption></figure>
+          <figure class="cs-mag-card"><img src="images/arcade-soundlab.webp" alt="ArcadeOS SoundLab profile controls" width="1200" height="750" loading="lazy"><figcaption>SoundLab - generated audio profiles, previews, mute, and reduced audio.</figcaption></figure>
+          <figure class="cs-mag-card"><img src="images/arcade-diagnostics.webp" alt="ArcadeOS diagnostics panels" width="1200" height="750" loading="lazy"><figcaption>Diagnostics - non-destructive checks for input, storage, audio, network, and hardware.</figcaption></figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="cs-section">
+      <div class="cs-container">
+        <span class="cs-section-marker">04. Technical Decisions</span>
+        <h2 class="cs-section-title">Restraint over dependency weight.</h2>
+        <div class="cs-feature-grid">
+          <div><h3>Vanilla platform</h3><p>Native modules, Custom Events, Canvas, Web Audio, Gamepad API, and browser storage keep the runtime inspectable and small.</p></div>
+          <div><h3>Owned listeners</h3><p>Route and app listeners are tagged by owner, then removed as a group when their screen closes.</p></div>
+          <div><h3>Safe resets</h3><p>Backup export and domain-specific resets prevent one settings action from deleting credits, saves, profiles, or customization presets unexpectedly.</p></div>
+          <div><h3>Progressive capability</h3><p>Audio, gamepad, service worker, and offline features report unsupported or waiting states without blocking core navigation.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cs-section cs-bg-alternate">
+      <div class="cs-container">
+        <span class="cs-section-marker">05. Quality</span>
+        <h2 class="cs-section-title">Performance and access are part of the system.</h2>
+        <div class="cs-split-layout">
+          <div><h3>Accessibility</h3><ul class="cs-bullet-list"><li>Semantic controls and visible focus states.</li><li>Keyboard, cabinet, touch, and gamepad parity.</li><li>Route and game announcements.</li><li>Reduced motion and reduced audio support.</li><li>Explicit Home and Exit actions prevent navigation traps.</li></ul></div>
+          <div><h3>Performance</h3><ul class="cs-bullet-list"><li>Lazy system modules and no giant UI dependency.</li><li>Animation frames stop when the cabinet is idle or off-screen.</li><li>Games cancel loops and listeners on destroy.</li><li>Optimized WebP screenshots and stable media ratios.</li><li>Mobile effects are reduced without removing the product identity.</li></ul></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cs-section">
+      <div class="cs-container">
+        <span class="cs-section-marker">06. Testing</span>
+        <h2 class="cs-section-title">Regression coverage follows the user journey.</h2>
+        <p class="cs-editorial-body">Automated browser tests cover boot, entry, launcher focus, every system route, all games and creative tools, module recovery, keyboard and gamepad mapping, storage safety, repeated route teardown, portfolio links, and responsive overflow. Manual QA runs across desktop, tablet, and mobile viewports.</p>
+        <div class="cs-stat-row"><div class="cs-stat-pill"><strong>7</strong><span>Target viewports</span></div><div class="cs-stat-pill"><strong>10x</strong><span>Route repetition</span></div><div class="cs-stat-pill"><strong>0</strong><span>Required frameworks</span></div></div>
+      </div>
+    </section>
+
+    <section class="cs-section cs-bg-alternate">
+      <div class="cs-container">
+        <span class="cs-section-marker">07. Result</span>
+        <h2 class="cs-section-title">A technical proof piece visitors can actually use.</h2>
+        <p class="cs-editorial-body">ArcadeOS turns the portfolio itself into evidence: interaction design, state management, performance engineering, game loops, accessibility, persistence, testing, and product storytelling operate together in one shipped experience.</p>
+        <div class="project-actions"><a href="index.html#intro-sequence" class="btn-primary">Live Demo</a><a href="{{projects.arcade-os.githubUrl}}" class="btn-secondary" target="_blank" rel="noopener noreferrer">GitHub Repository</a></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="project-footer"><a href="index.html#work">Selected work</a><span>Manav Agarwal - Hyderabad, India</span></footer>
+</body>
+</html>

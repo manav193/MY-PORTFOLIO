@@ -1,6 +1,90 @@
 // Centralized Arcade Achievements & Progress Manager (Phase 4B)
 // Handcrafted ES Module managing unlocked achievements, timestamps, and registry info
 
+export function calculateProfileRank({
+  sessionsPlayed = 0,
+  totalPlaytime = 0,
+  achievementsUnlocked = 0,
+  uniqueAppsPlayed = 0,
+  presetsCreated = 0
+}) {
+  const sessions = Math.max(0, Number(sessionsPlayed) || 0);
+  const playtime = Math.max(0, Number(totalPlaytime) || 0);
+  const achievements = Math.max(0, Number(achievementsUnlocked) || 0);
+  const apps = Math.max(0, Number(uniqueAppsPlayed) || 0);
+  const presets = Math.max(0, Number(presetsCreated) || 0);
+
+  // Pure weighted score points formula
+  const points =
+    sessions * 10
+    + Math.floor(playtime / 300) * 5
+    + achievements * 20
+    + apps * 30
+    + presets * 15;
+
+  let rank = "Visitor";
+  let nextRank = "Operator";
+  let minScore = 0;
+  let maxScore = 100;
+  let progressPct = 0;
+
+  if (points >= 2500) {
+    rank = "Machine Master";
+    nextRank = "Max Rank";
+    minScore = 2500;
+    maxScore = 2500;
+    progressPct = 100;
+  } else if (points >= 1000) {
+    rank = "Arcade Regular";
+    nextRank = "Machine Master";
+    minScore = 1000;
+    maxScore = 2500;
+    progressPct = Math.floor(((points - minScore) / (maxScore - minScore)) * 100);
+  } else if (points >= 400) {
+    rank = "Technician";
+    nextRank = "Arcade Regular";
+    minScore = 400;
+    maxScore = 1000;
+    progressPct = Math.floor(((points - minScore) / (maxScore - minScore)) * 100);
+  } else if (points >= 100) {
+    rank = "Operator";
+    nextRank = "Technician";
+    minScore = 100;
+    maxScore = 400;
+    progressPct = Math.floor(((points - minScore) / (maxScore - minScore)) * 100);
+  } else {
+    rank = "Visitor";
+    nextRank = "Operator";
+    minScore = 0;
+    maxScore = 100;
+    progressPct = Math.floor(((points - minScore) / (maxScore - minScore)) * 100);
+  }
+
+  return {
+    score: points,
+    title: rank,
+    nextTitle: nextRank,
+    progress: Math.min(100, Math.max(0, progressPct)),
+    thresholds: { min: minScore, max: maxScore }
+  };
+}
+
+export function extractBestTimestamp(entry) {
+  if (!entry) return new Date().toISOString();
+  if (typeof entry === 'string') {
+    const d = new Date(entry);
+    return isNaN(d.getTime()) ? new Date().toISOString() : d.toISOString();
+  }
+  if (typeof entry === 'object') {
+    const candidate = entry.unlockedAt || entry.timestamp || entry.date;
+    if (candidate) {
+      const d = new Date(candidate);
+      if (!isNaN(d.getTime())) return d.toISOString();
+    }
+  }
+  return new Date().toISOString();
+}
+
 export const ArcadeAchievements = {
   initialized: false,
   data: {
@@ -8,14 +92,12 @@ export const ArcadeAchievements = {
     unlocked: {},
     counters: {}
   },
-  
-  // Track achievements unlocked during the current active session
-  sessionUnlocked: [],
+  activeFilter: 'ALL',
 
   REGISTRY: [
     // --- SYSTEM ---
     { id: 'first_boot', title: 'First Boot', desc: 'Welcome to the Grid.', icon: '🖥️', category: 'SYSTEM' },
-    { id: 'first_coin', title: 'Insert Coin', desc: 'Insert your first coin credit.', icon: '🪙', category: 'SYSTEM' },
+    { id: 'first_coin', title: 'First Coin', desc: 'Insert your first coin credit.', icon: '🪙', category: 'SYSTEM' },
     { id: 'first_cabinet', title: 'First Custom Cabinet', desc: 'Apply your first cabinet customization.', icon: '🎨', category: 'SYSTEM' },
     { id: 'preset_saved', title: 'First Preset Saved', desc: 'Save a customized cabinet preset.', icon: '💾', category: 'SYSTEM' },
     { id: 'config_exported', title: 'Config Exported', desc: 'Export a custom cabinet profile.', icon: '📤', category: 'SYSTEM' },
@@ -34,7 +116,7 @@ export const ArcadeAchievements = {
     { id: 'under_300', title: 'Under 300ms', desc: 'Achieve a score under 300ms.', icon: '🏹', category: 'REACTION' },
     { id: 'under_200', title: 'Under 200ms', desc: 'Achieve a score under 200ms.', icon: '🎯', category: 'REACTION' },
     { id: 'under_150', title: 'Under 150ms', desc: 'Achieve a score under 150ms.', icon: '🔥', category: 'REACTION' },
-    { id: 'three_fast', title: 'Three Fast Runs', desc: 'Achieve under 250ms three times.', icon: '⚡', category: 'REACTION', target: 3 },
+    { id: 'three_fast', title: 'Three Fast Runs', desc: 'Achieve under 250ms three times.', icon: '⚡', category: 'REACTION', target: 3, hidden: true },
 
     // --- SNAKE ---
     { id: 'snake_10', title: 'Score 10', desc: 'Score 10 points in Neon Snake.', icon: '🐍', category: 'SNAKE' },
@@ -46,7 +128,7 @@ export const ArcadeAchievements = {
     { id: 'breakout_brick', title: 'First Brick', desc: 'Break your first brick.', icon: '🧱', category: 'BREAKOUT' },
     { id: 'breakout_level', title: 'First Level', desc: 'Clear a level in Breakout.', icon: '🏆', category: 'BREAKOUT' },
     { id: 'breakout_1000', title: 'Score 1000', desc: 'Score 1000 points in Breakout.', icon: '💎', category: 'BREAKOUT' },
-    { id: 'breakout_streak', title: 'No-Miss Streak', desc: 'Achieve a 15-brick hit streak.', icon: '💫', category: 'BREAKOUT' },
+    { id: 'breakout_streak', title: 'No-Miss Streak', desc: 'Achieve a 15-brick hit streak.', icon: '💫', category: 'BREAKOUT', hidden: true },
 
     // --- CREATIVE ---
     { id: 'pixel_saved', title: 'Pixel Art Saved', desc: 'Save a canvas sketch in Pixel Pad.', icon: '🎨', category: 'CREATIVE' },
@@ -58,61 +140,78 @@ export const ArcadeAchievements = {
     { id: 'theme_switcher', title: 'Theme Switcher', desc: 'Load a built-in chassis theme.', icon: '🎨', category: 'CUSTOMIZATION' },
     { id: 'cabinet_designer', title: 'Cabinet Designer', desc: 'Save custom accent colors.', icon: '⚙️', category: 'CUSTOMIZATION' },
     { id: 'preset_collector', title: 'Preset Collector', desc: 'Save 5 cabinet presets.', icon: '🗃️', category: 'CUSTOMIZATION', target: 5 },
-    { id: 'random_variant', title: 'Random Variant', desc: 'Generate a random variant.', icon: '🎲', category: 'CUSTOMIZATION' },
+    { id: 'random_variant', title: 'Random Variant', desc: 'Generate a random variant.', icon: '🎲', category: 'CUSTOMIZATION', hidden: true },
     { id: 'custom_marquee', title: 'Custom Marquee', desc: 'Save a custom marquee header text.', icon: '✨', category: 'CUSTOMIZATION' }
   ],
 
   init() {
     if (this.initialized) return;
     this.initialized = true;
-    
     this.loadAndMigrate();
   },
 
   loadAndMigrate() {
     const raw = localStorage.getItem('arcade_machine_achievements');
+    this.data = {
+      schemaVersion: 2,
+      unlocked: {},
+      counters: {}
+    };
+
     if (!raw) {
-      this.data = { schemaVersion: 2, unlocked: {}, counters: {} };
       this.saveToStorage();
       return;
     }
-    
+
     try {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed)) {
-        // Migrate legacy array structure
-        this.data = { schemaVersion: 2, unlocked: {}, counters: {} };
+        // Legacy array of achievement IDs
         parsed.forEach(id => {
-          this.data.unlocked[id] = { unlockedAt: new Date().toISOString() };
+          if (id && typeof id === 'string') {
+            this.data.unlocked[id] = { unlockedAt: new Date().toISOString() };
+          }
         });
         this.saveToStorage();
       } else if (parsed && typeof parsed === 'object') {
         if (!parsed.schemaVersion || parsed.schemaVersion < 2) {
-          // Schema structure V1 -> V2
-          this.data = {
-            schemaVersion: 2,
-            unlocked: parsed.unlocked || {},
-            counters: parsed.counters || {}
-          };
+          // V1 to V2 object migration
+          if (Array.isArray(parsed.unlocked)) {
+            parsed.unlocked.forEach(id => {
+              if (id && typeof id === 'string') {
+                this.data.unlocked[id] = { unlockedAt: new Date().toISOString() };
+              }
+            });
+          } else if (parsed.unlocked && typeof parsed.unlocked === 'object') {
+            Object.keys(parsed.unlocked).forEach(id => {
+              this.data.unlocked[id] = { unlockedAt: extractBestTimestamp(parsed.unlocked[id]) };
+            });
+          }
+          this.data.counters = parsed.counters || {};
           this.saveToStorage();
         } else {
-          this.data = parsed;
+          // Valid V2, copy securely preserving dates
+          if (parsed.unlocked && typeof parsed.unlocked === 'object') {
+            Object.keys(parsed.unlocked).forEach(id => {
+              this.data.unlocked[id] = { unlockedAt: extractBestTimestamp(parsed.unlocked[id]) };
+            });
+          }
+          if (parsed.counters && typeof parsed.counters === 'object') {
+            this.data.counters = parsed.counters;
+          }
         }
       }
     } catch (e) {
-      console.warn("Failed to parse achievements data, resetting", e);
-      this.data = { schemaVersion: 2, unlocked: {}, counters: {} };
+      console.warn("Failed to parse achievements, using safe recovery", e);
     }
   },
 
   saveToStorage() {
+    this.data.schemaVersion = 2;
     localStorage.setItem('arcade_machine_achievements', JSON.stringify(this.data));
   },
 
   getStatsData() {
-    if (window.ArcadeStats && window.ArcadeStats.data) {
-      return window.ArcadeStats.data;
-    }
     const raw = localStorage.getItem('arcade_machine_stats');
     if (raw) {
       try {
@@ -123,31 +222,24 @@ export const ArcadeAchievements = {
   },
 
   getCustomizerData() {
-    if (window.ArcadeCustomizer && window.ArcadeCustomizer.presets) {
-      return window.ArcadeCustomizer;
-    }
     const raw = localStorage.getItem('arcade_machine_customization');
     if (raw) {
       try {
-        const parsed = JSON.parse(raw);
-        return { presets: parsed.presets || [] };
+        return JSON.parse(raw);
       } catch (e) {}
     }
     return { presets: [] };
   },
 
-  // ============================================================================
-  // PROGRESS COMPUTATION
-  // ============================================================================
   getProgress(id) {
     const ach = this.REGISTRY.find(a => a.id === id);
     if (!ach || !ach.target) return null;
-    
+
     const stats = this.getStatsData();
     const customizer = this.getCustomizerData();
-    
     let current = 0;
-    
+
+    // Explicitly mapped progress sources (Correction 8)
     switch (id) {
       case 'five_sessions':
       case 'ten_sessions':
@@ -159,8 +251,7 @@ export const ArcadeAchievements = {
         break;
       case 'every_app':
         if (stats && stats.perGame) {
-          const launchedApps = Object.keys(stats.perGame).filter(key => stats.perGame[key].launches > 0);
-          current = launchedApps.length;
+          current = Object.keys(stats.perGame).filter(key => stats.perGame[key].launches > 0).length;
         }
         break;
       case 'three_fast':
@@ -173,27 +264,27 @@ export const ArcadeAchievements = {
         current = (stats && stats.perGame && stats.perGame.palettelab) ? stats.perGame.palettelab.palettesExported : 0;
         break;
       case 'preset_collector':
-        current = customizer ? customizer.presets.length : 0;
+        current = customizer ? (customizer.presets ? customizer.presets.length : 0) : 0;
         break;
       default:
         current = 0;
     }
-    
-    const completed = current >= ach.target;
+
     return {
-      current: Math.min(current, ach.target),
+      current: Math.max(0, Math.min(current, ach.target)),
       target: ach.target,
-      completed: completed
+      completed: current >= ach.target
     };
   },
 
-  // ============================================================================
-  // EVALUATION & UNLOCKS
-  // ============================================================================
   evaluate(eventName, payload) {
+    // Diagnostic events must never unlock achievements or mutate counters.
+    if (payload && payload.diagnostic) return;
+    if (eventName && String(eventName).startsWith('DIAGNOSTIC_')) return;
+
     const stats = this.getStatsData();
-    
-    // Evaluate SYSTEM checks
+
+    // SYSTEM Evaluation
     if (eventName === 'GAME_LAUNCHED' && payload && payload.id === 'os') {
       this.unlock('first_boot');
     }
@@ -203,7 +294,6 @@ export const ArcadeAchievements = {
     if (eventName === 'CUSTOMIZER_APPLIED') {
       this.unlock('first_cabinet');
       this.unlock('cabinet_designer');
-      
       const customizer = this.getCustomizerData();
       if (customizer && customizer.presets && customizer.presets.length >= 5) {
         this.unlock('preset_collector');
@@ -216,7 +306,7 @@ export const ArcadeAchievements = {
         this.unlock('preset_collector');
       }
     }
-    if (eventName === 'THEME_LOADED') {
+    if (eventName === 'THEME_LOADED' || eventName === 'THEME_SWITCHER') {
       this.unlock('theme_switcher');
     }
     if (eventName === 'CONFIG_EXPORTED') {
@@ -232,41 +322,33 @@ export const ArcadeAchievements = {
       this.unlock('custom_marquee');
     }
 
-    // Evaluate PLAY checks
+    // PLAY Evaluation
     if (eventName === 'GAME_LAUNCHED' && payload && payload.id !== 'os') {
       this.unlock('first_game');
-      
       if (stats && stats.perGame) {
-        // check played every app progress
-        const launchedApps = Object.keys(stats.perGame).filter(key => {
-          return stats.perGame[key].launches > 0 || key === payload.id;
-        });
+        const launchedApps = Object.keys(stats.perGame).filter(key => stats.perGame[key].launches > 0 || key === payload.id);
         if (launchedApps.length >= 5) {
           this.unlock('every_app');
         }
       }
     }
-    
     if (eventName === 'PLAYTIME_UPDATED' && payload) {
       const play = payload.totalPlaytime || 0;
       if (play >= 3600) this.unlock('one_hour');
       if (play >= 18000) this.unlock('five_hours');
     }
-    
-    // Evaluate count based session counters
     if (stats) {
       if (stats.sessionsPlayed >= 5) this.unlock('five_sessions');
       if (stats.sessionsPlayed >= 10) this.unlock('ten_sessions');
     }
 
-    // Evaluate REACTION checks
+    // REACTION Evaluation
     if (eventName === 'REACTION_SCORE' && payload) {
       const score = payload.score;
       this.unlock('reaction_rookie');
       if (score < 300) this.unlock('under_300');
       if (score < 200) this.unlock('under_200');
       if (score < 150) this.unlock('under_150');
-      
       if (score < 250) {
         this.data.counters['fast_reaction_runs'] = (this.data.counters['fast_reaction_runs'] || 0) + 1;
         this.saveToStorage();
@@ -276,7 +358,7 @@ export const ArcadeAchievements = {
       }
     }
 
-    // Evaluate SNAKE checks
+    // SNAKE Evaluation
     if (eventName === 'SNAKE_SCORE' && payload) {
       const score = payload.score;
       if (score >= 10) this.unlock('snake_10');
@@ -289,23 +371,23 @@ export const ArcadeAchievements = {
       }
     }
 
-    // Evaluate BREAKOUT checks
+    // BREAKOUT Evaluation
     if (eventName === 'BREAKOUT_SCORE' && payload) {
       this.unlock('breakout_brick');
       if (payload.score >= 1000) {
         this.unlock('breakout_1000');
       }
     }
-    if (eventName === 'BREAKOUT_LEVEL_CLEARED') {
+    if (eventName === 'BREAKOUT_LEVEL_CLEARED' || eventName === 'BREAKOUT_LEVEL') {
       this.unlock('breakout_level');
     }
-    if (eventName === 'BREAKOUT_LONGEST_STREAK' && payload) {
-      if (payload.streak >= 15) {
+    if (eventName === 'BREAKOUT_LONGEST_STREAK' || eventName === 'BREAKOUT_STREAK') {
+      if (payload && payload.streak >= 15) {
         this.unlock('breakout_streak');
       }
     }
 
-    // Evaluate CREATIVE checks
+    // CREATIVE Evaluation
     if (eventName === 'PIXELPAD_SAVED') {
       this.unlock('pixel_saved');
       if (stats && stats.perGame && stats.perGame.pixelpad) {
@@ -323,29 +405,19 @@ export const ArcadeAchievements = {
   },
 
   unlock(id) {
-    if (this.data.unlocked[id]) return; // duplicate unlock blocker
-    
+    if (this.data.unlocked[id]) return; // prevent duplicate toast/unlocks
+
     const ach = this.REGISTRY.find(a => a.id === id);
     if (!ach) return;
-    
+
     this.data.unlocked[id] = { unlockedAt: new Date().toISOString() };
     this.saveToStorage();
-    
-    // Add to active session achievements list
-    if (!this.sessionUnlocked.includes(id)) {
-      this.sessionUnlocked.push(id);
+
+    // Emit event for session-level capture inside Stats (Correction 3 Decoupling)
+    if (window.ArcadeEventBus) {
+      window.ArcadeEventBus.emit('ACHIEVEMENT_UNLOCKED', { id });
     }
-    
-    // Notify stats dashboard or recent session calculations
-    if (window.ArcadeStats && window.ArcadeStats.activeSession) {
-      if (!window.ArcadeStats.activeSession.unlockedThisSession) {
-        window.ArcadeStats.activeSession.unlockedThisSession = [];
-      }
-      if (!window.ArcadeStats.activeSession.unlockedThisSession.includes(id)) {
-        window.ArcadeStats.activeSession.unlockedThisSession.push(id);
-      }
-    }
-    
+
     // Trigger OS toast alerts dynamically
     if (window.ArcadeOS) {
       window.ArcadeOS.showToast(ach);
@@ -363,77 +435,65 @@ export const ArcadeAchievements = {
     return this.REGISTRY.filter(a => a.category === category);
   },
 
-  // ============================================================================
-  // PROFILE LOCAL RANK CALCULATION
-  // ============================================================================
-  calculatePlayerRank() {
-    const unlockedCount = this.getUnlocked().length;
-    const stats = this.getStatsData();
-    const customizer = this.getCustomizerData();
-    
-    const launches = stats ? stats.totalLaunches : 0;
-    const presetsCount = customizer ? customizer.presets.length : 0;
-    
-    // Ranks threshold checklist:
-    // Machine Master: >= 20 achievements, >= 50 launches, >= 3 custom presets saved
-    // Arcade Regular: >= 12 achievements, >= 30 launches
-    // Technician: >= 6 achievements, >= 15 launches, >= 1 customization preset
-    // Operator: >= 2 achievements, >= 5 launches
-    // Visitor: default baseline
-    
-    let rank = "Visitor";
-    let nextRank = "Operator";
-    let progressPct = 0;
-    
-    if (unlockedCount >= 20 && launches >= 50 && presetsCount >= 3) {
-      rank = "Machine Master";
-      nextRank = "Max Rank Unlocked";
-      progressPct = 100;
-    } else if (unlockedCount >= 12 && launches >= 30) {
-      rank = "Arcade Regular";
-      nextRank = "Machine Master";
-      // Calc progress to next rank
-      const p1 = (unlockedCount - 12) / 8;
-      const p2 = (launches - 30) / 20;
-      const p3 = Math.min(1, presetsCount / 3);
-      progressPct = Math.round(((p1 + p2 + p3) / 3) * 100);
-    } else if (unlockedCount >= 6 && launches >= 15) {
-      rank = "Technician";
-      nextRank = "Arcade Regular";
-      const p1 = (unlockedCount - 6) / 6;
-      const p2 = (launches - 15) / 15;
-      progressPct = Math.round(((p1 + p2) / 2) * 100);
-    } else if (unlockedCount >= 2 && launches >= 5) {
-      rank = "Operator";
-      nextRank = "Technician";
-      const p1 = (unlockedCount - 2) / 4;
-      const p2 = (launches - 5) / 10;
-      progressPct = Math.round(((p1 + p2) / 2) * 100);
-    } else {
-      rank = "Visitor";
-      nextRank = "Operator";
-      const p1 = unlockedCount / 2;
-      const p2 = launches / 5;
-      progressPct = Math.round(((p1 + p2) / 2) * 100);
-    }
-    
+  getCompletionSummary() {
+    const unlocked = this.getUnlocked().length;
+    const total = this.REGISTRY.length;
     return {
-      title: rank,
-      nextTitle: nextRank,
-      progress: Math.min(100, Math.max(0, progressPct))
+      unlockedCount: unlocked,
+      totalCount: total,
+      percentage: total > 0 ? Math.round((unlocked / total) * 100) : 0
     };
   },
 
-  // ============================================================================
-  // VIEW RENDERING
-  // ============================================================================
+  calculatePlayerRank() {
+    const stats = this.getStatsData() || {};
+    const customizer = this.getCustomizerData() || { presets: [] };
+    const unlockedCount = this.getUnlocked().length;
+
+    const sessionsPlayed = stats.sessionsPlayed || 0;
+    const totalPlaytime = stats.totalPlaytime || 0;
+    const uniqueAppsPlayed = stats.perGame
+      ? Object.keys(stats.perGame).filter(key => stats.perGame[key].launches > 0).length
+      : 0;
+    const presetsCreated = customizer.presets ? customizer.presets.length : 0;
+
+    return calculateProfileRank({
+      sessionsPlayed,
+      totalPlaytime,
+      achievementsUnlocked: unlockedCount,
+      uniqueAppsPlayed,
+      presetsCreated
+    });
+  },
+
+  setFilter(filter, view) {
+    this.activeFilter = filter;
+    this.renderAchievements(view);
+    if (window.ArcadeSystemUI) {
+      window.ArcadeSystemUI.refreshFocusableElements();
+      const activeBtn = view.querySelector(`[data-filter="${filter}"]`);
+      if (activeBtn) {
+        window.ArcadeSystemUI.setFocus(activeBtn);
+      } else {
+        window.ArcadeSystemUI.focusFirst();
+      }
+    }
+  },
+
   renderAchievements(view) {
     if (!view) return;
-    
-    const categories = ['SYSTEM', 'PLAY', 'REACTION', 'SNAKE', 'BREAKOUT', 'CREATIVE', 'CUSTOMIZATION'];
+
+    // Stale-data synchronization on route open (Correction 9)
+    this.loadAndMigrate();
+
+    const categories = ['ALL', 'SYSTEM', 'PLAY', 'REACTION', 'SNAKE', 'BREAKOUT', 'CREATIVE', 'CUSTOMIZATION'];
     const unlockedList = this.getUnlocked();
-    const pct = Math.round((unlockedList.length / this.REGISTRY.length) * 100);
-    
+    const summary = this.getCompletionSummary();
+
+    const filtered = this.activeFilter === 'ALL'
+      ? this.REGISTRY
+      : this.REGISTRY.filter(a => a.category === this.activeFilter);
+
     view.innerHTML = `
       <div class="sys-app achievements-app" style="display:flex; flex-direction:column; height: 100%;">
         <div class="sys-header" style="flex-shrink:0;">
@@ -441,40 +501,67 @@ export const ArcadeAchievements = {
             <div>
               <h2 style="margin:0;">ACHIEVEMENTS</h2>
               <div style="font-size:8px; opacity:0.6; margin-top:2px;">
-                🏆 ${unlockedList.length}/${this.REGISTRY.length} Unlocked (${pct}%)
+                🏆 ${summary.unlockedCount}/${summary.totalCount} Unlocked (${summary.percentage}%)
               </div>
             </div>
-            <button class="sys-back-btn" onclick="window.ArcadeOS.goHome()" style="margin:0;">BACK (ESC)</button>
+            <div style="display:flex; gap:6px;">
+              <button class="sys-btn danger-btn" data-arcade-action="reset-achievements" data-arcade-focusable style="margin:0; font-size:7px; padding:2px 5px;">RESET</button>
+              <button class="sys-back-btn" onclick="window.ArcadeOS.goHome()" style="margin:0;" data-arcade-focusable data-arcade-action="back">BACK (ESC)</button>
+            </div>
+          </div>
+          <!-- Category Filters Container (Correction 6) -->
+          <div class="category-filters-container" style="display:flex; gap:3px; margin-top:6px; flex-wrap:wrap;">
+            ${categories.map(cat => {
+              const isSelected = this.activeFilter === cat;
+              return `
+                <button class="sys-btn filter-btn ${isSelected ? 'active' : ''}"
+                        style="font-size:7px; padding:2px 4px; margin:0;"
+                        data-arcade-focusable
+                        data-filter="${cat}"
+                        aria-selected="${isSelected ? 'true' : 'false'}"
+                        onclick="window.ArcadeAchievements.setFilter('${cat}', this.closest('.achievements-app').parentNode)">
+                  ${cat}
+                </button>
+              `;
+            }).join('')}
           </div>
         </div>
 
-        <!-- Scrollable cards container -->
-        <div class="achievements-scroll-area" style="flex:1; overflow-y:auto; padding:6px; display:grid; grid-template-columns: 1fr; gap:5px; max-height: 200px;">
-          ${this.REGISTRY.map(ach => {
+        <!-- Scrollable cards container (Correction 6 - static cards are not focusable) -->
+        <div class="achievements-scroll-area" style="flex:1; overflow-y:auto; padding:6px 0; display:grid; grid-template-columns: 1fr; gap:5px; max-height: 175px;">
+          ${filtered.length === 0 ? `
+            <div style="font-size:8px; opacity:0.6; text-align:center; padding-top:20px;">No achievements in this category yet. Play a game or customize the cabinet to unlock one.</div>
+          ` : filtered.map(ach => {
             const unlocked = !!this.data.unlocked[ach.id];
-            const prog = this.getProgress(ach.id);
-            const dateStr = unlocked 
+            const isHidden = ach.hidden && !unlocked;
+
+            const cardIcon = isHidden ? "🔒" : ach.icon;
+            const cardTitle = isHidden ? "Hidden Achievement" : ach.title.toUpperCase();
+            const cardDesc = isHidden ? "Keep playing to find out." : ach.desc;
+
+            const prog = isHidden ? null : this.getProgress(ach.id);
+            const dateStr = unlocked
               ? new Date(this.data.unlocked[ach.id].unlockedAt).toLocaleDateString([], { month: 'short', day: 'numeric' })
               : '';
-              
+
             return `
-              <div class="achievement-card ${unlocked ? 'unlocked' : 'locked'}" tabindex="0" style="background:${unlocked ? 'rgba(53, 208, 186, 0.04)' : 'rgba(255,255,255,0.01)'}; border: 1px solid ${unlocked ? 'rgba(53, 208, 186, 0.2)' : 'rgba(255,255,255,0.05)'}; border-radius:4px; padding:6px; display:flex; align-items:center; gap:8px;">
-                <div class="ach-icon" style="font-size:16px; opacity:${unlocked ? '1' : '0.2'}">${ach.icon}</div>
+              <div class="achievement-card ${unlocked ? 'unlocked' : 'locked'}" style="background:${unlocked ? 'rgba(53, 208, 186, 0.03)' : 'rgba(255,255,255,0.01)'}; border: 1px solid ${unlocked ? 'rgba(53, 208, 186, 0.15)' : 'rgba(255,255,255,0.05)'}; border-radius:4px; padding:6px; display:flex; align-items:center; gap:8px;">
+                <div class="ach-icon" style="font-size:16px; opacity:${unlocked ? '1' : '0.2'}">${cardIcon}</div>
                 <div style="flex:1; font-size:8px; text-align:left;">
-                  <div style="font-weight:bold; color:${unlocked ? 'var(--machine-accent, #35d0ba)' : '#888'};">${ach.title.toUpperCase()}</div>
-                  <div style="opacity:0.6; margin-top:2px;">${ach.desc}</div>
-                  
+                  <div style="font-weight:bold; color:${unlocked ? 'var(--machine-accent, #35d0ba)' : '#888'};">${cardTitle}</div>
+                  <div style="opacity:0.6; margin-top:2px;">${cardDesc}</div>
+
                   <!-- Progress Bar for count based targets -->
                   ${prog && !unlocked ? `
                     <div style="display:flex; align-items:center; gap:5px; margin-top:4px;">
-                      <div style="flex:1; background:rgba(255,255,255,0.1); height:3px; border-radius:1.5px;">
+                      <div style="flex:1; background:rgba(255,255,255,0.1); height:3px; border-radius:1.5px;" role="progressbar" aria-valuenow="${prog.current}" aria-valuemin="0" aria-valuemax="${prog.target}" aria-valuetext="${prog.current} of ${prog.target}">
                         <div style="background:var(--machine-accent, #35d0ba); height:100%; width:${(prog.current/prog.target)*100}%; border-radius:1.5px;"></div>
                       </div>
                       <span style="font-size:7px; opacity:0.6;">${prog.current}/${prog.target}</span>
                     </div>
                   ` : ''}
                 </div>
-                ${unlocked ? `<div style="font-size:7px; opacity:0.5; align-self:flex-start;">Unlocked<br>${dateStr}</div>` : `<div style="font-size:8px; opacity:0.2;">🔒</div>`}
+                ${unlocked ? `<div style="font-size:7px; opacity:0.5; align-self:flex-start; text-align:right;">Unlocked<br>${dateStr}</div>` : `<div style="font-size:8px; opacity:0.2;">🔒</div>`}
               </div>
             `;
           }).join('')}
