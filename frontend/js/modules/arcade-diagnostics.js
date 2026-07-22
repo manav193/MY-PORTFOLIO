@@ -68,23 +68,23 @@ export const ArcadeDiagnostics = {
       <div class="sys-app diagnostics-app">
         <div class="sys-header">
           <div>
-            <h2>DIAGNOSTICS</h2>
-            <p class="sys-subtitle">Diagnostic events are isolated from stats, achievements, credits, and saves.</p>
+            <h2><span class="hw-icon">🖥️</span> HARDWARE TELEMETRY & DIAGNOSTICS</h2>
+            <p class="sys-subtitle" style="font-size:7px; color:rgba(255,255,255,0.6); margin-top:2px; letter-spacing:0.06em;">TEST HARDWARE BUS, INPUTS, STORAGE, AND AUDIO SUBSYSTEMS IN REALTIME</p>
           </div>
           <button class="sys-back-btn" id="diagnostics-back-btn" data-arcade-focusable data-arcade-action="back">BACK (ESC)</button>
         </div>
-        <div class="diagnostics-toolbar">
-          <button class="sys-btn" id="diag-storage-btn" data-arcade-focusable>RUN STORAGE TEST</button>
-          <button class="sys-btn" id="diag-audio-btn" data-arcade-focusable>TEST AUDIO</button>
-          <button class="sys-btn" id="diag-led-btn" data-arcade-focusable>TEST LEDS</button>
-          <button class="sys-btn" id="diag-coin-btn" data-arcade-focusable>TEST COIN SLOT</button>
-          <button class="sys-btn danger-btn" id="diag-reset-btn" data-arcade-focusable>RESET DIAGNOSTICS STATE</button>
+        <div class="diagnostics-toolbar" style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
+          <button class="sys-btn" id="diag-storage-btn" data-arcade-focusable style="font-size:7px; padding:3px 6px;">RUN STORAGE TEST</button>
+          <button class="sys-btn" id="diag-audio-btn" data-arcade-focusable style="font-size:7px; padding:3px 6px;">TEST AUDIO</button>
+          <button class="sys-btn" id="diag-led-btn" data-arcade-focusable style="font-size:7px; padding:3px 6px;">TEST LEDS</button>
+          <button class="sys-btn" id="diag-coin-btn" data-arcade-focusable style="font-size:7px; padding:3px 6px;">TEST COIN SLOT</button>
+          <button class="sys-btn danger-btn" id="diag-reset-btn" data-arcade-focusable style="font-size:7px; padding:3px 6px;">RESET STATE</button>
         </div>
-        <div class="diagnostics-grid" aria-live="polite">
+        <div class="diagnostics-grid" aria-live="polite" style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; max-height:160px; overflow-y:auto; padding:2px;">
           ${panels.map(([key, label]) => `
-            <div class="diagnostic-panel" data-panel="${key}">
-              <span>${label}</span>
-              <strong class="${this.statusClass(this.statuses[key])}">${this.statuses[key]}</strong>
+            <div class="diagnostic-panel" data-panel="${key}" style="background:rgba(255,255,255,0.03); border:1px solid rgba(56,189,248,0.2); padding:6px 8px; border-radius:6px; display:flex; justify-content:space-between; align-items:center; font-size:8px;">
+              <span style="opacity:0.8; font-weight:bold;">${label}</span>
+              <strong class="${this.statusClass(this.statuses[key])}" style="font-size:8px; font-weight:800; font-family:'JetBrains Mono', monospace;">${this.statuses[key]}</strong>
             </div>
           `).join('')}
         </div>

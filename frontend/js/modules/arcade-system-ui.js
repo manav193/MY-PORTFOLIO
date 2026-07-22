@@ -345,6 +345,13 @@ export const ArcadeSystemUI = {
   move(direction) {
     if (this.isPhysicsGameplayActive()) return;
 
+    // When on ArcadeOS HOME, horizontal selection is authoritatively owned by ArcadeOS.moveSelection()
+    if (window.ArcadeOS && window.ArcadeOS.state === 'HOME') {
+      if (direction === 'left' || direction === 'right') {
+        return;
+      }
+    }
+
     this.refreshFocusableElements();
     if (this.focusableElements.length === 0) return;
 
@@ -385,6 +392,14 @@ export const ArcadeSystemUI = {
 
   activate() {
     if (this.isPhysicsGameplayActive()) return;
+
+    // When on ArcadeOS HOME, card activation is authoritatively owned by ArcadeOS ARCADE_CONFIRM handler
+    if (window.ArcadeOS && window.ArcadeOS.state === 'HOME') {
+      const el = this.getFocusedElement();
+      if (!el || el.classList.contains('app-card')) {
+        return;
+      }
+    }
 
     this.refreshFocusableElements();
     const el = this.getFocusedElement();

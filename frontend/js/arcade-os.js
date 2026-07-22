@@ -1128,6 +1128,24 @@ const ArcadeHardware = {
     });
   },
 
+  flashActionButtons() {
+    this.pulseInput();
+    const btnA = document.querySelector('.cab-btn.action-a') || document.querySelector('.cab-btn-small[data-tooltip="Start"]');
+    if (btnA) {
+      btnA.classList.add('is-pressed');
+      this.setHardwareTimer('flash_action', () => btnA.classList.remove('is-pressed'), 180);
+    }
+  },
+
+  flashBackButton() {
+    this.pulseInput();
+    const btnB = document.querySelector('.cab-btn.action-b') || document.querySelector('.cab-btn-small[data-tooltip="Select"]');
+    if (btnB) {
+      btnB.classList.add('is-pressed');
+      this.setHardwareTimer('flash_back', () => btnB.classList.remove('is-pressed'), 180);
+    }
+  },
+
   setHardwareTimer(key, callback, delay) {
     if (this.timers[key]) {
       clearTimeout(this.timers[key]);
@@ -1410,6 +1428,176 @@ window.ArcadeOS = {
   sessionAppId: null,
   sessionStartTime: null,
   sessionAccumulatedTime: 0,
+
+  isSleeping: false,
+  lastSleepTime: 0,
+  _wakeHandler: null,
+  _sleepGamepadTimer: null,
+
+  enterSleepMode() {
+    if (this.isSleeping) return;
+    this.isSleeping = true;
+    this.lastSleepTime = performance.now();
+
+    const crtScreen = document.getElementById('arcade-os') || this.container || document.querySelector('.screen-content-layer');
+    if (!crtScreen) return;
+
+    let sleepOverlay = document.getElementById('arcade-sleep-overlay');
+    if (!sleepOverlay) {
+      sleepOverlay = document.createElement('div');
+      sleepOverlay.id = 'arcade-sleep-overlay';
+      sleepOverlay.className = 'arcade-sleep-overlay';
+      sleepOverlay.innerHTML = `
+        <div class="sleep-content">
+          <div class="sleep-brand">ARCADE<span>OS</span></div>
+          <div class="sleep-status"><span class="sleep-dot"></span> STANDBY MODE</div>
+          <p class="sleep-hint">PRESS ANY KEY OR TAP SCREEN TO WAKE</p>
+        </div>
+      `;
+      crtScreen.appendChild(sleepOverlay);
+    }
+
+    const executeSleep = () => {
+      sleepOverlay.classList.add('active');
+      crtScreen.classList.add('is-sleeping');
+    };
+
+    if (window.ArcadeTransitions) {
+      window.ArcadeTransitions.enterSleep(executeSleep);
+    } else {
+      executeSleep();
+    }
+
+    const wake = (e) => {
+      if (e && (e.type === 'pointerdown' || e.type === 'click')) {
+        if (performance.now() - this.lastSleepTime < 300) return;
+      }
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      this.wakeFromSleep();
+    };
+
+    this._wakeHandler = wake;
+    window.addEventListener('keydown', wake, { capture: true, once: true });
+    sleepOverlay.addEventListener('pointerdown', wake, { capture: true, once: true });
+
+    this._sleepGamepadTimer = setInterval(() => {
+      if (!this.isSleeping) {
+        clearInterval(this._sleepGamepadTimer);
+        return;
+      }
+      const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
+      for (const gp of gamepads) {
+        if (gp && gp.buttons.some(b => b.pressed)) {
+          this.wakeFromSleep();
+          break;
+        }
+      }
+    }, 100);
+  },
+
+  wakeFromSleep() {
+    if (!this.isSleeping) return;
+    this.isSleeping = false;
+    if (this._sleepGamepadTimer) {
+      clearInterval(this._sleepGamepadTimer);
+      this._sleepGamepadTimer = null;
+    }
+
+    const executeWake = () => {
+      const sleepOverlay = document.getElementById('arcade-sleep-overlay');
+      const crtScreen = document.getElementById('arcade-os') || this.container || document.querySelector('.screen-content-layer');
+      if (sleepOverlay) sleepOverlay.classList.remove('active');
+      if (crtScreen) crtScreen.classList.remove('is-sleeping');
+
+      if (this._wakeHandler) {
+        window.removeEventListener('keydown', this._wakeHandler, { capture: true });
+        this._wakeHandler = null;
+      }
+      ArcadeAudio.playCoinInsert();
+    };
+
+    if (window.ArcadeTransitions) {
+      window.ArcadeTransitions.wakeFromSleep(executeWake);
+    } else {
+      executeWake();
+    }
+  },
+
+  openSessionEndDialog() {
+    const crtScreen = document.getElementById('arcade-os') || this.container || document.querySelector('.screen-content-layer');
+    if (!crtScreen) return;
+
+    let modal = document.getElementById('arcade-session-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'arcade-session-modal';
+      modal.className = 'arcade-modal-backdrop';
+      modal.setAttribute('role', 'dialog');
+      modal.setAttribute('aria-modal', 'true');
+      modal.innerHTML = `
+        <div class="arcade-modal-card">
+          <div class="modal-header">
+            <span class="modal-icon">⚠️</span>
+            <h3>END ARCADE SESSION?</h3>
+          </div>
+          <p class="modal-body">Return to ArcadeOS home state? Your achievements and customizations remain saved.</p>
+          <div class="modal-actions">
+            <button type="button" class="modal-btn btn-cancel" data-arcade-focusable data-modal-action="cancel">CANCEL</button>
+            <button type="button" class="modal-btn btn-confirm" data-arcade-focusable data-modal-action="confirm">END SESSION</button>
+          </div>
+        </div>
+      `;
+      crtScreen.appendChild(modal);
+    }
+
+    modal.classList.add('active');
+
+    const closeModal = () => {
+      modal.classList.remove('active');
+    };
+
+    const confirmEndSession = () => {
+      closeModal();
+      this.selectedIndex = 0;
+      this.state = 'HOME';
+      this.forceGoHome();
+      ArcadeAudio.playCoinInsert();
+    };
+
+    modal.querySelectorAll('[data-modal-action]').forEach(btn => {
+      btn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (btn.dataset.modalAction === 'confirm') {
+          confirmEndSession();
+        } else {
+          closeModal();
+          ArcadeAudio.playTick();
+        }
+      };
+    });
+
+    const keyHandler = (e) => {
+      if (!modal.classList.contains('active')) {
+        window.removeEventListener('keydown', keyHandler);
+        return;
+      }
+      if (e.key === 'Escape' || e.key === 'b' || e.key === 'B') {
+        e.preventDefault();
+        closeModal();
+        ArcadeAudio.playTick();
+        window.removeEventListener('keydown', keyHandler);
+      } else if (e.key === 'Enter' || e.key === 'a' || e.key === 'A') {
+        e.preventDefault();
+        confirmEndSession();
+        window.removeEventListener('keydown', keyHandler);
+      }
+    };
+    window.addEventListener('keydown', keyHandler);
+  },
 
   init() {
     if (this.initialized) return;
@@ -1817,8 +2005,17 @@ window.ArcadeOS = {
   },
 
   showToast(achievement) {
-    this.toastQueue.push(achievement);
-    this.processToastQueue();
+    if (!achievement) return;
+    if (window.ArcadeTransitions) {
+      window.ArcadeTransitions.showToast(
+        `ACHIEVEMENT UNLOCKED: ${achievement.title ? achievement.title.toUpperCase() : 'NEW BADGE'}`,
+        achievement.desc || '',
+        achievement.icon || '🏆',
+        'achievement',
+        4000
+      );
+    }
+    if (window.ArcadeAudio?.playAchievement) window.ArcadeAudio.playAchievement();
   },
 
   processToastQueue() {
@@ -2009,19 +2206,116 @@ window.ArcadeOS = {
         homeView.prepend(heroBrand);
       }
 
-      // 2. Ensure Background Decor Layer exists (Perspective Grid + Glowing Horizon Arc)
-      if (!homeView.querySelector('.arcade-universe-bg')) {
-        const bg = document.createElement('div');
+      // 2. Ensure Background Decor Layer exists (Realistic Orbital Earth)
+      let bg = homeView.querySelector('.arcade-universe-bg');
+      if (!bg) {
+        bg = document.createElement('div');
         bg.className = 'arcade-universe-bg';
         bg.setAttribute('aria-hidden', 'true');
-        bg.innerHTML = `
-          <div class="arcade-space-gradient"></div>
-          <div class="arcade-grid-perspective"></div>
-          <div class="arcade-horizon-arc"></div>
-          <div class="arcade-horizon-glow"></div>
-        `;
         homeView.prepend(bg);
       }
+      bg.innerHTML = `
+        <div class="arcade-space-gradient"></div>
+        <div class="arcade-orbital-stars">
+          <span class="star s1"></span><span class="star s2"></span><span class="star s3"></span>
+          <span class="star s4"></span><span class="star s5"></span><span class="star s6"></span>
+          <span class="star s7"></span><span class="star s8"></span><span class="star s9"></span>
+          <span class="star s10"></span><span class="star s11"></span><span class="star s12"></span>
+        </div>
+        <div class="arcade-earth-container">
+          <div class="arcade-earth-base"></div>
+          
+          <!-- Organic Continental Landmasses -->
+          <div class="arcade-earth-continents-realistic">
+            <svg viewBox="0 0 1600 600" preserveAspectRatio="none">
+              <defs>
+                <radialGradient id="earthShadeGrad" cx="50%" cy="0%" r="90%">
+                  <stop offset="0%" stop-color="#07132a" stop-opacity="0.95" />
+                  <stop offset="45%" stop-color="#040b1a" stop-opacity="0.92" />
+                  <stop offset="85%" stop-color="#02050c" stop-opacity="0.98" />
+                  <stop offset="100%" stop-color="#000205" stop-opacity="1" />
+                </radialGradient>
+              </defs>
+              <path d="M 140,240 Q 220,190 320,210 T 420,280 Q 460,360 360,420 T 200,340 Q 120,290 140,240 Z" fill="url(#earthShadeGrad)" stroke="rgba(56,189,248,0.16)" stroke-width="1.2" />
+              <path d="M 580,180 Q 720,130 880,160 T 1060,250 Q 1140,350 980,420 T 720,370 Q 560,280 580,180 Z" fill="url(#earthShadeGrad)" stroke="rgba(56,189,248,0.16)" stroke-width="1.2" />
+              <path d="M 1160,260 Q 1260,210 1380,240 T 1480,330 Q 1440,430 1320,400 T 1180,330 Z" fill="url(#earthShadeGrad)" stroke="rgba(56,189,248,0.14)" stroke-width="1.2" />
+              <path d="M 120,220 Q 220,170 340,190 T 440,270" fill="none" stroke="rgba(56,189,248,0.22)" stroke-width="1.8" filter="blur(2px)" />
+              <path d="M 560,160 Q 700,110 890,140 T 1080,230" fill="none" stroke="rgba(56,189,248,0.22)" stroke-width="1.8" filter="blur(2px)" />
+            </svg>
+          </div>
+
+          <!-- Sparse Realistic Irregular City Light Clusters -->
+          <div class="arcade-earth-city-lights">
+            <svg viewBox="0 0 1600 600" preserveAspectRatio="none">
+              <g fill="#fbbf24" opacity="0.88">
+                <circle cx="280" cy="250" r="2.2" filter="drop-shadow(0 0 4px #f59e0b)" />
+                <circle cx="295" cy="258" r="1.5" />
+                <circle cx="310" cy="240" r="1.8" filter="drop-shadow(0 0 3px #fbbf24)" />
+                <circle cx="330" cy="265" r="1.4" />
+                <circle cx="360" cy="295" r="2.4" filter="drop-shadow(0 0 5px #f59e0b)" />
+                <circle cx="375" cy="310" r="1.5" />
+                <circle cx="640" cy="195" r="2.5" filter="drop-shadow(0 0 5px #fbbf24)" />
+                <circle cx="660" cy="210" r="1.6" />
+                <circle cx="690" cy="200" r="2.0" filter="drop-shadow(0 0 4px #f59e0b)" />
+                <circle cx="730" cy="225" r="2.2" filter="drop-shadow(0 0 4px #fbbf24)" />
+                <circle cx="760" cy="215" r="1.5" />
+                <circle cx="800" cy="245" r="2.8" filter="drop-shadow(0 0 6px #f59e0b)" />
+                <circle cx="830" cy="260" r="1.8" />
+                <circle cx="1220" cy="270" r="2.6" filter="drop-shadow(0 0 5px #fbbf24)" />
+                <circle cx="1250" cy="285" r="1.7" />
+                <circle cx="1290" cy="300" r="2.2" filter="drop-shadow(0 0 4px #f59e0b)" />
+                <circle cx="1340" cy="310" r="3.0" filter="drop-shadow(0 0 7px #fbbf24)" />
+                <circle cx="1370" cy="325" r="1.8" />
+              </g>
+              <g fill="#fdba74" opacity="0.65">
+                <circle cx="410" cy="330" r="1.2" />
+                <circle cx="440" cy="350" r="1.0" />
+                <circle cx="870" cy="280" r="1.3" />
+                <circle cx="910" cy="300" r="1.1" />
+                <circle cx="1150" cy="290" r="1.3" />
+              </g>
+            </svg>
+          </div>
+
+          <!-- Multi-Layered Orbital Weather & Cloud Systems -->
+          <div class="arcade-earth-clouds layer-1">
+            <svg viewBox="0 0 1600 600" preserveAspectRatio="none">
+              <path d="M 0,270 Q 300,230 600,260 T 1200,240 Q 1400,220 1600,250 L 1600,290 Q 1300,260 1000,280 T 400,290 Z" fill="rgba(240,249,255,0.08)" filter="blur(5px)" />
+              <path d="M 200,190 Q 450,170 700,200 T 1200,180 L 1350,210 Q 1000,190 750,220 Z" fill="rgba(240,249,255,0.06)" filter="blur(7px)" />
+            </svg>
+          </div>
+          <div class="arcade-earth-clouds layer-2">
+            <svg viewBox="0 0 1600 600" preserveAspectRatio="none">
+              <path d="M 50,330 Q 350,300 700,340 T 1400,320 L 1550,350 Q 1100,330 650,360 Z" fill="rgba(224,242,254,0.05)" filter="blur(6px)" />
+            </svg>
+          </div>
+
+          <!-- Faint Atmospheric Polar Aurora Ribbon -->
+          <div class="arcade-earth-aurora"></div>
+
+          <!-- Multi-Layered Non-Uniform Atmospheric Rim Glow -->
+          <div class="arcade-earth-atmosphere-realistic">
+            <div class="atmosphere-core"></div>
+            <div class="atmosphere-scatter"></div>
+            <div class="atmosphere-haze"></div>
+          </div>
+
+          <!-- Asymmetric Sunrise Terminator Limb Light -->
+          <div class="arcade-earth-terminator">
+            <div class="sunrise-flare-streak"></div>
+          </div>
+
+          <!-- Minimal Restrained Sci-Fi HUD Overlay (5-8% opacity) -->
+          <div class="arcade-earth-hud-overlay">
+            <svg viewBox="0 0 1600 600" preserveAspectRatio="none">
+              <path d="M 0,180 Q 800,70 1600,180" fill="none" stroke="rgba(56,189,248,0.12)" stroke-width="1.2" stroke-dasharray="4,10" />
+              <circle cx="800" cy="125" r="3" fill="#38bdf8" filter="drop-shadow(0 0 6px #38bdf8)" class="orbital-satellite-marker" />
+              <path d="M 0,240 Q 800,140 1600,240" fill="none" stroke="rgba(168,85,247,0.07)" stroke-width="1" />
+              <text x="130" y="170" fill="rgba(56,189,248,0.22)" font-family="JetBrains Mono, monospace" font-size="8px" letter-spacing="2px">ORBIT // LAT 24.8° N • LON 82.4° W</text>
+            </svg>
+          </div>
+        </div>
+      `;
     }
 
     if (this.selectedIndex >= items.length) this.selectedIndex = 0;
@@ -2067,29 +2361,55 @@ window.ArcadeOS = {
 
     details.innerHTML = `
       <div class="arcade-hw-strip">
-        <div class="hw-btn profile-btn">
+        <button type="button" class="hw-btn profile-btn" data-arcade-focusable data-action="profile" title="Open Player Profile" tabindex="-1">
           <span class="hw-icon">👤</span> PROFILE
-        </div>
-        <button type="button" class="hw-btn logout-btn" onclick="window.ArcadeOS?.exitToPortfolio()">
+        </button>
+        <button type="button" class="hw-btn logout-btn" data-arcade-focusable data-action="logout" title="End Arcade Session" tabindex="-1">
           <span class="hw-led red"></span> LOGOUT
         </button>
-        <button type="button" class="hw-btn sleep-btn" onclick="window.ArcadeOS?.forceGoHome(true)">
+        <button type="button" class="hw-btn sleep-btn" data-arcade-focusable data-action="sleep" title="Enter Standby Mode" tabindex="-1">
           <span class="hw-led green"></span> SLEEP
         </button>
-        <div class="hw-clock" id="hw-clock-display">${timeStr}</div>
-        <div class="hw-user-tag">
+        <div class="hw-clock" id="hw-clock-display" aria-label="Current Time">${timeStr}</div>
+        <button type="button" class="hw-btn hw-user-tag" data-arcade-focusable data-action="profile" title="Open Player Profile" tabindex="-1">
           <strong>MAHAU</strong>
           <span class="hw-user-avatar">👾</span>
-        </div>
+        </button>
       </div>
     `;
+
+    details.querySelectorAll('[data-action]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const action = btn.dataset.action;
+        if (action === 'profile') {
+          ArcadeAudio.playTick();
+          this.routeTo('PROFILE');
+        } else if (action === 'sleep') {
+          ArcadeAudio.playTick();
+          this.enterSleepMode();
+        } else if (action === 'logout') {
+          ArcadeAudio.playTick();
+          this.openSessionEndDialog();
+        }
+      });
+    });
 
     carousel.querySelectorAll('.app-card').forEach(card => {
       card.addEventListener('click', (e) => {
         e.preventDefault();
-        const idx = parseInt(card.dataset.idx);
+        e.stopPropagation();
+        const idx = parseInt(card.dataset.idx, 10);
         if (idx === this.selectedIndex) {
-          ArcadeEventBus.emit('ARCADE_CONFIRM');
+          const selectedItem = items[this.selectedIndex];
+          if (selectedItem) {
+            if (selectedItem.isSystem) {
+              this.routeTo(selectedItem.route);
+            } else {
+              this.launchApp(selectedItem.id);
+            }
+          }
         } else {
           this.selectedIndex = idx;
           const selectedItem = items[this.selectedIndex];
@@ -2104,7 +2424,30 @@ window.ArcadeOS = {
       });
     });
 
-    if (launcherHadFocus) carousel.querySelector('.app-card.focused')?.focus({ preventScroll: true });
+    if (window.ArcadeEnvironmentService) {
+      window.ArcadeEnvironmentService.applyEnvironmentToDOM(window.ArcadeEnvironmentService.state.context);
+    }
+    if (window.Arcade3DPlanetEngine) {
+      window.Arcade3DPlanetEngine.init();
+    }
+
+    // Ensure exactly ONE card has focused styling and DOM focus
+    const activeCard = carousel.querySelector(`.app-card[data-idx="${this.selectedIndex}"]`);
+    carousel.querySelectorAll('.app-card').forEach(c => {
+      if (c !== activeCard) {
+        c.classList.remove('focused', 'is-ui-focused');
+        c.setAttribute('tabindex', '-1');
+        c.setAttribute('aria-current', 'false');
+      }
+    });
+    if (activeCard) {
+      activeCard.classList.add('focused', 'is-ui-focused');
+      activeCard.setAttribute('tabindex', '0');
+      activeCard.setAttribute('aria-current', 'true');
+      if (launcherHadFocus || document.activeElement?.closest('#home-carousel')) {
+        activeCard.focus({ preventScroll: true });
+      }
+    }
   },
 
   moveSelection(dir) {
@@ -2157,127 +2500,111 @@ window.ArcadeOS = {
       return;
     }
 
-    if (this.bootTimer) {
-      clearTimeout(this.bootTimer);
-      this.bootTimer = null;
-      document.querySelector('.boot-loader')?.classList.add('is-hidden');
-      const osLayer = document.getElementById('arcade-os');
-      if (osLayer) {
-        osLayer.style.opacity = '1';
-        osLayer.classList.add('os-booted');
-      }
-      ArcadeStorage.set(ArcadeStorage.KEYS.BOOT_COMPLETE, true);
-    }
-
-    const onboardingPanel = document.getElementById('arcade-onboarding');
-    if (onboardingPanel && !onboardingPanel.hidden) {
-      onboardingPanel.hidden = true;
-      onboardingPanel.querySelectorAll('.is-ui-focused').forEach(el => el.classList.remove('is-ui-focused'));
-      ArcadeStorage.set(ArcadeStorage.KEYS.ONBOARDING_COMPLETE, true);
-    }
-
-    const requestId = ++this.systemRouteRequestId;
-    const view = document.getElementById('arcade-app-view');
-    if (!view) return;
-
-    // Acknowledge target route states
-    this.state = routeState;
-    this.setRouteStatus(`LOADING ${routeCfg.title}`);
-    ArcadeHardware.setState(routeState);
-    ArcadeAudio.playSelect();
-    document.getElementById('arcade-home').classList.remove('active');
-
-    // Set status and display loading screen
-    view.setAttribute('data-route-status', 'loading');
-    view.innerHTML = `
-      <div class="sys-app route-loading-state" style="display:flex; align-items:center; justify-content:center; height:100%;">
-        <div class="loading-label" style="font-size:12px; font-weight:bold; color:var(--machine-accent, #35d0ba); text-transform:uppercase;">LOADING ${routeCfg.title}...</div>
-      </div>
-    `;
-    view.classList.add('active');
-
-    try {
-      let engine = null;
-      if (routeCfg.isLazy) {
-        // Tag route listeners registered during loader sequence
-        ArcadeEventBus.currentOwner = { owner: 'route', ownerId: routeState };
-        const module = await routeCfg.loader();
-        engine = module[routeCfg.moduleName];
-        ArcadeEventBus.currentOwner = null;
-
-        // Globally cache successful loader results
-        if (routeCfg.moduleName && !window[routeCfg.moduleName]) {
-          window[routeCfg.moduleName] = engine;
-          if (typeof engine.init === 'function') {
-            engine.init();
-          }
+    const executeOpen = async () => {
+      if (this.bootTimer) {
+        clearTimeout(this.bootTimer);
+        this.bootTimer = null;
+        document.querySelector('.boot-loader')?.classList.add('is-hidden');
+        const osLayer = document.getElementById('arcade-os');
+        if (osLayer) {
+          osLayer.style.opacity = '1';
+          osLayer.classList.add('os-booted');
         }
-      } else {
-        engine = this;
+        ArcadeStorage.set(ArcadeStorage.KEYS.BOOT_COMPLETE, true);
       }
 
-      // Check route request race condition
-      if (requestId !== this.systemRouteRequestId) {
-        if (window.ARCADE_DEBUG) {
-          console.warn(`[ArcadeOS Debug] Aborting route mount: requestId mismatch for ${routeState}`);
-        }
-        return;
+      const onboardingPanel = document.getElementById('arcade-onboarding');
+      if (onboardingPanel && !onboardingPanel.hidden) {
+        onboardingPanel.hidden = true;
+        onboardingPanel.querySelectorAll('.is-ui-focused').forEach(el => el.classList.remove('is-ui-focused'));
+        ArcadeStorage.set(ArcadeStorage.KEYS.ONBOARDING_COMPLETE, true);
       }
 
-      // Render route view content
-      view.innerHTML = '';
+      const requestId = ++this.systemRouteRequestId;
+      const view = document.getElementById('arcade-app-view');
+      if (!view) return;
 
-      // Tag events specifically registered in the render phase
-      ArcadeEventBus.currentOwner = { owner: 'route', ownerId: routeState };
-      routeCfg.render(view, engine);
-      ArcadeEventBus.currentOwner = null;
+      this.state = routeState;
+      this.setRouteStatus(`LOADING ${routeCfg.title}`);
+      ArcadeHardware.setState(routeState);
+      document.getElementById('arcade-home').classList.remove('active');
 
-      // Await render microtasks completion
-      await new Promise(resolve => setTimeout(resolve, 50));
-
-      if (requestId !== this.systemRouteRequestId) return;
-
-      // Route readiness includes the shared input/focus controller.
-      await this.ensureSystemUI();
-      if (requestId !== this.systemRouteRequestId) return;
-      window.ArcadeSystemUI.mountRoute(routeState, view);
-      window.ArcadeSystemUI.refreshFocusableElements();
-      window.ArcadeSystemUI.focusFirst();
-
-      // Update hardware
-      ArcadeHardware.updateOled(routeState);
-
-      // Set route status ready
-      view.setAttribute('data-route-status', 'ready');
-      this.setRouteStatus(routeCfg.title);
-
-      if (window.ARCADE_DEBUG) {
-        console.log(`[ArcadeOS Debug] Route successfully opened and mounted: ${routeState}`);
-        console.log(`[ArcadeOS Debug] Focusable count: ${window.ArcadeSystemUI ? window.ArcadeSystemUI.focusableElements.length : 0}`);
-      }
-
-    } catch (err) {
-      console.error(`[ArcadeOS Debug] Error opening route: ${routeState}`, err);
-      view.setAttribute('data-route-status', 'error');
-      this.setRouteStatus(`${routeCfg.title} ERROR`);
+      view.setAttribute('data-route-status', 'loading');
       view.innerHTML = `
-        <div class="sys-app error-screen" style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; gap:10px; padding:20px; box-sizing:border-box; text-align:center;">
-          <h2 style="color:#ef4444; margin:0;">SYSTEM ERROR</h2>
-          <p style="font-size:9px; opacity:0.8; margin:0;">Failed to load module for route "${routeCfg.title}".</p>
-          <p class="error-details" style="font-size:8px; opacity:0.5; max-width:80%; word-break:break-all; margin:0;">${err.message}</p>
-          <div style="display:flex; gap:8px; margin-top:10px;">
-            <button class="sys-btn" id="error-retry-btn" data-arcade-focusable data-arcade-action="retry">RETRY</button>
-            <button class="sys-btn" id="error-home-btn" data-arcade-focusable data-arcade-action="home">RETURN HOME</button>
-          </div>
+        <div class="sys-app route-loading-state" style="display:flex; align-items:center; justify-content:center; height:100%;">
+          <div class="loading-label" style="font-size:12px; font-weight:bold; color:var(--machine-accent, #35d0ba); text-transform:uppercase;">LOADING ${routeCfg.title}...</div>
         </div>
       `;
-      if (window.ArcadeSystemUI) {
+      view.classList.add('active');
+
+      try {
+        let engine = null;
+        if (routeCfg.isLazy) {
+          ArcadeEventBus.currentOwner = { owner: 'route', ownerId: routeState };
+          const module = await routeCfg.loader();
+          engine = module[routeCfg.moduleName];
+          ArcadeEventBus.currentOwner = null;
+
+          if (routeCfg.moduleName && !window[routeCfg.moduleName]) {
+            window[routeCfg.moduleName] = engine;
+            if (typeof engine.init === 'function') {
+              engine.init();
+            }
+          }
+        } else {
+          engine = this;
+        }
+
+        if (requestId !== this.systemRouteRequestId) return;
+
+        view.innerHTML = '';
+        ArcadeEventBus.currentOwner = { owner: 'route', ownerId: routeState };
+        routeCfg.render(view, engine);
+        ArcadeEventBus.currentOwner = null;
+
+        await new Promise(resolve => setTimeout(resolve, 30));
+
+        if (requestId !== this.systemRouteRequestId) return;
+
+        await this.ensureSystemUI();
+        if (requestId !== this.systemRouteRequestId) return;
         window.ArcadeSystemUI.mountRoute(routeState, view);
         window.ArcadeSystemUI.refreshFocusableElements();
         window.ArcadeSystemUI.focusFirst();
+
+        ArcadeHardware.updateOled(routeState);
+        view.setAttribute('data-route-status', 'ready');
+        this.setRouteStatus(routeCfg.title);
+
+      } catch (err) {
+        console.error(`[ArcadeOS Debug] Error opening route: ${routeState}`, err);
+        view.setAttribute('data-route-status', 'error');
+        this.setRouteStatus(`${routeCfg.title} ERROR`);
+        view.innerHTML = `
+          <div class="sys-app error-screen" style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; gap:10px; padding:20px; box-sizing:border-box; text-align:center;">
+            <h2 style="color:#ef4444; margin:0;">SYSTEM ERROR</h2>
+            <p style="font-size:9px; opacity:0.8; margin:0;">Failed to load module for route "${routeCfg.title}".</p>
+            <p class="error-details" style="font-size:8px; opacity:0.5; max-width:80%; word-break:break-all; margin:0;">${err.message}</p>
+            <div style="display:flex; gap:8px; margin-top:10px;">
+              <button class="sys-btn" id="error-retry-btn" data-arcade-focusable data-arcade-action="retry">RETRY</button>
+              <button class="sys-btn" id="error-home-btn" data-arcade-focusable data-arcade-action="home">RETURN HOME</button>
+            </div>
+          </div>
+        `;
+        if (window.ArcadeSystemUI) {
+          window.ArcadeSystemUI.mountRoute(routeState, view);
+          window.ArcadeSystemUI.refreshFocusableElements();
+          window.ArcadeSystemUI.focusFirst();
+        }
+        view.querySelector('#error-retry-btn')?.addEventListener('click', () => this.openSystemRoute(routeState));
+        view.querySelector('#error-home-btn')?.addEventListener('click', () => this.goHome());
       }
-      view.querySelector('#error-retry-btn')?.addEventListener('click', () => this.openSystemRoute(routeState));
-      view.querySelector('#error-home-btn')?.addEventListener('click', () => this.goHome());
+    };
+
+    if (window.ArcadeTransitions) {
+      window.ArcadeTransitions.openRoute(routeState, routeCfg, executeOpen);
+    } else {
+      executeOpen();
     }
   },
 
@@ -2360,28 +2687,31 @@ window.ArcadeOS = {
     const appConfig = ArcadeRegistry.getApp(id);
     if (!appConfig) return;
 
-    if (this.launchTimeoutId) {
-      clearTimeout(this.launchTimeoutId);
-      this.launchTimeoutId = null;
-    }
-    if (this.bootTimer) {
-      clearTimeout(this.bootTimer);
-      this.bootTimer = null;
-    }
+    const executeLaunch = async () => {
+      if (this.launchTimeoutId) {
+        clearTimeout(this.launchTimeoutId);
+        this.launchTimeoutId = null;
+      }
+      if (this.bootTimer) {
+        clearTimeout(this.bootTimer);
+        this.bootTimer = null;
+      }
 
-    this.launchPending = true;
-    ArcadeAudio.playSelect();
-    this.state = 'LOADING';
-    this.setRouteStatus(`LOADING ${appConfig.title}`);
-    ArcadeHardware.setState('LOADING');
+      this.launchPending = true;
+      this.state = 'LOADING';
+      this.setRouteStatus(`LOADING ${appConfig.title}`);
+      ArcadeHardware.setState('LOADING');
 
-    document.getElementById('arcade-home').classList.remove('active');
-    document.getElementById('arcade-loading').classList.add('active');
+      document.getElementById('arcade-home').classList.remove('active');
+      document.getElementById('arcade-loading').classList.add('active');
 
-    const isMobile = window.matchMedia('(max-width: 1024px)').matches;
-    const delay = isMobile ? 100 : 800;
+      const isMobile = window.matchMedia('(max-width: 1024px)').matches;
+      const delay = isMobile ? 50 : 220;
 
-    this.launchTimeoutId = setTimeout(() => {
+      await new Promise(resolve => {
+        this.launchTimeoutId = setTimeout(resolve, delay);
+      });
+
       this.launchTimeoutId = null;
       this.launchPending = false;
       document.getElementById('arcade-loading').classList.remove('active');
@@ -2392,7 +2722,6 @@ window.ArcadeOS = {
 
       try {
         const rawApp = new appConfig.component();
-        // Decorate app metadata for marquee updates
         rawApp._rawAppTitle = appConfig.title;
         rawApp._rawAppId = appConfig.id;
 
@@ -2418,7 +2747,13 @@ window.ArcadeOS = {
         console.error('App Launch Failed', e);
         this.goHome();
       }
-    }, delay);
+    };
+
+    if (window.ArcadeTransitions) {
+      window.ArcadeTransitions.launchApp(id, appConfig, executeLaunch);
+    } else {
+      executeLaunch();
+    }
   },
 
   createLifecycleAdapter(app, appId) {
@@ -2484,60 +2819,67 @@ window.ArcadeOS = {
 
   goHome(bypass = false) {
     if (this.checkUnsavedChanges(() => this.goHome(true), bypass)) return;
-    if (this.launchTimeoutId) {
-      clearTimeout(this.launchTimeoutId);
-      this.launchTimeoutId = null;
-    }
-    this.launchPending = false;
 
-    if (this.state === 'LOADING') {
-      const appView = document.getElementById('arcade-app-view');
-      const loadingView = document.getElementById('arcade-loading');
-      const homeView = document.getElementById('arcade-home');
-      if (appView) { appView.classList.remove('active'); appView.innerHTML = ''; }
-      if (loadingView) loadingView.classList.remove('active');
-      if (homeView) homeView.classList.add('active');
-      this.state = 'HOME';
-      this.setRouteStatus('HOME');
-      ArcadeHardware.setState('HOME');
-      this.renderHome();
-      return;
-    }
+    const executeReturn = () => {
+      if (this.launchTimeoutId) {
+        clearTimeout(this.launchTimeoutId);
+        this.launchTimeoutId = null;
+      }
+      this.launchPending = false;
 
-    if (this.state === 'APP') {
-      const activeAppId = this.activeApp ? this.activeApp._rawAppId : null;
-      ArcadeAudio.playBack();
-      if (this.activeApp) {
-        try {
-          this.stopPlaytimeSession();
-          this.activeApp.destroy();
-        } catch(e) {
-          console.error('App Destroy Failed', e);
+      if (this.state === 'LOADING') {
+        const appView = document.getElementById('arcade-app-view');
+        const loadingView = document.getElementById('arcade-loading');
+        const homeView = document.getElementById('arcade-home');
+        if (appView) { appView.classList.remove('active'); appView.innerHTML = ''; }
+        if (loadingView) loadingView.classList.remove('active');
+        if (homeView) homeView.classList.add('active');
+        this.state = 'HOME';
+        this.setRouteStatus('HOME');
+        ArcadeHardware.setState('HOME');
+        this.renderHome();
+        return;
+      }
+
+      if (this.state === 'APP') {
+        const activeAppId = this.activeApp ? this.activeApp._rawAppId : null;
+        if (this.activeApp) {
+          try {
+            this.stopPlaytimeSession();
+            this.activeApp.destroy();
+          } catch(e) {
+            console.error('App Destroy Failed', e);
+          }
+          this.activeApp = null;
         }
-        this.activeApp = null;
+
+        if (activeAppId) {
+          ArcadeEventBus.clearAppListeners(activeAppId);
+        }
+
+        const appView = document.getElementById('arcade-app-view');
+        if (appView) {
+          appView.classList.remove('active');
+          appView.innerHTML = '';
+        }
+        const homeView = document.getElementById('arcade-home');
+        if (homeView) homeView.classList.add('active');
+
+        this.state = 'HOME';
+        this.setRouteStatus('HOME');
+        ArcadeHardware.setState('HOME');
+        this.renderHome();
+        return;
       }
 
-      if (activeAppId) {
-        ArcadeEventBus.clearAppListeners(activeAppId);
-      }
+      this.closeSystemRoute();
+    };
 
-      const appView = document.getElementById('arcade-app-view');
-      if (appView) {
-        appView.classList.remove('active');
-        appView.innerHTML = '';
-      }
-      const homeView = document.getElementById('arcade-home');
-      if (homeView) homeView.classList.add('active');
-
-      this.state = 'HOME';
-      this.setRouteStatus('HOME');
-      ArcadeHardware.setState('HOME');
-      this.renderHome();
-      return;
+    if (window.ArcadeTransitions && this.state !== 'HOME') {
+      window.ArcadeTransitions.returnHome(executeReturn);
+    } else {
+      executeReturn();
     }
-
-    // Default system route exit
-    this.closeSystemRoute();
   },
 
   forceGoHome(bypass = false) {
@@ -2648,45 +2990,45 @@ window.ArcadeOS = {
     view.innerHTML = `
       <div class="sys-app settings-app">
         <div class="sys-header">
-          <h2>SYSTEM SETTINGS</h2>
+          <h2>⚙️ SYSTEM CONFIGURATION & SETTINGS</h2>
           <button class="sys-back-btn" id="settings-back-btn" data-arcade-focusable data-arcade-action="back">BACK (ESC)</button>
         </div>
-        <div class="settings-content">
-          <div class="settings-group">
-            <h3>DISPLAY</h3>
-            <div class="setting-item">
-              <label for="setting-brightness">Brightness</label>
-              <input type="range" id="setting-brightness" min="0.25" max="1.0" step="0.05" value="${settings.brightness}" data-arcade-focusable data-arcade-control="range" data-arcade-value="brightness">
-              <span id="val-brightness">${Math.round(settings.brightness * 100)}%</span>
+        <div class="settings-content" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; overflow-y:auto; max-height:220px; padding:2px;">
+          <div class="settings-group" style="background:rgba(255,255,255,0.03); padding:10px; border-radius:8px; border:1px solid rgba(56,189,248,0.2);">
+            <h3 style="font-size:10px; color:#38bdf8; margin:0 0 10px 0; letter-spacing:0.1em;">📺 DISPLAY & LIGHTING</h3>
+            <div class="setting-item" style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; font-size:9px;">
+              <label for="setting-brightness">CRT Brightness</label>
+              <input type="range" id="setting-brightness" min="0.25" max="1.0" step="0.05" value="${settings.brightness}" data-arcade-focusable data-arcade-control="range" data-arcade-value="brightness" style="width:70px;">
+              <span id="val-brightness" style="font-weight:bold; font-size:8px; width:30px; text-align:right;">${Math.round(settings.brightness * 100)}%</span>
             </div>
-            <div class="setting-item">
+            <div class="setting-item" style="display:flex; align-items:center; justify-content:space-between; font-size:9px;">
               <label for="setting-glow">Cabinet Glow</label>
-              <input type="range" id="setting-glow" min="0.0" max="1.0" step="0.05" value="${settings.glow}" data-arcade-focusable data-arcade-control="range" data-arcade-value="glow">
-              <span id="val-glow">${Math.round(settings.glow * 100)}%</span>
+              <input type="range" id="setting-glow" min="0.0" max="1.0" step="0.05" value="${settings.glow}" data-arcade-focusable data-arcade-control="range" data-arcade-value="glow" style="width:70px;">
+              <span id="val-glow" style="font-weight:bold; font-size:8px; width:30px; text-align:right;">${Math.round(settings.glow * 100)}%</span>
             </div>
           </div>
-          <div class="settings-group">
-            <h3>AUDIO</h3>
-            <div class="setting-item">
+          <div class="settings-group" style="background:rgba(255,255,255,0.03); padding:10px; border-radius:8px; border:1px solid rgba(56,189,248,0.2);">
+            <h3 style="font-size:10px; color:#38bdf8; margin:0 0 10px 0; letter-spacing:0.1em;">🔊 AUDIO SYNTHESIZER</h3>
+            <div class="setting-item" style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; font-size:9px;">
               <label for="setting-volume">Master Volume</label>
-              <input type="range" id="setting-volume" min="0.0" max="1.0" step="0.05" value="${settings.volume}" data-arcade-focusable data-arcade-control="range" data-arcade-value="volume">
-              <span id="val-volume">${Math.round(settings.volume * 100)}%</span>
+              <input type="range" id="setting-volume" min="0.0" max="1.0" step="0.05" value="${settings.volume}" data-arcade-focusable data-arcade-control="range" data-arcade-value="volume" style="width:70px;">
+              <span id="val-volume" style="font-weight:bold; font-size:8px; width:30px; text-align:right;">${Math.round(settings.volume * 100)}%</span>
             </div>
-            <div class="setting-item">
-              <label>Audio Enabled</label>
+            <div class="setting-item" style="display:flex; align-items:center; justify-content:space-between; font-size:9px;">
+              <label>Audio Mute Toggle</label>
               <button id="setting-audio-toggle" class="sys-btn" data-arcade-focusable data-arcade-action="audio-toggle">${settings.soundEnabled ? 'ENABLED' : 'MUTED'}</button>
             </div>
           </div>
-          <div class="settings-group">
-            <h3>COIN SYSTEM</h3>
-            <div class="setting-item">
+          <div class="settings-group" style="background:rgba(255,255,255,0.03); padding:10px; border-radius:8px; border:1px solid rgba(56,189,248,0.2);">
+            <h3 style="font-size:10px; color:#38bdf8; margin:0 0 10px 0; letter-spacing:0.1em;">🪙 HARDWARE CREDITS</h3>
+            <div class="setting-item" style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; font-size:9px;">
               <label>Current Credits</label>
-              <span id="val-credits">${stats.currentCredits || 0} CREDITS</span>
+              <span id="val-credits" style="font-weight:bold; color:#a855f7;">${stats.currentCredits || 0} CREDITS</span>
             </div>
             <button id="setting-reset-credits-btn" class="sys-btn" data-arcade-focusable data-arcade-action="reset-credits">RESET CREDITS</button>
           </div>
-          <div class="settings-group">
-            <h3>BACKUP / RESET SAFETY</h3>
+          <div class="settings-group" style="background:rgba(255,255,255,0.03); padding:10px; border-radius:8px; border:1px solid rgba(56,189,248,0.2); display:flex; flex-direction:column; gap:5px;">
+            <h3 style="font-size:10px; color:#38bdf8; margin:0 0 6px 0; letter-spacing:0.1em;">🛠️ SAFETY & RESET UTILITIES</h3>
             <button id="setting-replay-onboarding-btn" class="sys-btn" data-arcade-focusable data-arcade-action="replay-onboarding">REPLAY CONTROL GUIDE</button>
             <button id="setting-replay-boot-btn" class="sys-btn" data-arcade-focusable data-arcade-action="replay-boot">REPLAY BOOT SEQUENCE</button>
             <button id="setting-backup-btn" class="sys-btn" data-arcade-focusable data-arcade-action="backup-export">EXPORT MACHINE BACKUP</button>
@@ -2749,19 +3091,14 @@ window.ArcadeOS = {
       view.querySelector('#val-credits').textContent = '0 CREDITS';
       ArcadeAudio.playBack();
     });
-
-    // Destructive backup/reset actions are delegated through the central container
-    // handler so keyboard, cabinet, and pointer activation all use one modal flow.
   },
 
   renderProfile(view) {
     view.innerHTML = '<div class="sys-app"><h2>LOADING PLAYER PROFILE...</h2></div>';
     this.loadAchievementsEngine(achievementsEngine => {
-      // Reload on open (Correction 9)
       achievementsEngine.loadAndMigrate();
 
       this.loadStatsEngine(statsEngine => {
-        // Reload on open (Correction 9)
         statsEngine.loadAndMigrate();
 
         const profile = ArcadeStorage.get(ArcadeStorage.KEYS.PROFILE) || {};
@@ -2779,10 +3116,8 @@ window.ArcadeOS = {
           palettelab: "Palette Lab"
         };
         const favGameName = gameTitles[stats.favoriteGameId] || "None Yet";
-
         const avatars = ['🕹️', '👽', '👾', '🚀', '⭐', '💀'];
 
-        // Find recent achievement badge
         let recentBadgeHtml = '<span style="opacity:0.4;">None yet</span>';
         if (unlockedList.length > 0) {
           const sorted = Object.keys(achievementsEngine.data.unlocked).sort((a,b) => {
@@ -2791,62 +3126,63 @@ window.ArcadeOS = {
           const newestId = sorted[0];
           const newestAch = achievementsEngine.REGISTRY.find(a => a.id === newestId);
           if (newestAch) {
-            recentBadgeHtml = `<span title="${newestAch.desc}" style="background: rgba(53, 208, 186, 0.1); border: 1px solid rgba(53, 208, 186, 0.3); padding: 2px 4px; border-radius: 3px; font-size: 8px; color: var(--machine-accent, #35d0ba);">${newestAch.icon} ${newestAch.title}</span>`;
+            recentBadgeHtml = `<span title="${newestAch.desc}" style="background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.3); padding: 2px 6px; border-radius: 4px; font-size: 8px; color: #38bdf8; font-weight: bold;">${newestAch.icon} ${newestAch.title}</span>`;
           }
         }
 
-        // Find last session details
         let lastSessionHtml = '<span style="opacity:0.4;">No recent sessions</span>';
         if (stats.recentSessions && stats.recentSessions.length > 0) {
           const ls = stats.recentSessions[0];
           lastSessionHtml = `<span style="font-size:8px;">${gameTitles[ls.gameId] || ls.gameId} (${ls.durationSeconds}s, ${ls.result})</span>`;
         }
 
-        // Get current cabinet preset theme
         const config = ArcadeStorage.get('arcade_machine_customization') || {};
         const activeTheme = config.activeTheme || 'Default';
 
         view.innerHTML = `
-          <div class="sys-app profile-app" style="display:flex; flex-direction:column; height:100%;">
-            <div class="sys-header" style="flex-shrink:0;">
-              <h2>PLAYER PROFILE</h2>
+          <div class="sys-app profile-app">
+            <div class="sys-header">
+              <h2><span class="hw-icon">👤</span> PLAYER PROFILE // SYSTEM IDENTITY</h2>
               <button class="sys-back-btn" id="profile-back-btn" data-arcade-focusable data-arcade-action="back">BACK (ESC)</button>
             </div>
 
-            <div class="profile-content" style="flex:1; display:flex; flex-direction:column; gap:8px; overflow-y:auto; max-height:220px; font-size:9px; padding:2px;">
-              <div class="profile-card" style="display:flex; gap:10px; align-items:center; background:rgba(255,255,255,0.02); padding:6px; border-radius:4px; border:1px solid rgba(255,255,255,0.05);">
-                <div class="profile-avatar" id="active-avatar" style="font-size:24px;">${profile.avatar}</div>
+            <div class="profile-content" style="flex:1; display:flex; flex-direction:column; gap:10px; overflow-y:auto; max-height:220px; font-size:9px; padding:2px;">
+              <div class="profile-card" style="display:flex; gap:12px; align-items:center; background:rgba(255,255,255,0.03); padding:10px 12px; border-radius:8px; border:1px solid rgba(56,189,248,0.2);">
+                <div class="profile-avatar" id="active-avatar" style="font-size:32px; filter:drop-shadow(0 0 10px rgba(56,189,248,0.5));">${profile.avatar}</div>
                 <div class="profile-details" style="flex:1;">
-                  <input type="text" id="profile-name-input" value="${profile.name}" class="sys-input" maxLength="12" style="font-size:10px; font-weight:bold; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.1); border-radius:2px; padding:2px 4px; color:#fff; width:100px;" data-arcade-focusable data-arcade-control="text" data-arcade-value="name">
-                  <p class="profile-help-text" style="font-size:7px; opacity:0.5; margin:4px 0 2px 0;">Click avatar below to change:</p>
-                  <div class="avatar-selector" style="display:flex; gap:4px;">
-                    ${avatars.map(av => `<span class="avatar-option ${av === profile.avatar ? 'active' : ''}" style="cursor:pointer; font-size:12px; padding:2px; border-radius:2px; border:1px solid transparent; transition:0.2s;" data-arcade-focusable data-arcade-action="avatar" data-arcade-value="${av}">${av}</span>`).join('')}
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <input type="text" id="profile-name-input" value="${profile.name}" class="sys-input" maxLength="12" style="font-size:11px; font-weight:800; background:rgba(0,0,0,0.4); border:1px solid rgba(56,189,248,0.3); border-radius:4px; padding:4px 8px; color:#fff; width:120px;" data-arcade-focusable data-arcade-control="text" data-arcade-value="name">
+                    <span style="font-size:8px; font-weight:800; letter-spacing:0.1em; padding:2px 6px; border-radius:4px; background:rgba(168,85,247,0.18); border:1px solid rgba(168,85,247,0.4); color:#c084fc;">VERIFIED PLAYER</span>
+                  </div>
+                  <p class="profile-help-text" style="font-size:7px; opacity:0.6; margin:6px 0 3px 0; text-transform:uppercase; letter-spacing:0.08em;">SELECT PLAYER EMBLEM:</p>
+                  <div class="avatar-selector" style="display:flex; gap:6px;">
+                    ${avatars.map(av => `<span class="avatar-option ${av === profile.avatar ? 'active' : ''}" style="cursor:pointer; font-size:14px; padding:3px 6px; border-radius:4px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); transition:all 0.2s ease;" data-arcade-focusable data-arcade-action="avatar" data-arcade-value="${av}">${av}</span>`).join('')}
                   </div>
                 </div>
               </div>
 
               <!-- Rank progress panel -->
-              <div style="background:rgba(255,255,255,0.02); padding:6px; border-radius:4px; border:1px solid rgba(255,255,255,0.05);">
-                <div style="display:flex; justify-content:space-between; align-items:center; font-weight:bold;">
+              <div style="background:rgba(255,255,255,0.03); padding:10px 12px; border-radius:8px; border:1px solid rgba(56,189,248,0.2);">
+                <div style="display:flex; justify-content:space-between; align-items:center; font-weight:bold; letter-spacing:0.06em;">
                   <span>ACTIVITY RANK:</span>
-                  <span style="color:var(--machine-accent, #35d0ba);">${rankInfo.title.toUpperCase()}</span>
+                  <span style="color:#38bdf8; font-weight:900; letter-spacing:0.1em;">${rankInfo.title.toUpperCase()}</span>
                 </div>
-                <div style="display:flex; align-items:center; gap:6px; margin-top:4px;">
-                  <div style="flex:1; background:rgba(255,255,255,0.1); height:4px; border-radius:2px;">
-                    <div style="background:var(--machine-accent, #35d0ba); height:100%; width:${rankInfo.progress}%; border-radius:2px;"></div>
+                <div style="display:flex; align-items:center; gap:8px; margin-top:6px;">
+                  <div style="flex:1; background:rgba(255,255,255,0.08); height:6px; border-radius:3px; overflow:hidden;">
+                    <div style="background:linear-gradient(90deg, #38bdf8, #a855f7); height:100%; width:${rankInfo.progress}%; border-radius:3px; box-shadow:0 0 8px rgba(56,189,248,0.6);"></div>
                   </div>
-                  <span style="font-size:8px; opacity:0.6;">${rankInfo.progress}% to ${rankInfo.nextTitle} (${rankInfo.score} pts)</span>
+                  <span style="font-size:8px; opacity:0.8; font-weight:bold; font-family:'JetBrains Mono', monospace;">${rankInfo.progress}% (${rankInfo.score} PTS)</span>
                 </div>
               </div>
 
               <!-- Quick Stats Details -->
-              <div class="stats-panel" style="background:rgba(255,255,255,0.02); padding:6px; border-radius:4px; border:1px solid rgba(255,255,255,0.05);">
-                <table class="stats-table" style="width:100%; border-collapse:collapse;">
-                  <tr style="height:18px; border-bottom: 1px solid rgba(255,255,255,0.03);"><td style="opacity:0.6;">Favorite Game</td><td style="text-align:right; font-weight:bold;">${favGameName}</td></tr>
-                  <tr style="height:18px; border-bottom: 1px solid rgba(255,255,255,0.03);"><td style="opacity:0.6;">Cabinet Theme</td><td style="text-align:right; font-weight:bold; color:var(--machine-secondary,#ff365d);">${activeTheme}</td></tr>
-                  <tr style="height:18px; border-bottom: 1px solid rgba(255,255,255,0.03);"><td style="opacity:0.6;">Achievements Unlocked</td><td style="text-align:right; font-weight:bold;">${unlockedList.length} / ${achievementsCount} (${achievementsPct}%)</td></tr>
-                  <tr style="height:18px; border-bottom: 1px solid rgba(255,255,255,0.03);"><td style="opacity:0.6;">Recent Unlock</td><td style="text-align:right;">${recentBadgeHtml}</td></tr>
-                  <tr style="height:18px;"><td style="opacity:0.6;">Last Played Session</td><td style="text-align:right; font-weight:bold;">${lastSessionHtml}</td></tr>
+              <div class="stats-panel" style="background:rgba(255,255,255,0.03); padding:10px 12px; border-radius:8px; border:1px solid rgba(56,189,248,0.2);">
+                <table class="stats-table" style="width:100%; border-collapse:collapse; font-size:9px;">
+                  <tr style="height:20px; border-bottom: 1px solid rgba(255,255,255,0.05);"><td style="opacity:0.7;">Favorite Game</td><td style="text-align:right; font-weight:bold; color:#38bdf8;">${favGameName}</td></tr>
+                  <tr style="height:20px; border-bottom: 1px solid rgba(255,255,255,0.05);"><td style="opacity:0.7;">Cabinet Theme</td><td style="text-align:right; font-weight:bold; color:#a855f7;">${activeTheme}</td></tr>
+                  <tr style="height:20px; border-bottom: 1px solid rgba(255,255,255,0.05);"><td style="opacity:0.7;">Achievements Unlocked</td><td style="text-align:right; font-weight:bold;">${unlockedList.length} / ${achievementsCount} (${achievementsPct}%)</td></tr>
+                  <tr style="height:20px; border-bottom: 1px solid rgba(255,255,255,0.05);"><td style="opacity:0.7;">Recent Unlock</td><td style="text-align:right;">${recentBadgeHtml}</td></tr>
+                  <tr style="height:20px;"><td style="opacity:0.7;">Last Played Session</td><td style="text-align:right; font-weight:bold;">${lastSessionHtml}</td></tr>
                 </table>
               </div>
             </div>

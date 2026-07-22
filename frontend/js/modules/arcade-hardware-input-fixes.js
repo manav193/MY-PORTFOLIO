@@ -19,53 +19,51 @@ function installCabinetLayoutFix() {
     /* Keep the approved horizontal proportions. The previous 96–98vw override
        made the CRT look side-stretched, so width is restored here. */
     .cabinet-chassis.is-scaled {
-      width: 92vw !important;
-      max-width: 1500px !important;
-      height: min(900px, 92vh) !important;
-      max-height: 900px !important;
+      width: min(92vw, 1620px) !important;
+      max-width: 1620px !important;
+      height: clamp(740px, 88vh, 880px) !important;
+      max-height: 880px !important;
     }
 
-    /* Extend ONLY the physical cabinet shell downward. The screen, marquee and
-       control deck keep their own dimensions; this extra 112px is the lower
-       hardware bay behind the service hatch, coin LED and serial text. */
     .cabinet-chassis.is-scaled .cab-front {
       inset: 0 !important;
       width: 100% !important;
-      height: calc(100% + 112px) !important;
-      min-height: calc(100% + 112px) !important;
-      overflow: visible !important;
+      height: 100% !important;
+      min-height: 100% !important;
+      overflow: hidden !important;
       background-color: var(--cab-bg) !important;
       border-radius: 32px 32px 14px 14px !important;
       box-sizing: border-box !important;
     }
 
     .cabinet-chassis.is-scaled .cab-marquee {
-      width: 90% !important;
-      flex: 0 0 50px !important;
+      width: 94% !important;
+      flex: 0 0 44px !important;
+      margin-top: 36px !important;
     }
 
     .cabinet-chassis.is-scaled .cabinet-screen-bezel {
-      width: 90% !important;
-      flex: 0 0 500px !important;
-      min-height: 500px !important;
-      max-height: 500px !important;
-      margin: 10px auto 0 !important;
+      width: 94% !important;
+      flex: 0 0 clamp(520px, 64vh, 650px) !important;
+      min-height: 520px !important;
+      max-height: 650px !important;
+      margin: 6px auto 0 !important;
     }
 
     .cabinet-chassis.is-scaled .screen-content-layer {
-      top: 96px !important;
-      left: calc(5% + 16px) !important;
-      width: calc(90% - 32px) !important;
-      height: 468px !important;
+      top: 86px !important;
+      left: calc(3% + 12px) !important;
+      width: calc(94% - 24px) !important;
+      height: calc(clamp(520px, 64vh, 650px) - 24px) !important;
     }
 
     .cabinet-chassis.is-scaled .cab-control-deck {
       display: flex !important;
-      flex: 0 0 110px !important;
-      min-height: 110px !important;
-      max-height: 110px !important;
-      width: 90% !important;
-      margin: 10px auto 0 !important;
+      flex: 0 0 90px !important;
+      min-height: 90px !important;
+      max-height: 90px !important;
+      width: 94% !important;
+      margin: 8px auto 0 !important;
       padding: 0 40px !important;
       opacity: 1 !important;
       visibility: visible !important;

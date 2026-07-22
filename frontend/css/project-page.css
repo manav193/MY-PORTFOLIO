@@ -847,3 +847,246 @@ body[data-project-theme="nintendo"] .cs-back-link:hover {
 }
 @keyframes revealUp { to { opacity: 1; transform: translateY(0); } }
 @keyframes revealScale { to { opacity: 1; transform: scale(1) translateY(0); } }
+
+/* ==========================================================================
+   GLOBAL CASE STUDY ENVIRONMENTAL BACKGROUND SYSTEM (PART 2)
+   ========================================================================== */
+
+/* Base container for injected background layers */
+.project-env-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none !important;
+  z-index: -2;
+  overflow: hidden;
+  background-color: var(--project-bg, #07090e);
+}
+
+body:not([data-project-theme]) .project-env-bg {
+  display: none !important;
+}
+
+/* Layer 1: Ambient Gradient */
+.project-env-bg .env-ambient-gradient {
+  position: absolute;
+  inset: 0;
+  pointer-events: none !important;
+  background: var(--project-gradient, radial-gradient(circle at 50% 0%, rgba(30, 41, 59, 0.5) 0%, #07090e 80%));
+}
+
+/* Layer 2 & 3: Primary and Secondary Light Glows */
+.project-env-bg .env-glow-primary {
+  position: absolute;
+  top: -10vw;
+  left: 20%;
+  width: 60vw;
+  height: 55vh;
+  border-radius: 50%;
+  background: var(--project-glow-primary, radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 70%));
+  filter: blur(60px);
+  opacity: 0.8;
+}
+
+.project-env-bg .env-glow-secondary {
+  position: absolute;
+  top: 30vh;
+  right: -10vw;
+  width: 50vw;
+  height: 60vh;
+  border-radius: 50%;
+  background: var(--project-glow-secondary, radial-gradient(circle, rgba(168, 85, 247, 0.12) 0%, transparent 70%));
+  filter: blur(70px);
+  opacity: 0.7;
+}
+
+/* Layer 4: Geometric / Pattern Grid Layer */
+.project-env-bg .env-pattern-grid {
+  position: absolute;
+  inset: 0;
+  opacity: var(--project-grid-opacity, 0.05);
+  background-image: var(--project-grid-pattern, none);
+  background-size: var(--project-grid-size, 40px 40px);
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.3) 70%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.3) 70%, transparent 100%);
+}
+
+/* Layer 5: Project-Specific Motif Overlay */
+.project-env-bg .env-pattern-motifs {
+  position: absolute;
+  inset: 0;
+  opacity: var(--project-motif-opacity, 0.08);
+  background-image: var(--project-motif-pattern, none);
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+/* Layer 6: Vignette Shading */
+.project-env-bg .env-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, transparent 40%, rgba(3, 4, 7, 0.75) 100%);
+}
+
+/* Readability Protection: Ensure background intensity stays soft behind text */
+.cs-hero-cinematic,
+.cs-container,
+.project-hero {
+  position: relative;
+  z-index: 2;
+}
+
+.cs-card,
+.cs-feature-grid li,
+.cs-overview-card {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* --------------------------------------------------
+   1. ARCADEOS (Retro-Futuristic Hardware)
+   -------------------------------------------------- */
+body[data-project-theme="arcade-os"] {
+  --project-bg: #04060b;
+  --project-gradient: radial-gradient(ellipse at 50% 10%, #0d1527 0%, #050811 50%, #020306 100%);
+  --project-glow-primary: radial-gradient(circle, rgba(56, 189, 248, 0.18) 0%, transparent 70%);
+  --project-glow-secondary: radial-gradient(circle, rgba(168, 85, 247, 0.14) 0%, transparent 70%);
+  --project-grid-opacity: 0.07;
+  --project-grid-pattern: linear-gradient(to right, rgba(56, 189, 248, 0.2) 1px, transparent 1px), linear-gradient(to bottom, rgba(56, 189, 248, 0.2) 1px, transparent 1px);
+  --project-grid-size: 50px 50px;
+  --p-accent: #38bdf8;
+}
+
+/* --------------------------------------------------
+   2. NIMO (Orbital AI Intelligence)
+   -------------------------------------------------- */
+body[data-project-theme="nimo"] {
+  --project-bg: #060814;
+  --project-gradient: radial-gradient(ellipse at 50% 0%, #101633 0%, #080a1a 50%, #03040a 100%);
+  --project-glow-primary: radial-gradient(circle, rgba(56, 189, 248, 0.22) 0%, transparent 65%);
+  --project-glow-secondary: radial-gradient(circle, rgba(192, 132, 252, 0.18) 0%, transparent 70%);
+  --project-grid-opacity: 0.05;
+  --project-grid-pattern: radial-gradient(circle at 50% 50%, rgba(192, 132, 252, 0.4) 1px, transparent 1px);
+  --project-grid-size: 32px 32px;
+  --p-accent: #38bdf8;
+}
+
+/* --------------------------------------------------
+   3. TOOLVERSE (Developer Utility Workspace)
+   -------------------------------------------------- */
+body[data-project-theme="toolverse"] {
+  --project-bg: #090d16;
+  --project-gradient: radial-gradient(ellipse at 50% 0%, #111a2e 0%, #090e1a 50%, #04060c 100%);
+  --project-glow-primary: radial-gradient(circle, rgba(0, 242, 254, 0.16) 0%, transparent 70%);
+  --project-glow-secondary: radial-gradient(circle, rgba(79, 172, 254, 0.14) 0%, transparent 70%);
+  --project-grid-opacity: 0.08;
+  --project-grid-pattern: linear-gradient(to right, rgba(0, 242, 254, 0.15) 1px, transparent 1px), linear-gradient(to bottom, rgba(0, 242, 254, 0.15) 1px, transparent 1px);
+  --project-grid-size: 36px 36px;
+  --p-accent: #00f2fe;
+}
+
+/* --------------------------------------------------
+   4. SELFYY (Creative SaaS Product)
+   -------------------------------------------------- */
+body[data-project-theme="selfyy"] {
+  --project-bg: #0e0c15;
+  --project-gradient: radial-gradient(ellipse at 50% 0%, #1d162b 0%, #0e0c15 50%, #060509 100%);
+  --project-glow-primary: radial-gradient(circle, rgba(244, 63, 94, 0.18) 0%, transparent 70%);
+  --project-glow-secondary: radial-gradient(circle, rgba(251, 113, 133, 0.12) 0%, transparent 70%);
+  --project-grid-opacity: 0.04;
+  --project-grid-pattern: radial-gradient(circle, rgba(244, 63, 94, 0.25) 1px, transparent 1px);
+  --project-grid-size: 40px 40px;
+  --p-accent: #f43f5e;
+}
+
+/* --------------------------------------------------
+   5. VELORA BITES / VELDORA-BITES (Luxury Dining Hospitality)
+   -------------------------------------------------- */
+body[data-project-theme="velora"],
+body[data-project-theme="veldora-bites"] {
+  --project-bg: #0f0a07;
+  --project-gradient: radial-gradient(ellipse at 50% 0%, #26160d 0%, #0f0a07 60%, #050302 100%);
+  --project-glow-primary: radial-gradient(circle, rgba(245, 158, 11, 0.16) 0%, transparent 70%);
+  --project-glow-secondary: radial-gradient(circle, rgba(217, 119, 6, 0.12) 0%, transparent 70%);
+  --project-grid-opacity: 0.03;
+  --project-grid-pattern: linear-gradient(45deg, rgba(245, 158, 11, 0.1) 1px, transparent 1px);
+  --project-grid-size: 48px 48px;
+  --p-accent: #f59e0b;
+}
+
+/* --------------------------------------------------
+   6. SHIFT-ZERO (Futuristic Speed System)
+   -------------------------------------------------- */
+body[data-project-theme="shift-zero"] {
+  --project-bg: #080a0e;
+  --project-gradient: radial-gradient(ellipse at 50% 0%, #151a24 0%, #080a0e 50%, #030406 100%);
+  --project-glow-primary: radial-gradient(circle, rgba(239, 68, 68, 0.18) 0%, transparent 70%);
+  --project-glow-secondary: radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, transparent 70%);
+  --project-grid-opacity: 0.08;
+  --project-grid-pattern: linear-gradient(135deg, rgba(6, 182, 212, 0.15) 1px, transparent 1px);
+  --project-grid-size: 32px 32px;
+  --p-accent: #ef4444;
+}
+
+/* --------------------------------------------------
+   7. LOVE / LOVE JOURNEY (Cinematic Emotional Memory)
+   -------------------------------------------------- */
+body[data-project-theme="love"] {
+  --project-bg: #12060c;
+  --project-gradient: radial-gradient(ellipse at 50% 0%, #260d1b 0%, #12060c 60%, #060204 100%);
+  --project-glow-primary: radial-gradient(circle, rgba(225, 29, 72, 0.16) 0%, transparent 70%);
+  --project-glow-secondary: radial-gradient(circle, rgba(147, 51, 234, 0.14) 0%, transparent 70%);
+  --project-grid-opacity: 0.04;
+  --project-grid-pattern: radial-gradient(circle, rgba(225, 29, 72, 0.2) 1px, transparent 1px);
+  --project-grid-size: 36px 36px;
+  --p-accent: #e11d48;
+}
+
+/* --------------------------------------------------
+   8. NINTENDO UI (Playful Premium Console Interface)
+   -------------------------------------------------- */
+body[data-project-theme="nintendo"] {
+  --project-bg: #09090b;
+  --project-gradient: radial-gradient(ellipse at 50% 0%, #1b1b22 0%, #09090b 60%, #030304 100%);
+  --project-glow-primary: radial-gradient(circle, rgba(230, 0, 18, 0.16) 0%, transparent 70%);
+  --project-glow-secondary: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, transparent 70%);
+  --project-grid-opacity: 0.04;
+  --project-grid-pattern: radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+  --project-grid-size: 40px 40px;
+  --p-accent: #e60012;
+}
+
+/* --------------------------------------------------
+   9. NIKE WEBSITE UI (Sport / Motion / Editorial Commerce)
+   -------------------------------------------------- */
+body[data-project-theme="nike"] {
+  --project-bg: #050505;
+  --project-gradient: radial-gradient(ellipse at 50% 0%, #141414 0%, #050505 60%, #000000 100%);
+  --project-glow-primary: radial-gradient(circle, rgba(225, 29, 72, 0.15) 0%, transparent 70%);
+  --project-glow-secondary: radial-gradient(circle, rgba(249, 115, 22, 0.12) 0%, transparent 70%);
+  --project-grid-opacity: 0.05;
+  --project-grid-pattern: linear-gradient(60deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  --project-grid-size: 60px 60px;
+  --p-accent: #e11d48;
+}
+
+/* --------------------------------------------------
+   10. PROMPTAI / AI WORKSPACE (Neural Purple/Cyan Workspace)
+   -------------------------------------------------- */
+body[data-project-theme="promptai"] {
+  --project-bg: #090714;
+  --project-gradient: radial-gradient(ellipse at 50% 0%, #17112e 0%, #090714 60%, #030208 100%);
+  --project-glow-primary: radial-gradient(circle, rgba(139, 92, 246, 0.18) 0%, transparent 70%);
+  --project-glow-secondary: radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, transparent 70%);
+  --project-grid-opacity: 0.06;
+  --project-grid-pattern: linear-gradient(to right, rgba(139, 92, 246, 0.15) 1px, transparent 1px), linear-gradient(to bottom, rgba(6, 182, 212, 0.15) 1px, transparent 1px);
+  --project-grid-size: 40px 40px;
+  --p-accent: #8b5cf6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-env-bg .env-glow-primary,
+  .project-env-bg .env-glow-secondary {
+    animation: none !important;
+  }
+}

@@ -769,7 +769,11 @@ body:has(.cabinet-chassis.is-scaled) .theme-dock {
 
 /* ABSOLUTE CENTERED ARCHITECTURE (LUXURY PADDING) */
 .system-architecture {
-  position: relative; width: 100%; overflow: hidden;
+  position: relative;
+  z-index: 30;
+  width: 100%;
+  overflow: hidden;
+  background-color: var(--color-bg);
 }
 .system-section {
   position: relative; display: flex; width: 100%; padding: 240px 0; z-index: 1;

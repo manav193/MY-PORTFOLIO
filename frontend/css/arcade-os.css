@@ -230,13 +230,33 @@
   cursor: pointer;
 }
 
+/* Authoritative single card selection: ONLY .app-card.focused receives the primary selection ring */
+.app-card {
+  outline: none !important;
+}
+
+.app-card:not(.focused):focus,
+.app-card:not(.focused):focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.app-card:hover:not(.focused) {
+  opacity: 0.7;
+  transform: scale(0.94);
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  box-shadow: none !important;
+}
+
 .app-card.focused {
   opacity: 1;
   transform: scale(1.08);
-  border-color: #52525b;
+  border-color: #38bdf8 !important;
   box-shadow: 
-    0 8px 16px rgba(0,0,0,0.5),
-    inset 0 1px 1px rgba(255,255,255,0.05);
+    0 8px 20px rgba(0,0,0,0.6),
+    0 0 14px rgba(56, 189, 248, 0.7),
+    inset 0 0 6px rgba(56, 189, 248, 0.4) !important;
+  z-index: 10;
 }
 
 .app-icon {
@@ -2812,5 +2832,474 @@ select.is-ui-focused {
   }
   input[type="range"].is-ui-focused {
     transform: none; /* Do not scale range sliders */
+  }
+}
+
+/* ==========================================================================
+   ARCADEOS UNIFIED INTERNAL ROUTE DESIGN SYSTEM (PHASE 4)
+   ========================================================================== */
+
+/* Shared System App Container */
+.sys-app {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, rgba(8, 14, 30, 0.96) 0%, rgba(4, 7, 18, 0.98) 100%);
+  border: 1.5px solid rgba(56, 189, 248, 0.22);
+  border-radius: 12px;
+  box-shadow: inset 0 0 24px rgba(56, 189, 248, 0.04), 0 8px 24px rgba(0, 0, 0, 0.6);
+  padding: 12px 14px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* Header Bar */
+.sys-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.18);
+  flex-shrink: 0;
+}
+
+.sys-header h2 {
+  font-family: 'Outfit', 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: #38bdf8;
+  text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sys-back-btn {
+  appearance: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 4px 10px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sys-back-btn:hover,
+.sys-back-btn.is-ui-focused {
+  background: rgba(56, 189, 248, 0.16);
+  border-color: #38bdf8;
+  color: #ffffff;
+}
+
+/* Focus States across System Controls */
+.is-ui-focused,
+[data-arcade-focusable]:focus-visible {
+  outline: 2px solid #38bdf8 !important;
+  outline-offset: 1px !important;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.5), inset 0 0 4px rgba(56, 189, 248, 0.3) !important;
+  border-color: #38bdf8 !important;
+}
+
+/* High Contrast Range Sliders */
+input[type="range"] {
+  appearance: none;
+  background: rgba(255, 255, 255, 0.12);
+  height: 6px;
+  border-radius: 3px;
+  outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #38bdf8;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.8);
+  cursor: pointer;
+}
+input[type="range"].is-ui-focused::-webkit-slider-thumb {
+  background: #f97316 !important;
+  box-shadow: 0 0 12px rgba(249, 115, 22, 0.9) !important;
+}
+
+/* Route-Specific Background Atmospheres */
+.profile-app {
+  background: 
+    radial-gradient(circle at 80% 20%, rgba(168, 85, 247, 0.16) 0%, transparent 55%),
+    radial-gradient(circle at 20% 80%, rgba(56, 189, 248, 0.14) 0%, transparent 55%),
+    linear-gradient(180deg, rgba(8, 14, 30, 0.96) 0%, rgba(4, 7, 18, 0.98) 100%);
+}
+
+.customizer-app {
+  background-image: 
+    linear-gradient(rgba(56, 189, 248, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.achievements-app {
+  background: 
+    radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.12) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(8, 14, 30, 0.96) 0%, rgba(4, 7, 18, 0.98) 100%);
+}
+
+.stats-app {
+  background: 
+    radial-gradient(circle at 50% 100%, rgba(56, 189, 248, 0.12) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(8, 14, 30, 0.96) 0%, rgba(4, 7, 18, 0.98) 100%);
+}
+
+.diagnostics-app {
+  background: 
+    linear-gradient(180deg, rgba(6, 11, 24, 0.97) 0%, rgba(3, 6, 14, 0.99) 100%);
+}
+
+/* ==========================================================================
+   ARCADE OS STANDBY SLEEP & SESSION MODAL OVERLAYS
+   ========================================================================== */
+.arcade-sleep-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(2, 4, 12, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+  backdrop-filter: blur(8px);
+}
+
+.arcade-sleep-overlay.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.screen-content-layer.is-sleeping #arcade-os {
+  filter: brightness(0.2) opacity(0.3);
+}
+
+.sleep-content {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.sleep-brand {
+  font-family: 'Outfit', sans-serif;
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  color: #38bdf8;
+  text-shadow: 0 0 16px rgba(56, 189, 248, 0.6);
+}
+
+.sleep-brand span {
+  color: #a855f7;
+}
+
+.sleep-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  color: #10b981;
+}
+
+.sleep-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 10px #10b981;
+  animation: sleepPulse 2s ease-in-out infinite;
+}
+
+@keyframes sleepPulse {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+.sleep-hint {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 8px;
+}
+
+/* SESSION END CONFIRMATION MODAL */
+.arcade-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(2, 4, 10, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+  backdrop-filter: blur(6px);
+}
+
+.arcade-modal-backdrop.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.arcade-modal-card {
+  width: 90%;
+  max-width: 340px;
+  background: linear-gradient(180deg, #131b2e 0%, #090e1a 100%);
+  border: 1.5px solid rgba(56, 189, 248, 0.3);
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(56, 189, 248, 0.2);
+  text-align: center;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.modal-header h3 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: #f43f5e;
+  margin: 0;
+}
+
+.modal-body {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.75);
+  margin-bottom: 18px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.modal-btn {
+  appearance: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.modal-btn.btn-cancel {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #e2e8f0;
+}
+
+.modal-btn.btn-cancel:hover,
+.modal-btn.btn-cancel.focused {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: #38bdf8;
+  color: #fff;
+}
+
+.modal-btn.btn-confirm {
+  background: linear-gradient(180deg, #e11d48 0%, #9f1239 100%);
+  border-color: #f43f5e;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(225, 29, 72, 0.4);
+}
+
+.modal-btn.btn-confirm:hover,
+.modal-btn.btn-confirm.focused {
+  background: linear-gradient(180deg, #f43f5e 0%, #be123c 100%);
+  box-shadow: 0 4px 18px rgba(244, 63, 94, 0.7);
+}
+
+/* ==========================================================================
+   ARCADEOS TRANSITION & TOAST NOTIFICATION SYSTEM
+   ========================================================================== */
+
+/* CRT Transition Scan Line Sweep */
+.arcade-scan-sweep {
+  position: absolute;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent 0%, rgba(56, 189, 248, 0.25) 50%, transparent 100%);
+  height: 20%;
+  opacity: 0;
+}
+
+.arcade-scan-sweep.active {
+  animation: scanSweepPass 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes scanSweepPass {
+  0% { top: -20%; opacity: 0.8; }
+  100% { top: 100%; opacity: 0; }
+}
+
+/* App Launch Card Pulse & Dimming */
+.arcade-card.is-launching-pulse {
+  transform: scale(1.05) translateY(-4px) !important;
+  border-color: #38bdf8 !important;
+  box-shadow: 0 0 24px rgba(56, 189, 248, 0.8), inset 0 0 12px rgba(56, 189, 248, 0.5) !important;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease !important;
+}
+
+#arcade-home.is-app-launching .arcade-card:not(.is-launching-pulse) {
+  opacity: 0.35;
+  filter: blur(1px);
+  transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+.arcade-universe-bg.is-dimmed {
+  filter: brightness(0.4);
+  transition: filter 0.3s ease;
+}
+
+/* System Route Opening & Return Home Transitions */
+#arcade-home.is-route-opening {
+  transform: scale(0.97);
+  opacity: 0.5;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
+}
+
+#arcade-app-view.is-returning-home {
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+/* Standby Shutdown & Wake Keyframes */
+.screen-content-layer.is-shutting-down #arcade-os {
+  filter: brightness(0);
+  transform: scaleY(0.02) scaleX(0.95);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), filter 0.3s ease;
+}
+
+.screen-content-layer.is-waking-up #arcade-os {
+  animation: phosphorWake 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes phosphorWake {
+  0% { filter: brightness(3) contrast(1.5); transform: scale(0.98); }
+  100% { filter: brightness(1) contrast(1); transform: scale(1); }
+}
+
+/* System Toast Container & Notifications */
+.arcade-toast-container {
+  position: absolute;
+  bottom: 34px;
+  right: 14px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.arcade-toast-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(10, 16, 32, 0.92);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  border-left: 3px solid #38bdf8;
+  border-radius: 6px;
+  padding: 6px 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6), 0 0 12px rgba(56, 189, 248, 0.25);
+  backdrop-filter: blur(8px);
+  transform: translateY(20px) scale(0.95);
+  opacity: 0;
+  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.25s ease;
+}
+
+.arcade-toast-item.active {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+.toast-icon {
+  font-size: 14px;
+}
+
+.toast-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.toast-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #ffffff;
+}
+
+.toast-subtitle {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 7px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.toast-achievement {
+  border-left-color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.5);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6), 0 0 12px rgba(245, 158, 11, 0.3);
+}
+
+.toast-achievement .toast-title {
+  color: #fbbf24;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arcade-scan-sweep,
+  .arcade-scan-sweep.active {
+    display: none !important;
+  }
+  .arcade-card.is-launching-pulse,
+  #arcade-home.is-route-opening,
+  #arcade-app-view.is-returning-home,
+  .screen-content-layer.is-shutting-down #arcade-os,
+  .screen-content-layer.is-waking-up #arcade-os {
+    transition: opacity 0.08s ease !important;
+    transform: none !important;
+    animation: none !important;
   }
 }

@@ -495,49 +495,48 @@ export const ArcadeAchievements = {
       : this.REGISTRY.filter(a => a.category === this.activeFilter);
 
     view.innerHTML = `
-      <div class="sys-app achievements-app" style="display:flex; flex-direction:column; height: 100%;">
-        <div class="sys-header" style="flex-shrink:0;">
-          <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-            <div>
-              <h2 style="margin:0;">ACHIEVEMENTS</h2>
-              <div style="font-size:8px; opacity:0.6; margin-top:2px;">
-                🏆 ${summary.unlockedCount}/${summary.totalCount} Unlocked (${summary.percentage}%)
-              </div>
-            </div>
-            <div style="display:flex; gap:6px;">
-              <button class="sys-btn danger-btn" data-arcade-action="reset-achievements" data-arcade-focusable style="margin:0; font-size:7px; padding:2px 5px;">RESET</button>
-              <button class="sys-back-btn" onclick="window.ArcadeOS.goHome()" style="margin:0;" data-arcade-focusable data-arcade-action="back">BACK (ESC)</button>
+      <div class="sys-app achievements-app">
+        <div class="sys-header">
+          <div>
+            <h2 style="margin:0;"><span class="hw-icon">🏆</span> ACHIEVEMENT VAULT // ${summary.unlockedCount}/${summary.totalCount} (${summary.percentage}%)</h2>
+            <div style="font-size:7px; color:rgba(255,255,255,0.6); margin-top:3px; letter-spacing:0.08em;">
+              UNLOCK TROPHIES THROUGH GAMEPLAY & MACHINE CUSTOMIZATION
             </div>
           </div>
-          <!-- Category Filters Container (Correction 6) -->
-          <div class="category-filters-container" style="display:flex; gap:3px; margin-top:6px; flex-wrap:wrap;">
-            ${categories.map(cat => {
-              const isSelected = this.activeFilter === cat;
-              return `
-                <button class="sys-btn filter-btn ${isSelected ? 'active' : ''}"
-                        style="font-size:7px; padding:2px 4px; margin:0;"
-                        data-arcade-focusable
-                        data-filter="${cat}"
-                        aria-selected="${isSelected ? 'true' : 'false'}"
-                        onclick="window.ArcadeAchievements.setFilter('${cat}', this.closest('.achievements-app').parentNode)">
-                  ${cat}
-                </button>
-              `;
-            }).join('')}
+          <div style="display:flex; gap:6px;">
+            <button class="sys-btn danger-btn" data-arcade-action="reset-achievements" data-arcade-focusable style="margin:0; font-size:7px; padding:3px 6px;">RESET</button>
+            <button class="sys-back-btn" onclick="window.ArcadeOS.goHome()" style="margin:0;" data-arcade-focusable data-arcade-action="back">BACK (ESC)</button>
           </div>
         </div>
 
-        <!-- Scrollable cards container (Correction 6 - static cards are not focusable) -->
-        <div class="achievements-scroll-area" style="flex:1; overflow-y:auto; padding:6px 0; display:grid; grid-template-columns: 1fr; gap:5px; max-height: 175px;">
+        <!-- Category Filters Container -->
+        <div class="category-filters-container" style="display:flex; gap:4px; margin-bottom:8px; flex-wrap:wrap;">
+          ${categories.map(cat => {
+            const isSelected = this.activeFilter === cat;
+            return `
+              <button class="sys-btn filter-btn ${isSelected ? 'active' : ''}"
+                      style="font-size:7px; padding:3px 6px; margin:0; border-radius:4px; ${isSelected ? 'background:rgba(56,189,248,0.2); border-color:#38bdf8; color:#fff; box-shadow:0 0 8px rgba(56,189,248,0.4);' : ''}"
+                      data-arcade-focusable
+                      data-filter="${cat}"
+                      aria-selected="${isSelected ? 'true' : 'false'}"
+                      onclick="window.ArcadeAchievements.setFilter('${cat}', this.closest('.achievements-app').parentNode)">
+                ${cat}
+              </button>
+            `;
+          }).join('')}
+        </div>
+
+        <!-- Scrollable cards container -->
+        <div class="achievements-scroll-area" style="flex:1; overflow-y:auto; padding:2px; display:grid; grid-template-columns: 1fr; gap:6px; max-height: 175px;">
           ${filtered.length === 0 ? `
-            <div style="font-size:8px; opacity:0.6; text-align:center; padding-top:20px;">No achievements in this category yet. Play a game or customize the cabinet to unlock one.</div>
+            <div style="font-size:8px; opacity:0.6; text-align:center; padding:24px 10px; background:rgba(255,255,255,0.02); border-radius:6px; border:1px dashed rgba(255,255,255,0.1);">No achievements in this category yet. Play a game or customize the cabinet to unlock one.</div>
           ` : filtered.map(ach => {
             const unlocked = !!this.data.unlocked[ach.id];
             const isHidden = ach.hidden && !unlocked;
 
             const cardIcon = isHidden ? "🔒" : ach.icon;
             const cardTitle = isHidden ? "Hidden Achievement" : ach.title.toUpperCase();
-            const cardDesc = isHidden ? "Keep playing to find out." : ach.desc;
+            const cardDesc = isHidden ? "Keep playing to discover this trophy." : ach.desc;
 
             const prog = isHidden ? null : this.getProgress(ach.id);
             const dateStr = unlocked
@@ -545,23 +544,23 @@ export const ArcadeAchievements = {
               : '';
 
             return `
-              <div class="achievement-card ${unlocked ? 'unlocked' : 'locked'}" style="background:${unlocked ? 'rgba(53, 208, 186, 0.03)' : 'rgba(255,255,255,0.01)'}; border: 1px solid ${unlocked ? 'rgba(53, 208, 186, 0.15)' : 'rgba(255,255,255,0.05)'}; border-radius:4px; padding:6px; display:flex; align-items:center; gap:8px;">
-                <div class="ach-icon" style="font-size:16px; opacity:${unlocked ? '1' : '0.2'}">${cardIcon}</div>
+              <div class="achievement-card ${unlocked ? 'unlocked' : 'locked'}" style="background:${unlocked ? 'rgba(56, 189, 248, 0.05)' : 'rgba(255,255,255,0.02)'}; border: 1px solid ${unlocked ? 'rgba(56, 189, 248, 0.3)' : 'rgba(255,255,255,0.08)'}; border-radius:6px; padding:8px 10px; display:flex; align-items:center; gap:10px; box-shadow:${unlocked ? '0 0 10px rgba(56,189,248,0.15)' : 'none'};">
+                <div class="ach-icon" style="font-size:18px; filter:${unlocked ? 'drop-shadow(0 0 6px rgba(56,189,248,0.6))' : 'grayscale(100%) opacity(0.3)'};">${cardIcon}</div>
                 <div style="flex:1; font-size:8px; text-align:left;">
-                  <div style="font-weight:bold; color:${unlocked ? 'var(--machine-accent, #35d0ba)' : '#888'};">${cardTitle}</div>
-                  <div style="opacity:0.6; margin-top:2px;">${cardDesc}</div>
-
-                  <!-- Progress Bar for count based targets -->
-                  ${prog && !unlocked ? `
-                    <div style="display:flex; align-items:center; gap:5px; margin-top:4px;">
-                      <div style="flex:1; background:rgba(255,255,255,0.1); height:3px; border-radius:1.5px;" role="progressbar" aria-valuenow="${prog.current}" aria-valuemin="0" aria-valuemax="${prog.target}" aria-valuetext="${prog.current} of ${prog.target}">
-                        <div style="background:var(--machine-accent, #35d0ba); height:100%; width:${(prog.current/prog.target)*100}%; border-radius:1.5px;"></div>
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <strong style="font-size:9px; color:${unlocked ? '#38bdf8' : '#cbd5e1'}; font-weight:800; letter-spacing:0.06em;">${cardTitle}</strong>
+                    ${unlocked ? `<span style="font-size:7px; color:#10b981; font-weight:bold;">UNLOCKED ${dateStr}</span>` : ''}
+                  </div>
+                  <div style="opacity:0.75; margin-top:2px; line-height:1.3;">${cardDesc}</div>
+                  ${(!unlocked && prog) ? `
+                    <div style="display:flex; align-items:center; gap:6px; margin-top:4px;">
+                      <div style="flex:1; background:rgba(255,255,255,0.1); height:3px; border-radius:2px;">
+                        <div style="background:#38bdf8; height:100%; width:${prog.percentage}%; border-radius:2px;"></div>
                       </div>
                       <span style="font-size:7px; opacity:0.6;">${prog.current}/${prog.target}</span>
                     </div>
                   ` : ''}
                 </div>
-                ${unlocked ? `<div style="font-size:7px; opacity:0.5; align-self:flex-start; text-align:right;">Unlocked<br>${dateStr}</div>` : `<div style="font-size:8px; opacity:0.2;">🔒</div>`}
               </div>
             `;
           }).join('')}

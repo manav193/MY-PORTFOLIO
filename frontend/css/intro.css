@@ -7,7 +7,8 @@
   width: 100%;
   height: 200vh;
   position: relative;
-  z-index: 9999;
+  z-index: 20;
+  isolation: isolate;
   overflow-x: clip;
   contain: paint;
 }
@@ -21,7 +22,138 @@ body.intro-skipped #intro-sequence {
   width: 100%;
   height: 100vh;
   overflow: hidden;
-  background-color: #030303;
+  z-index: 2;
+  background-color: #030407;
+}
+
+/* ==========================================================================
+   ARCADE DIGITAL SHOWROOM ENVIRONMENT (PART 1)
+   ========================================================================== */
+.arcade-env-showroom {
+  position: absolute;
+  inset: 0;
+  pointer-events: none !important;
+  z-index: 0;
+  overflow: hidden;
+}
+
+/* Layer 1: Deep Navy / Graphite Base Gradient */
+.arcade-env-bg {
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse at 50% 30%, #0c121e 0%, #060910 60%, #020306 100%),
+    linear-gradient(180deg, #04060a 0%, #080c14 50%, #030407 100%);
+}
+
+/* Layer 2: Soft Cyan / Violet Radial Illumination behind Cabinet */
+.arcade-env-radial-glow {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90vw;
+  max-width: 1400px;
+  height: 70vh;
+  background: 
+    radial-gradient(ellipse at 50% 40%, rgba(56, 189, 248, 0.16) 0%, rgba(168, 85, 247, 0.10) 45%, transparent 70%);
+  filter: blur(40px);
+  will-change: opacity;
+  animation: env-glow-pulse 8s ease-in-out infinite alternate;
+}
+
+@keyframes env-glow-pulse {
+  0% { opacity: 0.8; transform: translate(-50%, -50%) scale(0.98); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1.04); }
+}
+
+/* Layer 3: Horizon Glow Line Behind Lower Half of Cabinet */
+.arcade-env-horizon-light {
+  position: absolute;
+  top: 58%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(56, 189, 248, 0.05) 15%, 
+    rgba(56, 189, 248, 0.6) 45%, 
+    rgba(168, 85, 247, 0.7) 50%, 
+    rgba(56, 189, 248, 0.6) 55%, 
+    rgba(56, 189, 248, 0.05) 85%, 
+    transparent 100%
+  );
+  box-shadow: 
+    0 0 25px rgba(56, 189, 248, 0.5),
+    0 0 60px rgba(168, 85, 247, 0.3);
+  opacity: 0.85;
+}
+
+/* Layer 4: Perspective Showroom Floor Grid Beneath Cabinet */
+.arcade-env-floor-grid {
+  position: absolute;
+  bottom: 0;
+  left: -20%;
+  width: 140%;
+  height: 48vh;
+  perspective: 600px;
+  mask-image: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 40%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 40%, transparent 100%);
+}
+
+.arcade-env-floor-grid::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(to right, rgba(56, 189, 248, 0.09) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(56, 189, 248, 0.09) 1px, transparent 1px);
+  background-size: 50px 40px;
+  transform: rotateX(68deg) translateY(0);
+  transform-origin: 50% 100%;
+}
+
+/* Layer 5: Atmospheric Micro-particles */
+.arcade-env-particles {
+  position: absolute;
+  inset: 0;
+}
+
+.arcade-env-particles .particle {
+  position: absolute;
+  border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 8px #38bdf8;
+  opacity: 0.4;
+  animation: particle-float 12s ease-in-out infinite;
+}
+
+.arcade-env-particles .p1 { top: 25%; left: 20%; width: 3px; height: 3px; animation-delay: 0s; }
+.arcade-env-particles .p2 { top: 35%; left: 80%; width: 4px; height: 4px; background: #a855f7; box-shadow: 0 0 10px #a855f7; animation-delay: 2s; }
+.arcade-env-particles .p3 { top: 65%; left: 15%; width: 2px; height: 2px; animation-delay: 4s; }
+.arcade-env-particles .p4 { top: 70%; left: 85%; width: 3px; height: 3px; animation-delay: 1s; }
+.arcade-env-particles .p5 { top: 15%; left: 70%; width: 2px; height: 2px; animation-delay: 5s; }
+.arcade-env-particles .p6 { top: 50%; left: 10%; width: 3px; height: 3px; background: #a855f7; box-shadow: 0 0 8px #a855f7; animation-delay: 3s; }
+
+@keyframes particle-float {
+  0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; }
+  50% { transform: translateY(-20px) translateX(10px); opacity: 0.7; }
+}
+
+/* Layer 6: Foreground Edge Vignette */
+.arcade-env-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(2, 3, 6, 0.6) 75%, rgba(1, 2, 4, 0.92) 100%);
+  z-index: 1;
+  pointer-events: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arcade-env-radial-glow,
+  .arcade-env-particles .particle {
+    animation: none !important;
+  }
 }
 
 .outer-center-wrapper {
@@ -37,6 +169,7 @@ body.intro-skipped #intro-sequence {
   perspective: 5000px;
   transform-style: preserve-3d;
   pointer-events: none;
+  z-index: 10;
 }
 .outer-center-wrapper > * {
   pointer-events: auto;
@@ -185,10 +318,10 @@ body:not(.intro-skipped) .living-ambient-light {
 
 /* Base structural scaling */
 .cabinet-chassis.is-scaled {
-  width: 86vw;
-  height: min(720px, 84vh);
-  max-width: 1380px;
-  max-height: 760px;
+  width: min(92vw, 1620px);
+  height: clamp(740px, 88vh, 880px);
+  max-width: 1620px;
+  max-height: 880px;
   border-radius: 32px 32px 12px 12px; 
   box-shadow: 0 50px 100px -20px rgba(0,0,0,1), 0 20px 40px rgba(0,0,0,0.8);
 }
@@ -382,8 +515,8 @@ body:not(.intro-skipped) .living-ambient-light {
    TOP MARQUEE
    ========================================================================== */
 .cab-marquee {
-  width: 84%;
-  height: 50px;
+  width: 94%;
+  height: 44px;
   background: #0d0d0f;
   border: 1px solid #1a1a1f;
   border-bottom: 2px solid #050507;
@@ -391,7 +524,7 @@ body:not(.intro-skipped) .living-ambient-light {
     inset 0 1px 2px rgba(255,255,255,0.05),
     inset 0 -10px 20px rgba(0,0,0,0.8),
     0 5px 15px rgba(0,0,0,0.5);
-  margin-top: 56px; /* Space for the top header & oled display */
+  margin-top: 36px;
   position: relative;
   display: flex;
   align-items: center;
@@ -450,10 +583,10 @@ body:not(.intro-skipped) .living-ambient-light {
 }
 
 .cabinet-chassis.is-scaled .cabinet-screen-bezel {
-  width: 86%;
-  height: 440px;
-  margin: 10px auto 0;
-  border-radius: 16px;
+  width: 94%;
+  height: clamp(520px, 64vh, 650px);
+  margin: 6px auto 0;
+  border-radius: 14px;
   background-color: #0d0d0f;
   border: 1px solid #1a1a1f;
   box-shadow: 
@@ -466,7 +599,7 @@ body:not(.intro-skipped) .living-ambient-light {
 /* Smoked Glass Thickness & Bloom */
 .cab-glass-thickness {
   position: absolute;
-  inset: 12px; /* Recessed depth spacing */
+  inset: 6px; /* Recessed depth spacing */
   border-radius: 10px;
   border: 1px solid rgba(0,0,0,0.8);
   border-top: 1px solid rgba(255,255,255,0.08); /* Catch-light edge */
@@ -514,10 +647,10 @@ body:not(.intro-skipped) .living-ambient-light {
 
 /* Aligned precisely with the bezel offsets when cabinet is scaled */
 .cabinet-chassis.is-scaled .screen-content-layer {
-  top: 96px; /* Marquee top/height + bezel margin + screen inset */
-  left: calc(7% + 16px); /* 7% bezel left offset + 16px screen inset */
-  width: calc(86% - 32px);
-  height: 408px; /* Exactly matches 440px CRT bezel minus 32px insets */
+  top: 86px; /* Marquee top (36px) + height (44px) + bezel margin (6px) */
+  left: calc(3% + 12px); /* 3% bezel left offset + 12px screen inset */
+  width: calc(94% - 24px);
+  height: calc(clamp(520px, 64vh, 650px) - 24px);
   border-radius: 6px;
 }
 
@@ -556,9 +689,9 @@ body:not(.intro-skipped) .living-ambient-light {
    CONTROL DECK
    ========================================================================== */
 .cab-control-deck {
-  width: 86%;
-  height: 95px;
-  margin: 12px auto 0;
+  width: 93%;
+  height: 90px;
+  margin: 8px auto 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -917,30 +1050,30 @@ body:not(.intro-skipped) .living-ambient-light {
 @media (max-width: 768px) {
   .cabinet-chassis.is-scaled {
     width: 92vw;
-    height: 520px;
+    height: 540px;
   }
   .cabinet-chassis.is-scaled .cabinet-screen-bezel {
-    width: 86%;
-    height: 265px;
+    width: 93%;
+    height: 285px;
   }
   .cabinet-chassis.is-scaled .screen-content-layer {
-    top: 90px;
-    left: calc(7% + 16px);
-    width: calc(86% - 32px);
-    height: 233px;
+    top: 76px;
+    left: calc(3.5% + 10px);
+    width: calc(93% - 20px);
+    height: 265px;
   }
   .cab-marquee {
-    width: 86%;
+    width: 93%;
     height: 44px;
-    margin-top: 24px;
+    margin-top: 20px;
   }
   .cab-control-deck {
-    width: 86%;
+    width: 93%;
     padding: 0 24px;
     height: 80px;
   }
   .cab-bottom-details {
-    width: 86%;
+    width: 93%;
     margin-bottom: 12px;
   }
 }

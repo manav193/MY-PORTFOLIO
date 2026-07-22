@@ -460,40 +460,39 @@ export const ArcadeStats = {
     view.innerHTML = `
       <div class="sys-app stats-app">
         <div class="sys-header">
-          <h2>STATS DASHBOARD</h2>
+          <h2><span class="hw-icon">📊</span> TELEMETRY & STATS DASHBOARD</h2>
           <button class="sys-back-btn" onclick="window.ArcadeOS.goHome()" data-arcade-focusable data-arcade-action="back">BACK (ESC)</button>
         </div>
 
-        <div class="stats-grid-container" style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px; max-height:140px; overflow-y:auto; padding:5px; font-size:9px;">
+        <div class="stats-grid-container" style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; max-height:150px; overflow-y:auto; padding:2px; font-size:9px;">
           <!-- Left Main Metrics Column -->
-          <div class="metrics-block" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 6px; border-radius: 4px;">
-            <h3 style="margin: 0 0 6px 0; color: var(--machine-accent, #35d0ba); font-size:9px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:3px;">SYSTEM STATS</h3>
-            <table style="width: 100%; border-collapse: collapse;">
-              <tr><td style="opacity: 0.6;">Total Playtime:</td><td style="text-align: right; font-weight: bold;">${Math.round(d.totalPlaytime)}s</td></tr>
-              <tr><td style="opacity: 0.6;">Launches / Sessions:</td><td style="text-align: right; font-weight: bold;">${d.totalLaunches} / ${d.sessionsPlayed}</td></tr>
-              <tr><td style="opacity: 0.6;">Average Session:</td><td style="text-align: right; font-weight: bold;">${Math.round(d.averageSessionSeconds)}s</td></tr>
-              <tr><td style="opacity: 0.6;">Longest Session:</td><td style="text-align: right; font-weight: bold;">${Math.round(d.longestSessionSeconds)}s</td></tr>
-              <tr><td style="opacity: 0.6;">Coin Inserts:</td><td style="text-align: right; font-weight: bold;">${d.lifetimeCoinInserts}</td></tr>
-              <tr><td style="opacity: 0.6;">Favorite Game:</td><td style="text-align: right; font-weight: bold; color: var(--machine-secondary, #ff365d);">${favGameName}</td></tr>
+          <div class="metrics-block" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(56,189,248,0.2); padding: 8px 10px; border-radius: 8px;">
+            <h3 style="margin: 0 0 6px 0; color: #38bdf8; font-size:9px; border-bottom:1px solid rgba(56,189,248,0.2); padding-bottom:4px; letter-spacing:0.08em;">SYSTEM TELEMETRY</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size:9px;">
+              <tr style="height:18px;"><td style="opacity: 0.7;">Total Playtime:</td><td style="text-align: right; font-weight: bold; color:#38bdf8;">${Math.round(d.totalPlaytime)}s</td></tr>
+              <tr style="height:18px;"><td style="opacity: 0.7;">Launches / Sessions:</td><td style="text-align: right; font-weight: bold;">${d.totalLaunches} / ${d.sessionsPlayed}</td></tr>
+              <tr style="height:18px;"><td style="opacity: 0.7;">Average Session:</td><td style="text-align: right; font-weight: bold;">${Math.round(d.averageSessionSeconds)}s</td></tr>
+              <tr style="height:18px;"><td style="opacity: 0.7;">Longest Session:</td><td style="text-align: right; font-weight: bold;">${Math.round(d.longestSessionSeconds)}s</td></tr>
+              <tr style="height:18px;"><td style="opacity: 0.7;">Coin Inserts:</td><td style="text-align: right; font-weight: bold; color:#f59e0b;">${d.lifetimeCoinInserts}</td></tr>
+              <tr style="height:18px;"><td style="opacity: 0.7;">Favorite Game:</td><td style="text-align: right; font-weight: bold; color:#a855f7;">${favGameName}</td></tr>
             </table>
           </div>
 
           <!-- Right Per-Game Metrics Column -->
-          <div class="metrics-block" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 6px; border-radius: 4px;">
-            <h3 style="margin: 0 0 6px 0; color: var(--machine-accent, #35d0ba); font-size:9px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:3px;">PER-GAME RUNTIME</h3>
-            <div style="display:flex; flex-direction:column; gap:4px;">
+          <div class="metrics-block" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(56,189,248,0.2); padding: 8px 10px; border-radius: 8px;">
+            <h3 style="margin: 0 0 6px 0; color: #38bdf8; font-size:9px; border-bottom:1px solid rgba(56,189,248,0.2); padding-bottom:4px; letter-spacing:0.08em;">PER-GAME DISTRIBUTION</h3>
+            <div style="display:flex; flex-direction:column; gap:5px;">
               ${this.APPROVED_GAME_IDS.map(gid => {
                 const pg = d.perGame[gid];
                 const pct = d.totalPlaytime > 0 ? Math.round((pg.playtimeSeconds / d.totalPlaytime) * 100) : 0;
                 return `
                   <div>
                     <div style="display:flex; justify-content:space-between; font-size:8px;">
-                      <span>${gameTitles[gid]}</span>
-                      <span>${pg.launches} launches (${pct}%)</span>
+                      <span style="font-weight:bold;">${gameTitles[gid]}</span>
+                      <span style="opacity:0.8;">${pg.launches} launches (${pct}%)</span>
                     </div>
-                    <!-- CSS Progress Bar -->
-                    <div style="background: rgba(255,255,255,0.1); height:4px; border-radius:2px; margin-top:2px;">
-                      <div style="background: var(--machine-accent, #35d0ba); height: 100%; width: ${pct}%; border-radius:2px;"></div>
+                    <div style="background: rgba(255,255,255,0.08); height:5px; border-radius:3px; margin-top:2px; overflow:hidden;">
+                      <div style="background: linear-gradient(90deg, #38bdf8, #a855f7); height: 100%; width: ${pct}%; border-radius:3px; box-shadow:0 0 6px rgba(56,189,248,0.5);"></div>
                     </div>
                   </div>
                 `;
@@ -502,11 +501,11 @@ export const ArcadeStats = {
           </div>
         </div>
 
-        <!-- Bottom Recent Sessions History Logger (Correction 7 - semantic list / table) -->
-        <div style="margin-top: 8px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 6px;">
+        <!-- Bottom Recent Sessions History Logger -->
+        <div style="margin-top: 8px; border-top: 1px dashed rgba(56,189,248,0.2); padding-top: 6px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 4px;">
-            <h3 style="margin: 0; font-size:9px; color: var(--machine-accent, #35d0ba);">RECENT GAME LOGS</h3>
-            <button class="sys-btn" id="clear-history-btn" style="font-size:7px; padding:1px 4px; margin:0; line-height:1;" data-arcade-focusable data-arcade-action="clear-session-history">CLEAR HISTORY</button>
+            <h3 style="margin: 0; font-size:9px; color: #38bdf8; letter-spacing:0.08em;">📋 RECENT ACTIVITY LOGS</h3>
+            <button class="sys-btn" id="clear-history-btn" style="font-size:7px; padding:2px 6px; margin:0; line-height:1;" data-arcade-focusable data-arcade-action="clear-session-history">CLEAR LOGS</button>
           </div>
           <div style="max-height:80px; overflow-y:auto;">
             <ul class="session-history-list" style="margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:3px;">

@@ -12,6 +12,10 @@ import { initNimo } from "./modules/nimo.js";
 import { initRuntimeFixes } from "./modules/runtime-fixes.js";
 import { initArcadeCinematicScene } from "./modules/arcade-cinematic-scene.js";
 import { initArcadeHardwareInputFixes } from "./modules/arcade-hardware-input-fixes.js";
+import { initProjectEnvironment } from "./modules/project-environment.js";
+import { ArcadeEnvironmentService } from "./modules/arcade-environment-service.js";
+import { Arcade3DPlanetEngine } from "./modules/arcade-3d-planet-engine.js";
+import ArcadeTransitions from "./modules/arcade-transitions.js";
 
 document.body.classList.add("is-loading");
 document.body.style.opacity = '0';
@@ -21,7 +25,13 @@ requestAnimationFrame(() => requestAnimationFrame(() => {
   document.body.classList.remove("is-loading");
 }));
 
+window.ArcadeEnvironmentService = ArcadeEnvironmentService;
+window.Arcade3DPlanetEngine = Arcade3DPlanetEngine;
+ArcadeEnvironmentService.init();
+Arcade3DPlanetEngine.init();
+ArcadeTransitions.init();
 initOS();
+initProjectEnvironment();
 initCursorSystem();
 initCommandPalette();
 initSectionProgressRail();

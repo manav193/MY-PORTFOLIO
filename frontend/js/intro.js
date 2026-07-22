@@ -237,17 +237,13 @@
     }
 
     // Mathematical Timeline from single source of truth
-    // scale smoothly transitions from 1.0 down to 0.75 across the entire safeProgress
-    const ease = 1 - Math.pow(1 - safeProgress, 3); // ease-out cubic
-    
-    let scale = 1 - (ease * 0.25);     // 1.0 -> 0.75
-    // Safety clamp for scale to prevent invisible/NaN values
-    scale = Number.isFinite(scale) ? Math.max(0.5, scale) : 1.0;
+    // At full Arcade presentation state (is-scaled), cabinet renders at 100% full scale (1.0)
+    let scale = 1.0;
     
     let opacity = 1;
     const rotateX = 0;
 
-    // Apply strict pure math state safely via raw transform string (chassis is dedicated to scale/opacity)
+    // Apply strict pure math state safely via raw transform string
     chassis.style.transform = `scale(${scale}) translateZ(0) rotateX(${rotateX}deg)`;
     chassis.style.opacity = opacity;
     
