@@ -16,18 +16,21 @@ function installCabinetLayoutFix() {
   const style = document.createElement('style');
   style.id = 'arcade-hardware-layout-fix';
   style.textContent = `
-    /* Large immersive CRT + a fully visible physical control deck. */
+    /* Large immersive CRT with the complete cabinet kept inside the viewport. */
     .cabinet-chassis.is-scaled {
       width: 92vw !important;
       max-width: 1500px !important;
-      height: min(940px, 96vh) !important;
-      max-height: 940px !important;
+      height: min(900px, 92vh) !important;
+      max-height: 900px !important;
     }
 
-    /* Extend the themed front shell downward instead of clipping the joystick/buttons. */
+    /* The themed front face owns the whole cabinet. Never extend it beyond the
+       chassis: that was what allowed the joystick/buttons to be clipped by the
+       sticky intro viewport. */
     .cabinet-chassis.is-scaled .cab-front {
-      height: calc(100% + 78px) !important;
-      bottom: auto !important;
+      inset: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
       overflow: visible !important;
       background-color: var(--cab-bg) !important;
       border-radius: 32px 32px 14px 14px !important;
@@ -46,7 +49,7 @@ function installCabinetLayoutFix() {
       margin: 10px auto 0 !important;
     }
 
-    /* Grow the actual render surface with the bezel; never scale/squash the UI. */
+    /* Grow the real render surface with the bezel; never scale/squash the UI. */
     .cabinet-chassis.is-scaled .screen-content-layer {
       top: 96px !important;
       left: calc(5% + 16px) !important;
@@ -94,14 +97,14 @@ function installCabinetLayoutFix() {
       display: grid !important;
     }
 
-    /* Keep the lower themed cabinet body in normal flow, below the complete deck. */
+    /* Compact lower body in normal flow so it cannot push/crop the deck. */
     .cabinet-chassis.is-scaled .cab-bottom-details {
       width: 90% !important;
-      min-height: 72px !important;
-      height: 72px !important;
-      flex: 0 0 72px !important;
-      margin: 8px auto 0 !important;
-      padding: 8px 0 6px !important;
+      min-height: 58px !important;
+      height: 58px !important;
+      flex: 0 0 58px !important;
+      margin: 6px auto 0 !important;
+      padding: 5px 0 4px !important;
       box-sizing: border-box !important;
       background: transparent !important;
       align-items: flex-end !important;
@@ -114,7 +117,6 @@ function installCabinetLayoutFix() {
       content: none !important;
     }
 
-    /* Ensure hardware itself can never be cropped by a parent introduced by themes. */
     .cabinet-chassis.is-scaled .cab-joystick,
     .cabinet-chassis.is-scaled .cab-joy-ball,
     .cabinet-chassis.is-scaled .cab-btn,
@@ -123,44 +125,55 @@ function installCabinetLayoutFix() {
       overflow: visible !important;
     }
 
+    /* Short laptop screens need a slightly shorter CRT, not cropped hardware. */
+    @media (max-height: 900px) and (min-width: 769px) {
+      .cabinet-chassis.is-scaled {
+        height: 88vh !important;
+        max-height: 790px !important;
+      }
+
+      .cabinet-chassis.is-scaled .cabinet-screen-bezel {
+        flex-basis: 430px !important;
+        min-height: 430px !important;
+        max-height: 430px !important;
+      }
+
+      .cabinet-chassis.is-scaled .screen-content-layer {
+        height: 398px !important;
+      }
+
+      .cabinet-chassis.is-scaled .cab-control-deck {
+        flex-basis: 96px !important;
+        min-height: 96px !important;
+        max-height: 96px !important;
+      }
+
+      .cabinet-chassis.is-scaled .cab-bottom-details {
+        min-height: 48px !important;
+        height: 48px !important;
+        flex-basis: 48px !important;
+      }
+    }
+
     @media (max-width: 1100px) {
       .cabinet-chassis.is-scaled {
         width: 94vw !important;
-        height: min(860px, 95vh) !important;
-      }
-
-      .cabinet-chassis.is-scaled .cab-front {
-        height: calc(100% + 64px) !important;
       }
 
       .cabinet-chassis.is-scaled .cabinet-screen-bezel {
         width: 90% !important;
-        flex-basis: 450px !important;
-        min-height: 450px !important;
-        max-height: 450px !important;
       }
 
       .cabinet-chassis.is-scaled .screen-content-layer {
         left: calc(5% + 16px) !important;
         width: calc(90% - 32px) !important;
-        height: 418px !important;
-      }
-
-      .cabinet-chassis.is-scaled .cab-control-deck {
-        flex-basis: 102px !important;
-        min-height: 102px !important;
-        max-height: 102px !important;
       }
     }
 
     @media (max-width: 768px) {
       .cabinet-chassis.is-scaled {
         width: 96vw !important;
-        height: min(720px, 94vh) !important;
-      }
-
-      .cabinet-chassis.is-scaled .cab-front {
-        height: calc(100% + 52px) !important;
+        height: min(720px, 90vh) !important;
       }
 
       .cabinet-chassis.is-scaled .cab-marquee {
@@ -191,9 +204,9 @@ function installCabinetLayoutFix() {
 
       .cabinet-chassis.is-scaled .cab-bottom-details {
         width: 92% !important;
-        min-height: 54px !important;
-        height: 54px !important;
-        flex-basis: 54px !important;
+        min-height: 44px !important;
+        height: 44px !important;
+        flex-basis: 44px !important;
       }
     }
   `;
@@ -234,7 +247,6 @@ function installGamepadLifecycleFix() {
     if (!document.hidden) scheduleEnsure();
   });
 
-  // Browsers can expose an already-connected controller before the listener is attached.
   window.setTimeout(scheduleEnsure, 0);
   window.setTimeout(scheduleEnsure, 400);
   window.setTimeout(scheduleEnsure, 1200);
@@ -250,7 +262,6 @@ function installGamepadLifecycleFix() {
   };
   attachChassisObserver();
 
-  // First user interaction is another reliable point where Gamepad API state becomes available.
   const onFirstInteraction = () => scheduleEnsure();
   window.addEventListener('pointerdown', onFirstInteraction, { once: true, capture: true });
   window.addEventListener('keydown', onFirstInteraction, { once: true, capture: true });
