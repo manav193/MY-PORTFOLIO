@@ -10,6 +10,7 @@ import { initCommandPalette } from "./modules/command-palette.js";
 import { initSectionProgressRail } from "./modules/section-progress-rail.js";
 import { initNimo } from "./modules/nimo.js";
 import { initRuntimeFixes } from "./modules/runtime-fixes.js";
+import { initArcadeCinematicScene } from "./modules/arcade-cinematic-scene.js";
 
 document.body.classList.add("is-loading");
 document.body.style.opacity = '0';
@@ -26,6 +27,7 @@ initSectionProgressRail();
 initDockController();
 initNimo();
 initRuntimeFixes();
+initArcadeCinematicScene();
 initReveal();
 initCounters();
 initScrollProgress();
