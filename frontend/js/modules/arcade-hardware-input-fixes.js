@@ -24,6 +24,11 @@ function installCabinetLayoutFix() {
       max-height: 920px !important;
     }
 
+    .cabinet-chassis.is-scaled .cab-front {
+      background-color: var(--cab-bg) !important;
+      overflow: hidden !important;
+    }
+
     .cabinet-chassis.is-scaled .cab-marquee {
       width: 90% !important;
       flex: 0 0 50px !important;
@@ -75,11 +80,29 @@ function installCabinetLayoutFix() {
       display: grid !important;
     }
 
+    /* Fill the lower chassis with the active cabinet material instead of
+       letting the page background show through below the control deck. */
     .cabinet-chassis.is-scaled .cab-bottom-details {
-      width: 90% !important;
-      flex: 0 0 auto !important;
-      margin-top: auto !important;
-      margin-bottom: 8px !important;
+      width: 100% !important;
+      min-height: 92px !important;
+      flex: 1 1 auto !important;
+      margin: 0 !important;
+      padding: 14px 5% 10px !important;
+      box-sizing: border-box !important;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.22)),
+        var(--cab-bg) !important;
+      align-items: flex-end !important;
+      position: relative !important;
+      z-index: 10 !important;
+    }
+
+    .cabinet-chassis.is-scaled .cab-bottom-details::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.035);
     }
 
     @media (max-width: 1100px) {
@@ -135,7 +158,9 @@ function installCabinetLayoutFix() {
       }
 
       .cabinet-chassis.is-scaled .cab-bottom-details {
-        width: 92% !important;
+        min-height: 72px !important;
+        padding-left: 4% !important;
+        padding-right: 4% !important;
       }
     }
   `;
