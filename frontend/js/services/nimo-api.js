@@ -1,8 +1,6 @@
-```javascript
-/**
+﻿/**
  * NIMO Frontend API Client Service
  * Handles secure asynchronous communication with the backend OpenRouter API endpoint.
- * Safe fallback guarantees 100% functionality even when offline or when backend is unreachable.
  */
 
 const DEFAULT_BACKEND_URL =
@@ -41,7 +39,7 @@ export async function fetchNimoBackendReply(userMessage, context = {}) {
         success: false,
         reply: null,
         actions: [],
-error: 'Server responded with status ' + response.status
+        error: 'Server responded with status ' + response.status
       };
     }
 
@@ -67,4 +65,3 @@ error: 'Server responded with status ' + response.status
     clearTimeout(timeoutId);
   }
 }
-```
