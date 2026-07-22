@@ -1,4 +1,3 @@
-```javascript
 /**
  * NIMO Frontend API Client Service
  * Handles secure asynchronous communication with the backend OpenRouter API endpoint.
@@ -10,7 +9,7 @@ const DEFAULT_BACKEND_URL =
     ? window.NIMO_BACKEND_URL
     : typeof window !== 'undefined' && window.location.hostname === 'localhost'
       ? 'http://localhost:3000/api/nimo/chat'
-      : 'https://nimo-backend.manav-nimo.workers.dev/api/nimo/chat';
+      : '/api/nimo/chat';
 
 export async function fetchNimoBackendReply(userMessage, context = {}) {
   const controller = new AbortController();
@@ -67,4 +66,3 @@ export async function fetchNimoBackendReply(userMessage, context = {}) {
     clearTimeout(timeoutId);
   }
 }
-```

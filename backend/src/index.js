@@ -8,38 +8,60 @@ const DEFAULT_ALLOWED_ORIGINS = [
   'https://my-portfolio-mu-jade-52.vercel.app'
 ];
 
-function getCorsHeaders(request, env = {}) {
+function getCorsInfo(request, env = {}) {
   const rawOrigins = env.ALLOWED_ORIGINS || '';
   const allowedOrigins = rawOrigins
     ? rawOrigins.split(',').map(o => o.trim())
     : DEFAULT_ALLOWED_ORIGINS;
 
   const origin = request.headers.get('origin');
-  let allowOrigin = '*';
 
-  if (origin && (allowedOrigins.includes(origin) || allowedOrigins.includes('*'))) {
-    allowOrigin = origin;
-  } else if (allowedOrigins.length > 0 && !allowedOrigins.includes('*')) {
-    allowOrigin = allowedOrigins[0];
+  // Direct server-to-server or non-browser requests without Origin header
+  if (!origin) {
+    return {
+      isAllowed: true,
+      headers: {}
+    };
   }
 
+  // Exact origin match or wildcard allowlist
+  if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+    return {
+      isAllowed: true,
+      headers: {
+        'Access-Control-Allow-Origin': origin,
+        'Vary': 'Origin',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Max-Age': '86400'
+      }
+    };
+  }
+
+  // Unauthorized origin
   return {
-    'Access-Control-Allow-Origin': allowOrigin,
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    'Access-Control-Max-Age': '86400'
+    isAllowed: false,
+    headers: {}
   };
 }
 
 export default {
   async fetch(request, env = {}, ctx) {
-    const corsHeaders = getCorsHeaders(request, env);
+    const cors = getCorsInfo(request, env);
 
-    // Handle OPTIONS preflight requests
+    // Reject unauthorized cross-origin requests & preflights
+    if (!cors.isAllowed) {
+      return new Response(JSON.stringify({ error: 'Origin not allowed' }), {
+        status: 403,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Handle OPTIONS preflight requests for allowed origins
     if (request.method === 'OPTIONS') {
       return new Response(null, {
         status: 204,
-        headers: corsHeaders
+        headers: cors.headers
       });
     }
 
@@ -53,19 +75,19 @@ export default {
         timestamp: new Date().toISOString()
       }), {
         status: 200,
-        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+        headers: { 'Content-Type': 'application/json', ...cors.headers }
       });
     }
 
     // POST /api/nimo/chat
     if (request.method === 'POST' && url.pathname === '/api/nimo/chat') {
-      return await handleNimoChatRoute(request, env, corsHeaders);
+      return await handleNimoChatRoute(request, env, cors.headers);
     }
 
     // 404 Fallback
     return new Response(JSON.stringify({ error: 'Endpoint not found' }), {
       status: 404,
-      headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      headers: { 'Content-Type': 'application/json', ...cors.headers }
     });
   }
 };
