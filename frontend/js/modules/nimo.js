@@ -5,6 +5,8 @@
  * (English, Devanagari Hindi, and Hinglish / Roman Hindi).
  */
 
+import { fetchNimoBackendReply } from '../services/nimo-api.js';
+
 // ==========================================
 // 1. PORTFOLIO & PROJECT ENTITY DATABASE
 // ==========================================
@@ -499,6 +501,8 @@ const SHORTHAND_MAP = [
 ];
 
 const REPEATED_CONVERSATIONAL_MAP = [
+  [/\b(hi){2,}\b/g, 'hi'],
+  [/\b(ha){2,}\b/g, 'haha'],
   [/\bhe+y+\b/g, 'hey'],
   [/\bhi{2,}\b/g, 'hi'],
   [/\bhe+l+o+\b/g, 'hello'],
@@ -985,6 +989,7 @@ const INTENT_REGISTRY = [
     priority: 90,
     matches: (text, entities, locationCtx, activeCS) => {
       if (!activeCS) return false;
+      if (locationCtx?.type !== 'case-study' && (text.includes("manav") || text.includes("portfolio"))) return false;
       if (entities.technology && GLOSSARY_DB[entities.technology]) return false;
       return matchesAnyPhrase(text, ['summary', 'summarize', 'overview', 'about this project', 'what is this project', 'tell me about this', 'summarize it', 'summarize this', 'tech', 'technology', 'built with', 'stack', 'languages', 'tech was used', 'tech is used', 'what tech', 'problem', 'challenge', 'goal', 'problem does it solve', 'feature', 'features', 'main features', 'key features', 'its main features']);
     },
@@ -1929,26 +1934,66 @@ export function initNimo() {
     return `Hi! I'm **NIMO**, your portfolio assistant.\n\nI can help you navigate, explain case studies, answer web development questions, or launch Arcade OS. How can I help you today?`;
   }
 
-  function handleUserMessage(userText) {
+  async function handleUserMessage(userText) {
     renderMessage('user', userText, true);
     saveToHistory('user', userText);
 
     const typingEl = showTypingIndicator();
 
-    setTimeout(() => {
+    // 1. Process local deterministic intent engine first
+    const localResponse = processUserQuery(userText);
+    const isLocalFallback = localResponse.intentId === 'fallback';
+
+    if (!isLocalFallback) {
+      // Keep confident local response 100% local!
+      setTimeout(() => {
+        typingEl.remove();
+        renderMessage('assistant', localResponse.text, true, localResponse.actions);
+        saveToHistory('assistant', localResponse.text);
+        renderSuggestions();
+        if (localResponse.navigateTarget) {
+          setTimeout(() => {
+            executeNavigation(localResponse.navigateTarget);
+          }, 600);
+        }
+      }, 200);
+      return;
+    }
+
+    // 2. Unknown / Fallback Query -> Consult Cloudflare Worker / OpenRouter API
+    const locCtx = getCurrentLocationContext();
+    const detectedLangInfo = detectLanguageStyle(userText);
+    const contextPayload = {
+      page: locCtx?.title || locCtx?.type || 'home',
+      section: locCtx?.id || locCtx?.title || 'home',
+      project: locCtx?.id || locCtx?.title || null,
+      language: detectedLangInfo?.lang || getSessionLanguage()
+    };
+
+    try {
+      const backendResult = await fetchNimoBackendReply(userText, contextPayload);
       typingEl.remove();
-      const response = processUserQuery(userText);
-      renderMessage('assistant', response.text, true, response.actions);
-      saveToHistory('assistant', response.text);
 
-      renderSuggestions();
+      if (backendResult && backendResult.success && backendResult.reply) {
+        const actions = (backendResult.actions && backendResult.actions.length > 0)
+          ? backendResult.actions
+          : localResponse.actions;
 
-      if (response.navigateTarget) {
-        setTimeout(() => {
-          executeNavigation(response.navigateTarget);
-        }, 600);
+        renderMessage('assistant', backendResult.reply, true, actions);
+        saveToHistory('assistant', backendResult.reply);
+      } else {
+        // Backend unavailable/unconfigured -> Render safe local fallback
+        renderMessage('assistant', localResponse.text, true, localResponse.actions);
+        saveToHistory('assistant', localResponse.text);
       }
-    }, 250);
+    } catch (err) {
+      typingEl.remove();
+      // Safe local fallback on exception
+      renderMessage('assistant', localResponse.text, true, localResponse.actions);
+      saveToHistory('assistant', localResponse.text);
+    }
+
+    renderSuggestions();
   }
 
   function renderMessage(role, text, animate = true, actions = []) {
