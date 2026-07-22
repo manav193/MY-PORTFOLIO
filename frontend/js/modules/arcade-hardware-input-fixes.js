@@ -16,20 +16,23 @@ function installCabinetLayoutFix() {
   const style = document.createElement('style');
   style.id = 'arcade-hardware-layout-fix';
   style.textContent = `
-    /* Large immersive CRT with the COMPLETE lower cabinet shell included. */
+    /* Keep the approved horizontal proportions. The previous 96–98vw override
+       made the CRT look side-stretched, so width is restored here. */
     .cabinet-chassis.is-scaled {
-      width: 96vw !important;
-      max-width: 1660px !important;
-      height: min(960px, 96vh) !important;
-      max-height: 960px !important;
+      width: 92vw !important;
+      max-width: 1500px !important;
+      height: min(900px, 92vh) !important;
+      max-height: 900px !important;
     }
 
-    /* The themed face must continue behind the service hatch / coin LED /
-       serial markings. Those details are part of the cabinet, not page chrome. */
+    /* Extend ONLY the physical cabinet shell downward. The screen, marquee and
+       control deck keep their own dimensions; this extra 112px is the lower
+       hardware bay behind the service hatch, coin LED and serial text. */
     .cabinet-chassis.is-scaled .cab-front {
       inset: 0 !important;
       width: 100% !important;
-      height: 100% !important;
+      height: calc(100% + 112px) !important;
+      min-height: calc(100% + 112px) !important;
       overflow: visible !important;
       background-color: var(--cab-bg) !important;
       border-radius: 32px 32px 14px 14px !important;
@@ -37,12 +40,12 @@ function installCabinetLayoutFix() {
     }
 
     .cabinet-chassis.is-scaled .cab-marquee {
-      width: 92% !important;
+      width: 90% !important;
       flex: 0 0 50px !important;
     }
 
     .cabinet-chassis.is-scaled .cabinet-screen-bezel {
-      width: 92% !important;
+      width: 90% !important;
       flex: 0 0 500px !important;
       min-height: 500px !important;
       max-height: 500px !important;
@@ -51,8 +54,8 @@ function installCabinetLayoutFix() {
 
     .cabinet-chassis.is-scaled .screen-content-layer {
       top: 96px !important;
-      left: calc(4% + 16px) !important;
-      width: calc(92% - 32px) !important;
+      left: calc(5% + 16px) !important;
+      width: calc(90% - 32px) !important;
       height: 468px !important;
     }
 
@@ -61,7 +64,7 @@ function installCabinetLayoutFix() {
       flex: 0 0 110px !important;
       min-height: 110px !important;
       max-height: 110px !important;
-      width: 92% !important;
+      width: 90% !important;
       margin: 10px auto 0 !important;
       padding: 0 40px !important;
       opacity: 1 !important;
@@ -96,11 +99,10 @@ function installCabinetLayoutFix() {
       display: grid !important;
     }
 
-    /* This is the physical lower hardware bay: speaker/service hatch on the
-       left, illuminated coin acceptor in the middle, manufacturing text right.
-       Reserve real cabinet height for it so none of it sits outside the shell. */
+    /* Lower hardware stays in normal flow, fully inside the newly extended
+       themed shell. Do not stretch the CRT to create this space. */
     .cabinet-chassis.is-scaled .cab-bottom-details {
-      width: 92% !important;
+      width: 90% !important;
       min-height: 78px !important;
       height: 78px !important;
       flex: 0 0 78px !important;
@@ -125,6 +127,12 @@ function installCabinetLayoutFix() {
       z-index: 25 !important;
     }
 
+    /* The feet/base belong at the new physical bottom, not at the old shell edge. */
+    .cabinet-chassis.is-scaled .cabinet-base {
+      bottom: -16px !important;
+      width: 90% !important;
+    }
+
     .cabinet-chassis.is-scaled .cab-joystick,
     .cabinet-chassis.is-scaled .cab-joy-ball,
     .cabinet-chassis.is-scaled .cab-btn,
@@ -133,12 +141,19 @@ function installCabinetLayoutFix() {
       overflow: visible !important;
     }
 
-    /* On laptop-height screens, keep the cabinet tall enough to wrap the lower
-       hardware. Reduce only the CRT height; never eject the bottom details. */
+    /* Laptop-height screens: preserve width and controls. Shorten only the CRT
+       when needed, while the front shell still extends downward by 96px. */
     @media (max-height: 900px) and (min-width: 769px) {
       .cabinet-chassis.is-scaled {
-        height: 96vh !important;
-        max-height: 850px !important;
+        width: 92vw !important;
+        max-width: 1500px !important;
+        height: 86vh !important;
+        max-height: 780px !important;
+      }
+
+      .cabinet-chassis.is-scaled .cab-front {
+        height: calc(100% + 96px) !important;
+        min-height: calc(100% + 96px) !important;
       }
 
       .cabinet-chassis.is-scaled .cabinet-screen-bezel {
@@ -161,39 +176,43 @@ function installCabinetLayoutFix() {
         min-height: 72px !important;
         height: 72px !important;
         flex-basis: 72px !important;
-        margin-top: 8px !important;
       }
     }
 
     @media (max-width: 1100px) {
       .cabinet-chassis.is-scaled {
-        width: 98vw !important;
+        width: 94vw !important;
       }
 
       .cabinet-chassis.is-scaled .cab-marquee,
       .cabinet-chassis.is-scaled .cabinet-screen-bezel,
       .cabinet-chassis.is-scaled .cab-control-deck,
       .cabinet-chassis.is-scaled .cab-bottom-details {
-        width: 94% !important;
+        width: 92% !important;
       }
 
       .cabinet-chassis.is-scaled .screen-content-layer {
-        left: calc(3% + 16px) !important;
-        width: calc(94% - 32px) !important;
+        left: calc(4% + 16px) !important;
+        width: calc(92% - 32px) !important;
       }
     }
 
     @media (max-width: 768px) {
       .cabinet-chassis.is-scaled {
-        width: 98vw !important;
-        height: min(760px, 94vh) !important;
+        width: 96vw !important;
+        height: min(700px, 88vh) !important;
+      }
+
+      .cabinet-chassis.is-scaled .cab-front {
+        height: calc(100% + 72px) !important;
+        min-height: calc(100% + 72px) !important;
       }
 
       .cabinet-chassis.is-scaled .cab-marquee,
       .cabinet-chassis.is-scaled .cabinet-screen-bezel,
       .cabinet-chassis.is-scaled .cab-control-deck,
       .cabinet-chassis.is-scaled .cab-bottom-details {
-        width: 94% !important;
+        width: 92% !important;
       }
 
       .cabinet-chassis.is-scaled .cabinet-screen-bezel {
@@ -204,8 +223,8 @@ function installCabinetLayoutFix() {
 
       .cabinet-chassis.is-scaled .screen-content-layer {
         top: 90px !important;
-        left: calc(3% + 16px) !important;
-        width: calc(94% - 32px) !important;
+        left: calc(4% + 16px) !important;
+        width: calc(92% - 32px) !important;
         height: 288px !important;
       }
 
