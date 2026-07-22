@@ -14,6 +14,7 @@ const portfolioConfig = Object.freeze({
     'nimo',
     'toolverse',
     'selfyy',
+    'veldora-bites',
     'shift-zero',
     'love',
     'velora-bites',
@@ -44,6 +45,12 @@ const portfolioConfig = Object.freeze({
       liveUrl: 'https://selfyy.vercel.app/',
       githubUrl: 'https://github.com/manav193/SELFYY',
       caseStudyPath: 'project-selfyy.html'
+    }),
+    'veldora-bites': Object.freeze({
+      status: 'Live',
+      liveUrl: 'https://veldora-bites.vercel.app/orders.html',
+      githubUrl: 'https://github.com/manav193/VELDORA-BITES',
+      caseStudyPath: 'project-veldora-bites.html'
     }),
     'shift-zero': Object.freeze({
       status: 'In Development',
