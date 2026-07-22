@@ -6,6 +6,8 @@ import { initContactForm } from "./modules/contact.js";
 import { initOS } from "./modules/os.js";
 import { initDockController } from "./modules/dock-controller.js";
 import { initCursorSystem } from "./modules/cursor-system.js";
+import { initCommandPalette } from "./modules/command-palette.js";
+import { initSectionProgressRail } from "./modules/section-progress-rail.js";
 
 document.body.classList.add("is-loading");
 document.body.style.opacity = '0';
@@ -17,6 +19,8 @@ requestAnimationFrame(() => requestAnimationFrame(() => {
 
 initOS();
 initCursorSystem();
+initCommandPalette();
+initSectionProgressRail();
 initDockController();
 initReveal();
 initCounters();

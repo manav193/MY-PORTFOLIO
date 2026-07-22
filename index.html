@@ -269,11 +269,11 @@
   <div class="cursor-ring" data-cursor-ring></div>
 
   <!-- COMMAND PALETTE OVERLAY -->
-  <div class="cmd-palette-backdrop" data-cmd-backdrop>
-    <div class="cmd-palette">
+  <div class="cmd-palette-backdrop" data-cmd-backdrop hidden>
+    <div class="cmd-palette" role="dialog" aria-modal="true" aria-label="Command palette">
       <div class="cmd-search">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-        <input type="text" id="cmd-input" placeholder="Type a command or search..." autocomplete="off">
+        <input type="text" id="cmd-input" placeholder="Type a command or search..." autocomplete="off" aria-label="Search commands">
         <span class="cmd-shortcut">ESC</span>
       </div>
       <div class="cmd-results" id="cmd-results">
@@ -299,7 +299,7 @@
         <a href="#contact">Contact</a>
         <a href="{{portfolio.resumePath}}" target="_blank" rel="noopener noreferrer" class="nav-link-secondary">Resume</a>
         <a href="{{portfolio.githubUrl}}" target="_blank" rel="noopener noreferrer" class="nav-link-secondary">GitHub</a>
-        <button class="cmd-trigger" aria-label="Command Palette" onclick="document.querySelector('[data-cmd-backdrop]').classList.add('active'); document.getElementById('cmd-input').focus();">
+        <button class="cmd-trigger" type="button" data-cmd-trigger aria-label="Command Palette">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"></path></svg>
           <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;">Ctrl K</span>
         </button>
@@ -310,7 +310,7 @@
   <!-- PREMIUM PRODUCT ARCHITECTURE -->
   <main class="system-architecture" id="main-content">
     <!-- 00 // HERO -->
-    <section class="system-section hero-section">
+    <section id="home" class="system-section hero-section">
       <div class="container-centered">
         <p class="hero-kicker reveal-up" style="transition-delay: 0.1s">{{portfolio.role}} // {{portfolio.location}}</p>
         <h1 class="hero-title reveal-up" style="transition-delay: 0.2s">Manav<br>Agarwal.</h1>
@@ -426,11 +426,11 @@
           </article>
         </div>
 
-        <div class="design-work reveal-up" aria-labelledby="design-work-title">
-          <div class="section-header compact-header"><p class="hero-kicker">MORE EXPERIMENTS</p><h3 id="design-work-title">Additional interface explorations</h3></div>
-          <div class="design-work-grid">
-            <article class="design-project"><img src="images/sz_menu.png" alt="SHIFT-ZERO high-contrast game HUD design" width="1200" height="800" loading="lazy"><div><span class="project-status status-progress">Design Prototype</span><h4>SHIFT-ZERO UI</h4><p>High-contrast HUD and menu language designed for rapid gameplay readability.</p><a href="https://github.com/manav193/SHIFT-ZERO-UI" target="_blank" rel="noopener noreferrer">View GitHub</a></div></article>
-            <article class="design-project"><img src="images/promptai_new.png" alt="PromptAI multi-model orchestration interface" width="1200" height="800" loading="lazy"><div><span class="project-status status-progress">UI Concept</span><h4>PromptAI</h4><p>A dense split-pane workspace for comparing prompts, models, outputs, and test context.</p><a href="project-promptai.html">View Case Study</a></div></article>
+        <div class="more-experiments reveal-up" aria-labelledby="design-work-title">
+          <div class="section-header more-experiments__header"><p class="hero-kicker">MORE EXPERIMENTS</p><h3 id="design-work-title">Additional interface explorations</h3></div>
+          <div class="experiments-grid">
+            <article class="experiment-card"><div class="experiment-card__media"><img src="images/sz_menu.png" alt="SHIFT-ZERO high-contrast game HUD design" width="1200" height="800" loading="lazy"></div><div class="experiment-card__content"><span class="project-status status-progress">Design Prototype</span><h4>SHIFT-ZERO UI</h4><p>High-contrast HUD and menu language designed for rapid gameplay readability.</p><div class="experiment-card__actions"><a href="https://github.com/manav193/SHIFT-ZERO-UI" target="_blank" rel="noopener noreferrer">View GitHub</a></div></div></article>
+            <article class="experiment-card"><div class="experiment-card__media"><img src="images/promptai_new.png" alt="PromptAI multi-model orchestration interface" width="1200" height="800" loading="lazy"></div><div class="experiment-card__content"><span class="project-status status-progress">UI Concept</span><h4>PromptAI</h4><p>A dense split-pane workspace for comparing prompts, models, outputs, and test context.</p><div class="experiment-card__actions"><a href="project-promptai.html">View Case Study</a></div></div></article>
           </div>
         </div>
       </div>

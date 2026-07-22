@@ -254,7 +254,7 @@ function processSWContent(content, base) {
   let processed = content;
   
   // Bump version to trigger fresh caching on update
-  processed = processed.replace(/manav-portfolio-v18/g, 'manav-portfolio-v19');
+  processed = processed.replace(/manav-portfolio-v19/g, 'manav-portfolio-v20');
   
   // Prepend base path to cached assets
   processed = processed.replace(/"\.\/"/g, `"${base}"`);
