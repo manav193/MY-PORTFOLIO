@@ -16,20 +16,33 @@ function installCabinetLayoutFix() {
   const style = document.createElement('style');
   style.id = 'arcade-hardware-layout-fix';
   style.textContent = `
-    /* Keep the large CRT, but reserve real physical space for the control deck. */
+    /* Large immersive CRT + guaranteed physical control deck. */
     .cabinet-chassis.is-scaled {
-      height: min(820px, 92vh) !important;
-      max-height: 840px !important;
+      width: 92vw !important;
+      max-width: 1500px !important;
+      height: min(900px, 94vh) !important;
+      max-height: 920px !important;
     }
 
     .cabinet-chassis.is-scaled .cab-marquee {
+      width: 90% !important;
       flex: 0 0 50px !important;
     }
 
     .cabinet-chassis.is-scaled .cabinet-screen-bezel {
-      flex: 0 0 440px !important;
-      min-height: 440px !important;
-      max-height: 440px !important;
+      width: 90% !important;
+      flex: 0 0 520px !important;
+      min-height: 520px !important;
+      max-height: 520px !important;
+      margin: 10px auto 0 !important;
+    }
+
+    /* Grow the actual render surface with the bezel instead of stretching it. */
+    .cabinet-chassis.is-scaled .screen-content-layer {
+      top: 96px !important;
+      left: calc(5% + 16px) !important;
+      width: calc(90% - 32px) !important;
+      height: 488px !important;
     }
 
     .cabinet-chassis.is-scaled .cab-control-deck {
@@ -37,7 +50,7 @@ function installCabinetLayoutFix() {
       flex: 0 0 95px !important;
       min-height: 95px !important;
       max-height: 95px !important;
-      width: 86% !important;
+      width: 90% !important;
       margin: 10px auto 0 !important;
       padding: 0 36px !important;
       opacity: 1 !important;
@@ -63,31 +76,66 @@ function installCabinetLayoutFix() {
     }
 
     .cabinet-chassis.is-scaled .cab-bottom-details {
+      width: 90% !important;
       flex: 0 0 auto !important;
       margin-top: auto !important;
       margin-bottom: 8px !important;
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: 1100px) {
       .cabinet-chassis.is-scaled {
-        height: min(640px, 90vh) !important;
+        width: 94vw !important;
+        height: min(820px, 93vh) !important;
       }
 
       .cabinet-chassis.is-scaled .cabinet-screen-bezel {
-        flex-basis: 300px !important;
-        min-height: 300px !important;
-        max-height: 300px !important;
+        width: 90% !important;
+        flex-basis: 470px !important;
+        min-height: 470px !important;
+        max-height: 470px !important;
       }
 
       .cabinet-chassis.is-scaled .screen-content-layer {
-        height: 268px !important;
+        left: calc(5% + 16px) !important;
+        width: calc(90% - 32px) !important;
+        height: 438px !important;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .cabinet-chassis.is-scaled {
+        width: 96vw !important;
+        height: min(680px, 92vh) !important;
+      }
+
+      .cabinet-chassis.is-scaled .cab-marquee {
+        width: 92% !important;
+      }
+
+      .cabinet-chassis.is-scaled .cabinet-screen-bezel {
+        width: 92% !important;
+        flex-basis: 330px !important;
+        min-height: 330px !important;
+        max-height: 330px !important;
+      }
+
+      .cabinet-chassis.is-scaled .screen-content-layer {
+        top: 90px !important;
+        left: calc(4% + 16px) !important;
+        width: calc(92% - 32px) !important;
+        height: 298px !important;
       }
 
       .cabinet-chassis.is-scaled .cab-control-deck {
+        width: 92% !important;
         flex-basis: 78px !important;
         min-height: 78px !important;
         max-height: 78px !important;
         padding: 0 20px !important;
+      }
+
+      .cabinet-chassis.is-scaled .cab-bottom-details {
+        width: 92% !important;
       }
     }
   `;
