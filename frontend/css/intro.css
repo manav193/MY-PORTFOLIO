@@ -185,10 +185,10 @@ body:not(.intro-skipped) .living-ambient-light {
 
 /* Base structural scaling */
 .cabinet-chassis.is-scaled {
-  width: 90vw;
-  height: 90vh;
-  max-width: 1100px;
-  max-height: 900px;
+  width: 86vw;
+  height: min(720px, 84vh);
+  max-width: 1380px;
+  max-height: 760px;
   border-radius: 32px 32px 12px 12px; 
   box-shadow: 0 50px 100px -20px rgba(0,0,0,1), 0 20px 40px rgba(0,0,0,0.8);
 }
@@ -450,9 +450,9 @@ body:not(.intro-skipped) .living-ambient-light {
 }
 
 .cabinet-chassis.is-scaled .cabinet-screen-bezel {
-  width: 84%;
-  height: 52%;
-  margin-top: 16px;
+  width: 86%;
+  height: 440px;
+  margin: 10px auto 0;
   border-radius: 16px;
   background-color: #0d0d0f;
   border: 1px solid #1a1a1f;
@@ -514,10 +514,10 @@ body:not(.intro-skipped) .living-ambient-light {
 
 /* Aligned precisely with the bezel offsets when cabinet is scaled */
 .cabinet-chassis.is-scaled .screen-content-layer {
-  top: 32px; /* 16px bezel margin + 16px screen inset */
-  left: calc(8% + 16px); /* 8% bezel left offset + 16px screen inset */
-  width: calc(84% - 32px);
-  height: calc(52% - 32px);
+  top: 96px; /* Marquee top/height + bezel margin + screen inset */
+  left: calc(7% + 16px); /* 7% bezel left offset + 16px screen inset */
+  width: calc(86% - 32px);
+  height: 408px; /* Exactly matches 440px CRT bezel minus 32px insets */
   border-radius: 6px;
 }
 
@@ -556,13 +556,13 @@ body:not(.intro-skipped) .living-ambient-light {
    CONTROL DECK
    ========================================================================== */
 .cab-control-deck {
-  width: 84%;
-  height: 16%;
-  margin-top: 16px;
+  width: 86%;
+  height: 95px;
+  margin: 12px auto 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 32px;
+  padding: 0 36px;
   opacity: 0;
   transition: opacity 0.5s ease;
   background: #111113;
@@ -573,8 +573,10 @@ body:not(.intro-skipped) .living-ambient-light {
     inset 0 -12px 24px rgba(0,0,0,0.85),
     0 10px 25px rgba(0,0,0,0.6);
   position: relative;
+  z-index: 30;
+  pointer-events: auto;
 }
-.cabinet-chassis.is-scaled .cab-control-deck { opacity: 1; }
+.cabinet-chassis.is-scaled .cab-control-deck { opacity: 1 !important; }
 
 .cab-deck-left {
   display: flex;
@@ -783,7 +785,7 @@ body:not(.intro-skipped) .living-ambient-light {
   justify-content: space-between;
   align-items: flex-end;
   margin-top: auto;
-  margin-bottom: 24px;
+  margin-bottom: 10px;
   opacity: 0;
   transition: opacity 0.5s ease;
 }
@@ -791,7 +793,7 @@ body:not(.intro-skipped) .living-ambient-light {
 
 .cab-coin-door {
   width: 56px;
-  height: 72px;
+  height: 48px;
   background: #0d0d0f;
   border-radius: 4px;
   box-shadow: inset 0 2px 6px rgba(0,0,0,0.95), 0 1px 0 rgba(255,255,255,0.05);
@@ -799,8 +801,8 @@ body:not(.intro-skipped) .living-ambient-light {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 10px;
-  gap: 12px;
+  padding-top: 6px;
+  gap: 6px;
   position: relative;
 }
 /* Orange backlit indicator slot */
@@ -915,31 +917,31 @@ body:not(.intro-skipped) .living-ambient-light {
 @media (max-width: 768px) {
   .cabinet-chassis.is-scaled {
     width: 92vw;
-    height: 75vh;
+    height: 520px;
   }
   .cabinet-chassis.is-scaled .cabinet-screen-bezel {
     width: 86%;
-    height: 50%;
+    height: 265px;
   }
   .cabinet-chassis.is-scaled .screen-content-layer {
-    top: 32px;
+    top: 90px;
     left: calc(7% + 16px);
     width: calc(86% - 32px);
-    height: calc(50% - 32px);
+    height: 233px;
   }
   .cab-marquee {
     width: 86%;
     height: 44px;
-    margin-top: 52px;
+    margin-top: 24px;
   }
   .cab-control-deck {
     width: 86%;
     padding: 0 24px;
-    height: 15%;
+    height: 80px;
   }
   .cab-bottom-details {
     width: 86%;
-    margin-bottom: 18px;
+    margin-bottom: 12px;
   }
 }
 

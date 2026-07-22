@@ -3,6 +3,176 @@
  * Core Architecture: Storage, EventBus, Registry, InputManager, Router
  */
 
+function escapeMarkup(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function getPremiumAppIcon(appId) {
+  const id = String(appId || '').toLowerCase();
+  
+  // 1. REACTION TEST -> Reflex / Lightning Push Button
+  if (id === 'reaction' || id === 'reaction-test') {
+    return `<svg class="arcade-premium-icon" viewBox="0 0 64 64" fill="none">
+      <defs>
+        <radialGradient id="btn-glow-cyan" cx="40%" cy="35%" r="60%">
+          <stop offset="0%" stop-color="#73f6ff"/>
+          <stop offset="60%" stop-color="#00c8ff"/>
+          <stop offset="100%" stop-color="#0066aa"/>
+        </radialGradient>
+      </defs>
+      <circle cx="32" cy="34" r="24" fill="#121726" stroke="#2a334d" stroke-width="2" filter="drop-shadow(0 6px 12px rgba(0,0,0,0.6))"/>
+      <circle cx="32" cy="34" r="19" fill="#1a2238" stroke="#00c8ff" stroke-opacity="0.5"/>
+      <circle cx="32" cy="32" r="15" fill="url(#btn-glow-cyan)" filter="drop-shadow(0 0 10px rgba(0,229,255,0.7))"/>
+      <path d="M34 19L24 33h7l-3 12 12-14h-7l3-12z" fill="#ffffff" filter="drop-shadow(0 0 4px #ffffff)"/>
+    </svg>`;
+  }
+
+  // 2. NEON SNAKE -> Pixel Serpent / Grid Snake
+  if (id === 'snake') {
+    return `<svg class="arcade-premium-icon" viewBox="0 0 64 64" fill="none">
+      <defs>
+        <filter id="snake-glow" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="1.5" result="blur"/>
+          <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+        </filter>
+      </defs>
+      <g filter="url(#snake-glow)">
+        <circle cx="16" cy="16" r="1.5" fill="#143825"/>
+        <circle cx="32" cy="16" r="1.5" fill="#143825"/>
+        <circle cx="48" cy="16" r="1.5" fill="#143825"/>
+        <circle cx="16" cy="32" r="1.5" fill="#143825"/>
+        <circle cx="32" cy="32" r="1.5" fill="#143825"/>
+        <circle cx="48" cy="32" r="1.5" fill="#143825"/>
+        <rect x="12" y="12" width="10" height="10" rx="2.5" fill="#00ff88"/>
+        <rect x="24" y="12" width="10" height="10" rx="2.5" fill="#00ff88"/>
+        <rect x="36" y="12" width="10" height="10" rx="2.5" fill="#00ff88"/>
+        <rect x="36" y="24" width="10" height="10" rx="2.5" fill="#00ff88"/>
+        <rect x="36" y="36" width="10" height="10" rx="2.5" fill="#00ff88"/>
+        <rect x="24" y="36" width="10" height="10" rx="2.5" fill="#00ff88"/>
+        <rect x="12" y="36" width="10" height="10" rx="2.5" fill="#00ff88"/>
+        <rect x="12" y="48" width="10" height="10" rx="2.5" fill="#00e577"/>
+        <circle cx="15" cy="51" r="1.5" fill="#06120b"/>
+        <circle cx="19" cy="51" r="1.5" fill="#06120b"/>
+        <circle cx="48" cy="48" r="5" fill="#ff0055" filter="drop-shadow(0 0 6px #ff0055)"/>
+      </g>
+    </svg>`;
+  }
+
+  // 3. BREAKOUT -> Brick & Paddle & Ball
+  if (id === 'breakout') {
+    return `<svg class="arcade-premium-icon" viewBox="0 0 64 64" fill="none">
+      <rect x="8" y="12" width="14" height="6" rx="2" fill="#ff0055"/>
+      <rect x="25" y="12" width="14" height="6" rx="2" fill="#ff9900"/>
+      <rect x="42" y="12" width="14" height="6" rx="2" fill="#00f0ff"/>
+      <rect x="8" y="21" width="14" height="6" rx="2" fill="#00ff88"/>
+      <rect x="25" y="21" width="14" height="6" rx="2" fill="#a052ff"/>
+      <rect x="42" y="21" width="14" height="6" rx="2" fill="#ff0055"/>
+      <rect x="18" y="48" width="28" height="6" rx="3" fill="#ffffff" filter="drop-shadow(0 0 6px #00f0ff)"/>
+      <circle cx="32" cy="36" r="5" fill="#ffea00" filter="drop-shadow(0 0 8px #ffea00)"/>
+    </svg>`;
+  }
+
+  // 4. PIXEL PAD -> Pixel Canvas Grid & Stylus Pencil
+  if (id === 'pixelpad' || id === 'pixel-pad') {
+    return `<svg class="arcade-premium-icon" viewBox="0 0 64 64" fill="none">
+      <rect x="10" y="10" width="44" height="44" rx="6" fill="#121829" stroke="#3b4870" stroke-width="2"/>
+      <rect x="16" y="16" width="8" height="8" fill="#ff0055"/>
+      <rect x="26" y="16" width="8" height="8" fill="#00f0ff"/>
+      <rect x="36" y="16" width="8" height="8" fill="#00ff88"/>
+      <rect x="16" y="26" width="8" height="8" fill="#a052ff"/>
+      <rect x="26" y="26" width="8" height="8" fill="#ffea00"/>
+      <rect x="36" y="26" width="8" height="8" fill="#ff0055"/>
+      <path d="M48 48L34 34l8-8 14 14-8 8z" fill="#ff9900" filter="drop-shadow(0 4px 8px rgba(0,0,0,0.5))"/>
+      <polygon points="34,34 30,42 38,38" fill="#ffffff"/>
+      <polygon points="30,42 28,44 32,42" fill="#222222"/>
+    </svg>`;
+  }
+
+  // 5. PALETTE LAB -> Eyedropper & Color Swatches
+  if (id === 'palettelab' || id === 'palette-lab') {
+    return `<svg class="arcade-premium-icon" viewBox="0 0 64 64" fill="none">
+      <defs>
+        <linearGradient id="flask-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#00f0ff"/>
+          <stop offset="50%" stop-color="#a052ff"/>
+          <stop offset="100%" stop-color="#ff007f"/>
+        </linearGradient>
+      </defs>
+      <path d="M26 8h12v8l12 24c2 4-1 10-6 10H16c-5 0-8-6-6-10l12-24V8z" fill="url(#flask-grad)" opacity="0.88" filter="drop-shadow(0 6px 12px rgba(0,0,0,0.5))"/>
+      <rect x="24" y="4" width="16" height="4" rx="2" fill="#ffffff"/>
+      <circle cx="28" cy="38" r="3" fill="#ffffff" opacity="0.7"/>
+      <circle cx="36" cy="42" r="2" fill="#ffffff" opacity="0.8"/>
+      <circle cx="16" cy="20" r="4" fill="#ff0055" filter="drop-shadow(0 0 4px #ff0055)"/>
+      <circle cx="48" cy="20" r="4" fill="#00ff88" filter="drop-shadow(0 0 4px #00ff88)"/>
+    </svg>`;
+  }
+
+  // 6. SYSTEM CONFIG / SETTINGS -> 3D Metallic Gear
+  if (id === 'settings' || id === 'system' || id === 'system-config') {
+    return `<svg class="arcade-premium-icon" viewBox="0 0 64 64" fill="none">
+      <defs>
+        <linearGradient id="gear-metal" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#e0e6ed"/>
+          <stop offset="50%" stop-color="#95a5b9"/>
+          <stop offset="100%" stop-color="#475569"/>
+        </linearGradient>
+      </defs>
+      <g filter="drop-shadow(0 6px 14px rgba(0,0,0,0.6))">
+        <path d="M60 28h-6.2c-.5-2.2-1.3-4.3-2.4-6.2l4.4-4.4c.8-.8.8-2 0-2.8l-5.7-5.7c-.8-.8-2-.8-2.8 0l-4.4 4.4c-1.9-1.1-4-1.9-6.2-2.4V4.7c0-1.1-.9-2-2-2h-8c-1.1 0-2 .9-2 2v6.2c-2.2.5-4.3 1.3-6.2 2.4l-4.4-4.4c-.8-.8-2-.8-2.8 0l-5.7 5.7c-.8.8-.8 2 0 2.8l4.4 4.4c-1.1 1.9-1.9 4-2.4 6.2H4c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h6.2c.5 2.2 1.3 4.3 2.4 6.2l-4.4 4.4c-.8.8-.8 2 0 2.8l5.7 5.7c.8.8 2 .8 2.8 0l4.4-4.4c1.9 1.1 4 1.9 6.2 2.4v6.2c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2v-6.2c2.2-.5 4.3-1.3 6.2-2.4l4.4 4.4c.8.8 2 .8 2.8 0l5.7-5.7c.8-.8.8-2 0-2.8l-4.4-4.4c1.1-1.9 1.9-4 2.4-6.2H60c1.1 0 2-.9 2-2v-8c0-1.1-.9-2-2-2zM32 44c-6.6 0-12-5.4-12-12s5.4-12 12-12 12 5.4 12 12-5.4 12-12 12z" fill="url(#gear-metal)"/>
+        <circle cx="32" cy="32" r="8" fill="#00f0ff" opacity="0.85" filter="drop-shadow(0 0 6px #00f0ff)"/>
+      </g>
+    </svg>`;
+  }
+
+  // 7. CABINET CUSTOMIZER -> Arcade Cabinet & Wrench
+  if (id === 'customizer' || id === 'themes') {
+    return `<svg class="arcade-premium-icon" viewBox="0 0 64 64" fill="none">
+      <path d="M16 10h32l4 8v38H12V18l4-8zm4 6h24v10H20V16zm-4 14v10h32V30H16z" fill="#202942" stroke="#485c8a" stroke-width="2"/>
+      <circle cx="26" cy="35" r="3" fill="#ff0055"/>
+      <circle cx="38" cy="35" r="3" fill="#00f0ff"/>
+      <path d="M42 42l12 12a3 3 0 0 1-4.2 4.2L37.8 46l4.2-4.2z" fill="#00ff88" filter="drop-shadow(0 0 6px #00ff88)"/>
+    </svg>`;
+  }
+
+  // 8. DIAGNOSTICS -> Oscilloscope / Waveform & Probe
+  if (id === 'diagnostics' || id === 'diag') {
+    return `<svg class="arcade-premium-icon" viewBox="0 0 64 64" fill="none">
+      <rect x="8" y="12" width="48" height="36" rx="6" fill="#0c1220" stroke="#00f0ff" stroke-width="2"/>
+      <path d="M14 30h8l4-10 6 20 6-14 4 6h12" stroke="#00ff88" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" filter="drop-shadow(0 0 6px #00ff88)"/>
+      <circle cx="52" cy="40" r="2" fill="#ff0055" filter="drop-shadow(0 0 4px #ff0055)"/>
+    </svg>`;
+  }
+
+  // 9. STATS -> Bar Chart & Trend
+  if (id === 'stats') {
+    return `<svg class="arcade-premium-icon" viewBox="0 0 64 64" fill="none">
+      <rect x="12" y="34" width="8" height="18" rx="2" fill="#a052ff"/>
+      <rect x="24" y="24" width="8" height="28" rx="2" fill="#00f0ff"/>
+      <rect x="36" y="16" width="8" height="36" rx="2" fill="#00ff88"/>
+      <rect x="48" y="28" width="8" height="24" rx="2" fill="#ff0055"/>
+      <path d="M12 28l12-10 12-6 12 10" stroke="#ffffff" stroke-width="2" stroke-linecap="round" filter="drop-shadow(0 0 4px #ffffff)"/>
+    </svg>`;
+  }
+
+  // 10. ACHIEVEMENTS -> Gold Trophy
+  if (id === 'achievements') {
+    return `<svg class="arcade-premium-icon" viewBox="0 0 64 64" fill="none">
+      <path d="M50 12h-6V8H20v4h-6c-3.3 0-6 2.7-6 6v4c0 7.7 5.7 14.1 13 15.3A14.04 14.04 0 0 0 28 45.4V50h-8v6h24v-6h-8v-4.6c5.2-1 9.5-4.6 11-9.7 7.3-1.2 13-7.6 13-15.3v-4c0-3.3-2.7-6-6-6z" fill="#ffd700" filter="drop-shadow(0 6px 12px rgba(0,0,0,0.5))"/>
+      <circle cx="32" cy="24" r="6" fill="#ff8f00"/>
+    </svg>`;
+  }
+
+  return `<svg class="arcade-premium-icon" viewBox="0 0 64 64" fill="none">
+    <circle cx="32" cy="32" r="20" fill="#1b2034" stroke="#00f0ff" stroke-width="2"/>
+    <text x="32" y="38" font-size="20" font-weight="900" text-anchor="middle" fill="#00f0ff">◈</text>
+  </svg>`;
+}
+
 // ============================================================================
 // 1. STORAGE SYSTEM
 // ============================================================================
@@ -759,23 +929,31 @@ const ArcadeInput = {
 
     const direction = this.getGamepadDirection(pad);
     if (direction) {
-      const repeated = direction === this.lastDirection;
-      const elapsed = time - this.lastDirectionAt;
-      const shouldEmit = !repeated || elapsed >= (this.lastDirectionAt ? this.directionRepeatRate : this.directionRepeatDelay);
-      if (shouldEmit) {
-        this.emitDirection(direction);
+      if (direction !== this.lastDirection) {
         this.lastDirection = direction;
-        this.lastDirectionAt = time;
+        this.lastDirectionTime = time;
+        this.lastRepeatTime = time;
+        this.emitDirection(direction);
+      } else {
+        const heldDuration = time - (this.lastDirectionTime || time);
+        const sinceRepeat = time - (this.lastRepeatTime || time);
+        if (heldDuration >= this.directionRepeatDelay && sinceRepeat >= this.directionRepeatRate) {
+          this.lastRepeatTime = time;
+          this.emitDirection(direction);
+        }
       }
     } else {
       this.lastDirection = '';
-      this.lastDirectionAt = 0;
+      this.lastDirectionTime = 0;
+      this.lastRepeatTime = 0;
     }
 
     this.handleGamepadButton(pad, 0, 'ARCADE_CONFIRM', 'A');
     this.handleGamepadButton(pad, 1, 'ARCADE_BACK', 'B');
-    this.handleGamepadButton(pad, 9, 'ARCADE_CONFIRM', 'START');
-    this.handleGamepadButton(pad, 8, 'ARCADE_BACK', 'SELECT');
+    this.handleGamepadButton(pad, 2, 'ARCADE_ACTION_X', 'X');
+    this.handleGamepadButton(pad, 3, 'ARCADE_ACTION_Y', 'Y');
+    this.handleGamepadButton(pad, 8, 'ARCADE_SELECT', 'SELECT');
+    this.handleGamepadButton(pad, 9, 'ARCADE_START', 'START');
 
     this.gamepadRafId = requestAnimationFrame((nextTime) => this.handleGamepadFrame(nextTime));
   },
@@ -809,7 +987,17 @@ const ArcadeInput = {
     ArcadeEventBus.emit('ARCADE_GAMEPAD_BUTTON', { diagnostic: true, button: label, index });
     if (label === 'A') ArcadeEventBus.emit('ARCADE_ACTION_A', { source: 'gamepad' });
     if (label === 'B') ArcadeEventBus.emit('ARCADE_ACTION_B', { source: 'gamepad' });
-    ArcadeEventBus.emit(eventName, { source: 'gamepad' });
+    if (label === 'X') ArcadeEventBus.emit('ARCADE_ACTION_X', { source: 'gamepad' });
+    if (label === 'Y') ArcadeEventBus.emit('ARCADE_ACTION_Y', { source: 'gamepad' });
+    if (label === 'START') {
+      ArcadeEventBus.emit('ARCADE_START', { source: 'gamepad' });
+    }
+    if (label === 'SELECT') {
+      ArcadeEventBus.emit('ARCADE_SELECT', { source: 'gamepad' });
+    }
+    if (eventName && eventName !== 'ARCADE_START' && eventName !== 'ARCADE_SELECT') {
+      ArcadeEventBus.emit(eventName, { source: 'gamepad' });
+    }
   }
 };
 
@@ -885,8 +1073,29 @@ const ArcadeHardware = {
 
     // Input events feedback (reusing central ArcadeInput events)
     const inputs = ['ARCADE_UP', 'ARCADE_DOWN', 'ARCADE_LEFT', 'ARCADE_RIGHT'];
+    const joyBall = document.querySelector('.cab-joy-ball');
     inputs.forEach(evt => {
-      ArcadeEventBus.on(evt, () => this.pulseInput());
+      ArcadeEventBus.on(evt, () => {
+        this.pulseInput();
+        if (joyBall) {
+          const dir = evt.replace('ARCADE_', '');
+          const transforms = { UP: 'translateY(-4px)', DOWN: 'translateY(4px)', LEFT: 'translateX(-4px)', RIGHT: 'translateX(4px)' };
+          joyBall.style.transform = transforms[dir] || '';
+          this.setHardwareTimer('joy_anim', () => { joyBall.style.transform = ''; }, 120);
+        }
+      });
+    });
+
+    ['action-a', 'action-b', 'action-x', 'action-y', 'action-l', 'action-r'].forEach(code => {
+      const label = code.replace('action-', '').toUpperCase();
+      ArcadeEventBus.on(`ARCADE_ACTION_${label}`, () => {
+        this.pulseInput();
+        const btn = document.querySelector(`.cab-btn.${code}`);
+        if (btn) {
+          btn.classList.add('is-pressed');
+          this.setHardwareTimer(`btn_${code}`, () => btn.classList.remove('is-pressed'), 120);
+        }
+      });
     });
 
     ArcadeEventBus.on('ARCADE_CONFIRM', () => {
@@ -894,7 +1103,7 @@ const ArcadeHardware = {
       const startBtn = document.querySelector('.cab-btn-small[data-tooltip="Start"]');
       if (startBtn) {
         startBtn.classList.add('is-pressed');
-        this.setHardwareTimer('confirm_btn', () => startBtn.classList.remove('is-pressed'), 100);
+        this.setHardwareTimer('confirm_btn', () => startBtn.classList.remove('is-pressed'), 120);
       }
     });
 
@@ -903,16 +1112,7 @@ const ArcadeHardware = {
       const selectBtn = document.querySelector('.cab-btn-small[data-tooltip="Select"]');
       if (selectBtn) {
         selectBtn.classList.add('is-pressed');
-        this.setHardwareTimer('back_btn', () => selectBtn.classList.remove('is-pressed'), 100);
-      }
-    });
-
-    ArcadeEventBus.on('ARCADE_ACTION_A', () => {
-      this.pulseInput();
-      const actionA = document.querySelector('.cab-btn.action-a');
-      if (actionA) {
-        actionA.classList.add('is-pressed');
-        this.setHardwareTimer('action_a_btn', () => actionA.classList.remove('is-pressed'), 100);
+        this.setHardwareTimer('back_btn', () => selectBtn.classList.remove('is-pressed'), 120);
       }
     });
 
@@ -1684,12 +1884,14 @@ window.ArcadeOS = {
     const bootDuration = options.replay || !completedBefore ? 700 : 120;
 
     this.bootTimer = setTimeout(() => {
+      this.bootTimer = null;
+      if (this.state === 'APP' || this.state === 'LOADING' || this.userExited) return;
       if (bootLoader) bootLoader.classList.add('is-hidden');
       if (osLayer) {
         osLayer.style.opacity = '1';
         osLayer.classList.add('os-booted');
       }
-      if (homeView) {
+      if (homeView && this.state === 'BOOT') {
         homeView.classList.add('active');
       }
       this.state = 'HOME';
@@ -1699,7 +1901,6 @@ window.ArcadeOS = {
       this.renderOnboarding(options.onboarding === true);
 
       if (!completedBefore) ArcadeEventBus.emit('GAME_LAUNCHED', { id: 'os' });
-      this.bootTimer = null;
     }, bootDuration);
   },
 
@@ -1729,7 +1930,12 @@ window.ArcadeOS = {
     panel.querySelector('.onboarding-dismiss')?.addEventListener('click', () => {
       ArcadeStorage.set(ArcadeStorage.KEYS.ONBOARDING_COMPLETE, true);
       panel.hidden = true;
+      panel.querySelectorAll('.is-ui-focused').forEach(el => el.classList.remove('is-ui-focused'));
       this.announce('Control guide dismissed. Replay it from Settings.');
+      if (window.ArcadeSystemUI) {
+        window.ArcadeSystemUI.refreshFocusableElements();
+        window.ArcadeSystemUI.focusFirst();
+      }
     }, { once: true });
   },
 
@@ -1746,7 +1952,15 @@ window.ArcadeOS = {
   },
 
   exitToPortfolio() {
+    this.userExited = true;
+    this.osVisible = false;
     this.forceGoHome(true);
+    document.getElementById('arcade-home')?.classList.remove('active');
+    document.getElementById('arcade-app-view')?.classList.remove('active');
+    document.getElementById('arcade-loading')?.classList.remove('active');
+    document.body.classList.remove('arcade-active');
+    const chassis = document.querySelector('.cabinet-chassis');
+    if (chassis) chassis.classList.remove('is-scaled');
     if (typeof window.exitArcadeToPortfolio === 'function') window.exitArcadeToPortfolio();
     else document.getElementById('main-content')?.scrollIntoView({ behavior: 'smooth' });
   },
@@ -1779,23 +1993,95 @@ window.ArcadeOS = {
     const details = document.getElementById('home-details');
     if (!carousel || !details) return;
 
+    const homeView = document.getElementById('arcade-home');
+    if (homeView) {
+      homeView.classList.add('arcade-cinematic-v5');
+      
+      // 1. Ensure Hero Brand Header exists (ARCADEOS 3D Retro Title & Subtitle Tagline)
+      let heroBrand = homeView.querySelector('.arcade-hero-brand');
+      if (!heroBrand) {
+        heroBrand = document.createElement('div');
+        heroBrand.className = 'arcade-hero-brand';
+        heroBrand.innerHTML = `
+          <h1 class="arcade-hero-title">ARCADE<span>OS</span></h1>
+          <p class="arcade-hero-tagline">PLAY. CODE. CREATE. REPEAT.</p>
+        `;
+        homeView.prepend(heroBrand);
+      }
+
+      // 2. Ensure Background Decor Layer exists (Perspective Grid + Glowing Horizon Arc)
+      if (!homeView.querySelector('.arcade-universe-bg')) {
+        const bg = document.createElement('div');
+        bg.className = 'arcade-universe-bg';
+        bg.setAttribute('aria-hidden', 'true');
+        bg.innerHTML = `
+          <div class="arcade-space-gradient"></div>
+          <div class="arcade-grid-perspective"></div>
+          <div class="arcade-horizon-arc"></div>
+          <div class="arcade-horizon-glow"></div>
+        `;
+        homeView.prepend(bg);
+      }
+    }
+
     if (this.selectedIndex >= items.length) this.selectedIndex = 0;
+    const total = items.length;
+
+    // Calculate 4-card sliding window
+    let startIdx = this.selectedIndex - 1;
+    if (startIdx < 0) startIdx = 0;
+    if (startIdx + 4 > total) startIdx = Math.max(0, total - 4);
+    const visibleIndexes = new Set(Array.from({ length: Math.min(4, total) }, (_, i) => startIdx + i));
 
     const launcherHadFocus = carousel.contains(document.activeElement);
-    carousel.innerHTML = items.map((item, idx) => `
-      <button type="button" class="app-card ${idx === this.selectedIndex ? 'focused' : ''} ${item.isSystem ? 'system-card' : ''}" data-idx="${idx}" data-launcher-id="${item.id}" data-launcher-group="${item.group}" aria-label="Open ${item.title}" aria-current="${idx === this.selectedIndex ? 'true' : 'false'}">
-        <div class="app-icon">${item.icon}</div>
-      </button>
-    `).join('');
+    carousel.innerHTML = items.map((item, idx) => {
+      const isFocused = idx === this.selectedIndex;
+      const isVisible = visibleIndexes.has(idx);
+      
+      const displayTitle = item.title;
+      const displaySub = item.description || (item.group === 'PLAY' ? 'Classic Arcade Game' : item.group === 'CREATE' ? 'Creative Studio' : 'System Utility');
+      const iconHtml = getPremiumAppIcon(item.id);
 
-    const activeItem = items[this.selectedIndex];
+      return `
+        <button type="button" 
+          class="app-card ${isFocused ? 'focused is-ui-focused' : ''} ${isVisible ? 'is-visible' : ''} ${item.isSystem ? 'system-card' : ''}" 
+          data-arcade-focusable
+          data-idx="${idx}" 
+          data-launcher-id="${item.id}" 
+          data-launcher-group="${item.group}" 
+          aria-label="Open ${displayTitle}" 
+          aria-current="${isFocused ? 'true' : 'false'}"
+          tabindex="${isFocused ? '0' : '-1'}">
+          <div class="arcade-card-icon">${iconHtml}</div>
+          <div class="arcade-card-copy">
+            <strong class="arcade-card-name">${escapeMarkup(displayTitle)}</strong>
+            <span class="arcade-card-sub">${escapeMarkup(displaySub)}</span>
+          </div>
+        </button>
+      `;
+    }).join('');
+
+    // Hardware Status Strip inside home-details
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+
     details.innerHTML = `
-      <div class="app-group">${activeItem.group}</div>
-      <div class="app-category">${activeItem.category}</div>
-      <h2 class="app-title">${activeItem.title}</h2>
-      <p class="app-desc">${activeItem.description}</p>
-      <div class="app-status-badge ${activeItem.status || 'ready'}">${(activeItem.status || 'SYSTEM').toUpperCase().replace('-', ' ')}</div>
-      <div class="app-hint">Press ENTER, Start, or Tap to Open</div>
+      <div class="arcade-hw-strip">
+        <div class="hw-btn profile-btn">
+          <span class="hw-icon">👤</span> PROFILE
+        </div>
+        <button type="button" class="hw-btn logout-btn" onclick="window.ArcadeOS?.exitToPortfolio()">
+          <span class="hw-led red"></span> LOGOUT
+        </button>
+        <button type="button" class="hw-btn sleep-btn" onclick="window.ArcadeOS?.forceGoHome(true)">
+          <span class="hw-led green"></span> SLEEP
+        </button>
+        <div class="hw-clock" id="hw-clock-display">${timeStr}</div>
+        <div class="hw-user-tag">
+          <strong>MAHAU</strong>
+          <span class="hw-user-avatar">👾</span>
+        </div>
+      </div>
     `;
 
     carousel.querySelectorAll('.app-card').forEach(card => {
@@ -1813,16 +2099,11 @@ window.ArcadeOS = {
           }
           ArcadeAudio.playTick();
           this.renderHome();
-          // Keep hardware status in sync
           ArcadeHardware.updateOled(this.state);
         }
       });
     });
 
-    const cardWidth = 70;
-    const gap = 16;
-    const offset = -(this.selectedIndex * (cardWidth + gap));
-    carousel.style.transform = `translateX(${offset}px)`;
     if (launcherHadFocus) carousel.querySelector('.app-card.focused')?.focus({ preventScroll: true });
   },
 
@@ -1886,6 +2167,13 @@ window.ArcadeOS = {
         osLayer.classList.add('os-booted');
       }
       ArcadeStorage.set(ArcadeStorage.KEYS.BOOT_COMPLETE, true);
+    }
+
+    const onboardingPanel = document.getElementById('arcade-onboarding');
+    if (onboardingPanel && !onboardingPanel.hidden) {
+      onboardingPanel.hidden = true;
+      onboardingPanel.querySelectorAll('.is-ui-focused').forEach(el => el.classList.remove('is-ui-focused'));
+      ArcadeStorage.set(ArcadeStorage.KEYS.ONBOARDING_COMPLETE, true);
     }
 
     const requestId = ++this.systemRouteRequestId;
@@ -2075,6 +2363,10 @@ window.ArcadeOS = {
     if (this.launchTimeoutId) {
       clearTimeout(this.launchTimeoutId);
       this.launchTimeoutId = null;
+    }
+    if (this.bootTimer) {
+      clearTimeout(this.bootTimer);
+      this.bootTimer = null;
     }
 
     this.launchPending = true;

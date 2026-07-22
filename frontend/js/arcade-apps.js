@@ -132,7 +132,7 @@ class ReactionTestApp {
             </div>
           </div>
           
-          <button class="placeholder-back-btn" id="rt-back-btn">EXIT</button>
+          <button class="placeholder-back-btn" id="rt-back-btn" data-arcade-focusable>EXIT</button>
         </div>
       `;
     } 
@@ -183,8 +183,8 @@ class ReactionTestApp {
           <h2 class="rt-error-msg">TOO EARLY!</h2>
           <p class="rt-error-tip">You pressed before the screen turned green.</p>
           <div class="rt-actions">
-            <button class="rt-action-btn primary" id="rt-retry-btn">RETRY</button>
-            <button class="rt-action-btn" id="rt-back-btn">LAUNCHER</button>
+            <button class="rt-action-btn primary" id="rt-retry-btn" data-arcade-focusable>RETRY</button>
+            <button class="rt-action-btn" id="rt-back-btn" data-arcade-focusable>LAUNCHER</button>
           </div>
         </div>
       `;
@@ -205,6 +205,10 @@ class ReactionTestApp {
         this.transitionToState('WAITING');
       });
     }
+    if (window.ArcadeSystemUI) {
+      window.ArcadeSystemUI.refreshFocusableElements();
+      window.ArcadeSystemUI.focusFirst();
+    }
   }
 
   renderInterrupted() {
@@ -213,13 +217,17 @@ class ReactionTestApp {
         <div class="rt-error-icon">⏱️</div>
         <h2 class="rt-error-msg">INTERRUPTED</h2>
         <p class="rt-error-tip">Test interrupted — tab focus was lost.</p>
-        <button class="placeholder-back-btn" id="rt-back-btn">EXIT</button>
+        <button class="placeholder-back-btn" id="rt-back-btn" data-arcade-focusable>EXIT</button>
       </div>
     `;
     this.contentEl.querySelector('#rt-back-btn').addEventListener('click', (e) => {
       e.stopPropagation();
       this.bus.emit('ARCADE_BACK');
     });
+    if (window.ArcadeSystemUI) {
+      window.ArcadeSystemUI.refreshFocusableElements();
+      window.ArcadeSystemUI.focusFirst();
+    }
   }
 
   handleInputConfirm() {
@@ -602,8 +610,8 @@ class NeonSnakeApp {
           <h2 class="snake-menu-title">NEON SNAKE</h2>
           <p class="snake-menu-desc">Eat neon nodes. Do not run into walls or your own tail.</p>
           <div class="snake-menu-hi">HIGH SCORE: ${this.highScore}</div>
-          <button class="snake-menu-btn primary" id="snake-start-btn">START GAME</button>
-          <button class="snake-menu-btn" id="snake-exit-btn">EXIT</button>
+          <button class="snake-menu-btn primary" id="snake-start-btn" data-arcade-focusable>START GAME</button>
+          <button class="snake-menu-btn" id="snake-exit-btn" data-arcade-focusable>EXIT</button>
         </div>
       `;
       this.overlay.querySelector('#snake-start-btn').addEventListener('click', () => this.start());
@@ -620,9 +628,9 @@ class NeonSnakeApp {
       this.overlay.innerHTML = `
         <div class="snake-menu-paused">
           <h2 class="snake-menu-title">PAUSED</h2>
-          <button class="snake-menu-btn primary" id="snake-resume-btn">RESUME</button>
-          <button class="snake-menu-btn" id="snake-restart-btn">RESTART</button>
-          <button class="snake-menu-btn" id="snake-exit-btn">RETURN HOME</button>
+          <button class="snake-menu-btn primary" id="snake-resume-btn" data-arcade-focusable>RESUME</button>
+          <button class="snake-menu-btn" id="snake-restart-btn" data-arcade-focusable>RESTART</button>
+          <button class="snake-menu-btn" id="snake-exit-btn" data-arcade-focusable>RETURN HOME</button>
         </div>
       `;
       this.overlay.querySelector('#snake-resume-btn').addEventListener('click', () => this.resume());
@@ -657,13 +665,18 @@ class NeonSnakeApp {
           <p class="snake-score-tip">Score achieved</p>
           ${newBest ? '<div class="snake-new-best-badge">🏆 NEW RECORD!</div>' : `<div class="snake-menu-hi">BEST: ${this.highScore}</div>`}
           <div class="snake-menu-actions">
-            <button class="snake-menu-btn primary" id="snake-retry-btn">RETRY</button>
-            <button class="snake-menu-btn" id="snake-exit-btn">RETURN HOME</button>
+            <button class="snake-menu-btn primary" id="snake-retry-btn" data-arcade-focusable>RETRY</button>
+            <button class="snake-menu-btn" id="snake-exit-btn" data-arcade-focusable>RETURN HOME</button>
           </div>
         </div>
       `;
       this.overlay.querySelector('#snake-retry-btn').addEventListener('click', () => this.restart());
       this.overlay.querySelector('#snake-exit-btn').addEventListener('click', () => this.bus.emit('ARCADE_BACK'));
+    }
+
+    if (nextState !== 'PLAYING' && window.ArcadeSystemUI) {
+      window.ArcadeSystemUI.refreshFocusableElements();
+      window.ArcadeSystemUI.focusFirst();
     }
   }
   
@@ -1119,8 +1132,8 @@ class BreakoutApp {
           <h2 class="breakout-menu-title">BREAKOUT</h2>
           <p class="breakout-menu-desc">Destroy all bricks. Keep the ball bouncing. Move with keys, mouse, or touch.</p>
           <div class="breakout-menu-hi">HIGH SCORE: ${this.highScore}</div>
-          <button class="breakout-menu-btn primary" id="breakout-start-btn">START GAME</button>
-          <button class="breakout-menu-btn" id="breakout-exit-btn">EXIT</button>
+          <button class="breakout-menu-btn primary" id="breakout-start-btn" data-arcade-focusable>START GAME</button>
+          <button class="breakout-menu-btn" id="breakout-exit-btn" data-arcade-focusable>EXIT</button>
         </div>
       `;
       this.overlay.querySelector('#breakout-start-btn').addEventListener('click', () => this.start());
@@ -1137,9 +1150,9 @@ class BreakoutApp {
       this.overlay.innerHTML = `
         <div class="breakout-menu-paused">
           <h2 class="breakout-menu-title">PAUSED</h2>
-          <button class="breakout-menu-btn primary" id="breakout-resume-btn">RESUME</button>
-          <button class="breakout-menu-btn" id="breakout-restart-btn">RESTART</button>
-          <button class="breakout-menu-btn" id="breakout-exit-btn">RETURN HOME</button>
+          <button class="breakout-menu-btn primary" id="breakout-resume-btn" data-arcade-focusable>RESUME</button>
+          <button class="breakout-menu-btn" id="breakout-restart-btn" data-arcade-focusable>RESTART</button>
+          <button class="breakout-menu-btn" id="breakout-exit-btn" data-arcade-focusable>RETURN HOME</button>
         </div>
       `;
       this.overlay.querySelector('#breakout-resume-btn').addEventListener('click', () => this.resume());
@@ -1158,7 +1171,7 @@ class BreakoutApp {
           <div class="breakout-menu-logo">⭐</div>
           <h2 class="breakout-menu-title">LEVEL CLEAR!</h2>
           <p class="breakout-menu-desc">Ready for next level? Speed increases and paddle shrinks.</p>
-          <button class="breakout-menu-btn primary" id="breakout-next-btn">NEXT LEVEL</button>
+          <button class="breakout-menu-btn primary" id="breakout-next-btn" data-arcade-focusable>NEXT LEVEL</button>
         </div>
       `;
       this.overlay.querySelector('#breakout-next-btn').addEventListener('click', () => this.nextLevel());
@@ -1193,8 +1206,8 @@ class BreakoutApp {
           <p class="breakout-score-tip">FINAL SCORE ACHIEVED</p>
           ${newBest ? '<div class="breakout-new-best-badge">🏆 NEW RECORD!</div>' : `<div class="breakout-menu-hi">BEST: ${this.highScore}</div>`}
           <div class="breakout-menu-actions">
-            <button class="breakout-menu-btn primary" id="breakout-retry-btn">PLAY AGAIN</button>
-            <button class="breakout-menu-btn" id="breakout-exit-btn">RETURN HOME</button>
+            <button class="breakout-menu-btn primary" id="breakout-retry-btn" data-arcade-focusable>PLAY AGAIN</button>
+            <button class="breakout-menu-btn" id="breakout-exit-btn" data-arcade-focusable>RETURN HOME</button>
           </div>
         </div>
       `;
@@ -1226,13 +1239,18 @@ class BreakoutApp {
           <p class="breakout-score-tip">Score achieved</p>
           ${newBest ? '<div class="breakout-new-best-badge">🏆 NEW RECORD!</div>' : `<div class="breakout-menu-hi">BEST: ${this.highScore}</div>`}
           <div class="breakout-menu-actions">
-            <button class="breakout-menu-btn primary" id="breakout-retry-btn">RETRY</button>
-            <button class="breakout-menu-btn" id="breakout-exit-btn">RETURN HOME</button>
+            <button class="breakout-menu-btn primary" id="breakout-retry-btn" data-arcade-focusable>RETRY</button>
+            <button class="breakout-menu-btn" id="breakout-exit-btn" data-arcade-focusable>RETURN HOME</button>
           </div>
         </div>
       `;
       this.overlay.querySelector('#breakout-retry-btn').addEventListener('click', () => this.restart());
       this.overlay.querySelector('#breakout-exit-btn').addEventListener('click', () => window.ArcadeOS.goHome());
+    }
+
+    if (nextState !== 'PLAYING' && window.ArcadeSystemUI) {
+      window.ArcadeSystemUI.refreshFocusableElements();
+      window.ArcadeSystemUI.focusFirst();
     }
   }
   
@@ -1795,13 +1813,13 @@ class PixelPadToolApp {
             <div class="tool-kicker">CREATIVE TOOL</div>
             <h2>Pixel Pad</h2>
           </div>
-          <button class="placeholder-back-btn" id="pixelpad-exit">EXIT</button>
+          <button class="placeholder-back-btn" id="pixelpad-exit" data-arcade-focusable>EXIT</button>
         </div>
         <div class="pixelpad-grid" id="pixelpad-grid" aria-label="12 by 12 pixel canvas"></div>
         <div class="pixelpad-controls">
           <div class="pixelpad-swatches" id="pixelpad-swatches"></div>
-          <button class="tool-btn" id="pixelpad-clear">CLEAR</button>
-          <button class="tool-btn" id="pixelpad-save">SAVE</button>
+          <button class="tool-btn" id="pixelpad-clear" data-arcade-focusable>CLEAR</button>
+          <button class="tool-btn" id="pixelpad-save" data-arcade-focusable>SAVE</button>
         </div>
         <p class="tool-status" id="pixelpad-status">Tap a cell to paint.</p>
       </div>
@@ -1815,6 +1833,10 @@ class PixelPadToolApp {
     this.container.querySelector('#pixelpad-exit')?.addEventListener('click', () => this.bus.emit('ARCADE_BACK'));
     this.container.querySelector('#pixelpad-clear')?.addEventListener('click', () => this.clear());
     this.container.querySelector('#pixelpad-save')?.addEventListener('click', () => this.save('Saved to local storage.'));
+    
+    if (window.ArcadeSystemUI) {
+      window.ArcadeSystemUI.mountRoute('pixelpad', this.container);
+    }
   }
 
   renderGrid() {
@@ -1835,7 +1857,7 @@ class PixelPadToolApp {
   renderSwatches() {
     const swatches = this.container.querySelector('#pixelpad-swatches');
     swatches.innerHTML = this.palette.map(color => `
-      <button class="pixel-swatch ${color === this.activeColor ? 'active' : ''}" data-color="${color}" style="background:${color}" aria-label="Select ${color}"></button>
+      <button class="pixel-swatch ${color === this.activeColor ? 'active' : ''}" data-color="${color}" style="background:${color}" aria-label="Select ${color}" data-arcade-focusable></button>
     `).join('');
 
     swatches.querySelectorAll('.pixel-swatch').forEach(btn => {
@@ -1884,12 +1906,12 @@ class PaletteLabToolApp {
             <div class="tool-kicker">CREATIVE TOOL</div>
             <h2>Palette Lab</h2>
           </div>
-          <button class="placeholder-back-btn" id="palette-exit">EXIT</button>
+          <button class="placeholder-back-btn" id="palette-exit" data-arcade-focusable>EXIT</button>
         </div>
         <div class="palette-strip" id="palette-strip"></div>
         <div class="palette-controls">
-          <button class="tool-btn" id="palette-generate">GENERATE</button>
-          <button class="tool-btn" id="palette-copy">COPY HEX</button>
+          <button class="tool-btn" id="palette-generate" data-arcade-focusable>GENERATE</button>
+          <button class="tool-btn" id="palette-copy" data-arcade-focusable>COPY HEX</button>
         </div>
         <p class="tool-status" id="palette-status">Lock colors, then generate variants.</p>
       </div>
@@ -1901,6 +1923,10 @@ class PaletteLabToolApp {
     this.container.querySelector('#palette-exit')?.addEventListener('click', () => this.bus.emit('ARCADE_BACK'));
     this.container.querySelector('#palette-generate')?.addEventListener('click', () => this.regenerate());
     this.container.querySelector('#palette-copy')?.addEventListener('click', () => this.copyPalette());
+
+    if (window.ArcadeSystemUI) {
+      window.ArcadeSystemUI.mountRoute('palettelab', this.container);
+    }
   }
 
   generatePalette() {
@@ -1926,8 +1952,8 @@ class PaletteLabToolApp {
     const strip = this.container.querySelector('#palette-strip');
     strip.innerHTML = this.colors.map((color, idx) => `
       <div class="palette-color" style="background:${color}">
-        <button class="palette-lock ${this.locks[idx] ? 'active' : ''}" data-idx="${idx}" aria-label="Toggle lock for ${color}">${this.locks[idx] ? 'LOCK' : 'OPEN'}</button>
-        <button class="palette-hex" data-color="${color}">${color}</button>
+        <button class="palette-lock ${this.locks[idx] ? 'active' : ''}" data-idx="${idx}" aria-label="Toggle lock for ${color}" data-arcade-focusable>${this.locks[idx] ? 'LOCK' : 'OPEN'}</button>
+        <button class="palette-hex" data-color="${color}" data-arcade-focusable>${color}</button>
       </div>
     `).join('');
 

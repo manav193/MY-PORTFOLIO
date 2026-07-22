@@ -127,30 +127,77 @@ export const ArcadeSystemUI = {
     this.previousFocusElement = null;
   },
 
+  isPhysicsGameplayActive() {
+    if (!window.ArcadeOS || window.ArcadeOS.state !== 'APP') return false;
+    const activeApp = window.ArcadeOS.activeApp;
+    if (!activeApp) return false;
+
+    const rawApp = activeApp._rawApp || activeApp;
+    const appState = rawApp.state || activeApp.state;
+
+    // Check if actively in physics play (Snake or Breakout in PLAYING state)
+    if (appState === 'PLAYING') {
+      const focused = this.getFocusedElement();
+      // If a menu overlay button is explicitly focused inside app view, UI has priority
+      if (focused && focused.closest('.snake-menu-paused, .snake-menu-gameover, .breakout-menu-paused, .breakout-menu-gameover')) {
+        return false;
+      }
+      return true;
+    }
+
+    return false;
+  },
+
   refreshFocusableElements() {
-    if (!this.rootElement) return;
-    
-    // Check if virtual confirmation modal is active
+    const appView = document.getElementById('arcade-app-view');
+    const homeView = document.getElementById('arcade-home');
     const modal = document.getElementById('arcade-confirm-modal');
-    const modalActive = modal && modal.classList.contains('active');
-    
-    const container = modalActive ? modal : this.rootElement;
-    
-    // Query visible, enabled controls
-    const elements = Array.from(container.querySelectorAll('[data-arcade-focusable]'))
-      .filter(el => {
-        if (el.disabled || el.classList.contains('disabled')) return false;
-        // Verify visual visibility
-        const rect = el.getBoundingClientRect();
-        return rect.width > 0 && rect.height > 0;
-      });
-      
-    this.focusableElements = elements;
-    
-    // Sync index
+    const diffModal = document.getElementById('builder-import-diff-modal');
+
+    let container = document.body;
+
+    if (modal && modal.classList.contains('active')) {
+      container = modal;
+    } else if (diffModal && diffModal.classList.contains('active')) {
+      container = diffModal;
+    } else if (window.ArcadeOS && window.ArcadeOS.state === 'APP' && appView) {
+      const overlayMenu = appView.querySelector(
+        '.snake-menu-paused, .snake-menu-gameover, .snake-menu-ready, ' +
+        '.breakout-menu-paused, .breakout-menu-gameover, .breakout-menu-ready, .breakout-menu-levelclear, ' +
+        '.rt-title-screen, .rt-error-screen, .pixelpad-app, .palette-app'
+      );
+      container = overlayMenu || appView;
+    } else if (this.rootElement && this.rootElement.classList.contains('active')) {
+      container = this.rootElement;
+    } else if (homeView && homeView.classList.contains('active')) {
+      container = homeView;
+    } else if (appView && appView.classList.contains('active')) {
+      container = appView;
+    }
+
+    let elements = Array.from(container.querySelectorAll('[data-arcade-focusable]'));
+
+    if (elements.length === 0) {
+      elements = Array.from(container.querySelectorAll('button, input, select, [tabindex="0"], a.btn'));
+    }
+
+    const filtered = elements.filter(el => {
+      if (!el.isConnected) return false;
+      if (el.disabled || el.classList.contains('disabled')) return false;
+      const rect = el.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0) return false;
+      const style = window.getComputedStyle(el);
+      if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') return false;
+      return true;
+    });
+
+    this.focusableElements = filtered;
+
     const currentFocused = this.getFocusedElement();
-    if (currentFocused && currentFocused.isConnected) {
-      this.selectedIndex = this.focusableElements.indexOf(currentFocused);
+    if (currentFocused && currentFocused.isConnected && filtered.includes(currentFocused)) {
+      this.selectedIndex = filtered.indexOf(currentFocused);
+    } else if (filtered.length > 0) {
+      this.selectedIndex = 0;
     } else {
       this.selectedIndex = -1;
     }
@@ -179,13 +226,10 @@ export const ArcadeSystemUI = {
     this.selectedIndex = this.focusableElements.indexOf(el);
     el.classList.add('is-ui-focused');
     
-    // Trigger browser native focus to keep accessibility layers happy
     try {
       el.focus({ preventScroll: true });
     } catch(e) {}
     
-    // Keep keyboard focus visible without allowing transformed cabinet content
-    // to scroll the portfolio document and accidentally suspend ArcadeOS.
     let scrollParent = el.parentElement;
     while (scrollParent && scrollParent !== this.rootElement) {
       const style = window.getComputedStyle(scrollParent);
@@ -207,47 +251,117 @@ export const ArcadeSystemUI = {
   },
 
   clearFocusClass() {
-    if (this.rootElement) {
-      this.rootElement.querySelectorAll('.is-ui-focused').forEach(el => {
-        el.classList.remove('is-ui-focused');
-      });
+    document.querySelectorAll('.is-ui-focused').forEach(el => {
+      el.classList.remove('is-ui-focused');
+    });
+  },
+
+  findSpatialTarget(direction) {
+    if (this.focusableElements.length === 0) return null;
+    const current = this.getFocusedElement() || this.focusableElements[0];
+    if (!current || !current.isConnected) return this.focusableElements[0];
+
+    const explicitTargetId = current.getAttribute(`data-nav-${direction}`);
+    if (explicitTargetId) {
+      const hintTarget = document.getElementById(explicitTargetId) || document.querySelector(explicitTargetId);
+      if (hintTarget && this.focusableElements.includes(hintTarget)) {
+        return hintTarget;
+      }
     }
-    const modal = document.getElementById('arcade-confirm-modal');
-    if (modal) {
-      modal.querySelectorAll('.is-ui-focused').forEach(el => {
-        el.classList.remove('is-ui-focused');
-      });
+
+    const curRect = current.getBoundingClientRect();
+    const curCenter = {
+      x: curRect.left + curRect.width / 2,
+      y: curRect.top + curRect.height / 2
+    };
+
+    let bestCandidate = null;
+    let bestScore = Infinity;
+    const alignmentPenalty = 2.5;
+
+    for (const candidate of this.focusableElements) {
+      if (candidate === current) continue;
+
+      const candRect = candidate.getBoundingClientRect();
+      const candCenter = {
+        x: candRect.left + candRect.width / 2,
+        y: candRect.top + candRect.height / 2
+      };
+
+      const dx = candCenter.x - curCenter.x;
+      const dy = candCenter.y - curCenter.y;
+
+      let isValidDirection = false;
+      let primaryDist = 0;
+      let secondaryDist = 0;
+
+      switch (direction) {
+        case 'right':
+          isValidDirection = dx > 2 || (candRect.left >= curRect.right - 4 && Math.abs(dy) < Math.max(curRect.height, candRect.height));
+          primaryDist = Math.abs(dx);
+          secondaryDist = Math.abs(dy);
+          break;
+        case 'left':
+          isValidDirection = dx < -2 || (candRect.right <= curRect.left + 4 && Math.abs(dy) < Math.max(curRect.height, candRect.height));
+          primaryDist = Math.abs(dx);
+          secondaryDist = Math.abs(dy);
+          break;
+        case 'down':
+          isValidDirection = dy > 2 || (candRect.top >= curRect.bottom - 4 && Math.abs(dx) < Math.max(curRect.width, candRect.width));
+          primaryDist = Math.abs(dy);
+          secondaryDist = Math.abs(dx);
+          break;
+        case 'up':
+          isValidDirection = dy < -2 || (candRect.bottom <= curRect.top + 4 && Math.abs(dx) < Math.max(curRect.width, candRect.width));
+          primaryDist = Math.abs(dy);
+          secondaryDist = Math.abs(dx);
+          break;
+      }
+
+      if (!isValidDirection) continue;
+
+      const score = primaryDist + secondaryDist * alignmentPenalty;
+
+      if (score < bestScore) {
+        bestScore = score;
+        bestCandidate = candidate;
+      }
     }
+
+    if (!bestCandidate) {
+      const idx = this.focusableElements.indexOf(current);
+      if (direction === 'down' || direction === 'right') {
+        const next = (idx + 1) % this.focusableElements.length;
+        bestCandidate = this.focusableElements[next];
+      } else if (direction === 'up' || direction === 'left') {
+        const prev = (idx - 1 + this.focusableElements.length) % this.focusableElements.length;
+        bestCandidate = this.focusableElements[prev];
+      }
+    }
+
+    return bestCandidate;
   },
 
   move(direction) {
-    // Suspend UI navigation if game is active
-    if (window.ArcadeOS && window.ArcadeOS.state === 'APP') return;
-    
+    if (this.isPhysicsGameplayActive()) return;
+
     this.refreshFocusableElements();
     if (this.focusableElements.length === 0) return;
-    
+
     const el = this.getFocusedElement();
-    
-    // Sliders / Ranges adjustment blocks standard navigation
+
     if (el && el.getAttribute('data-arcade-control') === 'range') {
       if (direction === 'left' || direction === 'right') {
         this.adjustSlider(el, direction);
         return;
       }
     }
-    
-    // Text input in editing mode blocks navigation
+
     if (this.editingElement) return;
 
-    if (direction === 'down' || direction === 'right') {
-      let next = this.selectedIndex + 1;
-      if (next >= this.focusableElements.length) next = 0; // wrap
-      this.setFocus(this.focusableElements[next]);
-    } else if (direction === 'up' || direction === 'left') {
-      let prev = this.selectedIndex - 1;
-      if (prev < 0) prev = this.focusableElements.length - 1; // wrap
-      this.setFocus(this.focusableElements[prev]);
+    const target = this.findSpatialTarget(direction);
+    if (target) {
+      this.setFocus(target);
     }
   },
 
@@ -265,41 +379,31 @@ export const ArcadeSystemUI = {
     
     el.value = val;
     
-    // Dispatch input and change events so page bindings receive updates
     el.dispatchEvent(new Event('input', { bubbles: true }));
     el.dispatchEvent(new Event('change', { bubbles: true }));
   },
 
   activate() {
-    if (window.ArcadeOS && window.ArcadeOS.state === 'APP') return;
-    
+    if (this.isPhysicsGameplayActive()) return;
+
     this.refreshFocusableElements();
     const el = this.getFocusedElement();
     if (!el) return;
-    
-    // Text control activation
+
     const controlType = el.getAttribute('data-arcade-control');
     if (controlType === 'text') {
       this.setEditingMode(el);
       return;
     }
-    
-    // Simulate natural browser click
+
     el.click();
-    
-    // Refresh list in case DOM changed
+
     setTimeout(() => this.refreshFocusableElements(), 100);
   },
 
   back() {
-    if (window.ArcadeOS && window.ArcadeOS.state === 'APP') return;
-    
-    if (window.ARCADE_DEBUG) console.log('[ArcadeSystemUI] back() resolving priorities');
-
-    // 1. If active confirm modal is open (e.g. #arcade-confirm-modal with class active)
     const modal = document.getElementById('arcade-confirm-modal');
     if (modal && modal.classList.contains('active')) {
-      if (window.ARCADE_DEBUG) console.log('ArcadeSystemUI.back: Closing confirm modal');
       const cancelBtn = modal.querySelector('#modal-cancel-btn') || modal.querySelector('#modal-ok-btn');
       if (cancelBtn) {
         cancelBtn.click();
@@ -311,10 +415,8 @@ export const ArcadeSystemUI = {
       return;
     }
 
-    // 2. If customize import diff modal/overlay is open
     const diffModal = document.getElementById('builder-import-diff-modal');
     if (diffModal && diffModal.classList.contains('active')) {
-      if (window.ARCADE_DEBUG) console.log('ArcadeSystemUI.back: Closing customizer diff modal');
       const cancelBtn = diffModal.querySelector('#import-cancel-btn');
       if (cancelBtn) {
         cancelBtn.click();
@@ -326,38 +428,47 @@ export const ArcadeSystemUI = {
       return;
     }
 
-    // 3. If in editing mode (textbox/select/slider range active focus)
     if (this.editingElement) {
-      if (window.ARCADE_DEBUG) console.log('ArcadeSystemUI.back: Exiting editing mode');
       this.clearEditingMode();
       return;
     }
 
-    // 4. If CUSTOMIZE route has unsaved changes, check with checkUnsavedChanges
+    if (window.ArcadeOS && window.ArcadeOS.state === 'APP') {
+      const activeApp = window.ArcadeOS.activeApp;
+      const rawApp = activeApp?._rawApp || activeApp;
+
+      if (rawApp && typeof rawApp.pause === 'function' && rawApp.state === 'PLAYING') {
+        rawApp.pause();
+        this.refreshFocusableElements();
+        this.focusFirst();
+        return;
+      }
+
+      if (rawApp && typeof rawApp.resume === 'function' && rawApp.state === 'PAUSED') {
+        rawApp.resume();
+        this.refreshFocusableElements();
+        return;
+      }
+
+      window.ArcadeOS.goHome();
+      return;
+    }
+
     if (window.ArcadeOS && window.ArcadeOS.state === 'CUSTOMIZE') {
       if (window.ArcadeCustomizer && window.ArcadeCustomizer.isDirty()) {
-        if (window.ARCADE_DEBUG) console.log('ArcadeSystemUI.back: CUSTOMIZE has unsaved changes, showing modal');
         if (window.ArcadeOS.checkUnsavedChanges(() => window.ArcadeOS.goHome())) {
           return;
         }
       }
     }
 
-    // 5. If currently in a system route (non-HOME), return to HOME
     if (window.ArcadeOS && window.ArcadeOS.state !== 'HOME') {
-      if (window.ARCADE_DEBUG) console.log('ArcadeSystemUI.back: Returning to HOME from state:', window.ArcadeOS.state);
       window.ArcadeOS.goHome();
       return;
     }
 
-    // 6. Else if HOME, exit Arcade mode (slide back to portfolio) if trigger exit exists
     if (window.ArcadeOS && window.ArcadeOS.state === 'HOME') {
-      if (window.ARCADE_DEBUG) console.log('ArcadeSystemUI.back: Exiting Arcade mode to Portfolio');
-      if (window.DockController && typeof window.DockController.selectItem === 'function') {
-        window.DockController.selectItem('portfolio');
-      } else {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
+      return;
     }
   },
 

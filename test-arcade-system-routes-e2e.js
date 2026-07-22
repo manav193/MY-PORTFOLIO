@@ -67,7 +67,9 @@ const puppeteer = require('puppeteer');
         const loadingActive = document.getElementById('arcade-loading')?.classList.contains('active') || false;
         const activeViewsCount = [homeActive, appViewActive, loadingActive].filter(Boolean).length;
 
-        const focusedCount = document.querySelectorAll('.is-ui-focused').length;
+        const focusedEls = Array.from(document.querySelectorAll('.is-ui-focused'));
+        const focusedCount = focusedEls.length;
+        const focusedInfo = focusedEls.map(el => `${el.tagName}#${el.id}.${Array.from(el.classList).join('.')}`);
 
         const focusedElement = document.querySelector('.is-ui-focused');
         const focusedIsDetached = focusedElement ? !focusedElement.isConnected : false;
@@ -88,8 +90,12 @@ const puppeteer = require('puppeteer');
         const html = document.getElementById('arcade-app-view')?.innerHTML || '';
 
         return {
+          homeActive,
+          appViewActive,
+          loadingActive,
           activeViewsCount,
           focusedCount,
+          focusedInfo,
           focusedIsDetached,
           hiddenOverlayIntercepts,
           rejections,
@@ -108,7 +114,7 @@ const puppeteer = require('puppeteer');
         throw new Error(`DOM Audit Fail: Multiple views active concurrently (${auditResult.activeViewsCount})`);
       }
       if (auditResult.focusedCount > 1) {
-        throw new Error(`DOM Audit Fail: Multiple elements have .is-ui-focused (${auditResult.focusedCount})`);
+        throw new Error(`DOM Audit Fail: Multiple elements have .is-ui-focused (${auditResult.focusedCount}): ${JSON.stringify(auditResult.focusedInfo)}`);
       }
       if (auditResult.focusedIsDetached) {
         throw new Error(`DOM Audit Fail: The currently focused element is detached from the document!`);

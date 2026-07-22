@@ -1,147 +1,387 @@
+/**
+ * ArcadeOS — Cinematic Retro-Futuristic Home Scene (v5.0)
+ * Precision target matching reference design:
+ * 3D Retro ARCADEOS title with yellow-orange-red gradient, cyan tagline,
+ * perspective grid, glowing horizon arc, 4 large portrait cards with premium illustrated SVG icons,
+ * and glossy hardware status strip below monitor.
+ */
+
 export function initArcadeCinematicScene() {
   const install = () => {
     const home = document.getElementById('arcade-home');
     if (!home) return false;
 
-    home.classList.add('arcade-scene-v3');
+    home.classList.add('arcade-cinematic-v5');
 
-    if (!home.querySelector('.arcade-scene-decor')) {
-      const decor = document.createElement('div');
-      decor.className = 'arcade-scene-decor';
-      decor.setAttribute('aria-hidden', 'true');
-      decor.innerHTML = `
-        <div class="arcade-earth">
-          <div class="arcade-earth-glow"></div>
-          <div class="arcade-earth-surface"></div>
-          <div class="arcade-earth-atmosphere"></div>
-        </div>
-        <div class="arcade-orbit-line"></div>
-        <div class="arcade-rocket">🚀<span class="arcade-rocket-trail"></span></div>
-        <div class="arcade-float arcade-float--1">👾</div>
-        <div class="arcade-float arcade-float--2">🕹️</div>
-        <div class="arcade-float arcade-float--3">🎮</div>
-        <div class="arcade-float arcade-float--4">🎨</div>
-        <div class="arcade-float arcade-float--5">🔧</div>
-        <div class="arcade-float arcade-float--6">🧪</div>
-      `;
-      home.prepend(decor);
-    }
+    // Remove obsolete text logo / tagline elements if present
+    const oldBrand = home.querySelector('.arcade-cinematic-brand-v2');
+    if (oldBrand) oldBrand.remove();
 
     return true;
   };
 
   if (!install()) {
-    window.setTimeout(install, 150);
-    window.setTimeout(install, 600);
-    window.setTimeout(install, 1400);
+    window.setTimeout(install, 100);
+    window.setTimeout(install, 400);
+    window.setTimeout(install, 1200);
   }
 
-  if (!document.getElementById('arcade-scene-v3-styles')) {
-    const style = document.createElement('style');
-    style.id = 'arcade-scene-v3-styles';
-    style.textContent = `
-      #arcade-home.arcade-scene-v3{
-        isolation:isolate!important;
-        background:
-          radial-gradient(circle at 50% 18%,rgba(92,63,255,.18),transparent 30%),
-          linear-gradient(180deg,#030714 0%,#05091b 54%,#02050d 100%)!important;
-      }
-      #arcade-home.arcade-scene-v3:before{
-        background:none!important;
-        opacity:0!important;
-      }
-      #arcade-home.arcade-scene-v3:after{
-        display:none!important;
-      }
-      .arcade-scene-decor{
-        position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;
-      }
-      .arcade-earth{
-        position:absolute;left:50%;bottom:-38%;width:122%;aspect-ratio:2/1;transform:translateX(-50%);
-        border-radius:50% 50% 0 0/100% 100% 0 0;
-        background:
-          radial-gradient(circle at 52% 18%,rgba(120,226,255,.52) 0 2%,transparent 3%),
-          radial-gradient(circle at 35% 28%,rgba(30,114,167,.95) 0 8%,transparent 9%),
-          radial-gradient(circle at 64% 24%,rgba(28,154,133,.9) 0 7%,transparent 8%),
-          radial-gradient(circle at 47% 36%,rgba(29,103,151,.95) 0 10%,transparent 11%),
-          linear-gradient(180deg,#13b8df 0%,#1264b3 28%,#082c6a 58%,#04142f 100%);
-        box-shadow:0 -12px 34px rgba(26,213,255,.7),0 -34px 92px rgba(49,74,255,.42);
-        filter:saturate(1.18);
-      }
-      .arcade-earth:before{
-        content:"";position:absolute;inset:0;border-radius:inherit;
-        background:
-          radial-gradient(ellipse at 28% 22%,rgba(74,190,118,.85) 0 6%,transparent 7%),
-          radial-gradient(ellipse at 66% 19%,rgba(87,177,118,.8) 0 8%,transparent 9%),
-          radial-gradient(ellipse at 48% 31%,rgba(109,190,121,.7) 0 7%,transparent 8%),
-          repeating-linear-gradient(90deg,transparent 0 42px,rgba(255,255,255,.025) 43px 44px);
-        opacity:.8;
-      }
-      .arcade-earth:after{
-        content:"";position:absolute;left:0;right:0;top:-1px;height:10px;border-radius:50%;
-        background:linear-gradient(90deg,transparent,#73efff 20%,#d8ffff 50%,#73efff 80%,transparent);
-        box-shadow:0 0 14px #50e8ff,0 0 34px rgba(60,119,255,.85);
-      }
-      .arcade-earth-glow{position:absolute;inset:-8% -5% 0;border-radius:inherit;box-shadow:inset 0 26px 48px rgba(172,246,255,.18)}
-      .arcade-earth-surface{position:absolute;inset:0;border-radius:inherit;background:repeating-linear-gradient(0deg,transparent 0 17px,rgba(255,255,255,.018) 18px 19px);mix-blend-mode:screen}
-      .arcade-earth-atmosphere{position:absolute;left:4%;right:4%;top:-4%;height:12%;border-radius:50%;background:radial-gradient(ellipse,rgba(90,236,255,.32),transparent 70%);filter:blur(10px)}
-      .arcade-orbit-line{
-        position:absolute;left:6%;right:6%;bottom:13%;height:32%;border:1px solid rgba(121,82,255,.34);border-color:rgba(121,82,255,.36) transparent transparent transparent;border-radius:50%;transform:rotate(-5deg);
-      }
-      .arcade-rocket{
-        position:absolute;right:8%;top:15%;font-size:32px;transform:rotate(-37deg);filter:drop-shadow(0 8px 10px rgba(0,0,0,.48));animation:arcadeRocketDrift 6s ease-in-out infinite;
-      }
-      .arcade-rocket-trail{
-        position:absolute;width:70px;height:6px;right:25px;top:23px;border-radius:999px;
-        background:linear-gradient(90deg,transparent,rgba(85,226,255,.15),rgba(98,71,255,.7));filter:blur(2px);transform:rotate(4deg);
-      }
-      .arcade-float{
-        position:absolute;font-size:22px;opacity:.72;filter:drop-shadow(0 5px 8px rgba(0,0,0,.45));animation:arcadeFloat 5.4s ease-in-out infinite;
-      }
-      .arcade-float--1{left:7%;top:18%;font-size:28px;animation-delay:-1.4s}
-      .arcade-float--2{left:16%;top:47%;font-size:24px;animation-delay:-3.1s}
-      .arcade-float--3{right:17%;top:42%;animation-delay:-2.2s}
-      .arcade-float--4{right:7%;top:52%;font-size:21px;animation-delay:-4s}
-      .arcade-float--5{left:5%;top:63%;font-size:19px;animation-delay:-.8s}
-      .arcade-float--6{right:28%;top:17%;font-size:18px;animation-delay:-2.8s}
-      @keyframes arcadeFloat{0%,100%{transform:translate3d(0,0,0) rotate(-4deg)}50%{transform:translate3d(0,-8px,0) rotate(5deg)}}
-      @keyframes arcadeRocketDrift{0%,100%{transform:translate3d(0,0,0) rotate(-37deg)}50%{transform:translate3d(-16px,-9px,0) rotate(-33deg)}}
-
-      #arcade-home.arcade-scene-v3 .arcade-cinematic-brand-v2{
-        z-index:4!important;margin-top:2px!important;margin-bottom:14px!important;
-      }
-      #arcade-home.arcade-scene-v3 .arcade-cinematic-title-v2{
-        font-size:clamp(52px,9.6vw,92px)!important;
-        letter-spacing:-.055em!important;
-        filter:drop-shadow(0 5px 0 #7b180c) drop-shadow(0 14px 26px rgba(255,86,18,.35))!important;
-      }
-      #arcade-home.arcade-scene-v3 .arcade-cinematic-tagline-v2{
-        color:#21f0f4!important;text-shadow:0 0 18px rgba(33,240,244,.48)!important;
-      }
-      #arcade-home.arcade-scene-v3 #home-carousel{
-        z-index:4!important;max-width:760px!important;gap:16px!important;padding:10px 4px 16px!important;
-      }
-      #arcade-home.arcade-scene-v3 .app-card.is-dashboard-visible{
-        height:182px!important;border-radius:18px!important;
-        background:linear-gradient(180deg,rgba(10,18,46,.9),rgba(3,8,24,.94))!important;
-        border:1px solid rgba(115,83,255,.62)!important;
-        backdrop-filter:blur(8px);
-      }
-      #arcade-home.arcade-scene-v3 .app-card.is-dashboard-visible.focused{
-        border-color:#17e8ff!important;
-        box-shadow:0 0 0 1px rgba(23,232,255,.28),0 0 30px rgba(23,232,255,.26),0 20px 40px rgba(0,0,0,.44)!important;
-      }
-      #arcade-home.arcade-scene-v3 .arcade-card-icon-v2{font-size:62px!important;min-height:70px!important}
-      #arcade-home.arcade-scene-v3 #home-details{
-        z-index:4!important;background:rgba(2,7,22,.68)!important;border-color:rgba(67,223,255,.12)!important;backdrop-filter:blur(6px);
-      }
-      @media(max-width:720px){
-        .arcade-earth{width:150%;bottom:-31%}.arcade-rocket{font-size:24px;right:7%}.arcade-float{opacity:.5}
-        #arcade-home.arcade-scene-v3 .arcade-cinematic-title-v2{font-size:48px!important}
-        #arcade-home.arcade-scene-v3 .app-card.is-dashboard-visible{height:146px!important}
-      }
-      @media(prefers-reduced-motion:reduce){.arcade-rocket,.arcade-float{animation:none!important}}
-    `;
+  let style = document.getElementById('arcade-cinematic-v5-styles');
+  if (!style) {
+    style = document.createElement('style');
+    style.id = 'arcade-cinematic-v5-styles';
     document.head.appendChild(style);
   }
+  style.textContent = `
+      /* ==========================================
+         ARCADE OS HOME SCREEN V5 STYLES
+         ========================================== */
+      .cabinet-chassis:not(.is-scaled) #arcade-os,
+      .cabinet-chassis:not(.is-scaled) #arcade-home,
+      .cabinet-chassis:not(.is-scaled) #arcade-app-view,
+      .cabinet-chassis:not(.is-scaled) #arcade-loading,
+      .os-view:not(.active),
+      #arcade-home:not(.active),
+      #arcade-app-view:not(.active),
+      #arcade-loading:not(.active) {
+        display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        overflow: hidden !important;
+        pointer-events: none !important;
+      }
+
+      #arcade-home.arcade-cinematic-v5.active {
+        position: relative !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
+        padding: 10px 16px 8px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        isolation: isolate !important;
+        background: linear-gradient(180deg, #02040d 0%, #06091e 58%, #020309 100%) !important;
+        flex: 1 1 0% !important;
+        width: 100% !important;
+        height: 100% !important;
+        min-height: 0 !important;
+      }
+
+      #arcade-app-view.os-view.active {
+        display: flex !important;
+        flex-direction: column !important;
+        flex: 1 1 0% !important;
+        width: 100% !important;
+        height: 100% !important;
+        min-height: 0 !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
+      }
+
+      /* Hide old pseudo overrides */
+      #arcade-home.arcade-cinematic-v5:before,
+      #arcade-home.arcade-cinematic-v5:after {
+        display: none !important;
+        content: none !important;
+      }
+
+      /* 1. Hero Brand Header (3D ARCADEOS Title & Tagline) */
+      .arcade-hero-brand {
+        position: relative;
+        z-index: 5;
+        text-align: center;
+        margin-top: 2px;
+        margin-bottom: 6px;
+        pointer-events: none;
+        user-select: none;
+      }
+
+      .arcade-hero-title {
+        font-family: Impact, "Arial Black", sans-serif;
+        font-size: clamp(38px, 6.2vw, 66px);
+        line-height: 0.86;
+        letter-spacing: -0.04em;
+        font-style: italic;
+        background: linear-gradient(180deg, #fff360 0%, #ffc000 28%, #ff6a00 62%, #d82000 88%, #8b0000 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        -webkit-text-stroke: 1px rgba(255, 235, 120, 0.45);
+        filter: drop-shadow(0 3px 0 #7b1208) drop-shadow(0 6px 0 #4a0a04) drop-shadow(0 12px 22px rgba(255, 80, 20, 0.42));
+        margin: 0;
+      }
+
+      .arcade-hero-title span {
+        margin-left: 0.02em;
+      }
+
+      .arcade-hero-tagline {
+        margin-top: 5px;
+        margin-bottom: 0;
+        font-family: "Inter", system-ui, sans-serif;
+        font-size: clamp(8px, 1.3vw, 11px);
+        font-weight: 900;
+        letter-spacing: 0.22em;
+        color: #16edf2;
+        text-shadow: 0 0 12px rgba(22, 237, 242, 0.6), 0 0 24px rgba(22, 237, 242, 0.3);
+        text-transform: uppercase;
+      }
+
+      /* 2. Background Universe Decor Layer */
+      .arcade-universe-bg {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+        overflow: hidden;
+      }
+
+      .arcade-space-gradient {
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(ellipse at 50% 12%, rgba(110, 50, 255, 0.28) 0%, transparent 50%),
+          radial-gradient(circle at 18% 30%, rgba(0, 210, 255, 0.14), transparent 35%),
+          radial-gradient(circle at 82% 25%, rgba(220, 40, 255, 0.14), transparent 35%);
+      }
+
+      /* Perspective Grid near the bottom */
+      .arcade-grid-perspective {
+        position: absolute;
+        left: -25%;
+        right: -25%;
+        bottom: -12%;
+        height: 52%;
+        transform: perspective(280px) rotateX(66deg);
+        background-image:
+          linear-gradient(rgba(0, 220, 255, 0.22) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0, 220, 255, 0.22) 1px, transparent 1px);
+        background-size: 36px 36px;
+        mask-image: linear-gradient(to top, rgba(0,0,0,0.95) 10%, transparent 90%);
+      }
+
+      /* Curved Cyan/Blue Horizon Arc */
+      .arcade-horizon-arc {
+        position: absolute;
+        left: 50%;
+        bottom: -30%;
+        width: 132%;
+        height: 58%;
+        transform: translateX(-50%);
+        border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+        border-top: 3px solid #16f0f5;
+        box-shadow: 0 -8px 28px rgba(22, 240, 245, 0.85), 0 -28px 75px rgba(50, 70, 255, 0.5);
+        background: radial-gradient(ellipse at 50% 0%, rgba(22, 240, 245, 0.18), transparent 70%);
+      }
+
+      /* 3. Interactive 4-Card Viewport Layer */
+      #arcade-home.arcade-cinematic-v5 .home-carousel-wrapper {
+        position: relative !important;
+        z-index: 4 !important;
+        width: 100% !important;
+        max-width: min(1040px, 98%) !important;
+        height: auto !important;
+        overflow: visible !important;
+        margin: 2px 0 !important;
+      }
+
+      #arcade-home.arcade-cinematic-v5 #home-carousel {
+        position: relative !important;
+        z-index: 4 !important;
+        display: grid !important;
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+        gap: 16px !important;
+        width: 100% !important;
+        padding: 4px 2px 8px !important;
+        transform: none !important;
+        overflow: visible !important;
+        align-items: stretch !important;
+      }
+
+      /* Card Visibility & Styling */
+      #arcade-home.arcade-cinematic-v5 .app-card {
+        display: none !important;
+      }
+
+      #arcade-home.arcade-cinematic-v5 .app-card.is-visible {
+        display: flex !important;
+        position: relative !important;
+        width: 100% !important;
+        height: 200px !important;
+        padding: 16px 10px 12px !important;
+        border-radius: 18px !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        gap: 10px !important;
+        text-align: center !important;
+        background: linear-gradient(180deg, rgba(14, 22, 54, 0.94), rgba(4, 8, 26, 0.97)) !important;
+        border: 1.5px solid rgba(115, 83, 255, 0.55) !important;
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04), 0 16px 36px rgba(0, 0, 0, 0.5) !important;
+        backdrop-filter: blur(10px);
+        opacity: 0.85 !important;
+        transform: scale(0.97) !important;
+        transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease !important;
+      }
+
+      #arcade-home.arcade-cinematic-v5 .app-card.is-visible.focused {
+        opacity: 1 !important;
+        transform: translateY(-6px) scale(1.03) !important;
+        border-color: #14e9ff !important;
+        box-shadow:
+          0 0 0 1px rgba(20, 233, 255, 0.4),
+          0 0 34px rgba(20, 233, 255, 0.35),
+          0 22px 44px rgba(0, 0, 0, 0.6) !important;
+      }
+
+      .arcade-card-icon {
+        width: 60px !important;
+        height: 60px !important;
+        min-height: 60px !important;
+        display: grid !important;
+        place-items: center !important;
+        filter: drop-shadow(0 8px 14px rgba(0,0,0,0.5));
+      }
+
+      .arcade-premium-icon {
+        width: 52px !important;
+        height: 52px !important;
+        display: block !important;
+      }
+
+      .arcade-card-copy {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        width: 100%;
+        min-width: 0;
+      }
+
+      .arcade-card-name {
+        font-size: 12px;
+        font-weight: 900;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #ffffff;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .arcade-card-sub {
+        font-size: 8px;
+        line-height: 1.3;
+        color: rgba(220, 230, 255, 0.72);
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      /* 4. Hardware Control / Status Strip */
+      #arcade-home.arcade-cinematic-v5 #home-details {
+        position: relative !important;
+        z-index: 5 !important;
+        width: min(1040px, 98%) !important;
+        min-height: 38px !important;
+        margin: 2px auto 0 !important;
+        padding: 5px 10px !important;
+        border: 1px solid rgba(0, 229, 255, 0.2) !important;
+        background: linear-gradient(180deg, rgba(8, 12, 30, 0.92), rgba(3, 5, 16, 0.96)) !important;
+        border-radius: 12px !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 8px 24px rgba(0, 0, 0, 0.5) !important;
+        backdrop-filter: blur(10px);
+      }
+
+      .arcade-hw-strip {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        width: 100%;
+      }
+
+      .hw-btn {
+        appearance: none;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: linear-gradient(180deg, #1b2138 0%, #0d1122 100%);
+        color: #e2e8f0;
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        padding: 5px 10px;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        transition: background 0.15s ease, border-color 0.15s ease;
+      }
+
+      .hw-btn:hover {
+        border-color: rgba(0, 229, 255, 0.5);
+        color: #ffffff;
+      }
+
+      .hw-led {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        display: inline-block;
+      }
+
+      .hw-led.red { background: #ff3355; box-shadow: 0 0 8px #ff3355; }
+      .hw-led.green { background: #00ff88; box-shadow: 0 0 8px #00ff88; }
+      .hw-led.yellow { background: #ffbb00; box-shadow: 0 0 8px #ffbb00; }
+
+      .hw-clock {
+        font-family: "Courier New", monospace;
+        font-size: 11px;
+        font-weight: 900;
+        color: #00f0ff;
+        text-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
+        background: rgba(2, 8, 22, 0.8);
+        padding: 4px 10px;
+        border-radius: 6px;
+        border: 1px solid rgba(0, 240, 255, 0.25);
+        letter-spacing: 0.08em;
+      }
+
+      .hw-user-tag {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 3px 8px;
+        border-radius: 6px;
+        background: linear-gradient(90deg, rgba(160, 82, 255, 0.25), rgba(0, 240, 255, 0.25));
+        border: 1px solid rgba(160, 82, 255, 0.4);
+      }
+
+      .hw-user-tag strong {
+        font-size: 9px;
+        font-weight: 900;
+        color: #ffffff;
+        letter-spacing: 0.08em;
+      }
+
+      /* Responsive Adjustments */
+      @media (max-width: 720px) {
+        #arcade-home.arcade-cinematic-v5.active { padding: 8px 6px 6px !important; }
+        .arcade-hero-title { font-size: 34px !important; }
+        #arcade-home.arcade-cinematic-v5 #home-carousel { gap: 6px !important; }
+        #arcade-home.arcade-cinematic-v5 .app-card.is-visible { height: 140px !important; padding: 8px 4px !important; }
+        .arcade-card-icon { width: 44px !important; height: 44px !important; min-height: 44px !important; }
+        .arcade-premium-icon { width: 38px !important; height: 38px !important; }
+        .arcade-card-name { font-size: 10px; }
+        .arcade-card-sub { font-size: 6px; }
+        .hw-btn { padding: 4px 6px; font-size: 8px; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .app-card.is-visible { transition: none !important; }
+      }
+    `;
 }

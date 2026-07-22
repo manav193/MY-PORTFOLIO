@@ -182,6 +182,7 @@ function renderHtml(project, sections) {
   <footer class="site-footer" style="padding: 64px; text-align: center; border-top: 1px solid var(--color-border); margin-top: 120px;">
     <p style="color: var(--color-text-muted); font-size: 0.9rem;">&copy; 2026 Manav Agarwal.</p>
   </footer>
+  <script type="module" src="js/main.js"></script>
 </body>
 </html>`;
   return html;

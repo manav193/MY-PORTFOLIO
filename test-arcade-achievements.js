@@ -4,7 +4,7 @@ const path = require('path');
 const puppeteer = require('puppeteer');
 
 // Load and evaluate modules locally for pure Node.js unit tests
-const achievementsFile = fs.readFileSync(path.join(__dirname, 'js/modules/arcade-achievements.js'), 'utf8');
+const achievementsFile = fs.readFileSync(path.join(__dirname, 'frontend/js/modules/arcade-achievements.js'), 'utf8');
 const cleanAchievementsCode = achievementsFile
   .replace(/export function/g, 'function')
   .replace(/export const/g, 'const')

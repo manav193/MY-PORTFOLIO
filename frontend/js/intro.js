@@ -151,8 +151,12 @@
     // SAFE SINGLE SOURCE OF TRUTH (0 to 1)
     const safeProgress = Number.isFinite(currentProgress) ? Math.min(1, Math.max(0, currentProgress)) : 0;
     
-    // Add physical corners if we've started moving
-    if (safeProgress > 0.05) {
+    // Add physical corners if we've started moving (unless user explicitly exited Arcade)
+    if (window.ArcadeOS?.userExited) {
+      chassis.classList.remove('is-scaled');
+      osVisible = false;
+      if (window.ArcadeOS) window.ArcadeOS.osVisible = false;
+    } else if (safeProgress > 0.05) {
       chassis.classList.add('is-scaled');
       
       // Ensure ArcadeOS and apps are fully loaded before booting to prevent race conditions
@@ -167,7 +171,7 @@
     }
     
     // ===== OS LIFECYCLE SYNCHRONIZATION (HYSTERESIS) =====
-    if (hasBootedOS && window.ArcadeOS) {
+    if (hasBootedOS && window.ArcadeOS && !window.ArcadeOS.userExited) {
       const osLayer = document.getElementById('arcade-os');
       const bootLoader = document.querySelector('.boot-loader');
       
@@ -211,14 +215,14 @@
             bootLoader.classList.add('is-hidden');
           }
           
-          // Ensure OS is in HOME state
-          if (window.ArcadeOS.state !== 'HOME') {
+          // Ensure OS state is preserved if already in APP or LOADING
+          if (window.ArcadeOS.state !== 'APP' && window.ArcadeOS.state !== 'LOADING' && window.ArcadeOS.state !== 'HOME') {
             window.ArcadeOS.state = 'HOME';
             const homeView = document.getElementById('arcade-home');
             const appView = document.getElementById('arcade-app-view');
             const loadingView = document.getElementById('arcade-loading');
             if (homeView) homeView.classList.add('active');
-            if (appView) { appView.classList.remove('active'); appView.innerHTML = ''; }
+            if (appView) { appView.classList.remove('active'); }
             if (loadingView) loadingView.classList.remove('active');
             window.ArcadeOS.renderHome();
           }

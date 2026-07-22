@@ -1883,8 +1883,22 @@ export function initNimo() {
     renderSuggestions();
   }
 
-  launcher.addEventListener('click', togglePanel);
-  closeBtn.addEventListener('click', closePanel);
+  launcher.addEventListener('click', (e) => {
+    e.stopPropagation();
+    togglePanel();
+  });
+  if (closeBtn) {
+    closeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closePanel();
+    });
+  }
+  widget.addEventListener('click', (e) => {
+    if (e.target.closest('#nimo-close-btn, .nimo-close-btn')) {
+      e.stopPropagation();
+      closePanel();
+    }
+  });
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -1901,11 +1915,17 @@ export function initNimo() {
     }
   });
 
+  input.addEventListener('keydown', (e) => {
+    e.stopPropagation();
+  });
+
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && isOpen) {
+      e.preventDefault();
+      e.stopPropagation();
       closePanel();
     }
-  });
+  }, { capture: true });
 
   function togglePanel() {
     isOpen ? closePanel() : openPanel();
@@ -1914,6 +1934,7 @@ export function initNimo() {
   function openPanel() {
     isOpen = true;
     panel.classList.add('active');
+    panel.removeAttribute('aria-hidden');
     launcher.setAttribute('aria-expanded', 'true');
     input.focus();
   }
@@ -1921,8 +1942,13 @@ export function initNimo() {
   function closePanel() {
     isOpen = false;
     panel.classList.remove('active');
+    panel.setAttribute('aria-hidden', 'true');
     launcher.setAttribute('aria-expanded', 'false');
   }
+
+  window.NIMO.openNimo = openPanel;
+  window.NIMO.closeNimo = closePanel;
+  window.NIMO.toggleNimo = togglePanel;
 
   function getWelcomeMessage(lang) {
     if (lang === 'hinglish') {
@@ -2093,28 +2119,44 @@ function createWidgetDOM() {
   const container = document.createElement('div');
   container.id = 'nimo-widget';
   container.className = 'nimo-widget';
+
+  const logoSVG = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="26" height="26" class="nimo-logo-svg">
+      <defs>
+        <linearGradient id="nimo-grad-icon" x1="10" y1="8" x2="54" y2="56" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#a855f7"/>
+          <stop offset="0.5" stop-color="#6366f1"/>
+          <stop offset="1" stop-color="#06b6d4"/>
+        </linearGradient>
+      </defs>
+      <rect x="5" y="5" width="54" height="54" rx="17" fill="#0b1020"/>
+      <rect x="6" y="6" width="52" height="52" rx="16" fill="none" stroke="url(#nimo-grad-icon)" stroke-width="2.5" opacity="0.95"/>
+      <path d="M18 45V19h7.1l13.8 16.2V19H46v26h-6.8L25 28.5V45H18Z" fill="url(#nimo-grad-icon)"/>
+      <circle cx="47.5" cy="16.5" r="4.5" fill="#67e8f9"/>
+      <circle cx="47.5" cy="16.5" r="2" fill="#ecfeff"/>
+    </svg>
+  `;
+
   container.innerHTML = `
     <button id="nimo-launcher" class="nimo-launcher" aria-label="Open AI Assistant NIMO" aria-expanded="false">
       <div class="nimo-launcher-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 2a10 10 0 1 0 10 10H12V2z"></path>
-          <path d="M12 12L2.1 12"></path>
-          <path d="M12 12v9.9"></path>
-        </svg>
+        ${logoSVG}
       </div>
       <span class="nimo-launcher-label">NIMO AI</span>
     </button>
 
-    <div id="nimo-panel" class="nimo-panel" role="dialog" aria-label="NIMO Assistant">
+    <div id="nimo-panel" class="nimo-panel" role="dialog" aria-label="NIMO Assistant" aria-hidden="true">
       <div class="nimo-header">
         <div class="nimo-header-brand">
-          <div class="nimo-avatar">N</div>
+          <div class="nimo-avatar">
+            ${logoSVG}
+          </div>
           <div class="nimo-header-info">
             <span class="nimo-name">NIMO</span>
             <span class="nimo-status">Portfolio Assistant</span>
           </div>
         </div>
-        <button id="nimo-close-btn" class="nimo-close-btn" aria-label="Close Assistant">
+        <button id="nimo-close-btn" class="nimo-close-btn" aria-label="Close Assistant" type="button">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>

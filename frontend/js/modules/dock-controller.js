@@ -34,6 +34,17 @@ export function initDockController() {
 }
 
 export function enterArcade() {
+  if (window.ArcadeOS) {
+    window.ArcadeOS.userExited = false;
+    window.ArcadeOS.osVisible = true;
+  }
+  const chassis = document.querySelector('.cabinet-chassis');
+  if (chassis) chassis.classList.add('is-scaled');
+  const osLayer = document.getElementById('arcade-os');
+  if (osLayer) {
+    osLayer.style.opacity = '1';
+    osLayer.style.pointerEvents = 'auto';
+  }
   arcadeExplicitlySelected = true;
   arcadeArrivedAtCabinet = false;
   lockActiveDock("arcade", 5200);
@@ -41,6 +52,17 @@ export function enterArcade() {
 }
 
 export function exitArcadeToPortfolio(targetId = "main-content") {
+  if (window.ArcadeOS) {
+    window.ArcadeOS.userExited = true;
+    window.ArcadeOS.osVisible = false;
+  }
+  const chassis = document.querySelector('.cabinet-chassis');
+  if (chassis) chassis.classList.remove('is-scaled');
+  const osLayer = document.getElementById('arcade-os');
+  if (osLayer) {
+    osLayer.style.opacity = '0';
+    osLayer.style.pointerEvents = 'none';
+  }
   arcadeExplicitlySelected = false;
   arcadeArrivedAtCabinet = false;
   cleanupArcade();

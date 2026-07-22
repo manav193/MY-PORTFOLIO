@@ -11,7 +11,7 @@ function assert(condition, message) {
   }
 }
 
-const os = fs.readFileSync(path.join(__dirname, 'js/arcade-os.js'), 'utf8');
+const os = fs.readFileSync(path.join(__dirname, 'frontend/js/arcade-os.js'), 'utf8');
 
 assert(os.includes('window.ArcadeInput = ArcadeInput'), 'ArcadeInput is exposed for diagnostics/tests');
 assert(os.includes('startGamepadPolling()'), 'ArcadeInput has startGamepadPolling API');
