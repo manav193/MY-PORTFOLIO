@@ -18,7 +18,12 @@ BEHAVIOR RULES:
 - Maintain accurate facts about Manav and his portfolio.
 - Never invent fake credentials, fake companies, or fake AI capabilities.
 - Match the user's conversation language (English, Hindi, or Hinglish).
-- Answer the user's actual question directly. Never output internal safety labels, moderation labels, classifier labels, or policy-only text as the user-facing answer.`;
+- Answer the user's actual question directly.
+- Never reveal chain-of-thought, hidden reasoning, internal analysis, scratchpad text, moderation labels, safety labels, classifier labels, or policy-only text.
+- Do not narrate your reasoning with phrases like "the user is asking", "I should", "let me analyze", or "the safest response is".
+- Return only the final user-facing answer.
+- For general-knowledge questions unrelated to the portfolio, answer normally when you know the answer; do not pretend you are restricted only to portfolio facts.
+- Keep most answers under 180 words unless the user explicitly asks for detail.`;
 
 function getModelChain(env = {}) {
   const configuredModels = String(env.OPENROUTER_MODELS || '')
@@ -58,13 +63,25 @@ function isJunkReply(replyText) {
   ]);
 
   if (exactJunkReplies.has(normalized)) return true;
+  if (/^(user|content)?\s*safety\s*:\s*(safe|unsafe)$/i.test(normalized)) return true;
 
-  return /^(user|content)?\s*safety\s*:\s*(safe|unsafe)$/i.test(normalized);
+  const reasoningLeakPatterns = [
+    /^okay,?\s+the user\s+(is asking|asked|wants)/i,
+    /^the user\s+(is asking|asked|wants)/i,
+    /^let me\s+(analyze|think|check)/i,
+    /\bi should:\s*/i,
+    /\bthe safest response is\b/i,
+    /\blooking at .*portfolio summary\b/i,
+    /\bbut since i'm strictly bound\b/i,
+    /\bi shouldn't invent\b/i
+  ];
+
+  return reasoningLeakPatterns.some(pattern => pattern.test(String(replyText || '').trim()));
 }
 
 async function requestModel({ apiKey, model, contextualSystemMessage, userMessage }) {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 14000);
+  const timeoutId = setTimeout(() => controller.abort(), 18000);
 
   try {
     const response = await fetch(OPENROUTER_API_URL, {
@@ -81,8 +98,8 @@ async function requestModel({ apiKey, model, contextualSystemMessage, userMessag
           { role: 'system', content: contextualSystemMessage },
           { role: 'user', content: userMessage }
         ],
-        max_tokens: 300,
-        temperature: 0.7
+        max_tokens: 600,
+        temperature: 0.55
       }),
       signal: controller.signal
     });
@@ -101,7 +118,7 @@ async function requestModel({ apiKey, model, contextualSystemMessage, userMessag
     if (isJunkReply(replyText)) {
       return {
         success: false,
-        error: `Rejected unusable response from ${model}`
+        error: `Rejected unusable or reasoning-leak response from ${model}`
       };
     }
 
