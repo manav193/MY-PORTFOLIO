@@ -50,7 +50,7 @@ const portfolioConfig = Object.freeze({
       status: 'Live',
       liveUrl: 'https://veldora-bites.vercel.app/orders.html',
       githubUrl: 'https://github.com/manav193/VELDORA-BITES',
-      caseStudyPath: 'project-veldora-bites.html'
+      caseStudyPath: 'assets/case-studies/veldora-bites.html'
     }),
     'shift-zero': Object.freeze({
       status: 'In Development',
