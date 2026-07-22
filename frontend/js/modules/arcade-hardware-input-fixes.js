@@ -16,14 +16,16 @@ function installCabinetLayoutFix() {
   const style = document.createElement('style');
   style.id = 'arcade-hardware-layout-fix';
   style.textContent = `
-    /* Larger premium cabinet/background with the complete hardware kept visible. */
+    /* Large immersive CRT with the COMPLETE lower cabinet shell included. */
     .cabinet-chassis.is-scaled {
       width: 96vw !important;
       max-width: 1660px !important;
-      height: min(940px, 94vh) !important;
-      max-height: 940px !important;
+      height: min(960px, 96vh) !important;
+      max-height: 960px !important;
     }
 
+    /* The themed face must continue behind the service hatch / coin LED /
+       serial markings. Those details are part of the cabinet, not page chrome. */
     .cabinet-chassis.is-scaled .cab-front {
       inset: 0 !important;
       width: 100% !important;
@@ -31,37 +33,37 @@ function installCabinetLayoutFix() {
       overflow: visible !important;
       background-color: var(--cab-bg) !important;
       border-radius: 32px 32px 14px 14px !important;
+      box-sizing: border-box !important;
     }
 
     .cabinet-chassis.is-scaled .cab-marquee {
-      width: 93% !important;
+      width: 92% !important;
       flex: 0 0 50px !important;
     }
 
     .cabinet-chassis.is-scaled .cabinet-screen-bezel {
-      width: 93% !important;
-      flex: 0 0 520px !important;
-      min-height: 520px !important;
-      max-height: 520px !important;
+      width: 92% !important;
+      flex: 0 0 500px !important;
+      min-height: 500px !important;
+      max-height: 500px !important;
       margin: 10px auto 0 !important;
     }
 
-    /* Grow the real render surface with the bezel; never scale/squash the UI. */
     .cabinet-chassis.is-scaled .screen-content-layer {
       top: 96px !important;
-      left: calc(3.5% + 16px) !important;
-      width: calc(93% - 32px) !important;
-      height: 488px !important;
+      left: calc(4% + 16px) !important;
+      width: calc(92% - 32px) !important;
+      height: 468px !important;
     }
 
     .cabinet-chassis.is-scaled .cab-control-deck {
       display: flex !important;
-      flex: 0 0 112px !important;
-      min-height: 112px !important;
-      max-height: 112px !important;
-      width: 93% !important;
+      flex: 0 0 110px !important;
+      min-height: 110px !important;
+      max-height: 110px !important;
+      width: 92% !important;
       margin: 10px auto 0 !important;
-      padding: 0 44px !important;
+      padding: 0 40px !important;
       opacity: 1 !important;
       visibility: visible !important;
       overflow: visible !important;
@@ -94,13 +96,16 @@ function installCabinetLayoutFix() {
       display: grid !important;
     }
 
+    /* This is the physical lower hardware bay: speaker/service hatch on the
+       left, illuminated coin acceptor in the middle, manufacturing text right.
+       Reserve real cabinet height for it so none of it sits outside the shell. */
     .cabinet-chassis.is-scaled .cab-bottom-details {
-      width: 93% !important;
-      min-height: 60px !important;
-      height: 60px !important;
-      flex: 0 0 60px !important;
-      margin: 6px auto 0 !important;
-      padding: 5px 0 4px !important;
+      width: 92% !important;
+      min-height: 78px !important;
+      height: 78px !important;
+      flex: 0 0 78px !important;
+      margin: 8px auto 0 !important;
+      padding: 8px 8px 12px !important;
       box-sizing: border-box !important;
       background: transparent !important;
       align-items: flex-end !important;
@@ -113,6 +118,13 @@ function installCabinetLayoutFix() {
       content: none !important;
     }
 
+    .cabinet-chassis.is-scaled .cab-service-hatch,
+    .cabinet-chassis.is-scaled .cab-coin-door,
+    .cabinet-chassis.is-scaled .cab-serial {
+      position: relative !important;
+      z-index: 25 !important;
+    }
+
     .cabinet-chassis.is-scaled .cab-joystick,
     .cabinet-chassis.is-scaled .cab-joy-ball,
     .cabinet-chassis.is-scaled .cab-btn,
@@ -121,58 +133,60 @@ function installCabinetLayoutFix() {
       overflow: visible !important;
     }
 
-    /* Laptop-height screens: enlarge the cabinet background, but shorten only
-       the CRT enough to guarantee the complete physical deck remains visible. */
+    /* On laptop-height screens, keep the cabinet tall enough to wrap the lower
+       hardware. Reduce only the CRT height; never eject the bottom details. */
     @media (max-height: 900px) and (min-width: 769px) {
       .cabinet-chassis.is-scaled {
-        width: 96vw !important;
-        max-width: 1660px !important;
-        height: 92vh !important;
-        max-height: 830px !important;
+        height: 96vh !important;
+        max-height: 850px !important;
+      }
+
+      .cabinet-chassis.is-scaled .cabinet-screen-bezel {
+        flex-basis: 430px !important;
+        min-height: 430px !important;
+        max-height: 430px !important;
+      }
+
+      .cabinet-chassis.is-scaled .screen-content-layer {
+        height: 398px !important;
+      }
+
+      .cabinet-chassis.is-scaled .cab-control-deck {
+        flex-basis: 96px !important;
+        min-height: 96px !important;
+        max-height: 96px !important;
+      }
+
+      .cabinet-chassis.is-scaled .cab-bottom-details {
+        min-height: 72px !important;
+        height: 72px !important;
+        flex-basis: 72px !important;
+        margin-top: 8px !important;
+      }
+    }
+
+    @media (max-width: 1100px) {
+      .cabinet-chassis.is-scaled {
+        width: 98vw !important;
       }
 
       .cabinet-chassis.is-scaled .cab-marquee,
       .cabinet-chassis.is-scaled .cabinet-screen-bezel,
       .cabinet-chassis.is-scaled .cab-control-deck,
       .cabinet-chassis.is-scaled .cab-bottom-details {
-        width: 93% !important;
-      }
-
-      .cabinet-chassis.is-scaled .cabinet-screen-bezel {
-        flex-basis: 445px !important;
-        min-height: 445px !important;
-        max-height: 445px !important;
+        width: 94% !important;
       }
 
       .cabinet-chassis.is-scaled .screen-content-layer {
-        left: calc(3.5% + 16px) !important;
-        width: calc(93% - 32px) !important;
-        height: 413px !important;
-      }
-
-      .cabinet-chassis.is-scaled .cab-control-deck {
-        flex-basis: 100px !important;
-        min-height: 100px !important;
-        max-height: 100px !important;
-      }
-
-      .cabinet-chassis.is-scaled .cab-bottom-details {
-        min-height: 50px !important;
-        height: 50px !important;
-        flex-basis: 50px !important;
-      }
-    }
-
-    @media (max-width: 1100px) {
-      .cabinet-chassis.is-scaled {
-        width: 97vw !important;
+        left: calc(3% + 16px) !important;
+        width: calc(94% - 32px) !important;
       }
     }
 
     @media (max-width: 768px) {
       .cabinet-chassis.is-scaled {
         width: 98vw !important;
-        height: min(740px, 92vh) !important;
+        height: min(760px, 94vh) !important;
       }
 
       .cabinet-chassis.is-scaled .cab-marquee,
@@ -183,29 +197,29 @@ function installCabinetLayoutFix() {
       }
 
       .cabinet-chassis.is-scaled .cabinet-screen-bezel {
-        flex-basis: 330px !important;
-        min-height: 330px !important;
-        max-height: 330px !important;
+        flex-basis: 320px !important;
+        min-height: 320px !important;
+        max-height: 320px !important;
       }
 
       .cabinet-chassis.is-scaled .screen-content-layer {
         top: 90px !important;
         left: calc(3% + 16px) !important;
         width: calc(94% - 32px) !important;
-        height: 298px !important;
+        height: 288px !important;
       }
 
       .cabinet-chassis.is-scaled .cab-control-deck {
-        flex-basis: 86px !important;
-        min-height: 86px !important;
-        max-height: 86px !important;
+        flex-basis: 84px !important;
+        min-height: 84px !important;
+        max-height: 84px !important;
         padding: 0 20px !important;
       }
 
       .cabinet-chassis.is-scaled .cab-bottom-details {
-        min-height: 46px !important;
-        height: 46px !important;
-        flex-basis: 46px !important;
+        min-height: 62px !important;
+        height: 62px !important;
+        flex-basis: 62px !important;
       }
     }
   `;
