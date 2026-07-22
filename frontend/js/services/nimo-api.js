@@ -12,8 +12,7 @@ const DEFAULT_BACKEND_URL =
 
 export async function fetchNimoBackendReply(userMessage, context = {}) {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 10000);
-
+  const timeoutId = setTimeout(() => controller.abort(), 45000);
   try {
     const payload = {
       message: userMessage,
