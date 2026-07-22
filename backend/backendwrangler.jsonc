@@ -1,0 +1,8 @@
+{
+  "name": "nimo-backend",
+  "main": "src/index.js",
+  "compatibility_date": "2026-07-22",
+  "vars": {
+    "ALLOWED_ORIGINS": "https://my-portfolio-mu-jade-52.vercel.app"
+  }
+}

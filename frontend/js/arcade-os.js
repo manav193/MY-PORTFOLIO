@@ -456,6 +456,17 @@ const ArcadeInput = {
 
     // Keyboard Mapping
     document.addEventListener('keydown', (e) => {
+      const active = e.target || document.activeElement;
+      const isInput = active && (
+        active.tagName === 'INPUT' ||
+        active.tagName === 'TEXTAREA' ||
+        active.tagName === 'SELECT' ||
+        active.isContentEditable ||
+        active.hasAttribute?.('contenteditable') ||
+        active.getAttribute?.('data-arcade-control') === 'text'
+      );
+      if (isInput) return;
+
       // Accept input whenever ArcadeOS is active, including brief chassis animation transitions.
       const chassis = document.querySelector('.cabinet-chassis');
       const routeActive = window.ArcadeOS
@@ -535,6 +546,17 @@ const ArcadeInput = {
     });
 
     document.addEventListener('keyup', (e) => {
+      const active = e.target || document.activeElement;
+      const isInput = active && (
+        active.tagName === 'INPUT' ||
+        active.tagName === 'TEXTAREA' ||
+        active.tagName === 'SELECT' ||
+        active.isContentEditable ||
+        active.hasAttribute?.('contenteditable') ||
+        active.getAttribute?.('data-arcade-control') === 'text'
+      );
+      if (isInput) return;
+
       const smallBtns = document.querySelectorAll('.cab-btn-small');
       const btns = document.querySelectorAll('.cab-btn');
 

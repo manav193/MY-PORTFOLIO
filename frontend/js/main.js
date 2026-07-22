@@ -8,6 +8,7 @@ import { initDockController } from "./modules/dock-controller.js";
 import { initCursorSystem } from "./modules/cursor-system.js";
 import { initCommandPalette } from "./modules/command-palette.js";
 import { initSectionProgressRail } from "./modules/section-progress-rail.js";
+import { initNimo } from "./modules/nimo.js";
 
 document.body.classList.add("is-loading");
 document.body.style.opacity = '0';
@@ -22,6 +23,7 @@ initCursorSystem();
 initCommandPalette();
 initSectionProgressRail();
 initDockController();
+initNimo();
 initReveal();
 initCounters();
 initScrollProgress();

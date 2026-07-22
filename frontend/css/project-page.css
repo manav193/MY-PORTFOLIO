@@ -343,18 +343,30 @@
   --p-accent: #e60012;
   --p-accent-deep: #8f0010;
   --p-paper: #f7f4ef;
-  --p-graphite: #151515;
-  --p-accent-glow: rgba(230, 0, 18, 0.2);
+  --p-graphite: #ffffff;
+  --p-accent-glow: rgba(230, 0, 18, 0.25);
   --p-ambient:
-    radial-gradient(circle at 15% -10%, rgba(230, 0, 18, 0.18), transparent 45%),
-    radial-gradient(circle at 85% 8%, rgba(143, 0, 16, 0.12), transparent 36%);
+    radial-gradient(circle at 15% -10%, rgba(230, 0, 18, 0.22), transparent 45%),
+    radial-gradient(circle at 85% 8%, rgba(143, 0, 16, 0.18), transparent 36%);
+  --color-bg: #0b090a;
+  --color-text-primary: #f8fafc;
+  --color-text-secondary: #cbd5e1;
+  --color-text-muted: #94a3b8;
+  --color-surface: rgba(21, 15, 17, 0.82);
+  --color-border: rgba(230, 0, 18, 0.2);
+  --color-border-strong: rgba(230, 0, 18, 0.35);
+}
+
+html[data-theme="light-apple"] [data-project-theme="nintendo"],
+html[data-theme="light-apple"] body[data-project-theme="nintendo"] {
+  --p-graphite: #151515;
   --color-bg: #f7f4ef;
   --color-text-primary: #151515;
   --color-text-secondary: #3c3434;
   --color-text-muted: #746967;
-  --color-surface: rgba(255,255,255,0.82);
-  --color-border: rgba(143,0,16,0.14);
-  --color-border-strong: rgba(143,0,16,0.24);
+  --color-surface: rgba(255, 255, 255, 0.82);
+  --color-border: rgba(143, 0, 16, 0.14);
+  --color-border-strong: rgba(143, 0, 16, 0.24);
 }
 
 [data-project-theme="nike"] {
@@ -451,7 +463,7 @@ body[data-project-theme="nintendo"] .btn-primary:hover {
 }
 
 body[data-project-theme="nintendo"] .cs-hero-title {
-  background: linear-gradient(180deg, var(--p-graphite) 0%, var(--p-accent-deep) 120%);
+  background: linear-gradient(180deg, var(--color-text-primary) 0%, var(--p-accent) 120%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

@@ -1493,3 +1493,297 @@ body.cursor-pressed .cursor-ring {
   white-space: nowrap !important;
   border: 0 !important;
 }
+
+/* ==========================================================================
+   XX. NIMO ASSISTANT UI
+   ========================================================================== */
+.nimo-widget {
+  transition: opacity 0.4s var(--ease), visibility 0.4s var(--ease);
+}
+
+body.arcade-active .nimo-widget,
+body:has(.cabinet-chassis.is-scaled) .nimo-widget {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.nimo-launcher {
+  position: fixed;
+  bottom: 96px;
+  right: 32px;
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 100px;
+  background: rgba(var(--surface-rgb), 0.92);
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.3s var(--spring), border-color 0.3s, box-shadow 0.3s;
+}
+
+.nimo-launcher:hover {
+  transform: translateY(-3px);
+  border-color: var(--color-text-primary);
+  box-shadow: var(--shadow-deep);
+}
+
+.nimo-sparkle-icon {
+  color: var(--color-highlight, #10b981);
+}
+
+.nimo-panel {
+  position: fixed;
+  bottom: 156px;
+  right: 32px;
+  width: 360px;
+  max-height: 520px;
+  z-index: 10002;
+  display: flex;
+  flex-direction: column;
+  border-radius: 20px;
+  background: rgba(var(--surface-rgb), 0.95);
+  backdrop-filter: blur(32px) saturate(160%);
+  -webkit-backdrop-filter: blur(32px) saturate(160%);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-deep);
+  overflow: hidden;
+  transition: opacity 0.3s var(--ease), transform 0.3s var(--spring), visibility 0.3s;
+}
+
+.nimo-panel[hidden] {
+  display: none !important;
+}
+
+.nimo-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--color-border);
+  background: rgba(var(--surface-rgb), 0.5);
+}
+
+.nimo-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nimo-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(var(--highlight-rgb, 16, 185, 129), 0.15);
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-highlight, #10b981);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nimo-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-family: var(--font-mono);
+  letter-spacing: 0.05em;
+  line-height: 1.1;
+}
+
+.nimo-status {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+}
+
+.nimo-close-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s, background 0.2s;
+}
+
+.nimo-close-btn:hover {
+  color: var(--color-text-primary);
+  background: rgba(var(--highlight-rgb, 255, 255, 255), 0.1);
+}
+
+.nimo-messages {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 180px;
+  max-height: 320px;
+}
+
+.nimo-msg {
+  max-width: 88%;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.nimo-msg-user {
+  align-self: flex-end;
+  background: var(--color-text-primary);
+  color: var(--color-bg);
+  padding: 10px 14px;
+  border-radius: 16px 16px 4px 16px;
+  font-weight: 500;
+}
+
+.nimo-msg-assistant {
+  align-self: flex-start;
+  background: rgba(var(--highlight-rgb, 255, 255, 255), 0.06);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  padding: 12px 14px;
+  border-radius: 16px 16px 16px 4px;
+}
+
+.nimo-msg-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.nimo-action-btn {
+  background: rgba(var(--highlight-rgb, 16, 185, 129), 0.12);
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text-primary);
+  font-size: 0.78rem;
+  padding: 5px 10px;
+  border-radius: 99px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.nimo-action-btn:hover {
+  background: rgba(var(--highlight-rgb, 16, 185, 129), 0.25);
+  transform: translateY(-1px);
+}
+
+.nimo-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 16px 12px;
+  border-top: 1px dashed var(--color-border);
+}
+
+.nimo-chip {
+  background: rgba(var(--highlight-rgb, 255, 255, 255), 0.05);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: 0.76rem;
+  padding: 4px 10px;
+  border-radius: 99px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.nimo-chip:hover {
+  background: rgba(var(--highlight-rgb, 255, 255, 255), 0.12);
+  color: var(--color-text-primary);
+  border-color: var(--color-text-muted);
+}
+
+.nimo-input-form {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  border-top: 1px solid var(--color-border);
+  background: rgba(var(--surface-rgb), 0.6);
+}
+
+.nimo-input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--color-text-primary);
+  font-size: 0.88rem;
+  padding: 6px 8px;
+}
+
+.nimo-input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.nimo-send-btn {
+  background: var(--color-text-primary);
+  color: var(--color-bg);
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s var(--spring), opacity 0.2s;
+}
+
+.nimo-send-btn:hover {
+  transform: scale(1.08);
+}
+
+/* Typing Dots Animation */
+.nimo-typing-dots {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 2px;
+}
+
+.nimo-typing-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-text-muted);
+  animation: nimoPulse 1.2s infinite ease-in-out;
+}
+
+.nimo-typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.nimo-typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes nimoPulse {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+@media (max-width: 900px) {
+  .nimo-launcher {
+    bottom: 90px;
+    right: 20px;
+    padding: 8px 14px;
+  }
+  .nimo-panel {
+    bottom: 144px;
+    right: 16px;
+    width: calc(100vw - 32px);
+    max-width: 360px;
+    max-height: 460px;
+  }
+}

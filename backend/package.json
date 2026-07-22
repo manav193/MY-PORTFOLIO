@@ -1,0 +1,15 @@
+{
+  "name": "nimo-backend",
+  "version": "1.0.0",
+  "description": "Cloudflare Workers compatible backend API service for NIMO portfolio assistant",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "start:node": "node src/server.js"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}

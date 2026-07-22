@@ -109,6 +109,16 @@ export function initOS() {
   const konami = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
   let konamiIndex = 0;
   window.addEventListener('keydown', (e) => {
+    const active = e.target || document.activeElement;
+    const isInput = active && (
+      active.tagName === 'INPUT' ||
+      active.tagName === 'TEXTAREA' ||
+      active.tagName === 'SELECT' ||
+      active.isContentEditable ||
+      active.hasAttribute?.('contenteditable')
+    );
+    if (isInput) return;
+
     if (e.key === konami[konamiIndex]) {
       konamiIndex++;
       if (konamiIndex === konami.length) {

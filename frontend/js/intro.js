@@ -131,6 +131,9 @@
     
     // Skip heavy DOM updates and style manipulation when the cabinet is completely off-screen
     if (scrollY > window.innerHeight * 2.0) {
+      if (chassis.classList.contains('is-scaled')) {
+        chassis.classList.remove('is-scaled');
+      }
       return;
     }
     

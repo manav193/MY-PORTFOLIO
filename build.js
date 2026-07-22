@@ -3,7 +3,9 @@ const path = require('path');
 const esbuild = require('esbuild');
 const CleanCSS = require('clean-css');
 const HtmlMinifier = require('html-minifier-terser');
-const portfolioConfig = require('./js/portfolio-config.js');
+
+const FRONTEND_DIR = path.join(__dirname, 'frontend');
+const portfolioConfig = require(path.join(FRONTEND_DIR, 'js', 'portfolio-config.js'));
 
 const DIST_DIR = path.join(__dirname, 'dist');
 
@@ -49,12 +51,12 @@ function cleanDist() {
   fs.mkdirSync(path.join(DIST_DIR, 'js'));
 }
 
-// Copy static directory/file recursively
+// Copy static directory/file recursively from frontend/ to dist/
 function copyStatic(src, dest) {
-  const srcPath = path.join(__dirname, src);
+  const srcPath = path.join(FRONTEND_DIR, src);
   const destPath = path.join(DIST_DIR, dest);
   if (fs.existsSync(srcPath)) {
-    console.log(`Copying ${src} to dist/${dest}...`);
+    console.log(`Copying frontend/${src} to dist/${dest}...`);
     fs.cpSync(srcPath, destPath, { recursive: true });
   } else {
     console.warn(`Warning: Static asset source not found: ${src}`);
@@ -66,7 +68,7 @@ async function buildJS() {
   
   // 1. Bundle main.js module entry point
   await esbuild.build({
-    entryPoints: [path.join(__dirname, 'js/main.js')],
+    entryPoints: [path.join(FRONTEND_DIR, 'js/main.js')],
     bundle: true,
     minify: true,
     sourcemap: false,
@@ -80,7 +82,7 @@ async function buildJS() {
   // 2. Minify deferred classic global scripts
   const classicScripts = ['intro.js', 'arcade-os.js', 'arcade-apps.js', 'machine-bg.js', 'arcade-module-loader.js'];
   for (const script of classicScripts) {
-    const srcPath = path.join(__dirname, 'js', script);
+    const srcPath = path.join(FRONTEND_DIR, 'js', script);
     if (fs.existsSync(srcPath)) {
       await esbuild.build({
         entryPoints: [srcPath],
@@ -101,10 +103,11 @@ async function buildJS() {
     'modules/arcade-audio.js',
     'modules/arcade-soundlab.js',
     'modules/arcade-diagnostics.js',
-    'modules/arcade-reset-safety.js'
+    'modules/arcade-reset-safety.js',
+    'services/nimo-api.js'
   ];
   for (const mod of dynamicModules) {
-    const srcPath = path.join(__dirname, 'js', mod);
+    const srcPath = path.join(FRONTEND_DIR, 'js', mod);
     if (fs.existsSync(srcPath)) {
       await esbuild.build({
         entryPoints: [srcPath],
@@ -124,7 +127,7 @@ function buildCSS() {
   const cleanCSSInstance = new CleanCSS({ level: 1 });
 
   for (const file of cssFiles) {
-    const srcPath = path.join(__dirname, 'css', file);
+    const srcPath = path.join(FRONTEND_DIR, 'css', file);
     if (fs.existsSync(srcPath)) {
       const cssContent = fs.readFileSync(srcPath, 'utf8');
       const minified = cleanCSSInstance.minify(cssContent);
@@ -202,6 +205,7 @@ async function buildHTML() {
     'index.html',
     '404.html',
     'project-arcade-os.html',
+    'project-nimo.html',
     'project-toolverse.html',
     'project-selfyy.html',
     'project-love-journey.html',
@@ -213,7 +217,7 @@ async function buildHTML() {
   ];
 
   for (const file of htmlFiles) {
-    const srcPath = path.join(__dirname, file);
+    const srcPath = path.join(FRONTEND_DIR, file);
     if (fs.existsSync(srcPath)) {
       const htmlContent = fs.readFileSync(srcPath, 'utf8');
       const processedHtml = processHTMLContent(htmlContent, DEPLOY_BASE, SITE_URL, file);
@@ -254,7 +258,7 @@ function processSWContent(content, base) {
   let processed = content;
   
   // Bump version to trigger fresh caching on update
-  processed = processed.replace(/manav-portfolio-v19/g, 'manav-portfolio-v20');
+  processed = processed.replace(/manav-portfolio-v20/g, 'manav-portfolio-v21');
   
   // Prepend base path to cached assets
   processed = processed.replace(/"\.\/"/g, `"${base}"`);
@@ -310,6 +314,7 @@ function validateBuild(base, siteUrl) {
     'css/intro.css',
     'css/arcade-os.css',
     'project-arcade-os.html',
+    'project-nimo.html',
     portfolioConfig.resumePath,
     portfolioConfig.socialImagePath,
     'images/arcade-home.webp',
@@ -318,6 +323,7 @@ function validateBuild(base, siteUrl) {
     'images/arcade-achievements.webp',
     'images/arcade-soundlab.webp',
     'images/arcade-diagnostics.webp',
+    'images/nimo-preview.svg',
     'images/selfyy-preview.webp',
     'js/modules/arcade-system-ui.js',
     'js/modules/arcade-customizer.js',
@@ -478,7 +484,7 @@ async function main() {
     buildCSS();
     await buildHTML();
     
-    // Copy static assets
+    // Copy static assets from frontend/
     copyStatic('images', 'images');
     copyStatic('icons', 'icons');
     copyStatic('assets', 'assets');
@@ -487,7 +493,7 @@ async function main() {
     copyStatic(portfolioConfig.resumePath, portfolioConfig.resumePath);
 
     // Process manifest
-    const manifestPath = path.join(__dirname, 'site.webmanifest');
+    const manifestPath = path.join(FRONTEND_DIR, 'site.webmanifest');
     if (fs.existsSync(manifestPath)) {
       const content = fs.readFileSync(manifestPath, 'utf8');
       const processed = processManifestContent(content, DEPLOY_BASE);
@@ -495,7 +501,7 @@ async function main() {
     }
 
     // Process sw.js
-    const swPath = path.join(__dirname, 'sw.js');
+    const swPath = path.join(FRONTEND_DIR, 'sw.js');
     if (fs.existsSync(swPath)) {
       const content = fs.readFileSync(swPath, 'utf8');
       const processed = processSWContent(content, DEPLOY_BASE);
@@ -503,7 +509,7 @@ async function main() {
     }
 
     // Process robots.txt
-    const robotsPath = path.join(__dirname, 'robots.txt');
+    const robotsPath = path.join(FRONTEND_DIR, 'robots.txt');
     if (fs.existsSync(robotsPath)) {
       const content = fs.readFileSync(robotsPath, 'utf8');
       const processed = processRobotsContent(content, DEPLOY_BASE, SITE_URL);
@@ -511,7 +517,7 @@ async function main() {
     }
 
     // Process sitemap.xml
-    const sitemapPath = path.join(__dirname, 'sitemap.xml');
+    const sitemapPath = path.join(FRONTEND_DIR, 'sitemap.xml');
     if (fs.existsSync(sitemapPath)) {
       const content = fs.readFileSync(sitemapPath, 'utf8');
       const processed = processSitemapContent(content, DEPLOY_BASE, SITE_URL);

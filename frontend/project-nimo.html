@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NIMO — Local-First Portfolio Assistant Case Study</title>
+  <meta name="description" content="Engineering case study for NIMO — a local-first, website-aware portfolio assistant built with Vanilla JS, natural-language intent recognition, current-page context, and trilingual support.">
+  <meta name="theme-color" content="#000000">
+  <link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/project-page.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <script>
+    (function() {
+      try {
+        var localTheme = localStorage.getItem('premium-theme');
+        var sysTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark-graphite' : 'light-apple';
+        var activeTheme = localTheme || sysTheme;
+        document.documentElement.setAttribute('data-theme', activeTheme);
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body data-project-theme="nimo">
+  <nav class="site-nav showroom-nav">
+    <div class="nav-container">
+      <a href="index.html#work" class="brand" style="display:flex; align-items:center; gap:8px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Index
+      </a>
+      <div class="project-nav-actions">
+        <a href="#nimo-widget" class="btn-primary" onclick="if(window.NIMO) window.NIMO.processUserQuery('What can NIMO do?')">Try NIMO</a>
+        <a href="{{projects.nimo.githubUrl}}" class="btn-secondary" target="_blank" rel="noopener noreferrer">GitHub Repo</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="cs-premium-layout">
+    
+    <!-- 1. CINEMATIC HERO BANNER -->
+    <header class="cs-hero-cinematic">
+      <div class="cs-hero-content">
+        <h1 class="cs-hero-title reveal-text">NIMO</h1>
+        <p class="cs-hero-subtitle reveal-text" style="animation-delay: 0.1s;">
+          A Local-First, Website-Aware Assistant Built Into the Portfolio
+        </p>
+        <p class="cs-editorial-lead reveal-text" style="animation-delay: 0.2s; max-width: 780px; margin-top: 16px;">
+          NIMO is an interactive assistant designed specifically for this portfolio. Instead of acting like a generic chatbot, it understands the site itself — projects, case studies, navigation, developer concepts, current-page context, and user intent.
+        </p>
+      </div>
+      <div class="cs-hero-visual reveal-scale">
+        <img src="images/nimo-preview.svg" alt="NIMO Assistant Interface and Local Intent Architecture" class="cs-hero-img" width="1200" height="750">
+        <div class="cs-hero-stats">
+          <div class="cs-stat-pill">Design &amp; Development</div>
+          <div class="cs-stat-pill">Interactive Assistant</div>
+          <div class="cs-stat-pill">100% Local-First</div>
+          <div class="cs-stat-pill">Trilingual NLU</div>
+          <div class="cs-stat-pill">HTML5 / CSS / ES Modules</div>
+          <div class="cs-stat-pill">Input Focus Isolated</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- 2. PROJECT OVERVIEW -->
+    <section class="cs-editorial-section cs-fade-up">
+      <div class="cs-grid-layout">
+        <div class="cs-grid-col-4">
+          <span class="cs-section-marker">01. Overview</span>
+          <h2 class="cs-section-heading">Site-Aware Intelligence.</h2>
+        </div>
+        <div class="cs-grid-col-8">
+          <div class="cs-overview-blocks">
+            <div class="cs-overview-block">
+              <h3>Problem</h3>
+              <p>Traditional portfolios force visitors to manually navigate menus, scroll past project cards, and read long case studies to find specific details. Recruiters and visitors frequently seek immediate answers: <em>"Which projects involve UI?"</em>, <em>"What is ToolVerse?"</em>, <em>"What am I looking at?"</em>, <em>"Summarize this project"</em>, <em>"Who built this website?"</em>, or <em>"What does HTML mean?"</em>.</p>
+            </div>
+            <div class="cs-overview-block">
+              <h3>Solution</h3>
+              <p>NIMO was designed as a grounded, website-aware assistant embedded directly into the portfolio. Rather than relying on heavy third-party AI APIs or generic chatbot widgets, NIMO resolves natural-language navigation, project lookups, current-page context, developer concepts, and multilingual queries locally using a structured intent engine.</p>
+            </div>
+            <div class="cs-overview-block">
+              <h3>Target Audience</h3>
+              <p>Recruiters, hiring managers, and developers exploring the portfolio who want instant answers, fast section navigation, case study summaries, or developer concept explanations without manual searching.</p>
+            </div>
+            <div class="cs-overview-block">
+              <h3>Key Objectives</h3>
+              <p>Provide zero-latency answers, track current page and project context automatically, support trilingual English, Hindi, and Hinglish queries, enforce a strict no-hallucination rule, and maintain full keyboard focus isolation with Arcade OS.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. THE CORE IDEA & DESIGN PHILOSOPHY -->
+    <section class="cs-editorial-section cs-bg-alternate cs-fade-up">
+      <div class="cs-grid-layout">
+        <div class="cs-grid-col-6 cs-sticky-col">
+          <span class="cs-section-marker">02. Design Philosophy</span>
+          <h2 class="cs-section-heading">Embedded by design.<br>Intelligent by context.</h2>
+          <p class="cs-editorial-lead">NIMO is intentionally built to feel like an organic part of the portfolio experience rather than an embedded third-party widget. Its intelligence is grounded directly in real project metadata, page state, and structured developer knowledge.</p>
+        </div>
+        <div class="cs-grid-col-6">
+          <div class="cs-design-list">
+            <div class="cs-design-item">
+              <h4>Native Visual System</h4>
+              <p>Utilizes the portfolio's native CSS tokens, glassmorphism layers, dark/light theme switching, and responsive layout rules.</p>
+            </div>
+            <div class="cs-design-item">
+              <h4>Grounded Knowledge Source</h4>
+              <p>All answers draw from verified portfolio metadata, structured case study context, site configurations, and built-in developer concepts.</p>
+            </div>
+            <div class="cs-design-item">
+              <h4>Contextual Action Triggers</h4>
+              <p>Every response offers dynamic action buttons, enabling users to jump to sections, open live apps, or ask follow-up questions in one click.</p>
+            </div>
+            <div class="cs-design-item">
+              <h4>No-Hallucination Reliability</h4>
+              <p>NIMO never fabricates credentials or project claims. If a query falls outside its structured knowledge base, it gracefully provides a polite redirect.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. LOCAL-FIRST ARCHITECTURE -->
+    <section class="cs-editorial-section cs-fade-up">
+      <div class="cs-grid-layout">
+        <div class="cs-grid-col-12">
+          <span class="cs-section-marker">03. Architecture</span>
+          <h2 class="cs-section-heading">Local First. Zero Server Latency.</h2>
+        </div>
+        <div class="cs-grid-col-6">
+          <p class="cs-editorial-body">NIMO operates entirely inside the client's browser using modular Vanilla JavaScript (ES Modules). This architectural choice eliminates external API subscriptions, key leakage risks, and network latency, providing sub-millisecond query evaluation.</p>
+          <p class="cs-editorial-body">When a user submits a message, NIMO passes the text through a 6-stage local execution pipeline: language detection, text normalization, entity extraction, context resolution, intent scoring, and response localization.</p>
+        </div>
+        <div class="cs-grid-col-6">
+          <div class="cs-tech-stack">
+            <div class="cs-tech-tag">HTML5</div>
+            <div class="cs-tech-tag">CSS3 (Variables)</div>
+            <div class="cs-tech-tag">Vanilla ES Modules</div>
+            <div class="cs-tech-tag">Intent NLU Engine</div>
+            <div class="cs-tech-tag">Context Store</div>
+            <div class="cs-tech-tag">Trilingual Dictionary</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. NATURAL-LANGUAGE INTENT ENGINE -->
+    <section class="cs-editorial-section cs-bg-alternate cs-fade-up">
+      <div class="cs-grid-layout">
+        <div class="cs-grid-col-4">
+          <span class="cs-section-marker">04. Intent NLU Engine</span>
+          <h2 class="cs-section-heading">Scalable Intent Architecture.</h2>
+        </div>
+        <div class="cs-grid-col-8">
+          <p class="cs-editorial-body" style="margin-bottom: 24px;">Rather than relying on brittle hardcoded <code>if/else</code> conditions, NIMO implements a scalable intent-resolution engine. Wording variations, shorthand, typos, and phrases map into canonical intent categories.</p>
+          <ul class="cs-feature-grid">
+            <li><strong>Creator Identity:</strong> <em>"Who built this?"</em>, <em>"Who made this site?"</em>, <em>"Whose portfolio is this?"</em> $\rightarrow$ Creator intent.</li>
+            <li><strong>NIMO Identity:</strong> <em>"What is NIMO?"</em>, <em>"Who is NIMO?"</em>, <em>"Explain NIMO"</em> $\rightarrow$ NIMO definition.</li>
+            <li><strong>AI Honesty:</strong> <em>"Are you an AI?"</em>, <em>"Are you a chatbot?"</em> $\rightarrow$ Technical honesty response.</li>
+            <li><strong>Contextual Pronouns:</strong> <em>"Tell me about ToolVerse"</em> $\rightarrow$ <em>"What tech does it use?"</em> $\rightarrow$ Resolves "it" to ToolVerse.</li>
+            <li><strong>Typo Tolerance:</strong> Handles common typos (e.g. <code>htlm</code> $\rightarrow$ <code>html</code>, <code>nintedno</code> $\rightarrow$ <code>nintendo</code>).</li>
+            <li><strong>Vocative Stripping:</strong> Strips conversational names (e.g. <em>"How are you NIMO?"</em> $\rightarrow$ <em>"How are you"</em>).</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. CURRENT-PAGE AWARENESS & MULTILINGUAL -->
+    <section class="cs-editorial-section cs-fade-up">
+      <div class="cs-split-layout">
+        <div class="cs-split-half">
+          <span class="cs-section-marker">05. Context Awareness</span>
+          <h3 class="cs-subheading">Current-Page &amp; Case Study Awareness</h3>
+          <p class="cs-editorial-body" style="margin-bottom: 16px;">NIMO dynamically detects the user's active location across Home, Projects, About, Contact, Arcade OS, and individual project case studies.</p>
+          <ul class="cs-bullet-list">
+            <li><strong>"What am I viewing?":</strong> Identifies the exact active section or case study page.</li>
+            <li><strong>"Summarize this project":</strong> Summarizes the current case study without requiring the project title.</li>
+            <li><strong>"What tech was used?":</strong> Lists documented technologies for the currently active project.</li>
+            <li><strong>"What problem does it solve?":</strong> Extracts core challenges from case study metadata.</li>
+          </ul>
+        </div>
+        <div class="cs-split-half">
+          <span class="cs-section-marker">06. Multilingual Engine</span>
+          <h3 class="cs-subheading">Trilingual Conversation Layer</h3>
+          <p class="cs-editorial-body" style="margin-bottom: 16px;">NIMO supports English, Devanagari Hindi, and Hinglish (Roman Hindi) through a single canonical intent architecture.</p>
+          <ul class="cs-bullet-list">
+            <li><strong>English:</strong> <em>"Take me to Projects"</em> $\rightarrow$ Navigates to Projects section in English.</li>
+            <li><strong>Hinglish:</strong> <em>"Mujhe projects par le chalo"</em> $\rightarrow$ Resolves navigation intent &amp; replies in Hinglish.</li>
+            <li><strong>Hindi (Devanagari):</strong> <em>"मुझे प्रोजेक्ट्स पर ले चलो"</em> $\rightarrow$ Transliterates &amp; replies in modern Devanagari Hindi.</li>
+            <li><strong>Style Mirroring:</strong> Automatically mirrors user's language preference while retaining technical English terms.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. TECHNICAL CHALLENGES & SOLUTIONS -->
+    <section class="cs-editorial-section cs-bg-alternate cs-fade-up">
+      <div class="cs-grid-layout">
+        <div class="cs-grid-col-12">
+          <span class="cs-section-marker">07. Engineering Challenges</span>
+          <h2 class="cs-section-heading">Key Technical Challenges &amp; Solutions</h2>
+        </div>
+        <div class="cs-grid-col-4">
+          <div class="cs-overview-block">
+            <h3>WASD Input Conflict</h3>
+            <p><strong>Problem:</strong> Arcade OS registered global WASD keyboard handlers for retro game movement. When typing inside NIMO, WASD keys triggered game actions.<br><br><strong>Solution:</strong> Updated keydown handlers with input-focus isolation checking editable targets (<code>input</code>, <code>textarea</code>, <code>contenteditable</code>) to bypass game controls during active typing.</p>
+          </div>
+        </div>
+        <div class="cs-grid-col-4">
+          <div class="cs-overview-block">
+            <h3>Multilingual Engine</h3>
+            <p><strong>Problem:</strong> Supporting English, Hindi, and Hinglish without duplicating business logic or codebase size.<br><br><strong>Solution:</strong> Built a 3-layer language pipeline: automatic style detection $\rightarrow$ Devanagari transliteration &amp; phrase normalization $\rightarrow$ canonical intent resolver $\rightarrow$ response output localizer.</p>
+          </div>
+        </div>
+        <div class="cs-grid-col-4">
+          <div class="cs-overview-block">
+            <h3>Contextual Pronoun Memory</h3>
+            <p><strong>Problem:</strong> Handling follow-up queries like <em>"Tell me about ToolVerse"</em> followed by <em>"Summarize it"</em> or <em>"Open it"</em>.<br><br><strong>Solution:</strong> Engineered a <code>ConversationalContext</code> store tracking last-viewed project entities and section states to resolve pronouns without manual repetition.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. FEATURE GRID & CAPABILITIES -->
+    <section class="cs-editorial-section cs-fade-up">
+      <div class="cs-grid-layout">
+        <div class="cs-grid-col-4">
+          <span class="cs-section-marker">08. Feature Summary</span>
+          <h2 class="cs-section-heading">Capability Matrix</h2>
+        </div>
+        <div class="cs-grid-col-8">
+          <ul class="cs-feature-grid">
+            <li><strong>Navigation:</strong> Natural-language portfolio section routing.</li>
+            <li><strong>Project Discovery:</strong> Category, tech stack, and alias filtering.</li>
+            <li><strong>Case-Study Context:</strong> Current-page awareness and instant summaries.</li>
+            <li><strong>Conversational Memory:</strong> Follow-up pronoun resolution.</li>
+            <li><strong>Developer Glossary:</strong> Built-in 75+ web development definitions.</li>
+            <li><strong>Trilingual Support:</strong> English, Hindi (Devanagari), and Hinglish (Roman).</li>
+            <li><strong>100% Local-First:</strong> Zero external AI APIs, zero server latency.</li>
+            <li><strong>Input Safety:</strong> Keyboard focus isolation with Arcade OS.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. RESULTS & FUTURE ROADMAP -->
+    <section class="cs-editorial-section cs-bg-alternate cs-fade-up">
+      <div class="cs-grid-layout">
+        <div class="cs-grid-col-6">
+          <span class="cs-section-marker">09. Outcomes</span>
+          <h2 class="cs-section-heading">Grounded &amp; Reliable</h2>
+          <p class="cs-editorial-body">NIMO evolved from a simple phrase matcher into a complete portfolio interaction layer capable of natural navigation, contextual case study assistance, trilingual queries, and developer education — while remaining 100% local-first and tightly integrated with the portfolio's visual system.</p>
+          <p class="cs-editorial-body" style="margin-top: 12px;">Automated test suites confirm 100% pass rates across 58 unit tests and 25 multilingual intent evaluation scenarios.</p>
+        </div>
+        <div class="cs-grid-col-6">
+          <span class="cs-section-marker">10. Future Possibilities</span>
+          <h2 class="cs-section-heading">Roadmap</h2>
+          <p class="cs-editorial-body">Future iterations may include an optional secure server-side LLM fallback for out-of-scope domain questions, Web Speech API integration for hands-free voice commands, and expanded recruiter-mode evaluation features.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="cs-footer">
+    <a href="index.html#work" class="cs-back-link">Return to Portfolio</a>
+  </footer>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

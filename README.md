@@ -1,55 +1,67 @@
-# Manav Agarwal Portfolio
+# Manav Agarwal Portfolio & NIMO Assistant
 
-A production portfolio for Manav Agarwal, a creative technologist in Hyderabad who designs and develops apps, websites, product interfaces, and game UI.
+A high-performance portfolio for Manav Agarwal, a creative technologist in Hyderabad who designs and develops apps, websites, product interfaces, and game UI.
+
+## Architecture & Project Structure
+
+The codebase is structured into a clean two-folder architecture separating client-side presentation from secure server-side API boundaries:
+
+```text
+portfolio/
+├── frontend/             # Browser-facing static portfolio & NIMO client UI
+│   ├── index.html        # Main portfolio page
+│   ├── project-*.html    # Case-study pages (Arcade OS, NIMO, ToolVerse, etc.)
+│   ├── css/              # Production stylesheets & CSS Grid layout systems
+│   ├── js/               # Application logic, NIMO intent NLU engine, & modules
+│   │   ├── services/     # Isolated NIMO API client (nimo-api.js)
+│   │   └── modules/      # NIMO intent NLU, context store & Arcade modules
+│   ├── images/           # High-resolution SVG preview graphics & screenshots
+│   ├── sw.js             # Service Worker precache & offline capabilities
+│   └── site.webmanifest  # PWA manifest metadata
+│
+├── backend/              # Server-side NIMO API service & OpenRouter boundary
+│   ├── src/
+│   │   ├── server.js     # Native Node HTTP server & CORS handler
+│   │   ├── routes/       # Express/HTTP route handlers (nimo.js)
+│   │   └── services/     # Secure OpenRouter API client (openrouter.js)
+│   ├── .env.example      # Environment template (OPENROUTER_API_KEY)
+│   └── README.md         # Backend server documentation
+│
+├── build.js              # Production build script (compiles frontend/ -> dist/)
+├── vercel.json           # Deployment configuration
+└── package.json          # Development & test orchestration
+```
 
 ## Highlights
 
-- Recruiter-first portfolio with featured work, case studies, resume, and contact actions
-- ArcadeOS, an interactive cabinet experience with games, profiles, achievements, statistics, customization, SoundLab, diagnostics, and reset safety
-- Responsive layouts for desktop, tablet, and mobile input
-- Keyboard navigation, focus management, reduced-motion support, and semantic landmarks
-- Static production build with minified HTML, CSS, and JavaScript
-- Offline support through a versioned service worker
-- Canonical, Open Graph, Twitter, sitemap, robots, and structured-data metadata
-
-## Stack
-
-- HTML5
-- CSS3
-- Vanilla JavaScript and ES modules
-- esbuild, CleanCSS, and html-minifier-terser for production builds
-- Puppeteer-based release checks
+- **Recruiter-first portfolio** with featured work, case studies, resume, and contact actions.
+- **NIMO Portfolio Assistant**: Local-first, website-aware assistant with intent scoring, context memory, trilingual support (EN / HI / Hinglish), and secure backend API boundary.
+- **Arcade OS**: Interactive cabinet experience with games, profiles, achievements, statistics, customization, SoundLab, diagnostics, and reset safety.
+- **Static production build** with esbuild bundling, CleanCSS minification, and HTML minification.
 
 ## Local Development
 
+### Frontend Build & Preview
+
 ```bash
-npm ci
+npm install
 npm run build
-npm run preview -- --host 0.0.0.0
 ```
 
-The preview is available at `http://localhost:4173` by default. Run `npm run verify` while the preview server is active.
+### Backend Service (Optional for OpenRouter)
 
-## Production
-
-The primary deployment target is Vercel. `vercel.json` runs `npm run build` and publishes `dist`.
-
-- Production: [my-portfolio-mu-jade-52.vercel.app](https://my-portfolio-mu-jade-52.vercel.app)
-- Source: [github.com/manav193/MY-PORTFOLIO](https://github.com/manav193/MY-PORTFOLIO)
-
-The release process and verified checks are recorded in [LAUNCH_CHECKLIST.md](LAUNCH_CHECKLIST.md). No performance score is claimed without a recorded audit.
-
-## Project Structure
-
-```text
-assets/          Social and metadata assets
-case-studies/    Case-study source content
-css/             Portfolio, intro, ArcadeOS, and project styles
-images/          Project and ArcadeOS screenshots
-icons/           Favicons and app icons
-js/              Application code and modules
-dist/            Generated production output (ignored)
+```bash
+cd backend
+cp .env.example .env
+# Edit .env and set OPENROUTER_API_KEY
+npm start
 ```
+
+## Security & Environment Boundary
+
+- The `OPENROUTER_API_KEY` exists exclusively on the server side in `backend/.env`.
+- Frontend code in `frontend/` never contains or exposes API keys or secrets.
+- If the backend service is offline, NIMO seamlessly falls back to 100% local intent processing without breaking.
 
 ## License
 

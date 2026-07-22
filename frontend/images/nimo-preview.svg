@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="750" viewBox="0 0 1200 750" role="img" aria-labelledby="title desc">
+  <title id="title">NIMO Assistant Interface & Architecture Preview</title>
+  <desc id="desc">Interactive visualization of NIMO local-first assistant, conversational NLU engine, and trilingual support.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#090d16"/>
+      <stop offset="0.5" stop-color="#111827"/>
+      <stop offset="1" stop-color="#050810"/>
+    </linearGradient>
+    <linearGradient id="cyan-purple" x1="0" x2="1">
+      <stop stop-color="#06b6d4"/>
+      <stop offset="1" stop-color="#a855f7"/>
+    </linearGradient>
+    <linearGradient id="card-glass" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#ffffff" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.02"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="16" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background Layer -->
+  <rect width="1200" height="750" fill="url(#bg)"/>
+  <circle cx="200" cy="180" r="220" fill="#06b6d4" opacity="0.12" filter="url(#glow)"/>
+  <circle cx="1000" cy="550" r="260" fill="#a855f7" opacity="0.12" filter="url(#glow)"/>
+
+  <!-- Subtle Grid Lines -->
+  <g fill="none" stroke="#ffffff" opacity="0.04" stroke-width="1">
+    <path d="M0 125h1200M0 250h1200M0 375h1200M0 500h1200M0 625h1200"/>
+    <path d="M200 0v750M400 0v750M600 0v750M800 0v750M1000 0v750"/>
+  </g>
+
+  <!-- Assistant Widget Mockup Container -->
+  <rect x="120" y="80" width="960" height="590" rx="24" fill="url(#card-glass)" stroke="#ffffff" stroke-opacity="0.15" stroke-width="1.5"/>
+
+  <!-- Widget Top Bar -->
+  <path d="M120 104c0-13.255 10.745-24 24-24h912c13.255 0 24 10.745 24 24v56H120v-56z" fill="#0f172a" fill-opacity="0.8"/>
+  <circle cx="160" cy="108" r="7" fill="#ef4444"/>
+  <circle cx="182" cy="108" r="7" fill="#f59e0b"/>
+  <circle cx="204" cy="108" r="7" fill="#10b981"/>
+  <text x="240" y="113" font-family="JetBrains Mono, monospace" font-size="14" fill="#94a3b8">NIMO Assistant v3.0 — Local Multilingual NLU Engine</text>
+
+  <!-- Left Chat Interface Mockup -->
+  <rect x="160" y="180" width="420" height="450" rx="16" fill="#0b0f19" stroke="#ffffff" stroke-opacity="0.1"/>
+  
+  <!-- Assistant Header -->
+  <rect x="160" y="180" width="420" height="60" rx="16" fill="#1e293b" opacity="0.6"/>
+  <circle cx="196" cy="210" r="16" fill="url(#cyan-purple)"/>
+  <text x="191" y="215" font-family="Inter, sans-serif" font-weight="700" font-size="14" fill="#ffffff">N</text>
+  <text x="226" y="206" font-family="Inter, sans-serif" font-weight="600" font-size="15" fill="#ffffff">NIMO AI</text>
+  <text x="226" y="222" font-family="Inter, sans-serif" font-size="12" fill="#38bdf8">Portfolio Assistant • Active Context</text>
+
+  <!-- User Message Bubble 1 -->
+  <rect x="290" y="260" width="270" height="42" rx="14" fill="#2563eb" fill-opacity="0.8"/>
+  <text x="306" y="286" font-family="Inter, sans-serif" font-size="13" fill="#ffffff">Mujhe projects par le chalo!</text>
+
+  <!-- Assistant Response Bubble 1 -->
+  <rect x="180" y="316" width="340" height="74" rx="14" fill="#1e293b"/>
+  <text x="196" y="342" font-family="Inter, sans-serif" font-size="13" fill="#e2e8f0">Sure! Tumhe <tspan font-weight="bold" fill="#38bdf8">Projects section</tspan> par le chalta hoon.</text>
+  <rect x="196" y="356" width="115" height="24" rx="6" fill="#06b6d4" fill-opacity="0.2" stroke="#06b6d4" stroke-opacity="0.4"/>
+  <text x="208" y="372" font-family="Inter, sans-serif" font-size="11" fill="#38bdf8">Projects Dikhao</text>
+
+  <!-- User Message Bubble 2 -->
+  <rect x="310" y="404" width="250" height="42" rx="14" fill="#2563eb" fill-opacity="0.8"/>
+  <text x="326" y="430" font-family="Inter, sans-serif" font-size="13" fill="#ffffff">HTML ka matlab kya hai?</text>
+
+  <!-- Assistant Response Bubble 2 -->
+  <rect x="180" y="460" width="380" height="84" rx="14" fill="#1e293b"/>
+  <text x="196" y="484" font-family="Inter, sans-serif" font-size="12.5" fill="#e2e8f0"><tspan font-weight="bold" fill="#06b6d4">HTML</tspan> (HyperText Markup Language) web pages ki</text>
+  <text x="196" y="504" font-family="Inter, sans-serif" font-size="12.5" fill="#e2e8f0">structure banane ke liye standard language hai.</text>
+
+  <!-- Input Field -->
+  <rect x="180" y="564" width="380" height="44" rx="22" fill="#0f172a" stroke="#ffffff" stroke-opacity="0.2"/>
+  <text x="204" y="590" font-family="Inter, sans-serif" font-size="13" fill="#64748b">Ask NIMO anything (EN / HI / Hinglish)...</text>
+  <circle cx="538" cy="586" r="14" fill="url(#cyan-purple)"/>
+
+  <!-- Right Architecture Diagram -->
+  <rect x="610" y="180" width="430" height="450" rx="16" fill="#0b0f19" stroke="#ffffff" stroke-opacity="0.1"/>
+  <text x="636" y="218" font-family="Inter, sans-serif" font-weight="700" font-size="16" fill="#ffffff">Local Intent Resolution Pipeline</text>
+
+  <!-- Step 1 -->
+  <rect x="636" y="244" width="378" height="48" rx="10" fill="#1e293b" stroke="#38bdf8" stroke-opacity="0.3"/>
+  <text x="652" y="273" font-family="JetBrains Mono, monospace" font-size="12" fill="#38bdf8">1. Raw Query</text>
+  <text x="760" y="273" font-family="Inter, sans-serif" font-size="12" fill="#94a3b8">"What am I viewing?"</text>
+
+  <!-- Step 2 -->
+  <rect x="636" y="304" width="378" height="48" rx="10" fill="#1e293b" stroke="#a855f7" stroke-opacity="0.3"/>
+  <text x="652" y="333" font-family="JetBrains Mono, monospace" font-size="12" fill="#a855f7">2. Language &amp; NLU</text>
+  <text x="775" y="333" font-family="Inter, sans-serif" font-size="12" fill="#94a3b8">Detect 'en' + Normalization</text>
+
+  <!-- Step 3 -->
+  <rect x="636" y="364" width="378" height="48" rx="10" fill="#1e293b" stroke="#10b981" stroke-opacity="0.3"/>
+  <text x="652" y="393" font-family="JetBrains Mono, monospace" font-size="12" fill="#10b981">3. Entity &amp; Context</text>
+  <text x="785" y="393" font-family="Inter, sans-serif" font-size="12" fill="#94a3b8">locationCtx: 'case-study'</text>
+
+  <!-- Step 4 -->
+  <rect x="636" y="424" width="378" height="48" rx="10" fill="#1e293b" stroke="#f59e0b" stroke-opacity="0.3"/>
+  <text x="652" y="453" font-family="JetBrains Mono, monospace" font-size="12" fill="#f59e0b">4. Intent Handler</text>
+  <text x="770" y="453" font-family="Inter, sans-serif" font-size="12" fill="#94a3b8">id: 'location_context' (Score: 95)</text>
+
+  <!-- Step 5 -->
+  <rect x="636" y="484" width="378" height="48" rx="10" fill="#1e293b" stroke="#ec4899" stroke-opacity="0.3"/>
+  <text x="652" y="513" font-family="JetBrains Mono, monospace" font-size="12" fill="#ec4899">5. Localized Output</text>
+  <text x="780" y="513" font-family="Inter, sans-serif" font-size="12" fill="#94a3b8">Action Buttons + Context Payload</text>
+
+  <!-- Bottom Badge -->
+  <rect x="636" y="552" width="378" height="56" rx="12" fill="url(#cyan-purple)" opacity="0.15" stroke="url(#cyan-purple)" stroke-opacity="0.4"/>
+  <text x="652" y="585" font-family="Inter, sans-serif" font-weight="600" font-size="13" fill="#ffffff">⚡ 100% Local-First • 0ms Server Latency • Trilingual NLU</text>
+</svg>
