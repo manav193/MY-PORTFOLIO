@@ -3,7 +3,7 @@ const NIMO_LOGO_PATH = 'icons/nimo-logo.svg';
 export function initRuntimeFixes() {
   hardenNimoControls();
   hardenArcadeEntry();
-  installPremiumInterfaceStyles();
+  installArcadeHomeRedesign();
 }
 
 function hardenNimoControls() {
@@ -18,7 +18,7 @@ function hardenNimoControls() {
   closeBtn.style.pointerEvents = 'auto';
   closeBtn.style.touchAction = 'manipulation';
   closeBtn.style.position = 'relative';
-  closeBtn.style.zIndex = '20';
+  closeBtn.style.zIndex = '4';
 
   const forceClose = (event) => {
     event?.preventDefault();
@@ -39,160 +39,21 @@ function hardenNimoControls() {
 
   const launcherIcon = widget.querySelector('.nimo-launcher-icon');
   if (launcherIcon) launcherIcon.innerHTML = brandMarkup;
-}
 
-function installPremiumInterfaceStyles() {
-  if (document.getElementById('premium-arcade-nimo-concept-styles')) return;
-
-  const style = document.createElement('style');
-  style.id = 'premium-arcade-nimo-concept-styles';
-  style.textContent = `
-    /* ============================================================
-       NIMO — premium dark assistant direction
-       ============================================================ */
-    .nimo-widget{--nimo-violet:#8b5cf6;--nimo-purple:#6d28d9;--nimo-cyan:#22d3ee;--nimo-panel:#070914;--nimo-surface:#0d1120;--nimo-line:rgba(139,92,246,.35)}
-    .nimo-brand-mark{display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 12px rgba(34,211,238,.34)) drop-shadow(0 0 18px rgba(139,92,246,.24))}
-    .nimo-avatar--brand{display:grid!important;place-items:center!important;padding:0!important;overflow:visible!important;background:transparent!important;border:0!important;box-shadow:none!important}
-    .nimo-avatar--brand .nimo-brand-mark{width:38px;height:38px}
-    .nimo-launcher-icon{display:grid!important;place-items:center!important}
-    .nimo-launcher-icon .nimo-brand-mark{width:30px;height:30px}
-
-    .nimo-panel{
-      background:
-        radial-gradient(circle at 12% 0%,rgba(34,211,238,.08),transparent 28%),
-        radial-gradient(circle at 92% 8%,rgba(139,92,246,.13),transparent 34%),
-        linear-gradient(180deg,rgba(8,10,24,.985),rgba(4,6,16,.985))!important;
-      border:1px solid rgba(168,85,247,.62)!important;
-      box-shadow:0 28px 90px rgba(0,0,0,.58),0 0 0 1px rgba(34,211,238,.06) inset,0 0 38px rgba(109,40,217,.14)!important;
-      border-radius:24px!important;
-      overflow:hidden!important;
-      backdrop-filter:blur(24px) saturate(140%);
-    }
-    .nimo-header{
-      min-height:82px!important;
-      padding:16px 18px!important;
-      background:linear-gradient(180deg,rgba(16,18,40,.96),rgba(9,10,24,.94))!important;
-      border-bottom:1px solid rgba(139,92,246,.24)!important;
-      box-shadow:0 1px 0 rgba(255,255,255,.025) inset!important;
-    }
-    .nimo-header-brand{gap:12px!important}
-    .nimo-name{font-weight:850!important;letter-spacing:.12em!important;font-size:16px!important;color:#f8fafc!important;text-shadow:0 0 18px rgba(255,255,255,.12)}
-    .nimo-status{color:#a78bfa!important;font-size:11px!important;letter-spacing:.03em!important}
-    .nimo-close-btn{
-      cursor:pointer!important;isolation:isolate!important;width:42px!important;height:42px!important;border-radius:12px!important;
-      border:1px solid rgba(139,92,246,.34)!important;background:rgba(109,40,217,.09)!important;color:#c084fc!important;
-      transition:transform .18s ease,background .18s ease,border-color .18s ease,box-shadow .18s ease!important;
-    }
-    .nimo-close-btn:hover{transform:scale(1.04);background:rgba(139,92,246,.18)!important;border-color:rgba(192,132,252,.7)!important;box-shadow:0 0 22px rgba(139,92,246,.18)!important}
-    .nimo-close-btn svg{pointer-events:none}
-    .nimo-messages{padding:22px 20px 12px!important;background:transparent!important;scrollbar-width:thin;scrollbar-color:rgba(139,92,246,.4) transparent}
-    .nimo-msg{max-width:88%!important;margin-bottom:14px!important}
-    .nimo-msg-content{line-height:1.62!important;font-size:13px!important;letter-spacing:.005em!important}
-    .nimo-msg-assistant{
-      align-self:flex-start!important;
-      background:linear-gradient(145deg,rgba(18,23,43,.96),rgba(10,13,28,.96))!important;
-      border:1px solid rgba(148,163,184,.15)!important;
-      box-shadow:0 12px 30px rgba(0,0,0,.24),0 1px 0 rgba(255,255,255,.025) inset!important;
-      border-radius:6px 18px 18px 18px!important;
-    }
-    .nimo-msg-user{
-      align-self:flex-end!important;
-      background:linear-gradient(135deg,rgba(91,33,182,.86),rgba(76,29,149,.92))!important;
-      border:1px solid rgba(167,139,250,.35)!important;
-      box-shadow:0 12px 30px rgba(76,29,149,.2)!important;
-      border-radius:18px 18px 6px 18px!important;
-    }
-    .nimo-msg-actions{gap:8px!important;margin-top:12px!important;display:flex!important;flex-wrap:wrap!important}
-    .nimo-action-btn,.nimo-chip{
-      border:1px solid rgba(139,92,246,.32)!important;background:rgba(15,18,36,.82)!important;color:#e9d5ff!important;
-      border-radius:10px!important;box-shadow:none!important;transition:all .18s ease!important;
-    }
-    .nimo-action-btn:hover,.nimo-chip:hover{background:rgba(109,40,217,.2)!important;border-color:rgba(167,139,250,.65)!important;transform:translateY(-1px)!important}
-    .nimo-suggestions{padding:10px 18px 14px!important;border-top:0!important;background:transparent!important}
-    .nimo-input-form{
-      margin:0 16px 16px!important;padding:7px!important;border:1px solid rgba(139,92,246,.34)!important;border-radius:14px!important;
-      background:linear-gradient(180deg,rgba(11,14,29,.98),rgba(7,9,21,.98))!important;box-shadow:0 10px 34px rgba(0,0,0,.24),0 0 0 1px rgba(255,255,255,.015) inset!important;
-    }
-    .nimo-input{background:transparent!important;border:0!important;color:#f8fafc!important;padding:10px 12px!important}
-    .nimo-input::placeholder{color:#7c849b!important}
-    .nimo-input:focus{outline:none!important;box-shadow:none!important}
-    .nimo-send-btn{
-      width:40px!important;height:40px!important;border-radius:10px!important;border:1px solid rgba(192,132,252,.36)!important;
-      background:linear-gradient(135deg,#7c3aed,#5b21b6)!important;color:#fff!important;box-shadow:0 8px 24px rgba(109,40,217,.32)!important;
-    }
-    .nimo-launcher{
-      background:linear-gradient(145deg,rgba(8,10,24,.96),rgba(14,11,34,.98))!important;border:1px solid rgba(139,92,246,.55)!important;
-      box-shadow:0 16px 45px rgba(0,0,0,.38),0 0 28px rgba(109,40,217,.15)!important;
-    }
-
-    /* ============================================================
-       ARCADE OS — neon retro-future dashboard direction
-       Existing JS behavior and launcher semantics remain unchanged.
-       ============================================================ */
-    #arcade-os{
-      --arcade-cyan:#18e8ff;--arcade-blue:#2563eb;--arcade-violet:#7c3aed;--arcade-magenta:#d946ef;
-      background:
-        radial-gradient(circle at 50% 120%,rgba(0,174,255,.26),transparent 37%),
-        radial-gradient(circle at 18% 0%,rgba(76,29,149,.22),transparent 36%),
-        linear-gradient(180deg,#02030b 0%,#040617 46%,#04030e 100%)!important;
-    }
-    #arcade-home{
-      position:relative!important;overflow:hidden!important;
-      background:
-        linear-gradient(rgba(55,48,163,.12) 1px,transparent 1px),
-        linear-gradient(90deg,rgba(55,48,163,.12) 1px,transparent 1px),
-        radial-gradient(ellipse at 50% 112%,rgba(0,174,255,.33),transparent 33%),
-        radial-gradient(circle at 50% 25%,rgba(76,29,149,.18),transparent 45%),
-        #03040d!important;
-      background-size:42px 42px,42px 42px,auto,auto,auto!important;
-    }
-    #arcade-home::before{
-      content:'ARCADE OS';position:absolute;z-index:0;top:7%;left:50%;transform:translateX(-50%);
-      font-family:Impact,'Arial Black',system-ui,sans-serif;font-size:clamp(30px,6.5vw,72px);font-style:italic;font-weight:900;letter-spacing:.035em;white-space:nowrap;
-      color:#ffbd21;text-shadow:0 4px 0 #e04b15,0 8px 0 rgba(112,30,8,.85),0 0 26px rgba(255,128,0,.26);
-      pointer-events:none;
-    }
-    #arcade-home::after{
-      content:'PLAY · CODE · CREATE · REPEAT';position:absolute;z-index:0;top:24%;left:50%;transform:translateX(-50%);
-      color:#22d3ee;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:clamp(7px,1.5vw,13px);font-weight:800;letter-spacing:.22em;white-space:nowrap;text-shadow:0 0 18px rgba(34,211,238,.55);pointer-events:none;
-    }
-    #home-carousel{position:relative!important;z-index:2!important;filter:drop-shadow(0 20px 28px rgba(0,0,0,.34))}
-    .app-card{
-      border:1px solid rgba(99,102,241,.48)!important;border-radius:14px!important;
-      background:linear-gradient(180deg,rgba(13,19,44,.92),rgba(4,8,24,.96))!important;
-      box-shadow:0 14px 32px rgba(0,0,0,.36),0 0 0 1px rgba(255,255,255,.025) inset!important;
-      transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,background .18s ease!important;
-    }
-    .app-card:hover,.app-card.focused,.app-card.is-ui-focused{
-      transform:translateY(-4px) scale(1.035)!important;border-color:rgba(34,211,238,.92)!important;
-      background:linear-gradient(180deg,rgba(14,30,62,.96),rgba(7,12,34,.98))!important;
-      box-shadow:0 18px 44px rgba(0,0,0,.42),0 0 0 1px rgba(34,211,238,.2) inset,0 0 26px rgba(34,211,238,.2),0 0 42px rgba(124,58,237,.13)!important;
-    }
-    .app-card.system-card{border-color:rgba(217,70,239,.4)!important}
-    .app-card.system-card:hover,.app-card.system-card.focused{border-color:rgba(217,70,239,.82)!important;box-shadow:0 18px 44px rgba(0,0,0,.42),0 0 26px rgba(217,70,239,.18)!important}
-    .app-icon{filter:drop-shadow(0 10px 10px rgba(0,0,0,.45));transform:translateZ(0)}
-    #home-details{position:relative!important;z-index:2!important}
-    #home-details .app-group{color:#22d3ee!important;letter-spacing:.18em!important}
-    #home-details .app-title{color:#f8fafc!important;text-shadow:0 0 20px rgba(255,255,255,.09)!important}
-    #home-details .app-desc{color:#aab4ca!important}
-    #home-details .app-status-badge{border:1px solid rgba(34,211,238,.3)!important;background:rgba(8,47,73,.28)!important;color:#67e8f9!important;border-radius:999px!important}
-    #home-details .app-hint{color:#818cf8!important}
-
-    .arcade-header,.arcade-topbar,.arcade-status-bar,.arcade-bottom-bar,.system-bar{
-      background:linear-gradient(180deg,rgba(10,14,25,.96),rgba(4,7,14,.98))!important;border-color:rgba(100,116,139,.22)!important;
-      box-shadow:0 8px 24px rgba(0,0,0,.28)!important;
-    }
-
-    @media (max-width:720px){
-      .nimo-panel{border-radius:18px!important}
-      .nimo-header{min-height:70px!important;padding:12px 14px!important}
-      .nimo-messages{padding:16px 14px 10px!important}
-      .nimo-input-form{margin:0 10px 10px!important}
-      #arcade-home::before{top:6%;font-size:clamp(26px,10vw,50px)}
-      #arcade-home::after{top:20%;font-size:7px;letter-spacing:.12em}
-    }
-  `;
-  document.head.appendChild(style);
+  if (!document.getElementById('nimo-runtime-brand-styles')) {
+    const style = document.createElement('style');
+    style.id = 'nimo-runtime-brand-styles';
+    style.textContent = `
+      .nimo-brand-mark{display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 6px 14px rgba(79,70,229,.28))}
+      .nimo-avatar--brand{display:grid!important;place-items:center!important;padding:0!important;overflow:visible!important;background:transparent!important;border:0!important}
+      .nimo-avatar--brand .nimo-brand-mark{width:34px;height:34px}
+      .nimo-launcher-icon{display:grid;place-items:center}
+      .nimo-launcher-icon .nimo-brand-mark{width:28px;height:28px}
+      #nimo-close-btn{cursor:pointer;isolation:isolate}
+      #nimo-close-btn svg{pointer-events:none}
+    `;
+    document.head.appendChild(style);
+  }
 }
 
 function hardenArcadeEntry() {
@@ -246,4 +107,156 @@ function hardenArcadeEntry() {
   installForceHomeGuard();
   window.setTimeout(installForceHomeGuard, 250);
   window.setTimeout(installForceHomeGuard, 1000);
+}
+
+function installArcadeHomeRedesign() {
+  const install = () => {
+    const arcade = window.ArcadeOS;
+    if (!arcade || typeof arcade.renderHome !== 'function' || arcade.renderHome.__cinematicDashboard) return false;
+
+    const originalRenderHome = arcade.renderHome.bind(arcade);
+
+    const decorate = () => {
+      const home = document.getElementById('arcade-home');
+      const carousel = document.getElementById('home-carousel');
+      const details = document.getElementById('home-details');
+      if (!home || !carousel || !details) return;
+
+      home.classList.add('arcade-home-cinematic');
+
+      if (!home.querySelector('.arcade-cinematic-brand')) {
+        const brand = document.createElement('div');
+        brand.className = 'arcade-cinematic-brand';
+        brand.innerHTML = `
+          <div class="arcade-cinematic-title">ARCADE<span>OS</span></div>
+          <div class="arcade-cinematic-tagline">PLAY. CODE. CREATE. REPEAT.</div>
+        `;
+        home.prepend(brand);
+      }
+
+      const items = typeof arcade.getHomeItems === 'function' ? arcade.getHomeItems() : [];
+      carousel.querySelectorAll('.app-card').forEach((card) => {
+        const idx = Number(card.dataset.idx);
+        const item = items[idx];
+        if (!item) return;
+
+        const oldIcon = card.querySelector('.app-icon');
+        const icon = oldIcon?.innerHTML || '◈';
+        const label = item.title || item.id || 'APP';
+        const desc = item.description || (item.group === 'PLAY' ? 'Play classic & modern' : item.group === 'CREATE' ? 'Create something new' : 'System utility');
+
+        card.innerHTML = `
+          <div class="arcade-card-icon">${icon}</div>
+          <div class="arcade-card-copy">
+            <strong>${escapeMarkup(label)}</strong>
+            <span>${escapeMarkup(desc)}</span>
+          </div>
+        `;
+      });
+
+      const selected = items[arcade.selectedIndex] || items[0];
+      if (selected) {
+        details.innerHTML = `
+          <div class="arcade-cinematic-meta">
+            <span>${escapeMarkup(selected.group || selected.category || 'ARCADE')}</span>
+            <strong>${escapeMarkup(selected.title || selected.id || 'Ready')}</strong>
+            <small>Press ENTER, Start, or Tap to open</small>
+          </div>
+        `;
+      }
+
+      requestAnimationFrame(() => {
+        const focused = carousel.querySelector('.app-card.focused');
+        if (focused) focused.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      });
+    };
+
+    const redesignedRenderHome = (...args) => {
+      const result = originalRenderHome(...args);
+      decorate();
+      return result;
+    };
+
+    redesignedRenderHome.__cinematicDashboard = true;
+    arcade.renderHome = redesignedRenderHome;
+
+    if (arcade.state === 'HOME') arcade.renderHome();
+    return true;
+  };
+
+  if (!install()) {
+    window.setTimeout(install, 250);
+    window.setTimeout(install, 900);
+    window.setTimeout(install, 1800);
+  }
+
+  if (!document.getElementById('arcade-cinematic-dashboard-styles')) {
+    const style = document.createElement('style');
+    style.id = 'arcade-cinematic-dashboard-styles';
+    style.textContent = `
+      #arcade-home.arcade-home-cinematic{
+        position:relative!important;overflow:hidden!important;padding:16px 18px 14px!important;box-sizing:border-box!important;
+        background:
+          radial-gradient(circle at 50% 88%,rgba(0,216,255,.2),transparent 28%),
+          radial-gradient(circle at 18% 18%,rgba(128,42,255,.13),transparent 24%),
+          linear-gradient(180deg,#020511 0%,#050719 58%,#02040d 100%)!important;
+      }
+      #arcade-home.arcade-home-cinematic:before{
+        content:"";position:absolute;inset:0;pointer-events:none;opacity:.52;
+        background-image:linear-gradient(rgba(87,67,255,.11) 1px,transparent 1px),linear-gradient(90deg,rgba(87,67,255,.11) 1px,transparent 1px);
+        background-size:26px 26px;mask-image:linear-gradient(to bottom,transparent 7%,#000 35%,#000 100%);
+      }
+      #arcade-home.arcade-home-cinematic:after{
+        content:"";position:absolute;left:-12%;right:-12%;bottom:-31%;height:55%;border-radius:50% 50% 0 0/22% 22% 0 0;
+        border-top:2px solid rgba(0,220,255,.92);box-shadow:0 -10px 30px rgba(0,188,255,.26),0 -2px 70px rgba(88,52,255,.24);pointer-events:none;
+      }
+      .arcade-cinematic-brand{position:relative;z-index:2;text-align:center;margin:2px 0 12px;pointer-events:none}
+      .arcade-cinematic-title{font-family:Impact,"Arial Black",sans-serif;font-size:clamp(34px,7.2vw,72px);line-height:.88;letter-spacing:-.035em;font-style:italic;
+        background:linear-gradient(180deg,#fff26a 0%,#ffc52e 34%,#ff7b1d 67%,#d92919 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+        -webkit-text-stroke:1px rgba(255,205,72,.32);filter:drop-shadow(0 4px 0 #7b160b) drop-shadow(0 10px 18px rgba(255,91,20,.2));}
+      .arcade-cinematic-title span{margin-left:.03em}
+      .arcade-cinematic-tagline{margin-top:8px;font-size:clamp(8px,1.6vw,14px);font-weight:900;letter-spacing:.12em;color:#16ecf1;text-shadow:0 0 16px rgba(22,236,241,.35)}
+      #arcade-home.arcade-home-cinematic #home-carousel{
+        position:relative!important;z-index:2!important;display:grid!important;grid-auto-flow:column!important;grid-auto-columns:minmax(118px,1fr)!important;
+        gap:12px!important;overflow-x:auto!important;overflow-y:hidden!important;transform:none!important;padding:8px 6px 12px!important;scroll-snap-type:x mandatory!important;
+        scrollbar-width:none!important;max-width:100%!important;align-items:stretch!important;
+      }
+      #arcade-home.arcade-home-cinematic #home-carousel::-webkit-scrollbar{display:none}
+      #arcade-home.arcade-home-cinematic .app-card{
+        position:relative!important;scroll-snap-align:center!important;min-width:118px!important;height:156px!important;padding:13px 10px 12px!important;border-radius:15px!important;
+        display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:center!important;gap:10px!important;text-align:center!important;
+        background:linear-gradient(180deg,rgba(14,20,46,.94),rgba(5,9,27,.96))!important;border:1px solid rgba(107,74,255,.48)!important;
+        box-shadow:inset 0 0 0 1px rgba(255,255,255,.025),0 12px 26px rgba(0,0,0,.28)!important;transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease!important;
+      }
+      #arcade-home.arcade-home-cinematic .app-card.focused{
+        transform:translateY(-4px) scale(1.025)!important;border-color:#12e8ff!important;
+        box-shadow:0 0 0 1px rgba(18,232,255,.28),0 0 24px rgba(18,232,255,.28),0 18px 34px rgba(0,0,0,.38)!important;
+      }
+      .arcade-card-icon{font-size:48px;line-height:1;filter:drop-shadow(0 8px 10px rgba(0,0,0,.38));min-height:54px;display:grid;place-items:center}
+      .arcade-card-copy{display:flex;flex-direction:column;gap:5px;min-width:0;width:100%}
+      .arcade-card-copy strong{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      .arcade-card-copy span{font-size:7px;line-height:1.25;color:rgba(229,236,255,.7);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+      #arcade-home.arcade-home-cinematic #home-details{position:relative!important;z-index:2!important;min-height:43px!important;margin:0 6px!important;padding:8px 10px!important;border-top:1px solid rgba(255,255,255,.08)!important;background:rgba(3,7,18,.58)!important;border-radius:10px!important}
+      .arcade-cinematic-meta{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;width:100%}
+      .arcade-cinematic-meta span{font-size:7px;font-weight:900;letter-spacing:.12em;color:#14e6ec}
+      .arcade-cinematic-meta strong{font-size:10px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      .arcade-cinematic-meta small{font-size:6px;color:rgba(255,255,255,.52);white-space:nowrap}
+      @media(max-width:760px){
+        #arcade-home.arcade-home-cinematic{padding:12px 10px 10px!important}
+        #arcade-home.arcade-home-cinematic #home-carousel{grid-auto-columns:minmax(106px,42%)!important;gap:9px!important}
+        #arcade-home.arcade-home-cinematic .app-card{height:144px!important;min-width:106px!important}
+        .arcade-cinematic-meta{grid-template-columns:auto 1fr}.arcade-cinematic-meta small{display:none}
+      }
+    `;
+    document.head.appendChild(style);
+  }
+}
+
+function escapeMarkup(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
