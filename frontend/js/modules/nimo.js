@@ -1882,6 +1882,47 @@ function getSuggestedPrompts(lang) {
   ];
 }
 
+// Public Usage Guardrail Helpers
+export function isCodeGenerationRequest(text) {
+  const normalized = String(text || '').toLowerCase().trim();
+
+  // Exclude purely informational questions about tech stack/languages/skills
+  const isInformationalTech = /what (tech|language|stack|framework|library|tools?)|how (was|is) .* built|what is .* written in/i.test(normalized);
+  if (isInformationalTech && !/(write|generate|create|build|give me|make) (code|script|app|component|function|program|snippet|html|css|js)/i.test(normalized)) {
+    return false;
+  }
+
+  const codePatterns = [
+    /\b(write|generate|create|build|make|give me|produce|code)\b.*\b(code|script|app|application|website|page|component|function|program|class|algorithm|snippet|html|css|javascript|js|python|react)\b/i,
+    /\b(react component|html page|css layout|javascript function|python script|node service|full stack app|saas app|code snippet)\b/i,
+    /\b(write a|build me a|make me a|code a|create a)\b.*\b(app|website|game|tool|bot|component|script|snippet|function)\b/i,
+    /\b(give me the code|show me the code|write code for|generate code for|write code)\b/i
+  ];
+
+  return codePatterns.some(pattern => pattern.test(normalized));
+}
+
+export function sanitizeCodeOutput(replyText, userText) {
+  if (!replyText || typeof replyText !== 'string') return replyText;
+
+  const isCodeReq = isCodeGenerationRequest(userText);
+  const codeBlockRegex = /```[a-z]*\n([\s\S]*?)\n```/gi;
+
+  let sanitized = replyText.replace(codeBlockRegex, (match, codeContent) => {
+    const lines = codeContent.split('\n').filter(line => line.trim().length > 0);
+    if (lines.length > 2) {
+      if (isCodeReq && lines.length > 8) {
+        return `*Nice try 😏 I’m Manav’s portfolio companion, not your free coding department. I can explain the approach though. ✨*`;
+      }
+      const cappedCode = lines.slice(0, 2).join('\n');
+      return `\`\`\`javascript\n${cappedCode}\n// [Code output capped at 2 lines max] ✨\n\`\`\``;
+    }
+    return match;
+  });
+
+  return sanitized;
+}
+
 export function initNimo() {
   window.NIMO = {
     processUserQuery,
@@ -1892,6 +1933,8 @@ export function initNimo() {
     detectLanguageStyle,
     setSessionLanguage,
     getSessionLanguage,
+    isCodeGenerationRequest,
+    sanitizeCodeOutput,
     authorizeArcadeDeveloperMode: () => window.ArcadeDeveloperMode?.authorizeFromNimo()
   };
   if (document.getElementById('nimo-widget')) return;
@@ -1996,18 +2039,37 @@ export function initNimo() {
     return `Hi! I'm **NIMO**, your portfolio assistant.\n\nI can help you navigate, explain case studies, answer web development questions, or launch Arcade OS. How can I help you today?`;
   }
 
+  let isRequestPending = false;
+  let lastSubmitTime = 0;
+
   async function handleUserMessage(userText) {
+    if (isRequestPending) return;
+
+    const now = Date.now();
+    if (now - lastSubmitTime < 1800) {
+      renderMessage('user', userText, true);
+      renderMessage('assistant', "Easy there 😭 My circuits need a second. ⚡", true);
+      return;
+    }
+    lastSubmitTime = now;
+
     renderMessage('user', userText, true);
     saveToHistory('user', userText);
 
-    const typingEl = showTypingIndicator();
+    // 1. Input Length Guard (< 350 chars)
+    if (userText.length > 350) {
+      renderMessage('assistant', "Whoa, that’s a whole novel 😭 Keep it shorter and I’ll take a look. ⚡", true);
+      saveToHistory('assistant', "Whoa, that’s a whole novel 😭 Keep it shorter and I’ll take a look. ⚡");
+      return;
+    }
 
-    // 1. Process local deterministic intent engine first
+    // 2. Process local deterministic intent engine first
     const localResponse = processUserQuery(userText);
     const isLocalFallback = localResponse.intentId === 'fallback';
 
     if (!isLocalFallback) {
       // Keep confident local response 100% local!
+      const typingEl = showTypingIndicator();
       setTimeout(() => {
         typingEl.remove();
         renderMessage('assistant', localResponse.text, true, localResponse.actions);
@@ -2018,11 +2080,32 @@ export function initNimo() {
             executeNavigation(localResponse.navigateTarget);
           }, 600);
         }
-      }, 200);
+      }, 150);
       return;
     }
 
-    // 2. Unknown / Fallback Query -> Consult Cloudflare Worker / OpenRouter API
+    // 3. Code Request Classification & 5-Request Session Quota Check
+    const isCodeReq = isCodeGenerationRequest(userText);
+    let codeRequestsUsed = parseInt(sessionStorage.getItem('nimo_code_requests_used') || '0', 10);
+
+    if (isCodeReq) {
+      if (codeRequestsUsed >= 5) {
+        renderMessage('assistant', "Code credits exhausted 😌⚡ I’m here to show you Manav’s work now.", true);
+        saveToHistory('assistant', "Code credits exhausted 😌⚡ I’m here to show you Manav’s work now.");
+        renderSuggestions();
+        return;
+      }
+      codeRequestsUsed += 1;
+      sessionStorage.setItem('nimo_code_requests_used', codeRequestsUsed.toString());
+    }
+
+    // 4. Remote Fallback -> Consult Cloudflare Worker / OpenRouter API
+    isRequestPending = true;
+    if (input) input.disabled = true;
+    const sendBtn = document.getElementById('nimo-send-btn');
+    if (sendBtn) sendBtn.disabled = true;
+
+    const typingEl = showTypingIndicator();
     const locCtx = getCurrentLocationContext();
     const detectedLangInfo = detectLanguageStyle(userText);
     const contextPayload = {
@@ -2037,25 +2120,27 @@ export function initNimo() {
       typingEl.remove();
 
       if (backendResult && backendResult.success && backendResult.reply) {
+        let finalReply = sanitizeCodeOutput(backendResult.reply, userText);
         const actions = (backendResult.actions && backendResult.actions.length > 0)
           ? backendResult.actions
           : localResponse.actions;
 
-        renderMessage('assistant', backendResult.reply, true, actions);
-        saveToHistory('assistant', backendResult.reply);
+        renderMessage('assistant', finalReply, true, actions);
+        saveToHistory('assistant', finalReply);
       } else {
-        // Backend unavailable/unconfigured -> Render safe local fallback
         renderMessage('assistant', localResponse.text, true, localResponse.actions);
         saveToHistory('assistant', localResponse.text);
       }
     } catch (err) {
       typingEl.remove();
-      // Safe local fallback on exception
       renderMessage('assistant', localResponse.text, true, localResponse.actions);
       saveToHistory('assistant', localResponse.text);
+    } finally {
+      isRequestPending = false;
+      if (input) input.disabled = false;
+      if (sendBtn) sendBtn.disabled = false;
+      renderSuggestions();
     }
-
-    renderSuggestions();
   }
 
   function renderMessage(role, text, animate = true, actions = []) {

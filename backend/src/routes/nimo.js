@@ -1,4 +1,24 @@
-import { queryOpenRouter } from '../services/openrouter.js';
+// Sliding window rate limiter map (IP -> timestamps array)
+const ipRateMap = new Map();
+
+function isRateLimited(ip) {
+  if (!ip) return false;
+  const now = Date.now();
+  const windowMs = 60000; // 1 minute
+  const maxRequests = 10;
+
+  let timestamps = ipRateMap.get(ip) || [];
+  timestamps = timestamps.filter(t => now - t < windowMs);
+
+  if (timestamps.length >= maxRequests) {
+    ipRateMap.set(ip, timestamps);
+    return true;
+  }
+
+  timestamps.push(now);
+  ipRateMap.set(ip, timestamps);
+  return false;
+}
 
 export async function handleNimoChatRoute(request, env = {}, corsHeaders = {}) {
   try {
@@ -8,6 +28,18 @@ export async function handleNimoChatRoute(request, env = {}, corsHeaders = {}) {
     } catch (e) {
       return new Response(JSON.stringify({ success: false, error: 'Invalid JSON payload' }), {
         status: 400,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      });
+    }
+
+    const clientIp = request.headers.get('cf-connecting-ip') || request.headers.get('x-forwarded-for') || '127.0.0.1';
+    if (isRateLimited(clientIp)) {
+      return new Response(JSON.stringify({
+        success: false,
+        reply: "Easy there 😭 My circuits need a second. ⚡",
+        error: 'Rate limit exceeded.'
+      }), {
+        status: 429,
         headers: { 'Content-Type': 'application/json', ...corsHeaders }
       });
     }
@@ -25,7 +57,18 @@ export async function handleNimoChatRoute(request, env = {}, corsHeaders = {}) {
       });
     }
 
-    const sanitizedMessage = message.trim().substring(0, 500);
+    if (message.trim().length > 350) {
+      return new Response(JSON.stringify({
+        success: false,
+        reply: "Whoa, that’s a whole novel 😭 Keep it shorter and I’ll take a look. ⚡",
+        error: 'Input exceeds maximum length of 350 characters.'
+      }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      });
+    }
+
+    const sanitizedMessage = message.trim().substring(0, 350);
     const sanitizedContext = {
       page: context?.page ? String(context.page).substring(0, 100) : 'home',
       section: context?.section ? String(context.section).substring(0, 100) : 'work',

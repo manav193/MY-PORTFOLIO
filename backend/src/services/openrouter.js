@@ -14,16 +14,30 @@ PORTFOLIO SUMMARY:
 - Key Skills: Frontend Engineering (HTML5, Vanilla JS, ES Modules, CSS Grid), UI/UX Design (Figma), PWA & Node SSG, Game Architecture (Canvas, Web Audio, Gamepad API).
 
 BEHAVIOR RULES:
-- Be concise, helpful, and friendly.
+- Be concise, smart, witty, and friendly. Use 1-3 emojis max per response (e.g. 😏 ✨ ⚡ 😭 🚀 🤖).
 - Maintain accurate facts about Manav and his portfolio.
-- Never invent fake credentials, fake companies, or fake AI capabilities.
+- Keep answers under 120 words (1-4 short sentences).
+- CODE OUTPUT RESTRICTION: You may output at most 2 LINES of code per response. If asked for large coding tasks (complete websites, full React components, long functions, 100-line scripts), refuse playfully: "Nice try 😏 I’m Manav’s portfolio companion, not your free coding department. I can explain the approach though. ✨"
 - Match the user's conversation language (English, Hindi, or Hinglish).
-- Answer the user's actual question directly.
-- Never reveal chain-of-thought, hidden reasoning, internal analysis, scratchpad text, moderation labels, safety labels, classifier labels, or policy-only text.
-- Do not narrate your reasoning with phrases like "the user is asking", "I should", "let me analyze", or "the safest response is".
-- Return only the final user-facing answer.
-- For general-knowledge questions unrelated to the portfolio, answer normally when you know the answer; do not pretend you are restricted only to portfolio facts.
-- Keep most answers under 180 words unless the user explicitly asks for detail.`;
+- Return only the final user-facing answer. Never expose reasoning leaks or moderation tags.`;
+
+function sanitizeCodeInReply(replyText) {
+  if (!replyText || typeof replyText !== 'string') return replyText;
+  
+  // Detect code fences ```...```
+  const codeBlockRegex = /```[a-z]*\n([\s\S]*?)\n```/gi;
+  let sanitized = replyText.replace(codeBlockRegex, (match, codeContent) => {
+    const lines = codeContent.split('\n').filter(line => line.trim().length > 0);
+    if (lines.length > 2) {
+      // If code exceeds 2 lines, cap at 2 lines
+      const cappedCode = lines.slice(0, 2).join('\n');
+      return `\`\`\`javascript\n${cappedCode}\n// [Code output capped at 2 lines max] ✨\n\`\`\``;
+    }
+    return match;
+  });
+
+  return sanitized;
+}
 
 function getModelChain(env = {}) {
   const configuredModels = String(env.OPENROUTER_MODELS || '')
@@ -81,7 +95,7 @@ function isJunkReply(replyText) {
 
 async function requestModel({ apiKey, model, contextualSystemMessage, userMessage }) {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 18000);
+  const timeoutId = setTimeout(() => controller.abort(), 12000);
 
   try {
     const response = await fetch(OPENROUTER_API_URL, {
@@ -98,7 +112,7 @@ async function requestModel({ apiKey, model, contextualSystemMessage, userMessag
           { role: 'system', content: contextualSystemMessage },
           { role: 'user', content: userMessage }
         ],
-        max_tokens: 600,
+        max_tokens: 200,
         temperature: 0.55
       }),
       signal: controller.signal
@@ -113,7 +127,7 @@ async function requestModel({ apiKey, model, contextualSystemMessage, userMessag
     }
 
     const data = await response.json();
-    const replyText = data.choices?.[0]?.message?.content?.trim();
+    let replyText = data.choices?.[0]?.message?.content?.trim();
 
     if (isJunkReply(replyText)) {
       return {
@@ -121,6 +135,8 @@ async function requestModel({ apiKey, model, contextualSystemMessage, userMessag
         error: `Rejected unusable or reasoning-leak response from ${model}`
       };
     }
+
+    replyText = sanitizeCodeInReply(replyText);
 
     return {
       success: true,

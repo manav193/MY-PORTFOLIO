@@ -1,18 +1,21 @@
-﻿/**
+/**
  * NIMO Frontend API Client Service
  * Handles secure asynchronous communication with the backend OpenRouter API endpoint.
  */
 
-const DEFAULT_BACKEND_URL =
-  typeof window !== 'undefined' && window.NIMO_BACKEND_URL
-    ? window.NIMO_BACKEND_URL
-    : typeof window !== 'undefined' && window.location.hostname === 'localhost'
-      ? 'http://localhost:3000/api/nimo/chat'
-      : 'https://nimo-backend.manav-nimo.workers.dev/api/nimo/chat';
+function getBackendUrl() {
+  if (typeof window !== 'undefined' && window.NIMO_BACKEND_URL) {
+    return window.NIMO_BACKEND_URL;
+  }
+  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+    return '/api/nimo/chat';
+  }
+  return 'https://nimo-backend.manav-nimo.workers.dev/api/nimo/chat';
+}
 
 export async function fetchNimoBackendReply(userMessage, context = {}) {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 45000);
+  const timeoutId = setTimeout(() => controller.abort(), 8000);
   try {
     const payload = {
       message: userMessage,
@@ -24,7 +27,7 @@ export async function fetchNimoBackendReply(userMessage, context = {}) {
       }
     };
 
-    const response = await fetch(DEFAULT_BACKEND_URL, {
+    const response = await fetch(getBackendUrl(), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
