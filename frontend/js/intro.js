@@ -129,10 +129,14 @@
 
     const scrollY = window.scrollY;
     
-    // Skip heavy DOM updates and style manipulation when the cabinet is completely off-screen
-    if (scrollY > window.innerHeight * 2.0) {
+    // Skip heavy DOM updates and restore PORTFOLIO state when cabinet is scrolled completely off-screen into portfolio content below
+    const introRect = introSequence.getBoundingClientRect();
+    if (introRect.bottom <= 0) {
       if (chassis.classList.contains('is-scaled')) {
         chassis.classList.remove('is-scaled');
+      }
+      if (window.ArcadeExperience && window.ArcadeExperience.getState() !== 'PORTFOLIO' && window.ArcadeExperience.getState() !== 'ARCADE_EXITING') {
+        window.ArcadeExperience.exitArcadeExperience('scroll');
       }
       return;
     }

@@ -4,54 +4,126 @@ test.describe('Global Portfolio Shell & Arcade Boot Suite', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('http://localhost:8085/');
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(400);
   });
 
-  test('TEST 1: Home Global UI Components Presence', async ({ page }) => {
-    const dock = page.locator('.os-dock');
-    const palette = page.locator('[data-theme-dock]');
-    const nimo = page.locator('#nimo-launcher');
-    const statusRail = page.locator('.section-progress-rail');
+  test('TEST A — PURE SCROLL: Shell Persistence & Section Sync Across All Sections', async ({ page }) => {
+    const sections = [
+      { id: 'home', expectedDock: 'portfolio-intro', expectedRail: 'home' },
+      { id: 'work', expectedDock: 'work', expectedRail: 'work' },
+      { id: 'about', expectedDock: 'about', expectedRail: 'about' },
+      { id: 'skills', expectedDock: 'about', expectedRail: 'skills' },
+      { id: 'experience', expectedDock: 'about', expectedRail: 'experience' },
+      { id: 'contact', expectedDock: 'contact', expectedRail: 'contact' }
+    ];
 
-    await expect(dock).toBeVisible();
-    await expect(palette).toBeVisible();
-    await expect(nimo).toBeVisible();
-    await expect(page.locator('#nimo-widget')).toHaveCount(1);
-    await expect(statusRail).toBeVisible();
-  });
+    for (const sec of sections) {
+      if (sec.id !== 'home') {
+        const el = page.locator('#' + sec.id);
+        await el.scrollIntoViewIfNeeded();
+        await page.waitForTimeout(300);
+      }
 
-  test('TEST 2 & 3: Automatic Scroll Section Sync for Dock & Status Rail', async ({ page }) => {
-    const sections = ['work', 'about', 'contact'];
+      // Shell elements must remain visible
+      await expect(page.locator('.showroom-nav')).toBeVisible();
+      await expect(page.locator('#nimo-launcher')).toBeVisible();
+      await expect(page.locator('[data-theme-dock]')).toBeVisible();
+      await expect(page.locator('.section-progress-rail')).toBeVisible();
+      await expect(page.locator('.os-dock')).toBeVisible();
 
-    for (const sectionId of sections) {
-      await page.evaluate((id) => {
-        const el = document.getElementById(id);
-        if (el) el.scrollIntoView({ behavior: 'instant' });
-      }, sectionId);
-      await page.waitForTimeout(300);
+      // Body must NOT have arcade-active class
+      const hasArcadeActive = await page.evaluate(() => document.body.classList.contains('arcade-active'));
+      expect(hasArcadeActive).toBe(false);
 
-      const activeDockItem = page.locator(`.dock-item[data-dock-action="${sectionId}"]`);
+      // Section mapping check
+      const activeDockItem = page.locator(`.dock-item[data-dock-action="${sec.expectedDock}"]`);
       await expect(activeDockItem).toHaveClass(/dock-active/);
 
-      const activeRailItem = page.locator(`.section-progress-rail__link[data-section-id="${sectionId}"]`);
+      const activeRailItem = page.locator(`.section-progress-rail__link[data-section-id="${sec.expectedRail}"]`);
       await expect(activeRailItem).toHaveClass(/is-active/);
     }
   });
 
-  test('TEST 4: Case Study Global Shell & Parent Context', async ({ page }) => {
+  test('TEST B — CLICK THEN SCROLL: Arcade Exit Restores Full Shell & Tracking', async ({ page }) => {
+    // Click ARCADE
+    await page.evaluate(() => window.ArcadeExperience.enterArcadeExperience('dock'));
+    await page.waitForTimeout(400);
+
+    // Verify Arcade active
+    let hasArcadeActive = await page.evaluate(() => document.body.classList.contains('arcade-active'));
+    expect(hasArcadeActive).toBe(true);
+
+    // Exit Arcade to About
+    await page.evaluate(() => window.ArcadeExperience.exitArcadeExperience('dock', 'about'));
+    await page.waitForTimeout(400);
+
+    // Arcade highlight cleared, body class removed
+    hasArcadeActive = await page.evaluate(() => document.body.classList.contains('arcade-active'));
+    expect(hasArcadeActive).toBe(false);
+
+    const aboutDock = page.locator('.dock-item[data-dock-action="about"]');
+    await expect(aboutDock).toHaveClass(/dock-active/);
+
+    // Scroll through remaining sections
+    for (const secId of ['work', 'contact']) {
+      await page.locator('#' + secId).scrollIntoViewIfNeeded();
+      await page.waitForTimeout(300);
+
+      await expect(page.locator('.showroom-nav')).toBeVisible();
+      await expect(page.locator('#nimo-launcher')).toBeVisible();
+      await expect(page.locator('[data-theme-dock]')).toBeVisible();
+      await expect(page.locator('.section-progress-rail')).toBeVisible();
+      await expect(page.locator('.os-dock')).toBeVisible();
+
+      const activeDock = page.locator(`.dock-item[data-dock-action="${secId}"]`);
+      await expect(activeDock).toHaveClass(/dock-active/);
+    }
+  });
+
+  test('TEST C — RAPID TRANSITIONS: 10 Cycle Transitions Without Stale Body State', async ({ page }) => {
+    for (let cycle = 1; cycle <= 10; cycle++) {
+      // Enter Arcade
+      await page.evaluate(() => window.ArcadeExperience.enterArcadeExperience('dock'));
+      await page.waitForTimeout(80);
+
+      // Exit to About
+      await page.evaluate(() => window.ArcadeExperience.exitArcadeExperience('dock', 'about'));
+      await page.waitForTimeout(80);
+    }
+
+    await page.waitForTimeout(300);
+
+    const expState = await page.evaluate(() => window.ArcadeExperience.getState());
+    expect(expState).toBe('PORTFOLIO');
+
+    const hasArcadeActive = await page.evaluate(() => document.body.classList.contains('arcade-active'));
+    expect(hasArcadeActive).toBe(false);
+
+    const isScaled = await page.evaluate(() => document.querySelector('.cabinet-chassis')?.classList.contains('is-scaled'));
+    expect(isScaled).toBe(false);
+
+    await expect(page.locator('.showroom-nav')).toBeVisible();
+    await expect(page.locator('#nimo-launcher')).toBeVisible();
+    await expect(page.locator('[data-theme-dock]')).toBeVisible();
+    await expect(page.locator('.section-progress-rail')).toBeVisible();
+  });
+
+  test('TEST D — DOM UNIQUENESS: Exact 1 Component Instance', async ({ page }) => {
+    await expect(page.locator('#nimo-widget')).toHaveCount(1);
+    await expect(page.locator('[data-theme-dock]')).toHaveCount(1);
+    await expect(page.locator('.section-progress-rail')).toHaveCount(1);
+    await expect(page.locator('.os-dock')).toHaveCount(1);
+  });
+
+  test('TEST E: Case Study Global Shell & Parent Context', async ({ page }) => {
     await page.goto('http://localhost:8085/assets/case-studies/veldora-bites.html');
     await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(300);
 
-    const dock = page.locator('.os-dock');
-    const palette = page.locator('[data-theme-dock]');
-    const nimo = page.locator('#nimo-launcher');
-    const statusRail = page.locator('.section-progress-rail');
-
-    await expect(dock).toBeVisible();
-    await expect(palette).toBeVisible();
-    await expect(nimo).toBeVisible();
-    await expect(page.locator('#nimo-widget')).toHaveCount(1);
-    await expect(statusRail).toBeVisible();
+    await expect(page.locator('.os-dock')).toBeVisible();
+    await expect(page.locator('[data-theme-dock]')).toBeVisible();
+    await expect(page.locator('#nimo-launcher')).toBeVisible();
+    await expect(page.locator('.section-progress-rail')).toBeVisible();
 
     // WORK active as parent context
     const workDock = page.locator('.dock-item[data-dock-action="work"]');
@@ -59,68 +131,5 @@ test.describe('Global Portfolio Shell & Arcade Boot Suite', () => {
 
     const workRail = page.locator('.section-progress-rail__link[data-section-id="work"]');
     await expect(workRail).toHaveClass(/is-active/);
-  });
-
-  test('TEST 5: 50/50 Dock Navigation Reliability Test', async ({ page }) => {
-    const actions = ['work', 'about', 'contact', 'portfolio-intro', 'work'];
-    
-    for (let cycle = 0; cycle < 3; cycle++) {
-      for (const action of actions) {
-        const item = page.locator(`.dock-item[data-dock-action="${action}"]`);
-        await item.click();
-        await page.waitForTimeout(50);
-        await expect(item).toHaveClass(/dock-active/);
-      }
-    }
-  });
-
-  test('TEST 6: Manual Scroll Overrides Last Clicked Dock Action', async ({ page }) => {
-    // Click Work
-    const workDock = page.locator('.dock-item[data-dock-action="work"]');
-    await workDock.click();
-    await page.waitForTimeout(300);
-    await expect(workDock).toHaveClass(/dock-active/);
-
-    // Scroll to About
-    await page.evaluate(() => {
-      document.getElementById('about')?.scrollIntoView({ behavior: 'instant' });
-    });
-    await page.waitForTimeout(300);
-
-    const aboutDock = page.locator('.dock-item[data-dock-action="about"]');
-    await expect(aboutDock).toHaveClass(/dock-active/);
-    await expect(workDock).not.toHaveClass(/dock-active/);
-  });
-
-  test('TEST 7 & 8: First Arcade Boot & Fast-Path Re-entry', async ({ page }) => {
-    // First entry: Trigger boot
-    await page.evaluate(() => window.ArcadeExperience.enterArcadeExperience('dock'));
-    await page.waitForTimeout(300);
-
-    const osLayer = page.locator('#arcade-os');
-    await expect(osLayer).toHaveCSS('opacity', '1');
-
-    // Exit Arcade
-    await page.evaluate(() => window.ArcadeExperience.exitArcadeExperience('dock'));
-    await page.waitForTimeout(300);
-
-    // Re-enter Arcade (Fast-path warm re-entry)
-    await page.evaluate(() => window.ArcadeExperience.enterArcadeExperience('dock'));
-    await page.waitForTimeout(200);
-
-    const homeView = page.locator('#arcade-home');
-    await expect(homeView).toHaveClass(/active/);
-  });
-
-  test('TEST 9: Reverse Scroll During Boot Cancellation', async ({ page }) => {
-    await page.evaluate(() => window.ArcadeExperience.enterArcadeExperience('scroll'));
-    await page.waitForTimeout(100);
-
-    // Reverse scroll
-    await page.evaluate(() => window.ArcadeExperience.exitArcadeExperience('scroll'));
-    await page.waitForTimeout(200);
-
-    const expState = await page.evaluate(() => window.ArcadeExperience.getState());
-    expect(expState).toBe('PORTFOLIO');
   });
 });

@@ -48,7 +48,6 @@ export function exitArcadeToPortfolio(targetId = "main-content") {
 export function setActiveDock(action) {
   const normalized = VALID_ACTIONS.has(action) ? action : "none";
   activeAction = normalized;
-  document.body.classList.toggle("arcade-active", normalized === "arcade");
 
   const items = Array.from(document.querySelectorAll(".dock-item"));
   items.forEach((item) => {
@@ -115,7 +114,7 @@ function lockActiveDock(action, duration) {
 function initSectionObserver() {
   if (observer) observer.disconnect();
 
-  const targets = ["intro-sequence", "work", "about", "contact"]
+  const targets = ["intro-sequence", "work", "about", "skills", "experience", "contact"]
     .map((id) => document.getElementById(id))
     .filter(Boolean);
 
@@ -133,17 +132,19 @@ function initSectionObserver() {
 }
 
 function syncDockFromViewport() {
-  if (window.ArcadeExperience) {
-    const expState = window.ArcadeExperience.getState();
-    if (expState === 'ARCADE_HOME' || expState === 'ARCADE_APP' || expState === 'ARCADE_ENTERING') {
-      if (activeAction !== 'arcade') setActiveDock('arcade');
-      return;
-    }
-  }
-
   const isSubpage = !document.getElementById('home');
   if (isSubpage) {
     if (activeAction !== 'work') setActiveDock('work');
+    return;
+  }
+
+  const chassis = document.querySelector('.cabinet-chassis');
+  const isChassisScaled = chassis?.classList.contains('is-scaled');
+  const expState = window.ArcadeExperience?.getState();
+  const isArcadeTrulyActive = (expState === 'ARCADE_HOME' || expState === 'ARCADE_APP' || expState === 'ARCADE_ENTERING') && isChassisScaled;
+
+  if (isArcadeTrulyActive) {
+    if (activeAction !== 'arcade') setActiveDock('arcade');
     return;
   }
 
@@ -159,15 +160,23 @@ function syncDockFromViewport() {
   }
 
   if (activeAction === "arcade") {
-    setActiveDock("none");
+    setActiveDock("portfolio-intro");
   }
 }
 
 function getMostVisibleSectionAction() {
   const marker = window.innerHeight * 0.42;
-  const candidates = Array.from(SECTION_ACTIONS)
-    .map((action) => {
-      const section = document.getElementById(action);
+  const sectionMappings = [
+    { id: 'work', action: 'work' },
+    { id: 'about', action: 'about' },
+    { id: 'skills', action: 'about' },
+    { id: 'experience', action: 'about' },
+    { id: 'contact', action: 'contact' }
+  ];
+
+  const candidates = sectionMappings
+    .map(({ id, action }) => {
+      const section = document.getElementById(id);
       if (!section) return null;
       const rect = section.getBoundingClientRect();
       const containsMarker = rect.top <= marker && rect.bottom >= marker;

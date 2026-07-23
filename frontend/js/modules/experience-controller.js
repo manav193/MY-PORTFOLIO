@@ -22,6 +22,7 @@ export const ExperienceController = {
   },
 
   async enterArcadeExperience(source = 'button') {
+    document.body.classList.add('arcade-active');
     if (currentState === 'ARCADE_HOME' || currentState === 'ARCADE_APP' || currentState === 'ARCADE_ENTERING') {
       return true;
     }
@@ -82,6 +83,10 @@ export const ExperienceController = {
   },
 
   async exitArcadeExperience(source = 'button', targetSectionId = null) {
+    document.body.classList.remove('arcade-active');
+    const chassis = document.querySelector('.cabinet-chassis');
+    if (chassis) chassis.classList.remove('is-scaled');
+
     if (currentState === 'PORTFOLIO' || currentState === 'ARCADE_EXITING') {
       if (targetSectionId && targetSectionId !== 'none') {
         this.navigateToPortfolioSection(targetSectionId);
@@ -110,7 +115,6 @@ export const ExperienceController = {
     }
 
     // 3. Reset chassis scaling
-    const chassis = document.querySelector('.cabinet-chassis');
     if (chassis) chassis.classList.remove('is-scaled');
 
     // 4. Scroll to portfolio section if requested via dock or button
