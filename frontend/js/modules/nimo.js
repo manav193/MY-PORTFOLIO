@@ -888,10 +888,71 @@ const INTENT_REGISTRY = [
     })
   },
 
-  // 11. Arcade NIMO service authorization (session-scoped UX secret)
+  // 11a. First Arcade Secret Tease (Discovery Step)
+  {
+    id: 'arcade_secret_tease',
+    priority: 104,
+    matches: (text) => {
+      const normalized = String(text || '').toLowerCase().trim();
+      const isOverride = matchesAnyPhrase(normalized, [
+        'unlock arcade override', 'arcade override', 'nimo override', 'service access',
+        'show deeper arcade secret', 'authorize developer mode', 'override arcade'
+      ]);
+      if (isOverride) return false;
+
+      const hasSecretKey = matchesAnyPhrase(normalized, [
+        'secret', 'secrets', 'hidden', 'cheat', 'easter egg', 'easteregg'
+      ]) || /\b(secret|secrets|hidden|cheat)\b/i.test(normalized);
+
+      const hasArcadeKey = matchesAnyPhrase(normalized, [
+        'arcade', 'arcadeos', 'cabinet', 'game', 'system'
+      ]) || /\b(arcade|arcadeos|cabinet|game)\b/i.test(normalized);
+
+      if (hasSecretKey && hasArcadeKey) return true;
+
+      return matchesAnyPhrase(normalized, [
+        'do you know any arcade secrets', 'any arcade secrets', 'tell me an arcade secret',
+        'does arcadeos have secrets', 'do you know something hidden in arcade',
+        'arcade mein koi secret hai', 'koi hidden arcade secret batao', 'arcade secret',
+        'arcade secrets', 'do you know any secrets', 'tell me a secret'
+      ]);
+    },
+    handler: (text, entities, locationCtx, isHindi, isHinglish) => {
+      if (isHinglish) {
+        return {
+          intentId: 'arcade_secret_tease',
+          text: `Secrets? Main? Kabhi nahi. 😏\nLekin cabinet mein ek service layer hai jo zyadatar visitors nahi dekh paate... 👀`,
+          actions: [
+            { label: 'Show deeper Arcade secret', query: 'Show deeper Arcade secret' },
+            { label: 'Open Arcade', navigate: 'arcade' }
+          ]
+        };
+      }
+      if (isHindi) {
+        return {
+          intentId: 'arcade_secret_tease',
+          text: `सीक्रेट्स? मैं? कभी नहीं। 😏\nलेकिन कैबिनेट में एक सर्विस लेयर है जिसे ज्यादातर विज़िटर्स कभी नहीं देख पाते... 👀`,
+          actions: [
+            { label: 'Show deeper Arcade secret', query: 'Show deeper Arcade secret' },
+            { label: 'Open Arcade', navigate: 'arcade' }
+          ]
+        };
+      }
+      return {
+        intentId: 'arcade_secret_tease',
+        text: `Secrets? Me? Never. 😏\nBut the cabinet has a service layer most visitors never see... 👀`,
+        actions: [
+          { label: 'Show deeper Arcade secret', query: 'Show deeper Arcade secret' },
+          { label: 'Open Arcade', navigate: 'arcade' }
+        ]
+      };
+    }
+  },
+
+  // 11b. Arcade NIMO service authorization (session-scoped UX secret)
   {
     id: 'arcade_nimo_override',
-    priority: 99,
+    priority: 105,
     matches: (text) => matchesAnyPhrase(text, [
       'unlock arcade override', 'arcade override', 'nimo override', 'service access',
       'show deeper arcade secret', 'authorize developer mode', 'override arcade'
