@@ -14,40 +14,50 @@ function escapeMarkup(value) {
 
 function getPremiumAppIcon(appId) {
   const id = String(appId || '').toLowerCase();
-  
-  // 1. REACTION TEST -> Reflex / Lightning Push Button
-  if (id === 'reaction' || id === 'reaction-test') {
+
+  // 1. PAC-MAZE -> Pac-Man style maze chase
+  if (id === 'pacmaze') {
     return `<svg class="arcade-premium-icon" viewBox="0 0 64 64" fill="none">
-      <defs>
-        <radialGradient id="btn-glow-cyan" cx="40%" cy="35%" r="60%">
-          <stop offset="0%" stop-color="#73f6ff"/>
-          <stop offset="60%" stop-color="#00c8ff"/>
-          <stop offset="100%" stop-color="#0066aa"/>
-        </radialGradient>
-      </defs>
-      <circle cx="32" cy="34" r="24" fill="#121726" stroke="#2a334d" stroke-width="2" filter="drop-shadow(0 6px 12px rgba(0,0,0,0.6))"/>
-      <circle cx="32" cy="34" r="19" fill="#1a2238" stroke="#00c8ff" stroke-opacity="0.5"/>
-      <circle cx="32" cy="32" r="15" fill="url(#btn-glow-cyan)" filter="drop-shadow(0 0 10px rgba(0,229,255,0.7))"/>
-      <path d="M34 19L24 33h7l-3 12 12-14h-7l3-12z" fill="#ffffff" filter="drop-shadow(0 0 4px #ffffff)"/>
+      <circle cx="32" cy="32" r="24" fill="#0f172a" stroke="#3b82f6" stroke-width="2"/>
+      <path d="M32 32 L52 20 A22 22 0 1 0 52 44 Z" fill="#facc15" filter="drop-shadow(0 0 8px #facc15)"/>
+      <circle cx="48" cy="32" r="3" fill="#fde047"/>
+      <path d="M16 12h8M16 52h8" stroke="#1e3a8a" stroke-width="3" stroke-linecap="round"/>
     </svg>`;
   }
 
-  // 2. NEON SNAKE -> Pixel Serpent / Grid Snake
+  // 2. PIXEL PLUMBER -> Mario-style platformer block & cap
+  if (id === 'pixelplumber') {
+    return `<svg class="arcade-premium-icon" viewBox="0 0 64 64" fill="none">
+      <rect x="12" y="16" width="40" height="36" rx="6" fill="#b45309" stroke="#f59e0b" stroke-width="2"/>
+      <text x="32" y="42" font-size="26" font-weight="900" text-anchor="middle" fill="#fef08a">?</text>
+      <circle cx="20" cy="12" r="6" fill="#ef4444" filter="drop-shadow(0 0 6px #ef4444)"/>
+    </svg>`;
+  }
+
+  // 3. FLAPPY BYTE -> Endless cyber flyer
+  if (id === 'flappybyte') {
+    return `<svg class="arcade-premium-icon" viewBox="0 0 64 64" fill="none">
+      <rect x="8" y="8" width="14" height="24" fill="#06b6d4" rx="3"/>
+      <rect x="8" y="42" width="14" height="14" fill="#06b6d4" rx="3"/>
+      <circle cx="38" cy="28" r="14" fill="#facc15" filter="drop-shadow(0 0 8px #facc15)"/>
+      <path d="M38 28 L50 24 L50 32 Z" fill="#f97316"/>
+      <circle cx="44" cy="24" r="2.5" fill="#0f172a"/>
+    </svg>`;
+  }
+
+  // 4. SPACE WARS -> Fighter Spaceship
+  if (id === 'spacewars') {
+    return `<svg class="arcade-premium-icon" viewBox="0 0 64 64" fill="none">
+      <path d="M32 10 L18 48 L32 40 L46 48 Z" fill="#38bdf8" filter="drop-shadow(0 0 8px #38bdf8)"/>
+      <line x1="20" y1="20" x2="20" y2="8" stroke="#ef4444" stroke-width="3.5" stroke-linecap="round"/>
+      <line x1="44" y1="20" x2="44" y2="8" stroke="#ef4444" stroke-width="3.5" stroke-linecap="round"/>
+    </svg>`;
+  }
+
+  // 5. NEON SNAKE -> Pixel Serpent
   if (id === 'snake') {
     return `<svg class="arcade-premium-icon" viewBox="0 0 64 64" fill="none">
-      <defs>
-        <filter id="snake-glow" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="1.5" result="blur"/>
-          <feComposite in="SourceGraphic" in2="blur" operator="over"/>
-        </filter>
-      </defs>
-      <g filter="url(#snake-glow)">
-        <circle cx="16" cy="16" r="1.5" fill="#143825"/>
-        <circle cx="32" cy="16" r="1.5" fill="#143825"/>
-        <circle cx="48" cy="16" r="1.5" fill="#143825"/>
-        <circle cx="16" cy="32" r="1.5" fill="#143825"/>
-        <circle cx="32" cy="32" r="1.5" fill="#143825"/>
-        <circle cx="48" cy="32" r="1.5" fill="#143825"/>
+      <g filter="drop-shadow(0 0 6px #00ff88)">
         <rect x="12" y="12" width="10" height="10" rx="2.5" fill="#00ff88"/>
         <rect x="24" y="12" width="10" height="10" rx="2.5" fill="#00ff88"/>
         <rect x="36" y="12" width="10" height="10" rx="2.5" fill="#00ff88"/>
@@ -55,45 +65,59 @@ function getPremiumAppIcon(appId) {
         <rect x="36" y="36" width="10" height="10" rx="2.5" fill="#00ff88"/>
         <rect x="24" y="36" width="10" height="10" rx="2.5" fill="#00ff88"/>
         <rect x="12" y="36" width="10" height="10" rx="2.5" fill="#00ff88"/>
-        <rect x="12" y="48" width="10" height="10" rx="2.5" fill="#00e577"/>
-        <circle cx="15" cy="51" r="1.5" fill="#06120b"/>
-        <circle cx="19" cy="51" r="1.5" fill="#06120b"/>
-        <circle cx="48" cy="48" r="5" fill="#ff0055" filter="drop-shadow(0 0 6px #ff0055)"/>
+        <circle cx="48" cy="48" r="5" fill="#ff0055"/>
       </g>
     </svg>`;
   }
 
-  // 3. BREAKOUT -> Brick & Paddle & Ball
+  // 6. BREAKOUT -> Brick & Paddle
   if (id === 'breakout') {
     return `<svg class="arcade-premium-icon" viewBox="0 0 64 64" fill="none">
       <rect x="8" y="12" width="14" height="6" rx="2" fill="#ff0055"/>
       <rect x="25" y="12" width="14" height="6" rx="2" fill="#ff9900"/>
       <rect x="42" y="12" width="14" height="6" rx="2" fill="#00f0ff"/>
-      <rect x="8" y="21" width="14" height="6" rx="2" fill="#00ff88"/>
-      <rect x="25" y="21" width="14" height="6" rx="2" fill="#a052ff"/>
-      <rect x="42" y="21" width="14" height="6" rx="2" fill="#ff0055"/>
       <rect x="18" y="48" width="28" height="6" rx="3" fill="#ffffff" filter="drop-shadow(0 0 6px #00f0ff)"/>
       <circle cx="32" cy="36" r="5" fill="#ffea00" filter="drop-shadow(0 0 8px #ffea00)"/>
     </svg>`;
   }
 
-  // 4. PIXEL PAD -> Pixel Canvas Grid & Stylus Pencil
-  if (id === 'pixelpad' || id === 'pixel-pad') {
+  // 7. NEON PONG -> Table Tennis Paddles
+  if (id === 'neonpong') {
     return `<svg class="arcade-premium-icon" viewBox="0 0 64 64" fill="none">
-      <rect x="10" y="10" width="44" height="44" rx="6" fill="#121829" stroke="#3b4870" stroke-width="2"/>
-      <rect x="16" y="16" width="8" height="8" fill="#ff0055"/>
-      <rect x="26" y="16" width="8" height="8" fill="#00f0ff"/>
-      <rect x="36" y="16" width="8" height="8" fill="#00ff88"/>
-      <rect x="16" y="26" width="8" height="8" fill="#a052ff"/>
-      <rect x="26" y="26" width="8" height="8" fill="#ffea00"/>
-      <rect x="36" y="26" width="8" height="8" fill="#ff0055"/>
-      <path d="M48 48L34 34l8-8 14 14-8 8z" fill="#ff9900" filter="drop-shadow(0 4px 8px rgba(0,0,0,0.5))"/>
-      <polygon points="34,34 30,42 38,38" fill="#ffffff"/>
-      <polygon points="30,42 28,44 32,42" fill="#222222"/>
+      <rect x="10" y="18" width="6" height="28" rx="3" fill="#38bdf8" filter="drop-shadow(0 0 6px #38bdf8)"/>
+      <rect x="48" y="18" width="6" height="28" rx="3" fill="#f43f5e" filter="drop-shadow(0 0 6px #f43f5e)"/>
+      <circle cx="32" cy="32" r="5" fill="#facc15" filter="drop-shadow(0 0 8px #facc15)"/>
     </svg>`;
   }
 
-  // 5. PALETTE LAB -> Eyedropper & Color Swatches
+  // 8. VOID INVADERS -> Pixel Alien Invader
+  if (id === 'voidinvaders') {
+    return `<svg class="arcade-premium-icon" viewBox="0 0 64 64" fill="none">
+      <path d="M20 16h24v8H20zM12 24h40v12H12zM16 36h8v8h-8zM40 36h8v8h-8z" fill="#a855f7" filter="drop-shadow(0 0 8px #a855f7)"/>
+      <rect x="20" y="28" width="6" height="6" fill="#ffffff"/>
+      <rect x="38" y="28" width="6" height="6" fill="#ffffff"/>
+    </svg>`;
+  }
+
+  // 9. VECTOR DRIFT -> Asteroids Ship & Asteroid
+  if (id === 'vectordrift') {
+    return `<svg class="arcade-premium-icon" viewBox="0 0 64 64" fill="none">
+      <path d="M20 16 L44 32 L20 48 L26 32 Z" stroke="#38bdf8" stroke-width="2.5" fill="none" filter="drop-shadow(0 0 6px #38bdf8)"/>
+      <circle cx="48" cy="18" r="8" stroke="#94a3b8" stroke-width="2" fill="none"/>
+    </svg>`;
+  }
+
+  // 10. BLOCK//DROP -> Tetromino Blocks
+  if (id === 'blockdrop') {
+    return `<svg class="arcade-premium-icon" viewBox="0 0 64 64" fill="none">
+      <rect x="16" y="16" width="14" height="14" rx="2" fill="#a855f7"/>
+      <rect x="32" y="16" width="14" height="14" rx="2" fill="#a855f7"/>
+      <rect x="32" y="32" width="14" height="14" rx="2" fill="#a855f7"/>
+      <rect x="16" y="32" width="14" height="14" rx="2" fill="#3b82f6"/>
+    </svg>`;
+  }
+
+  // 11. PALETTE LAB -> Eyedropper & Color Swatches
   if (id === 'palettelab' || id === 'palette-lab') {
     return `<svg class="arcade-premium-icon" viewBox="0 0 64 64" fill="none">
       <defs>
@@ -190,6 +214,7 @@ const ArcadeStorage = {
 
   get(key, defaultValue = null) {
     try {
+      if (typeof localStorage === 'undefined') return defaultValue;
       const stored = localStorage.getItem(key);
       return stored !== null ? JSON.parse(stored) : defaultValue;
     } catch (e) {
@@ -200,7 +225,17 @@ const ArcadeStorage = {
 
   set(key, value) {
     try {
+      if (typeof localStorage === 'undefined') return;
+      const isScoreKey = /^arcade_.*_(best|record|high)$/i.test(String(key));
+      if (isScoreKey && window.ArcadeDeveloperMode?.shouldBlockScore()) {
+        sessionStorage.setItem(`developer_${key}`, JSON.stringify(value));
+        return;
+      }
+      const previous = isScoreKey ? Number(JSON.parse(localStorage.getItem(key) || '0')) : 0;
       localStorage.setItem(key, JSON.stringify(value));
+      if (isScoreKey && Number(value) > previous) {
+        document.dispatchEvent(new CustomEvent('arcade:new-high-score', { detail: { key, score: Number(value) } }));
+      }
     } catch (e) {
       console.warn('ArcadeStorage: Write failed', e);
     }
@@ -210,14 +245,15 @@ const ArcadeStorage = {
     // 1. Settings Domain Migration
     let settings = this.get(this.KEYS.SETTINGS);
     if (!settings) {
-      const legacySound = localStorage.getItem('arcade_sound_enabled');
+      const legacySound = (typeof localStorage !== 'undefined' ? localStorage.getItem('arcade_sound_enabled') : null);
       const soundEnabled = legacySound !== null ? JSON.parse(legacySound) : false;
+      const legacyTheme = (typeof localStorage !== 'undefined' ? localStorage.getItem('premium-theme') : null);
       settings = {
         schemaVersion: 1,
         volume: soundEnabled ? 0.5 : 0.0,
         brightness: 1.0,
         glow: 0.8,
-        theme: localStorage.getItem('premium-theme') || 'dark-graphite',
+        theme: legacyTheme || 'dark-graphite',
         scanlines: true,
         soundEnabled: soundEnabled
       };
@@ -262,6 +298,7 @@ const ArcadeStorage = {
     let saves = this.get(this.KEYS.SAVES);
     if (!saves) {
       const getLegacyScore = (key) => {
+        if (typeof localStorage === 'undefined') return 0;
         const stored = localStorage.getItem(key);
         return stored !== null ? Number(stored) : 0;
       };
@@ -285,15 +322,28 @@ ArcadeStorage.init();
 const ArcadeAudio = {
   ctx: null,
   masterGain: null,
+  sfxGain: null,
+  musicGain: null,
   activeNodes: new Set(),
   previewNodes: new Set(),
-  maxOscillators: 16,
+  activeLoops: new Map(),
+  cooldowns: new Map(),
+  maxOscillators: 20,
+  unlocked: false,
   profileId: (ArcadeStorage.get(ArcadeStorage.KEYS.SETTINGS) || {}).soundProfile || 'industrial',
   reducedAudio: !!(ArcadeStorage.get(ArcadeStorage.KEYS.SETTINGS) || {}).reducedAudio,
-  soundEnabled: (ArcadeStorage.get(ArcadeStorage.KEYS.SETTINGS) || {}).soundEnabled || false,
+  soundEnabled: typeof (ArcadeStorage.get(ArcadeStorage.KEYS.SETTINGS) || {}).soundEnabled === 'boolean'
+    ? (ArcadeStorage.get(ArcadeStorage.KEYS.SETTINGS) || {}).soundEnabled
+    : true,
   masterVolume: typeof (ArcadeStorage.get(ArcadeStorage.KEYS.SETTINGS) || {}).volume === 'number'
     ? (ArcadeStorage.get(ArcadeStorage.KEYS.SETTINGS) || {}).volume
     : 0.5,
+  sfxVolume: typeof (ArcadeStorage.get(ArcadeStorage.KEYS.SETTINGS) || {}).sfxVolume === 'number'
+    ? (ArcadeStorage.get(ArcadeStorage.KEYS.SETTINGS) || {}).sfxVolume
+    : 0.8,
+  musicVolume: typeof (ArcadeStorage.get(ArcadeStorage.KEYS.SETTINGS) || {}).musicVolume === 'number'
+    ? (ArcadeStorage.get(ArcadeStorage.KEYS.SETTINGS) || {}).musicVolume
+    : 0.35,
 
   profiles: {
     industrial: {
@@ -359,12 +409,17 @@ const ArcadeAudio = {
       if (!AudioContext) return false;
       this.ctx = new AudioContext();
       this.masterGain = this.ctx.createGain();
+      this.sfxGain = this.ctx.createGain();
+      this.musicGain = this.ctx.createGain();
+      this.sfxGain.connect(this.masterGain);
+      this.musicGain.connect(this.masterGain);
       this.masterGain.connect(this.ctx.destination);
       this.updateMasterGain();
     }
     if (this.ctx.state === 'suspended') {
       this.ctx.resume().catch(() => {});
     }
+    this.unlocked = true;
     return true;
   },
 
@@ -376,12 +431,16 @@ const ArcadeAudio = {
     if (!this.masterGain || !this.ctx) return;
     const gainValue = this.soundEnabled && !this.isMasterMuted() ? this.masterVolume : 0;
     this.masterGain.gain.setTargetAtTime(gainValue, this.ctx.currentTime, 0.012);
+    this.sfxGain?.gain.setTargetAtTime(this.sfxVolume, this.ctx.currentTime, 0.012);
+    this.musicGain?.gain.setTargetAtTime(this.musicVolume, this.ctx.currentTime, 0.012);
   },
 
   saveAudioSettings() {
     const settings = ArcadeStorage.get(ArcadeStorage.KEYS.SETTINGS) || {};
     settings.soundEnabled = this.soundEnabled;
     settings.volume = this.masterVolume;
+    settings.sfxVolume = this.sfxVolume;
+    settings.musicVolume = this.musicVolume;
     settings.soundProfile = this.profileId;
     settings.reducedAudio = !!this.reducedAudio;
     ArcadeStorage.set(ArcadeStorage.KEYS.SETTINGS, settings);
@@ -415,6 +474,18 @@ const ArcadeAudio = {
     this.updateMasterGain();
   },
 
+  setSfxVolume(value) {
+    this.sfxVolume = Math.max(0, Math.min(1, Number(value) || 0));
+    this.saveAudioSettings();
+    this.updateMasterGain();
+  },
+
+  setMusicVolume(value) {
+    this.musicVolume = Math.max(0, Math.min(1, Number(value) || 0));
+    this.saveAudioSettings();
+    this.updateMasterGain();
+  },
+
   setMuted(value) {
     this.soundEnabled = !value;
     if (this.soundEnabled && this.masterVolume === 0) {
@@ -432,25 +503,33 @@ const ArcadeAudio = {
   playTone(freq, type = 'sine', duration = 0.1, vol = 0.1, options = {}) {
     if (!this.soundEnabled || this.profileId === 'muted') return;
     if (this.activeNodes.size >= this.maxOscillators) return;
+    const nowMs = performance.now();
+    if (options.cooldownKey && nowMs < (this.cooldowns.get(options.cooldownKey) || 0)) return;
+    if (options.cooldownKey) this.cooldowns.set(options.cooldownKey, nowMs + (options.cooldown || 28));
     try {
       if (!this.initFromGesture()) return;
 
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       const durationValue = this.reducedAudio ? Math.min(duration, 0.08) : duration;
+      const startedAt = this.ctx.currentTime + Math.max(0, Number(options.delay) || 0);
 
       osc.type = type;
-      osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+      osc.frequency.setValueAtTime(Math.max(20, freq), startedAt);
+      if (options.pitchEnd) {
+        osc.frequency.exponentialRampToValueAtTime(Math.max(20, options.pitchEnd), startedAt + durationValue);
+      }
 
-      gain.gain.setValueAtTime(Math.max(0.0001, vol), this.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + durationValue);
+      gain.gain.setValueAtTime(0.0001, startedAt);
+      gain.gain.exponentialRampToValueAtTime(Math.max(0.0001, vol), startedAt + Math.min(0.012, durationValue / 3));
+      gain.gain.exponentialRampToValueAtTime(0.0001, startedAt + durationValue);
 
       osc.connect(gain);
-      gain.connect(this.masterGain);
+      gain.connect(options.channel === 'music' ? this.musicGain : this.sfxGain);
 
-      osc.start();
-      osc.stop(this.ctx.currentTime + durationValue);
-      const record = { osc, gain };
+      osc.start(startedAt);
+      osc.stop(startedAt + durationValue);
+      const record = { osc, gain, owner: options.owner || 'system' };
       this.activeNodes.add(record);
       if (options.preview) this.previewNodes.add(record);
       osc.onended = () => {
@@ -459,6 +538,170 @@ const ArcadeAudio = {
         try { osc.disconnect(); gain.disconnect(); } catch (_) {}
       };
     } catch(e) {}
+  },
+
+  playSequence(steps, options = {}) {
+    steps.forEach((step, index) => {
+      const [freq, type = 'sine', duration = 0.08, vol = 0.05, delay = index * 45, pitchEnd] = step;
+      this.playTone(freq, type, duration, vol, {
+        ...options,
+        cooldownKey: index === 0 ? options.cooldownKey : undefined,
+        delay: delay / 1000,
+        pitchEnd
+      });
+    });
+  },
+
+  gameEffects: {
+    pacmaze: {
+      pellet: [[620, 'sine', 0.025, 0.024, 0, 760]],
+      power: [[420, 'square', 0.06, 0.045, 0, 920], [920, 'sine', 0.08, 0.035, 45]],
+      ghost: [[1050, 'triangle', 0.09, 0.05, 0, 1450]],
+      frightened: [[180, 'square', 0.12, 0.025, 0, 240]],
+      defeat: [[220, 'sawtooth', 0.24, 0.065, 0, 70]],
+      victory: [[660, 'triangle', 0.09, 0.05], [880, 'triangle', 0.1, 0.05, 70], [1320, 'sine', 0.16, 0.055, 140]],
+      nextLevel: [[440, 'triangle', 0.06, 0.035], [660, 'triangle', 0.08, 0.04, 55]]
+    },
+    pixelplumber: {
+      jump: [[360, 'square', 0.08, 0.04, 0, 720]],
+      land: [[190, 'triangle', 0.045, 0.025, 0, 130]],
+      coin: [[880, 'sine', 0.05, 0.04], [1320, 'sine', 0.07, 0.035, 35]],
+      block: [[270, 'square', 0.055, 0.035, 0, 420]],
+      stomp: [[240, 'square', 0.07, 0.045, 0, 110]],
+      defeat: [[180, 'sawtooth', 0.22, 0.06, 0, 60]],
+      checkpoint: [[520, 'sine', 0.06, 0.035], [1040, 'sine', 0.09, 0.04, 55]],
+      victory: [[520, 'triangle', 0.07, 0.04], [780, 'triangle', 0.08, 0.04, 60], [1170, 'sine', 0.12, 0.045, 120]]
+    },
+    flappybyte: {
+      flap: [[520, 'triangle', 0.055, 0.035, 0, 820]],
+      score: [[780, 'sine', 0.05, 0.035, 0, 1040]],
+      collision: [[150, 'square', 0.08, 0.045, 0, 75]],
+      defeat: [[190, 'sawtooth', 0.22, 0.06, 0, 65]],
+      highScore: [[660, 'triangle', 0.06, 0.04], [990, 'sine', 0.1, 0.045, 55]]
+    },
+    spacewars: {
+      fire: [[980, 'square', 0.045, 0.028, 0, 260]],
+      enemyFire: [[420, 'sawtooth', 0.055, 0.025, 0, 160]],
+      asteroid: [[210, 'triangle', 0.075, 0.04, 0, 80]],
+      hit: [[180, 'sawtooth', 0.09, 0.045, 0, 70]],
+      shield: [[440, 'sine', 0.12, 0.03, 0, 880]],
+      wave: [[330, 'triangle', 0.07, 0.035], [660, 'triangle', 0.1, 0.04, 65]],
+      defeat: [[150, 'sawtooth', 0.28, 0.065, 0, 45]]
+    },
+    snake: {
+      eat: [[520, 'sine', 0.045, 0.035], [780, 'triangle', 0.055, 0.03, 30]],
+      turn: [[310, 'square', 0.025, 0.018, 0, 390]],
+      speed: [[480, 'triangle', 0.05, 0.03, 0, 720]],
+      highScore: [[620, 'sine', 0.07, 0.04], [930, 'sine', 0.09, 0.04, 50]],
+      defeat: [[160, 'sawtooth', 0.2, 0.055, 0, 55]]
+    },
+    breakout: {
+      wall: [[280, 'sine', 0.03, 0.022, 0, 360]],
+      paddle: [[420, 'square', 0.04, 0.03, 0, 650]],
+      brick: [[640, 'triangle', 0.045, 0.035, 0, 430]],
+      power: [[380, 'sine', 0.08, 0.035, 0, 900]],
+      lifeLost: [[210, 'triangle', 0.12, 0.045, 0, 90]],
+      levelClear: [[520, 'triangle', 0.06, 0.04], [840, 'sine', 0.1, 0.04, 60]],
+      defeat: [[140, 'sawtooth', 0.22, 0.06, 0, 50]]
+    },
+    neonpong: {
+      wall: [[260, 'sine', 0.03, 0.02, 0, 330]],
+      paddle: [[510, 'square', 0.045, 0.03, 0, 720]],
+      score: [[390, 'triangle', 0.08, 0.04], [780, 'sine', 0.1, 0.04, 55]],
+      round: [[300, 'triangle', 0.06, 0.035, 0, 600]],
+      victory: [[520, 'triangle', 0.07, 0.04], [780, 'triangle', 0.08, 0.04, 55], [1040, 'sine', 0.11, 0.045, 110]]
+    },
+    voidinvaders: {
+      fire: [[820, 'square', 0.045, 0.028, 0, 230]],
+      enemyFire: [[340, 'sawtooth', 0.055, 0.025, 0, 150]],
+      invader: [[640, 'triangle', 0.055, 0.035, 0, 310]],
+      playerHit: [[170, 'square', 0.09, 0.045, 0, 70]],
+      pressure: [[95, 'square', 0.07, 0.018, 0, 125]],
+      waveClear: [[430, 'triangle', 0.06, 0.035], [860, 'sine', 0.1, 0.04, 60]],
+      defeat: [[130, 'sawtooth', 0.26, 0.065, 0, 45]]
+    },
+    vectordrift: {
+      thrust: [[110, 'sawtooth', 0.055, 0.018, 0, 145]],
+      fire: [[920, 'sine', 0.04, 0.025, 0, 300]],
+      asteroid: [[230, 'triangle', 0.07, 0.04, 0, 90]],
+      split: [[280, 'triangle', 0.05, 0.035, 0, 520]],
+      damage: [[160, 'square', 0.09, 0.045, 0, 65]],
+      ufo: [[330, 'sine', 0.12, 0.025, 0, 440]],
+      defeat: [[145, 'sawtooth', 0.25, 0.06, 0, 40]]
+    },
+    blockdrop: {
+      move: [[260, 'square', 0.025, 0.018, 0, 330]],
+      rotate: [[420, 'triangle', 0.04, 0.025, 0, 620]],
+      softDrop: [[180, 'square', 0.02, 0.016, 0, 230]],
+      hardDrop: [[130, 'square', 0.06, 0.035, 0, 70]],
+      lock: [[150, 'square', 0.055, 0.03, 0, 95]],
+      clear: [[540, 'square', 0.07, 0.04], [900, 'triangle', 0.11, 0.045, 55]],
+      combo: [[620, 'triangle', 0.06, 0.04], [930, 'triangle', 0.08, 0.04, 50]],
+      level: [[440, 'sine', 0.06, 0.035], [880, 'sine', 0.1, 0.04, 60]],
+      defeat: [[120, 'sawtooth', 0.24, 0.06, 0, 40]]
+    },
+    palettelab: {
+      sample: [[480, 'sine', 0.035, 0.025, 0, 720]],
+      copy: [[660, 'triangle', 0.05, 0.035], [990, 'sine', 0.07, 0.03, 40]],
+      lock: [[310, 'square', 0.04, 0.025, 0, 260]]
+    }
+  },
+
+  playGameSfx(gameId, eventName, options = {}) {
+    const steps = this.gameEffects[gameId]?.[eventName];
+    if (!steps) return;
+    this.playSequence(steps, {
+      owner: gameId,
+      cooldownKey: `${gameId}:${eventName}`,
+      cooldown: options.cooldown ?? 24,
+      ...options
+    });
+  },
+
+  startLoop(owner, loopId, options = {}) {
+    const key = `${owner}:${loopId}`;
+    if (this.activeLoops.has(key) || !this.soundEnabled || !this.initFromGesture()) return;
+    if (this.activeNodes.size >= this.maxOscillators) return;
+    try {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = options.type || 'sawtooth';
+      osc.frequency.value = options.frequency || 90;
+      gain.gain.value = Math.max(0.0001, options.volume || 0.012);
+      osc.connect(gain);
+      gain.connect(options.channel === 'music' ? this.musicGain : this.sfxGain);
+      osc.start();
+      const record = { osc, gain, owner, loopId };
+      this.activeLoops.set(key, record);
+      this.activeNodes.add(record);
+    } catch (_) {}
+  },
+
+  updateLoop(owner, loopId, options = {}) {
+    const loop = this.activeLoops.get(`${owner}:${loopId}`);
+    if (!loop || !this.ctx) return;
+    if (options.frequency) loop.osc.frequency.setTargetAtTime(options.frequency, this.ctx.currentTime, 0.03);
+    if (options.volume != null) loop.gain.gain.setTargetAtTime(Math.max(0.0001, options.volume), this.ctx.currentTime, 0.03);
+  },
+
+  stopLoop(owner, loopId) {
+    const key = `${owner}:${loopId}`;
+    const loop = this.activeLoops.get(key);
+    if (!loop) return;
+    try { loop.osc.stop(); loop.osc.disconnect(); loop.gain.disconnect(); } catch (_) {}
+    this.activeLoops.delete(key);
+    this.activeNodes.delete(loop);
+  },
+
+  stopOwner(owner) {
+    Array.from(this.activeLoops.keys()).forEach(key => {
+      if (key.startsWith(`${owner}:`)) this.stopLoop(owner, key.slice(owner.length + 1));
+    });
+    this.activeNodes.forEach(node => {
+      if (node.owner !== owner) return;
+      try { node.osc?.stop(); } catch (_) {}
+      this.activeNodes.delete(node);
+    });
   },
 
   play(eventName, options = {}) {
@@ -511,6 +754,10 @@ const ArcadeAudio = {
 
   destroyTemporaryNodes() {
     this.stopPreview();
+    Array.from(this.activeLoops.keys()).forEach(key => {
+      const splitAt = key.indexOf(':');
+      this.stopLoop(key.slice(0, splitAt), key.slice(splitAt + 1));
+    });
     this.activeNodes.forEach(node => {
       try {
         if (node.timer) clearTimeout(node.timer);
@@ -518,6 +765,7 @@ const ArcadeAudio = {
       } catch (_) {}
     });
     this.activeNodes.clear();
+    this.cooldowns.clear();
   },
 
   playTick() { this.play('navigation'); },
@@ -526,16 +774,34 @@ const ArcadeAudio = {
   playError() { this.play('error'); },
   playCoinInsert() { this.play('coin'); },
   playAchievementUnlock() { this.play('achievement'); },
-  playWarning() { this.play('warning'); }
+  playWarning() { this.play('warning'); },
+  playCategorySwitch() {
+    this.playSequence([[360, 'sine', 0.045, 0.03, 0, 620]], { owner: 'system', cooldownKey: 'ui:category', cooldown: 80 });
+  },
+  playGameLaunch() {
+    this.playSequence([[280, 'triangle', 0.06, 0.04, 0, 620], [920, 'sine', 0.09, 0.045, 55, 1280]], { owner: 'system' });
+  },
+  playSystemOpen() {
+    this.playSequence([[520, 'sine', 0.045, 0.03], [780, 'triangle', 0.065, 0.035, 40]], { owner: 'system' });
+  }
 };
 
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden) {
-    ArcadeAudio.suspend();
-  } else if (ArcadeAudio.soundEnabled) {
-    ArcadeAudio.resume();
-  }
-});
+if (typeof document !== 'undefined') {
+  const unlockAudio = () => ArcadeAudio.initFromGesture();
+  document.addEventListener('pointerdown', unlockAudio, { capture: true, once: true });
+  document.addEventListener('keydown', unlockAudio, { capture: true, once: true });
+  document.addEventListener('arcade:new-high-score', event => {
+    ArcadeAudio.playSequence([[520, 'triangle', 0.07, 0.04], [780, 'triangle', 0.08, 0.04, 55], [1170, 'sine', 0.12, 0.045, 115]], { owner: 'system' });
+    window.ArcadeTransitions?.showToast?.('NEW HIGH SCORE', `${event.detail?.score || 0} // FAIR PLAY VERIFIED`, '◆', 'achievement', 3200);
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      ArcadeAudio.suspend();
+    } else if (ArcadeAudio.soundEnabled) {
+      ArcadeAudio.resume();
+    }
+  });
+}
 
 // ============================================================================
 // 3. EVENT BUS
@@ -609,23 +875,116 @@ const ArcadeInput = {
   directionRepeatDelay: 280,
   directionRepeatRate: 120,
   deadzone: 0.35,
+  keysState: {
+    UP: false, DOWN: false, LEFT: false, RIGHT: false,
+    CONFIRM: false, BACK: false, ACTION: false, SECONDARY: false
+  },
+  prevFrameState: { UP: false, DOWN: false, LEFT: false, RIGHT: false, CONFIRM: false, BACK: false, ACTION: false, SECONDARY: false },
+  currFrameState: { UP: false, DOWN: false, LEFT: false, RIGHT: false, CONFIRM: false, BACK: false, ACTION: false, SECONDARY: false },
+  observedState: Object.create(null),
+
+  normalizeAction(action) {
+    const normalized = String(action || '').toUpperCase();
+    const aliases = {
+      PRIMARY: 'ACTION',
+      ARCADE_ACTION_A: 'ACTION',
+      SECONDARY: 'SECONDARY',
+      ARCADE_ACTION_B: 'SECONDARY',
+      START: 'CONFIRM',
+      ARCADE_START: 'CONFIRM',
+      ARCADE_CONFIRM: 'CONFIRM',
+      ARCADE_UP: 'UP',
+      ARCADE_DOWN: 'DOWN',
+      ARCADE_LEFT: 'LEFT',
+      ARCADE_RIGHT: 'RIGHT',
+      ARCADE_BACK: 'BACK'
+    };
+    return aliases[normalized] || normalized;
+  },
+
+  updateFrame() {
+    ['UP', 'DOWN', 'LEFT', 'RIGHT', 'CONFIRM', 'BACK', 'ACTION', 'SECONDARY'].forEach(k => {
+      this.prevFrameState[k] = this.currFrameState[k];
+      this.currFrameState[k] = this.isPressed(k);
+    });
+  },
+
+  isDown(action) {
+    return this.isPressed(action);
+  },
+
+  wasPressed(action) {
+    const key = this.normalizeAction(action);
+    const current = this.isPressed(key);
+    const previous = Boolean(this.observedState[key]);
+    this.observedState[key] = current;
+    return current && !previous;
+  },
+
+  wasReleased(action) {
+    const key = this.normalizeAction(action);
+    const current = this.isPressed(key);
+    const previous = Boolean(this.observedState[key]);
+    this.observedState[key] = current;
+    return !current && previous;
+  },
+
+  isPressed(action) {
+    const key = this.normalizeAction(action);
+    if (this.keysState[key]) return true;
+
+    // Also check gamepad
+    const gamepads = this.getConnectedGamepads();
+    if (!gamepads.length) return false;
+
+    for (const gp of gamepads) {
+      if (!gp || !gp.buttons) continue;
+      if (key === 'UP' && (this.getButtonState(gp, 12) || this.getAxisState(gp, 1) < -this.deadzone)) return true;
+      if (key === 'DOWN' && (this.getButtonState(gp, 13) || this.getAxisState(gp, 1) > this.deadzone)) return true;
+      if (key === 'LEFT' && (this.getButtonState(gp, 14) || this.getAxisState(gp, 0) < -this.deadzone)) return true;
+      if (key === 'RIGHT' && (this.getButtonState(gp, 15) || this.getAxisState(gp, 0) > this.deadzone)) return true;
+      if (key === 'CONFIRM' && (this.getButtonState(gp, 0) || this.getButtonState(gp, 9))) return true;
+      if (key === 'BACK' && this.getButtonState(gp, 1)) return true;
+      if (key === 'ACTION' && this.getButtonState(gp, 0)) return true;
+      if (key === 'SECONDARY' && (this.getButtonState(gp, 1) || this.getButtonState(gp, 2))) return true;
+    }
+    return false;
+  },
+
+  setVirtualAction(action, isDown) {
+    const key = this.normalizeAction(action);
+    if (Object.prototype.hasOwnProperty.call(this.keysState, key)) {
+      this.keysState[key] = Boolean(isDown);
+    }
+  },
+
+  getButtonState(gamepad, index) {
+    const button = gamepad?.buttons?.[index];
+    return Boolean(button && (button.pressed || Number(button.value) > 0.5));
+  },
+
+  getAxisState(gamepad, index) {
+    const value = Number(gamepad?.axes?.[index]);
+    return Number.isFinite(value) ? value : 0;
+  },
 
   init() {
     if (this.initialized) return;
     this.initialized = true;
+    window.ArcadeInput = this;
 
     window.addEventListener('gamepadconnected', () => this.startGamepadPolling());
     window.addEventListener('gamepaddisconnected', () => this.handleGamepadDisconnect());
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
         this.stopGamepadPolling();
+        Object.keys(this.keysState).forEach(k => this.keysState[k] = false); // clear held keys
       } else if (this.getConnectedGamepads().length) {
         this.startGamepadPolling();
       }
     });
 
-    // Keyboard Mapping
-    document.addEventListener('keydown', (e) => {
+    const updateKeyState = (e, isDown) => {
       const active = e.target || document.activeElement;
       const isInput = active && (
         active.tagName === 'INPUT' ||
@@ -635,22 +994,33 @@ const ArcadeInput = {
         active.hasAttribute?.('contenteditable') ||
         active.getAttribute?.('data-arcade-control') === 'text'
       );
-      if (isInput) return;
+      if (isInput) return false;
 
-      // Accept input whenever ArcadeOS is active, including brief chassis animation transitions.
       const chassis = document.querySelector('.cabinet-chassis');
-      const routeActive = window.ArcadeOS
-        && !['BOOT', 'HOME'].includes(window.ArcadeOS.state);
-      const osActive = chassis?.classList.contains('is-scaled')
-        || (window.ArcadeOS?.osVisible && window.ArcadeOS.state !== 'BOOT')
-        || routeActive;
-      if (!osActive) return;
+      const routeActive = window.ArcadeOS && !['BOOT', 'HOME'].includes(window.ArcadeOS.state);
+      const osActive = chassis?.classList.contains('is-scaled') || (window.ArcadeOS?.osVisible && window.ArcadeOS.state !== 'BOOT') || routeActive;
+      if (!osActive) return false;
 
-      // Prevent default scrolling for arcade keys
-      const arcadeKeys = ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' ','Enter','Escape','w','a','s','d'];
+      const arcadeKeys = ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' ','Enter','Escape','Shift','x','X','w','a','s','d','Backspace'];
       if (arcadeKeys.includes(e.key)) {
-        e.preventDefault();
+        if (e.type === 'keydown') e.preventDefault();
       }
+
+      if (e.key === 'ArrowUp' || e.key === 'w') this.keysState['UP'] = isDown;
+      if (e.key === 'ArrowDown' || e.key === 's') this.keysState['DOWN'] = isDown;
+      if (e.key === 'ArrowLeft' || e.key === 'a') this.keysState['LEFT'] = isDown;
+      if (e.key === 'ArrowRight' || e.key === 'd') this.keysState['RIGHT'] = isDown;
+      if (e.key === 'Enter') this.keysState['CONFIRM'] = isDown;
+      if (e.key === 'Escape' || e.key === 'Backspace') this.keysState['BACK'] = isDown;
+      if (e.key === ' ' || e.key === 'Enter') this.keysState['ACTION'] = isDown;
+      if (e.key === 'Shift' || e.key === 'x' || e.key === 'X') this.keysState['SECONDARY'] = isDown;
+
+      return true;
+    };
+
+    document.addEventListener('keyup', (e) => updateKeyState(e, false));
+    document.addEventListener('keydown', (e) => {
+      if (!updateKeyState(e, true)) return;
 
       let moveX = 0;
       let moveY = 0;
@@ -687,7 +1057,6 @@ const ArcadeInput = {
         ArcadeEventBus.emit('ARCADE_CONFIRM');
       }
       if (e.key === 'Escape') {
-        console.log('ArcadeOS: Escape key down, OS state =', ArcadeOS.state);
         const smallBtns = document.querySelectorAll('.cab-btn-small');
         if (smallBtns.length >= 2) smallBtns[0].classList.add('is-pressed');
         ArcadeEventBus.emit('ARCADE_BACK');
@@ -712,6 +1081,12 @@ const ArcadeInput = {
         const btns = document.querySelectorAll('.cab-btn');
         if (btns.length >= 1) btns[0].classList.add('is-pressed');
         ArcadeEventBus.emit('ARCADE_ACTION_A');
+      }
+      if (e.key === 'x' || e.key === 'X') {
+        ArcadeEventBus.emit('ARCADE_ACTION_X');
+      }
+      if (e.key === 'Shift') {
+        ArcadeEventBus.emit('ARCADE_ACTION_B');
       }
     });
 
@@ -761,7 +1136,17 @@ const ArcadeInput = {
 
     // Hardware Buttons Mapping
     const btns = document.querySelectorAll('.cab-btn');
+    const bindHeldAction = (element, action) => {
+      const release = () => this.setVirtualAction(action, false);
+      element.addEventListener('pointerdown', () => this.setVirtualAction(action, true));
+      element.addEventListener('pointerup', release);
+      element.addEventListener('pointercancel', release);
+      element.addEventListener('lostpointercapture', release);
+    };
     if (btns.length >= 3) {
+      bindHeldAction(btns[0], 'PRIMARY');
+      bindHeldAction(btns[1], 'SECONDARY');
+      bindHeldAction(btns[2], 'START');
       btns[0].addEventListener('pointerdown', (e) => {
         e.preventDefault();
         ArcadeEventBus.emit('ARCADE_ACTION_A');
@@ -792,7 +1177,7 @@ const ArcadeInput = {
 
     // Physical Joystick Drag Interaction
     const joystick = document.getElementById('cab-joystick');
-    if (joystick) {
+    if (joystick && typeof joystick.querySelector === 'function') {
       const joyStickEl = joystick.querySelector('.cab-joy-stick');
       const joyBallEl = joystick.querySelector('.cab-joy-ball');
       let dragStart = null;
@@ -832,6 +1217,11 @@ const ArcadeInput = {
           joyBallEl.style.transform = `translate(${moveX}px, ${moveY}px)`;
         }
 
+        this.setVirtualAction('LEFT', Math.abs(deltaX) > minTriggerDistance && deltaX < 0);
+        this.setVirtualAction('RIGHT', Math.abs(deltaX) > minTriggerDistance && deltaX > 0);
+        this.setVirtualAction('UP', Math.abs(deltaY) > minTriggerDistance && deltaY < 0);
+        this.setVirtualAction('DOWN', Math.abs(deltaY) > minTriggerDistance && deltaY > 0);
+
         // Action trigger (throttled to 220ms)
         const now = Date.now();
         if (now - lastTrigger > 220) {
@@ -857,6 +1247,7 @@ const ArcadeInput = {
       const releaseJoystick = (e) => {
         if (!dragStart) return;
         dragStart = null;
+        ['LEFT', 'RIGHT', 'UP', 'DOWN'].forEach(action => this.setVirtualAction(action, false));
         try {
           joystick.releasePointerCapture(e.pointerId);
         } catch(err) {}
@@ -877,6 +1268,48 @@ const ArcadeInput = {
       joystick.addEventListener('pointerup', releaseJoystick);
       joystick.addEventListener('pointercancel', releaseJoystick);
     }
+
+    // Shared in-CRT touch layer for canvas games. Flappy Byte and Neon Snake
+    // own richer local gestures, so they opt out to avoid duplicate actions.
+    let touchOrigin = null;
+    let touchDirection = '';
+    const releaseTouchActions = () => {
+      ['PRIMARY', 'LEFT', 'RIGHT', 'UP', 'DOWN'].forEach(action => this.setVirtualAction(action, false));
+      touchOrigin = null;
+      touchDirection = '';
+    };
+    const isLocallyHandled = target => Boolean(target?.closest?.('.app-flappy-byte, .app-neon-snake'));
+
+    // Delegate from the document because ArcadeInput initializes before the OS
+    // creates #arcade-app-view. This remains stable across every app remount.
+    document.addEventListener('pointerdown', (e) => {
+      if (isLocallyHandled(e.target)) return;
+      if (!e.target.closest?.('#arcade-app-view canvas')) return;
+      touchOrigin = { x: e.clientX, y: e.clientY };
+      touchDirection = '';
+      this.setVirtualAction('PRIMARY', true);
+      ArcadeEventBus.emit('ARCADE_ACTION_A', { source: 'touch' });
+      e.preventDefault();
+    });
+
+    document.addEventListener('pointermove', (e) => {
+      if (!touchOrigin) return;
+      const dx = e.clientX - touchOrigin.x;
+      const dy = e.clientY - touchOrigin.y;
+      const nextDirection = Math.max(Math.abs(dx), Math.abs(dy)) < 16
+        ? ''
+        : (Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'RIGHT' : 'LEFT') : (dy > 0 ? 'DOWN' : 'UP'));
+
+      ['LEFT', 'RIGHT', 'UP', 'DOWN'].forEach(action => this.setVirtualAction(action, action === nextDirection));
+      if (nextDirection && nextDirection !== touchDirection) {
+        touchDirection = nextDirection;
+        ArcadeEventBus.emit(`ARCADE_${nextDirection}`, { source: 'touch' });
+      }
+      e.preventDefault();
+    });
+
+    document.addEventListener('pointerup', releaseTouchActions);
+    document.addEventListener('pointercancel', releaseTouchActions);
   }
   ,
 
@@ -1005,25 +1438,35 @@ const ArcadeInput = {
 // 5. APP REGISTRY
 // ============================================================================
 const ArcadeRegistry = {
-  apps: [],
+  appsMap: new Map(),
 
   register(appConfig) {
-    this.apps.push(appConfig);
+    if (!appConfig || !appConfig.id) return;
+    this.appsMap.set(appConfig.id, appConfig);
   },
 
   getApp(id) {
-    return this.apps.find(a => a.id === id);
+    return this.appsMap.get(id);
   },
 
   getAll() {
-    return this.apps;
+    return Array.from(this.appsMap.values());
   }
 };
-window.ArcadeRegistry = ArcadeRegistry;
-window.ArcadeStorage = ArcadeStorage;
-window.ArcadeAudio = ArcadeAudio;
-window.ArcadeInput = ArcadeInput;
-window.ArcadeEventBus = ArcadeEventBus;
+
+Object.defineProperty(ArcadeRegistry, 'apps', {
+  get() {
+    return Array.from(this.appsMap.values());
+  },
+  configurable: true
+});
+const g = (typeof window !== 'undefined' ? window : globalThis);
+g.ArcadeRegistry = ArcadeRegistry;
+g.ArcadeStorage = ArcadeStorage;
+g.ArcadeAudio = ArcadeAudio;
+g.ArcadeAudioManager = ArcadeAudio;
+g.ArcadeInput = ArcadeInput;
+g.ArcadeEventBus = ArcadeEventBus;
 
 // ============================================================================
 // 6. OS ROUTER & LIFECYCLE MANAGER
@@ -1058,7 +1501,7 @@ const ArcadeHardware = {
 
     // Bind click / keydown to coin slot
     const coinSlot = document.querySelector('.cab-coin-slot');
-    if (coinSlot) {
+    if (coinSlot && typeof coinSlot.addEventListener === 'function') {
       const insertCoinHandler = (e) => {
         e.preventDefault();
         this.insertCoin();
@@ -1332,7 +1775,7 @@ const ArcadeHardware = {
   }
 };
 
-window.ArcadeHardware = ArcadeHardware;
+(typeof window !== 'undefined' ? window : globalThis).ArcadeHardware = ArcadeHardware;
 
 // Shared ArcadeAudio now owns coin, achievement, warning, preview, and profile sounds.
 
@@ -1342,53 +1785,68 @@ window.ArcadeHardware = ArcadeHardware;
 const SYSTEM_ROUTES = {
   CUSTOMIZE: {
     title: 'Machine Customizer',
-    description: 'Visually configure your premium cabinet.',
+    description: 'Customize cabinet chassis, colors, LEDs, and marquee.',
     icon: '🎨',
     isLazy: true,
     loader: () => import('./modules/arcade-customizer.js'),
     moduleName: 'ArcadeCustomizer',
-    render: (view, engine) => engine.open(view)
+    render: (view, engine) => (engine && typeof engine.open === 'function' ? engine.open(view) : null)
   },
   ACHIEVEMENTS: {
     title: 'Achievements',
-    description: 'View unlocked trophies.',
+    description: 'Track trophies, milestones, and cabinet progress.',
     icon: '🏆',
     isLazy: true,
     loader: () => import('./modules/arcade-achievements.js'),
     moduleName: 'ArcadeAchievements',
-    render: (view, engine) => engine.renderAchievements(view)
+    render: (view, engine) => (engine && typeof engine.open === 'function' ? engine.open(view) : (engine && typeof engine.renderAchievements === 'function' ? engine.renderAchievements(view) : null))
   },
   STATS: {
     title: 'Stats Dashboard',
-    description: 'Detailed play statistics and logs.',
+    description: 'View playtime analytics, coins inserted, and metrics.',
     icon: '📊',
     isLazy: true,
     loader: () => import('./modules/arcade-stats.js'),
-    moduleName: 'ArcadeStats',
-    render: (view, engine) => engine.renderStats(view)
+    moduleName: 'ArcadeStatsEngine',
+    render: (view, engine) => (engine && typeof engine.open === 'function' ? engine.open(view) : (engine && typeof engine.renderStats === 'function' ? engine.renderStats(view) : null))
   },
-  LEADERBOARDS: {
+  PALETTE: {
+    title: 'Palette Lab',
+    description: 'Generate and test custom color palettes.',
+    icon: '🧪',
+    isLazy: true,
+    loader: () => import('./arcade-apps.js'),
+    moduleName: 'PaletteLabToolApp',
+    render: (view, engine) => {
+      if (engine && typeof engine === 'function') {
+        const app = new engine();
+        app.init(view, ArcadeEventBus, ArcadeStorage, ArcadeAudio);
+        app.mount();
+      }
+    }
+  },
+  RECORDS: {
     title: 'Local Records',
-    description: 'Cabinet high scores and ratings.',
-    icon: '🏆',
+    description: 'Leaderboards and top scores across all games.',
+    icon: '🏅',
     isLazy: true,
     loader: () => import('./modules/arcade-stats.js'),
-    moduleName: 'ArcadeStats',
-    render: (view, engine) => engine.renderLeaderboards(view)
+    moduleName: 'ArcadeStatsEngine',
+    render: (view, engine) => (engine && typeof engine.renderLeaderboards === 'function' ? engine.renderLeaderboards(view) : null)
   },
   SETTINGS: {
     title: 'Settings',
     description: 'Configure display, sound, and system settings.',
     icon: '⚙️',
     isLazy: false,
-    render: (view, engine) => engine.renderSettings(view)
+    render: (view, engine) => (engine && typeof engine.renderSettings === 'function' ? engine.renderSettings(view) : null)
   },
-PROFILE: {
+  PROFILE: {
     title: 'Player Profile',
     description: 'View stats and playtime summary.',
     icon: '👤',
     isLazy: false,
-    render: (view, engine) => engine.renderProfile(view)
+    render: (view, engine) => (engine && typeof engine.renderProfile === 'function' ? engine.renderProfile(view) : null)
   },
   SOUNDLAB: {
     title: 'SoundLab',
@@ -1397,7 +1855,7 @@ PROFILE: {
     isLazy: true,
     loader: () => import('./modules/arcade-soundlab.js'),
     moduleName: 'ArcadeSoundLab',
-    render: (view, engine) => engine.open(view)
+    render: (view, engine) => (engine && typeof engine.open === 'function' ? engine.open(view) : null)
   },
   DIAGNOSTICS: {
     title: 'Diagnostics',
@@ -1406,19 +1864,26 @@ PROFILE: {
     isLazy: true,
     loader: () => import('./modules/arcade-diagnostics.js'),
     moduleName: 'ArcadeDiagnostics',
-    render: (view, engine) => engine.open(view)
+    render: (view, engine) => (engine && typeof engine.open === 'function' ? engine.open(view) : null)
   }
 };
-window.SYSTEM_ROUTES = SYSTEM_ROUTES;
+(typeof window !== 'undefined' ? window : globalThis).SYSTEM_ROUTES = SYSTEM_ROUTES;
 
 let lastHomeLauncherItemId = null;
 
-window.ArcadeOS = {
+const ArcadeOSObj = {
   initialized: false,
   activeApp: null,
   state: 'BOOT', // BOOT, HOME, SETTINGS, PROFILE, ACHIEVEMENTS, LOADING, APP
   osVisible: false,
   systemRouteRequestId: 0,
+
+  importModule(modulePath) {
+    if (window.ArcadeModuleLoader && typeof window.ArcadeModuleLoader.import === 'function') {
+      return window.ArcadeModuleLoader.import(modulePath);
+    }
+    return import(modulePath);
+  },
 
 
 
@@ -1611,8 +2076,8 @@ window.ArcadeOS = {
     this.registerCoreEvents();
     this.applyHardwareEffects();
 
-    // Central delegated action handler for confirmations & resets (Correction 5)
-    this.container.addEventListener('click', (e) => {
+    if (this.container && typeof this.container.addEventListener === 'function') {
+      this.container.addEventListener('click', (e) => {
       const target = e.target.closest('[data-arcade-action]');
       if (!target) return;
 
@@ -1705,16 +2170,23 @@ window.ArcadeOS = {
         this.replayBootSequence();
       }
     });
+  }
 
-    window.ArcadeModuleLoader.import('./modules/arcade-customizer.js').then(module => {
-      window.ArcadeCustomizer = module.ArcadeCustomizer;
-      window.ArcadeCustomizer.init();
+    this.importModule('./modules/arcade-customizer.js').then(module => {
+      if (module && module.ArcadeCustomizer) {
+        window.ArcadeCustomizer = module.ArcadeCustomizer;
+        if (typeof window.ArcadeCustomizer.init === 'function') {
+          window.ArcadeCustomizer.init();
+        }
+      }
     }).catch(err => {
       console.warn('Lazy-load customizer failed initially', err);
     });
 
-    window.ArcadeModuleLoader.import('./modules/arcade-reset-safety.js').then(module => {
-      window.ArcadeResetSafety = module.ArcadeResetSafety;
+    this.importModule('./modules/arcade-reset-safety.js').then(module => {
+      if (module && module.ArcadeResetSafety) {
+        window.ArcadeResetSafety = module.ArcadeResetSafety;
+      }
     }).catch(err => {
       console.warn('Lazy-load reset safety failed initially', err);
     });
@@ -1735,19 +2207,23 @@ window.ArcadeOS = {
       </div>
       <div id="arcade-route-announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
 
-      <div id="arcade-home" class="os-view">
-        <aside id="arcade-onboarding" class="arcade-onboarding" aria-labelledby="arcade-onboarding-title" hidden></aside>
-        <div class="home-carousel-wrapper">
-          <div class="home-carousel" id="home-carousel"></div>
+      <div class="arcade-viewport">
+        <div class="arcade-viewport-safe">
+          <div id="arcade-home" class="os-view">
+            <aside id="arcade-onboarding" class="arcade-onboarding" aria-labelledby="arcade-onboarding-title" hidden></aside>
+            <div class="home-carousel-wrapper">
+              <div class="home-carousel" id="home-carousel"></div>
+            </div>
+            <div class="home-details" id="home-details"></div>
+          </div>
+
+          <div id="arcade-app-view" class="os-view"></div>
+
+          <div id="arcade-loading" class="os-view">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">BOOTING APP...</div>
+          </div>
         </div>
-        <div class="home-details" id="home-details"></div>
-      </div>
-
-      <div id="arcade-app-view" class="os-view"></div>
-
-      <div id="arcade-loading" class="os-view">
-        <div class="loading-spinner"></div>
-        <div class="loading-text">BOOTING APP...</div>
       </div>
 
       <div id="arcade-footer-controls">
@@ -1789,11 +2265,16 @@ window.ArcadeOS = {
     updateTime();
     this.clockInterval = setInterval(updateTime, 60000);
 
-    // Home Launcher State (loaded from lastHomeLauncherItemId)
-    const lastSelectedId = lastHomeLauncherItemId || 'reaction';
+    // Home Launcher State (loaded from ArcadeStorage or lastHomeLauncherItemId)
+    const storedLastId = ArcadeStorage.get(ArcadeStorage.KEYS.LAST_SELECTED) || lastHomeLauncherItemId || 'pacmaze';
     const items = this.getHomeItems();
-    const foundIdx = items.findIndex(item => item.id === lastSelectedId);
-    this.selectedIndex = foundIdx !== -1 ? foundIdx : 0;
+    const foundIdx = items.findIndex(item => item && item.id === storedLastId);
+    this.selectedIndex = (foundIdx >= 0 && foundIdx < items.length) ? foundIdx : 0;
+    if (foundIdx === -1) {
+      const fallbackId = items[0]?.id || 'pacmaze';
+      lastHomeLauncherItemId = fallbackId;
+      ArcadeStorage.set(ArcadeStorage.KEYS.LAST_SELECTED, fallbackId);
+    }
 
     this.launchPending = false;
     this.launchTimeoutId = null;
@@ -1842,10 +2323,16 @@ window.ArcadeOS = {
     const achievementEvents = [
       'GAME_LAUNCHED',
       'GAME_COMPLETED',
-      'REACTION_SCORE',
+      'PACMAZE_SCORE',
+      'PIXELPLUMBER_SCORE',
+      'FLAPPYBYTE_SCORE',
+      'SPACEWARS_SCORE',
       'SNAKE_SCORE',
       'BREAKOUT_SCORE',
-      'PIXELPAD_SAVED',
+      'NEONPONG_SCORE',
+      'VOIDINVADERS_SCORE',
+      'VECTORDRIFT_SCORE',
+      'BLOCKDROP_SCORE',
       'PALETTE_EXPORTED',
       'PLAYTIME_UPDATED',
       'COIN_INSERTED'
@@ -1974,6 +2461,7 @@ window.ArcadeOS = {
   checkAchievements(event, data) {
     if (data && data.diagnostic) return;
     if (event && String(event).startsWith('DIAGNOSTIC_')) return;
+    if (window.ArcadeDeveloperMode?.isCheatSession) return;
     if (event === 'REACTION_SCORE' && data?.score) {
       this.saveGameState('reaction_best', data.score);
       localStorage.setItem('reaction_best', data.score);
@@ -2065,9 +2553,10 @@ window.ArcadeOS = {
 
   boot(options = {}) {
     this.init();
+    this.booted = true;
     if (this.bootTimer) clearTimeout(this.bootTimer);
     ArcadeHardware.setState('BOOT');
-    this.renderHome();
+    this.ensureHomeRendered();
 
     this.setRouteStatus('BOOTING');
     const bootLoader = document.querySelector('.boot-loader');
@@ -2088,7 +2577,7 @@ window.ArcadeOS = {
         osLayer.style.opacity = '1';
         osLayer.classList.add('os-booted');
       }
-      if (homeView && this.state === 'BOOT') {
+      if (homeView && (this.state === 'BOOT' || this.state === 'HOME')) {
         homeView.classList.add('active');
       }
       this.state = 'HOME';
@@ -2099,6 +2588,45 @@ window.ArcadeOS = {
 
       if (!completedBefore) ArcadeEventBus.emit('GAME_LAUNCHED', { id: 'os' });
     }, bootDuration);
+  },
+
+  suspend() {
+    this.osVisible = false;
+    if (this.activeApp) {
+      try {
+        if (typeof this.activeApp.destroy === 'function') this.activeApp.destroy();
+      } catch (e) {}
+      this.activeApp = null;
+    }
+    const appView = document.getElementById('arcade-app-view');
+    if (appView) {
+      appView.classList.remove('active');
+      appView.innerHTML = '';
+    }
+    const loadingView = document.getElementById('arcade-loading');
+    if (loadingView) loadingView.classList.remove('active');
+    const homeView = document.getElementById('arcade-home');
+    if (homeView) homeView.classList.add('active');
+    this.state = 'HOME';
+    this.setRouteStatus('HOME');
+  },
+
+  resume() {
+    this.osVisible = true;
+    this.ensureHomeRendered();
+    const homeView = document.getElementById('arcade-home');
+    if (homeView && (this.state === 'HOME' || !this.activeApp)) {
+      homeView.classList.add('active');
+    }
+  },
+
+  ensureHomeRendered() {
+    const homeView = document.getElementById('arcade-home');
+    if (!homeView) return;
+    const cards = homeView.querySelectorAll('.app-card');
+    if (cards.length === 0) {
+      this.renderHome();
+    }
   },
 
   replayBootSequence() {
@@ -2162,30 +2690,102 @@ window.ArcadeOS = {
     else document.getElementById('main-content')?.scrollIntoView({ behavior: 'smooth' });
   },
 
+  getArcadeSafeRect() {
+    const safeContainer = document.querySelector('.arcade-viewport-safe') || document.querySelector('.arcade-viewport') || document.getElementById('arcade-os');
+    if (!safeContainer) {
+      return { x: 0, y: 0, width: window.innerWidth, height: window.innerHeight };
+    }
+    const rect = safeContainer.getBoundingClientRect();
+    return {
+      x: Math.round(rect.left),
+      y: Math.round(rect.top),
+      width: Math.round(rect.width),
+      height: Math.round(rect.height)
+    };
+  },
+
+  getArcadeGameSafeRect() {
+    return this.getArcadeSafeRect();
+  },
+
+  currentCategory: 'GAMES',
+
+  setCategory(cat) {
+    if (this.currentCategory === cat) return;
+    this.currentCategory = cat;
+    this.selectedIndex = 0;
+    ArcadeAudio.playCategorySwitch();
+    this.renderHome();
+  },
+
+    activateNimoOverride() {
+      const authorization = window.ArcadeDeveloperMode?.authorizeFromNimo();
+      if (authorization) {
+        return {
+          status: 'success',
+          message: authorization.text,
+          code: authorization.code,
+          authorizationStatus: 'authorized',
+        };
+      }
+    this.cheatMode = true;
+    ArcadeStorage.set('arcade_cheat_mode_active', true);
+    if (window.ArcadeAudio) window.ArcadeAudio.playTone(880, 'sine', 0.15, 0.1);
+
+    let banner = document.getElementById('arcade-nimo-banner');
+    if (!banner) {
+      banner = document.createElement('div');
+      banner.id = 'arcade-nimo-banner';
+      banner.className = 'arcade-nimo-banner';
+      const os = document.getElementById('arcade-os');
+      if (os) os.appendChild(banner);
+    }
+    banner.innerHTML = `
+      <span class="nimo-banner-icon">⚡</span>
+      <span class="nimo-banner-text">NIMO OVERRIDE // AUTHORIZED [CHEAT MODE ACTIVE]</span>
+    `;
+    banner.classList.add('active');
+    setTimeout(() => banner.classList.remove('active'), 4500);
+
+    return { status: 'success', message: 'NIMO override activated. Session marked CHEAT MODE.' };
+  },
+
   getHomeItems() {
-    const apps = ArcadeRegistry.getAll().map(a => ({
+    let rawApps = ArcadeRegistry.getAll();
+    if (rawApps.length === 0 && typeof window.registerAllArcadeApps === 'function') {
+      window.registerAllArcadeApps();
+      rawApps = ArcadeRegistry.getAll();
+    }
+    const apps = rawApps.map(a => ({
       ...a,
       isSystem: false,
-      group: ['reaction', 'snake', 'breakout'].includes(a.id) ? 'PLAY' : 'CREATE'
+      group: ['pacmaze', 'pixelplumber', 'flappybyte', 'spacewars', 'snake', 'breakout', 'neonpong', 'voidinvaders', 'vectordrift', 'blockdrop'].includes(a.id) ? 'PLAY' : 'CREATE'
     }));
-    const systemItems = Object.keys(SYSTEM_ROUTES).map(routeKey => {
+    return apps;
+  },
+
+  getSystemItems() {
+    return Object.keys(SYSTEM_ROUTES).map(routeKey => {
       const routeCfg = SYSTEM_ROUTES[routeKey];
       return {
         id: routeKey.toLowerCase(),
         title: routeCfg.title,
         category: 'SYSTEM',
-        description: routeCfg.description,
-        icon: routeCfg.icon,
+        description: routeCfg.description || 'System utility & cabinet tool.',
+        icon: routeCfg.icon || '⚙️',
         isSystem: true,
         group: 'SYSTEM',
         route: routeKey
       };
     });
-    return [...apps, ...systemItems];
+  },
+
+  getActiveCategoryItems() {
+    return this.currentCategory === 'SYSTEM' ? this.getSystemItems() : this.getHomeItems();
   },
 
   renderHome() {
-    const items = this.getHomeItems();
+    const items = this.getActiveCategoryItems();
     const carousel = document.getElementById('home-carousel');
     const details = document.getElementById('home-details');
     if (!carousel || !details) return;
@@ -2193,7 +2793,35 @@ window.ArcadeOS = {
     const homeView = document.getElementById('arcade-home');
     if (homeView) {
       homeView.classList.add('arcade-cinematic-v5');
-      
+
+      // Category Navigation Bar
+      let catBar = homeView.querySelector('.arcade-category-bar');
+      if (!catBar) {
+        catBar = document.createElement('div');
+        catBar.className = 'arcade-category-bar';
+        const carouselWrap = homeView.querySelector('.home-carousel-wrapper');
+        if (carouselWrap) homeView.insertBefore(catBar, carouselWrap);
+      }
+      const gamesCount = this.getHomeItems().length;
+      const systemCount = this.getSystemItems().length;
+      catBar.innerHTML = `
+        <button type="button" class="category-tab ${this.currentCategory === 'GAMES' ? 'active' : ''}" data-cat="GAMES">
+          🎮 GAMES (${gamesCount})
+        </button>
+        <button type="button" class="category-tab ${this.currentCategory === 'SYSTEM' ? 'active' : ''}" data-cat="SYSTEM">
+          ⚙️ SYSTEM & TOOLS (${systemCount})
+        </button>
+      `;
+
+      catBar.querySelectorAll('.category-tab').forEach(tab => {
+        tab.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const cat = tab.dataset.cat;
+          this.setCategory(cat);
+        });
+      });
+
       // 1. Ensure Hero Brand Header exists (ARCADEOS 3D Retro Title & Subtitle Tagline)
       let heroBrand = homeView.querySelector('.arcade-hero-brand');
       if (!heroBrand) {
@@ -2203,7 +2831,9 @@ window.ArcadeOS = {
           <h1 class="arcade-hero-title">ARCADE<span>OS</span></h1>
           <p class="arcade-hero-tagline">PLAY. CODE. CREATE. REPEAT.</p>
         `;
-        homeView.prepend(heroBrand);
+        if (typeof homeView.prepend === 'function') homeView.prepend(heroBrand);
+        else if (homeView.firstChild) homeView.insertBefore(heroBrand, homeView.firstChild);
+        else homeView.appendChild(heroBrand);
       }
 
       // 2. Ensure Background Decor Layer exists (Realistic Orbital Earth)
@@ -2224,7 +2854,7 @@ window.ArcadeOS = {
         </div>
         <div class="arcade-earth-container">
           <div class="arcade-earth-base"></div>
-          
+
           <!-- Organic Continental Landmasses -->
           <div class="arcade-earth-continents-realistic">
             <svg viewBox="0 0 1600 600" preserveAspectRatio="none">
@@ -2318,7 +2948,9 @@ window.ArcadeOS = {
       `;
     }
 
-    if (this.selectedIndex >= items.length) this.selectedIndex = 0;
+    if (!Number.isInteger(this.selectedIndex) || this.selectedIndex < 0 || this.selectedIndex >= items.length) {
+      this.selectedIndex = 0;
+    }
     const total = items.length;
 
     // Calculate 4-card sliding window
@@ -2331,19 +2963,19 @@ window.ArcadeOS = {
     carousel.innerHTML = items.map((item, idx) => {
       const isFocused = idx === this.selectedIndex;
       const isVisible = visibleIndexes.has(idx);
-      
+
       const displayTitle = item.title;
       const displaySub = item.description || (item.group === 'PLAY' ? 'Classic Arcade Game' : item.group === 'CREATE' ? 'Creative Studio' : 'System Utility');
       const iconHtml = getPremiumAppIcon(item.id);
 
       return `
-        <button type="button" 
-          class="app-card ${isFocused ? 'focused is-ui-focused' : ''} ${isVisible ? 'is-visible' : ''} ${item.isSystem ? 'system-card' : ''}" 
+        <button type="button"
+          class="app-card ${isFocused ? 'focused is-ui-focused' : ''} ${isVisible ? 'is-visible' : ''} ${item.isSystem ? 'system-card' : ''}"
           data-arcade-focusable
-          data-idx="${idx}" 
-          data-launcher-id="${item.id}" 
-          data-launcher-group="${item.group}" 
-          aria-label="Open ${displayTitle}" 
+          data-idx="${idx}"
+          data-launcher-id="${item.id}"
+          data-launcher-group="${item.group}"
+          aria-label="Open ${displayTitle}"
           aria-current="${isFocused ? 'true' : 'false'}"
           tabindex="${isFocused ? '0' : '-1'}">
           <div class="arcade-card-icon">${iconHtml}</div>
@@ -2542,13 +3174,16 @@ window.ArcadeOS = {
         if (routeCfg.isLazy) {
           ArcadeEventBus.currentOwner = { owner: 'route', ownerId: routeState };
           const module = await routeCfg.loader();
-          engine = module[routeCfg.moduleName];
+          engine = (routeCfg.moduleName && module[routeCfg.moduleName]) || module.default || module.engine || module;
+          if (engine && engine.default) engine = engine.default;
           ArcadeEventBus.currentOwner = null;
 
-          if (routeCfg.moduleName && !window[routeCfg.moduleName]) {
-            window[routeCfg.moduleName] = engine;
+          if (engine) {
+            if (routeCfg.moduleName && !window[routeCfg.moduleName]) {
+              window[routeCfg.moduleName] = engine;
+            }
             if (typeof engine.init === 'function') {
-              engine.init();
+              try { engine.init(); } catch (e) { console.warn('Engine init warning:', e); }
             }
           }
         } else {
@@ -2609,8 +3244,6 @@ window.ArcadeOS = {
   },
 
   closeSystemRoute() {
-    if (window.ARCADE_DEBUG) console.log(`[ArcadeOS Debug] Exiting system route from ${this.state}`);
-
     const closingRoute = this.state;
     const closingCfg = SYSTEM_ROUTES[closingRoute];
     const closingEngine = closingCfg && closingCfg.moduleName ? window[closingCfg.moduleName] : null;
@@ -2672,9 +3305,6 @@ window.ArcadeOS = {
       const activeCard = document.querySelector(`.app-card[data-launcher-id="${lastHomeLauncherItemId}"]`);
       if (activeCard && activeCard.isConnected) {
         activeCard.focus({ preventScroll: true });
-        if (window.ARCADE_DEBUG) {
-          console.log(`[ArcadeOS] Restored selection focus to card element: ${lastHomeLauncherItemId}`);
-        }
       }
     }
     ArcadeHardware.updateOled('HOME');
@@ -2686,6 +3316,11 @@ window.ArcadeOS = {
 
     const appConfig = ArcadeRegistry.getApp(id);
     if (!appConfig) return;
+    if (appConfig.category === 'SYSTEM' || appConfig.category === 'SYSTEM UTILITY') {
+      ArcadeAudio.playSystemOpen();
+    } else {
+      ArcadeAudio.playGameLaunch();
+    }
 
     const executeLaunch = async () => {
       if (this.launchTimeoutId) {
@@ -2719,6 +3354,7 @@ window.ArcadeOS = {
 
       this.state = 'APP';
       this.setRouteStatus(appConfig.title);
+      if (window.ArcadeExperience) window.ArcadeExperience.notifyAppStateChange(true);
 
       try {
         const rawApp = new appConfig.component();
@@ -2726,6 +3362,8 @@ window.ArcadeOS = {
         rawApp._rawAppId = appConfig.id;
 
         this.activeApp = this.createLifecycleAdapter(rawApp, id);
+        window.ArcadeDeveloperMode?.beginRun(id);
+        window.dispatchEvent(new CustomEvent('arcade:app-launched', { detail: { id } }));
 
         const view = document.getElementById('arcade-app-view');
         view.innerHTML = '';
@@ -2758,6 +3396,9 @@ window.ArcadeOS = {
 
   createLifecycleAdapter(app, appId) {
     const adapter = {
+      appId,
+      _rawAppId: appId,
+      _rawApp: app,
       init(container, bus, storage, audio) {
         if (typeof app.init === 'function') {
           app.init(container, bus, storage, audio);
@@ -2801,6 +3442,7 @@ window.ArcadeOS = {
         if (typeof app.destroy === 'function') {
           app.destroy();
         }
+        ArcadeAudio.destroyTemporaryNodes();
       },
       handleBack() {
         if (typeof app.handleBack === 'function') {
@@ -2843,32 +3485,35 @@ window.ArcadeOS = {
 
       if (this.state === 'APP') {
         const activeAppId = this.activeApp ? this.activeApp._rawAppId : null;
-        if (this.activeApp) {
-          try {
-            this.stopPlaytimeSession();
-            this.activeApp.destroy();
-          } catch(e) {
-            console.error('App Destroy Failed', e);
+        try {
+          if (this.activeApp) {
+            try {
+              this.stopPlaytimeSession();
+              this.activeApp.destroy();
+            } catch(e) {
+              console.warn('[ArcadeOS] App destroy nonfatal warning:', e);
+            }
+            this.activeApp = null;
           }
+          if (activeAppId) {
+            ArcadeEventBus.clearAppListeners(activeAppId);
+          }
+        } finally {
           this.activeApp = null;
-        }
+          const appView = document.getElementById('arcade-app-view');
+          if (appView) {
+            appView.classList.remove('active');
+            appView.innerHTML = '';
+          }
+          const homeView = document.getElementById('arcade-home');
+          if (homeView) homeView.classList.add('active');
 
-        if (activeAppId) {
-          ArcadeEventBus.clearAppListeners(activeAppId);
+          this.state = 'HOME';
+          this.setRouteStatus('HOME');
+          ArcadeHardware.setState('HOME');
+          if (window.ArcadeExperience) window.ArcadeExperience.notifyAppStateChange(false);
+          this.renderHome();
         }
-
-        const appView = document.getElementById('arcade-app-view');
-        if (appView) {
-          appView.classList.remove('active');
-          appView.innerHTML = '';
-        }
-        const homeView = document.getElementById('arcade-home');
-        if (homeView) homeView.classList.add('active');
-
-        this.state = 'HOME';
-        this.setRouteStatus('HOME');
-        ArcadeHardware.setState('HOME');
-        this.renderHome();
         return;
       }
 
@@ -2890,24 +3535,25 @@ window.ArcadeOS = {
     }
     this.launchPending = false;
 
-    if (this.activeApp) {
-      const activeAppId = this.activeApp._rawAppId;
-      try {
-        this.stopPlaytimeSession();
-        this.activeApp.destroy();
-      } catch(e) {
-        console.error('App Force Destroy Failed', e);
+    try {
+      if (this.activeApp) {
+        const activeAppId = this.activeApp._rawAppId;
+        try {
+          this.stopPlaytimeSession();
+          this.activeApp.destroy();
+        } catch(e) {
+          console.warn('[ArcadeOS] App force destroy nonfatal warning:', e);
+        }
+        this.activeApp = null;
+        if (activeAppId) {
+          ArcadeEventBus.clearAppListeners(activeAppId);
+        }
       }
+    } finally {
       this.activeApp = null;
-      if (activeAppId) {
-        ArcadeEventBus.clearAppListeners(activeAppId);
-      }
+      ArcadeHardware.clearAllTimers();
+      this.closeSystemRoute();
     }
-
-    ArcadeHardware.clearAllTimers();
-
-    // Close system routes
-    this.closeSystemRoute();
   },
 
   startPlaytimeSession(appId) {
@@ -2947,12 +3593,14 @@ window.ArcadeOS = {
       if (callback) callback(window.ArcadeStats);
       return;
     }
-    window.ArcadeModuleLoader.import('./modules/arcade-stats.js').then(module => {
-      window.ArcadeStats = module.ArcadeStats;
-      window.ArcadeStats.init();
-      if (callback) callback(window.ArcadeStats);
+    this.importModule('./modules/arcade-stats.js').then(module => {
+      if (module && module.ArcadeStats) {
+        window.ArcadeStats = module.ArcadeStats;
+        if (typeof window.ArcadeStats.init === 'function') window.ArcadeStats.init();
+        if (callback) callback(window.ArcadeStats);
+      }
     }).catch(err => {
-      console.error("Failed to load stats engine dynamically", err);
+      console.warn("Failed to load stats engine dynamically", err);
     });
   },
 
@@ -2961,12 +3609,14 @@ window.ArcadeOS = {
       if (callback) callback(window.ArcadeAchievements);
       return;
     }
-    window.ArcadeModuleLoader.import('./modules/arcade-achievements.js').then(module => {
-      window.ArcadeAchievements = module.ArcadeAchievements;
-      window.ArcadeAchievements.init();
-      if (callback) callback(window.ArcadeAchievements);
+    this.importModule('./modules/arcade-achievements.js').then(module => {
+      if (module && module.ArcadeAchievements) {
+        window.ArcadeAchievements = module.ArcadeAchievements;
+        if (typeof window.ArcadeAchievements.init === 'function') window.ArcadeAchievements.init();
+        if (callback) callback(window.ArcadeAchievements);
+      }
     }).catch(err => {
-      console.error("Failed to load achievements engine dynamically", err);
+      console.warn("Failed to load achievements engine dynamically", err);
     });
   },
 
@@ -2975,11 +3625,13 @@ window.ArcadeOS = {
       if (callback) callback(window.ArcadeResetSafety);
       return;
     }
-    window.ArcadeModuleLoader.import('./modules/arcade-reset-safety.js').then(module => {
-      window.ArcadeResetSafety = module.ArcadeResetSafety;
-      if (callback) callback(window.ArcadeResetSafety);
+    this.importModule('./modules/arcade-reset-safety.js').then(module => {
+      if (module && module.ArcadeResetSafety) {
+        window.ArcadeResetSafety = module.ArcadeResetSafety;
+        if (callback) callback(window.ArcadeResetSafety);
+      }
     }).catch(err => {
-      console.error("Failed to load reset safety engine dynamically", err);
+      console.warn("Failed to load reset safety engine dynamically", err);
     });
   },
 
@@ -3109,10 +3761,16 @@ window.ArcadeOS = {
         const achievementsPct = Math.round((unlockedList.length / achievementsCount) * 100);
 
         const gameTitles = {
-          reaction: "Reaction Test",
+          pacmaze: "PAC-MAZE",
+          pixelplumber: "Pixel Plumber",
+          flappybyte: "Flappy Byte",
+          spacewars: "Space Wars",
           snake: "Neon Snake",
           breakout: "Breakout",
-          pixelpad: "Pixel Pad",
+          neonpong: "Neon Pong",
+          voidinvaders: "Void Invaders",
+          vectordrift: "Vector Drift",
+          blockdrop: "BLOCK//DROP",
           palettelab: "Palette Lab"
         };
         const favGameName = gameTitles[stats.favoriteGameId] || "None Yet";
@@ -3275,3 +3933,9 @@ window.ArcadeOS = {
     return false; // Not intercepted
   }
 };
+
+(typeof window !== 'undefined' ? window : globalThis).ArcadeOS = ArcadeOSObj;
+(typeof window !== 'undefined' ? window : globalThis).getArcadeSafeRect = () => ArcadeOSObj.getArcadeSafeRect();
+(typeof window !== 'undefined' ? window : globalThis).getArcadeGameSafeRect = () => ArcadeOSObj.getArcadeGameSafeRect();
+
+export const ArcadeOS = ArcadeOSObj;

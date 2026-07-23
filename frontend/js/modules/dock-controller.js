@@ -34,41 +34,15 @@ export function initDockController() {
 }
 
 export function enterArcade() {
-  if (window.ArcadeOS) {
-    window.ArcadeOS.userExited = false;
-    window.ArcadeOS.osVisible = true;
+  if (window.ArcadeExperience) {
+    window.ArcadeExperience.enterArcadeExperience('dock');
   }
-  const chassis = document.querySelector('.cabinet-chassis');
-  if (chassis) chassis.classList.add('is-scaled');
-  const osLayer = document.getElementById('arcade-os');
-  if (osLayer) {
-    osLayer.style.opacity = '1';
-    osLayer.style.pointerEvents = 'auto';
-  }
-  arcadeExplicitlySelected = true;
-  arcadeArrivedAtCabinet = false;
-  lockActiveDock("arcade", 5200);
-  scrollToCabinetReadyPosition();
 }
 
 export function exitArcadeToPortfolio(targetId = "main-content") {
-  if (window.ArcadeOS) {
-    window.ArcadeOS.userExited = true;
-    window.ArcadeOS.osVisible = false;
+  if (window.ArcadeExperience) {
+    window.ArcadeExperience.exitArcadeExperience('dock', targetId);
   }
-  const chassis = document.querySelector('.cabinet-chassis');
-  if (chassis) chassis.classList.remove('is-scaled');
-  const osLayer = document.getElementById('arcade-os');
-  if (osLayer) {
-    osLayer.style.opacity = '0';
-    osLayer.style.pointerEvents = 'none';
-  }
-  arcadeExplicitlySelected = false;
-  arcadeArrivedAtCabinet = false;
-  cleanupArcade();
-  const target = document.getElementById(targetId) || document.getElementById("main-content");
-  lockActiveDock(targetId === "work" ? "work" : "portfolio-intro", 1400);
-  target?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 export function setActiveDock(action) {
@@ -76,18 +50,22 @@ export function setActiveDock(action) {
   activeAction = normalized;
   document.body.classList.toggle("arcade-active", normalized === "arcade");
 
-  dockItems.forEach((item) => item.classList.remove("dock-active"));
+  const items = Array.from(document.querySelectorAll(".dock-item"));
+  items.forEach((item) => {
+    const isMatch = item.dataset.dockAction === normalized && !item.classList.contains("dock-external");
+    item.classList.toggle("dock-active", isMatch);
+    if (isMatch) item.setAttribute("aria-current", "page");
+    else item.removeAttribute("aria-current");
+  });
 
   window.setCursorMode?.(normalized === "arcade" ? "arcade" : "portfolio");
-
-  if (normalized === "none") return;
-
-  const target = dockByAction.get(normalized);
-  if (target) target.classList.add("dock-active");
 }
 
 function bindDockClicks() {
   dockItems.forEach((item) => {
+    if (item.dataset.dockBound) return;
+    item.dataset.dockBound = "true";
+
     const action = item.dataset.dockAction;
 
     if (item.classList.contains("dock-external")) {
@@ -98,6 +76,12 @@ function bindDockClicks() {
     }
 
     if (!VALID_ACTIONS.has(action)) return;
+
+    if (action === "arcade") {
+      item.addEventListener("mouseenter", () => {
+        window.ArcadeBootController?.prewarm();
+      });
+    }
 
     item.addEventListener("click", (event) => routeDockAction(event, action));
     item.addEventListener("keydown", (event) => {
@@ -111,26 +95,15 @@ function bindDockClicks() {
 function routeDockAction(event, action) {
   event.preventDefault();
 
-  if (action === "portfolio-intro") {
-    arcadeExplicitlySelected = false;
-    arcadeArrivedAtCabinet = false;
-    cleanupArcade();
-    lockActiveDock("portfolio-intro", 1400);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    return;
-  }
-
-  if (SECTION_ACTIONS.has(action)) {
-    arcadeExplicitlySelected = false;
-    arcadeArrivedAtCabinet = false;
-    cleanupArcade();
-    lockActiveDock(action, 1800);
-    document.getElementById(action)?.scrollIntoView({ behavior: "smooth", block: "start" });
-    return;
-  }
-
   if (action === "arcade") {
-    enterArcade();
+    window.ArcadeBootController?.prewarm();
+    if (window.ArcadeExperience) {
+      window.ArcadeExperience.enterArcadeExperience('dock');
+    }
+  } else if (VALID_ACTIONS.has(action)) {
+    if (window.ArcadeExperience) {
+      window.ArcadeExperience.exitArcadeExperience('dock', action);
+    }
   }
 }
 
@@ -160,45 +133,32 @@ function initSectionObserver() {
 }
 
 function syncDockFromViewport() {
-  const sectionAction = getMostVisibleSectionAction();
-  const cabinetViewportCurrent = isCabinetViewportCurrent();
-  if (arcadeExplicitlySelected && cabinetViewportCurrent) {
-    arcadeArrivedAtCabinet = true;
-  }
-
-  if (Date.now() < userLock.until && VALID_ACTIONS.has(userLock.action)) {
-    if (userLock.action === "arcade" && arcadeArrivedAtCabinet && !cabinetViewportCurrent && sectionAction) {
-      userLock = { action: "none", until: 0 };
-      arcadeExplicitlySelected = false;
-      arcadeArrivedAtCabinet = false;
-      if (activeAction !== sectionAction) setActiveDock(sectionAction);
+  if (window.ArcadeExperience) {
+    const expState = window.ArcadeExperience.getState();
+    if (expState === 'ARCADE_HOME' || expState === 'ARCADE_APP' || expState === 'ARCADE_ENTERING') {
+      if (activeAction !== 'arcade') setActiveDock('arcade');
       return;
     }
+  }
 
-    if (activeAction !== userLock.action) setActiveDock(userLock.action);
+  const isSubpage = !document.getElementById('home');
+  if (isSubpage) {
+    if (activeAction !== 'work') setActiveDock('work');
     return;
   }
 
-  if (arcadeExplicitlySelected && cabinetViewportCurrent) {
-    if (activeAction !== "arcade") setActiveDock("arcade");
-    return;
-  }
-
+  const sectionAction = getMostVisibleSectionAction();
   if (sectionAction) {
-    arcadeExplicitlySelected = false;
-    arcadeArrivedAtCabinet = false;
     if (activeAction !== sectionAction) setActiveDock(sectionAction);
     return;
   }
 
   if (isIntroAtTop()) {
-    arcadeExplicitlySelected = false;
-    arcadeArrivedAtCabinet = false;
     if (activeAction !== "portfolio-intro") setActiveDock("portfolio-intro");
     return;
   }
 
-  if (activeAction === "arcade" && !cabinetViewportCurrent) {
+  if (activeAction === "arcade") {
     setActiveDock("none");
   }
 }

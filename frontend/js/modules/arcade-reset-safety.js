@@ -120,7 +120,7 @@ export const ArcadeResetSafety = {
 
   resetPerGameRecords() {
     this.resetAggregateStats();
-    ['arcade_reaction_best', 'arcade_reaction_latest', 'arcade_reaction_attempts', 'arcade_snake_best', 'arcade_breakout_best', 'reaction_best'].forEach(key => {
+    ['arcade_snake_best', 'arcade_breakout_best', 'arcade_pacmaze_best', 'arcade_pixelplumber_best', 'arcade_flappybyte_best', 'arcade_spacewars_best', 'arcade_neonpong_best', 'arcade_voidinvaders_best', 'arcade_vectordrift_best', 'arcade_blockdrop_best'].forEach(key => {
       localStorage.removeItem(key);
     });
   },

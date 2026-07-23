@@ -8,46 +8,42 @@ const PORTFOLIO_SECTIONS = [
 ];
 
 export function initSectionProgressRail() {
+  let rail = document.querySelector(".section-progress-rail");
+  const isSubpage = !document.getElementById("home");
+
+  if (!rail) {
+    rail = document.createElement("nav");
+    rail.className = "section-progress-rail";
+    rail.setAttribute("aria-label", "Page sections");
+    rail.innerHTML = `
+      <div class="section-progress-rail__track" aria-hidden="true">
+        <div class="section-progress-rail__fill"></div>
+      </div>
+      <ol class="section-progress-rail__items">
+        ${PORTFOLIO_SECTIONS.map(({ id, label, shortLabel }) => `
+          <li class="section-progress-rail__item">
+            <a class="section-progress-rail__link" href="${isSubpage ? 'index.html#' + id : '#' + id}" data-section-id="${id}" aria-label="Go to ${label} section">
+              <span class="section-progress-rail__marker" aria-hidden="true"></span>
+              <span class="section-progress-rail__number" aria-hidden="true">${shortLabel}</span>
+              <span class="section-progress-rail__label">${label}</span>
+            </a>
+          </li>
+        `).join("")}
+      </ol>
+    `;
+    document.body.append(rail);
+  }
+
   const sections = PORTFOLIO_SECTIONS
     .map(item => ({ ...item, element: document.getElementById(item.id) }))
     .filter(item => item.element);
-
-  if (!sections.length) return;
-
-  const rail = document.createElement("nav");
-  rail.className = "section-progress-rail";
-  rail.setAttribute("aria-label", "Page sections");
-  rail.innerHTML = `
-    <div class="section-progress-rail__track" aria-hidden="true">
-      <div class="section-progress-rail__fill"></div>
-    </div>
-    <ol class="section-progress-rail__items">
-      ${sections.map(({ id, label, shortLabel }) => `
-        <li class="section-progress-rail__item">
-          <a class="section-progress-rail__link" href="#${id}" data-section-id="${id}" aria-label="Go to ${label} section">
-            <span class="section-progress-rail__marker" aria-hidden="true"></span>
-            <span class="section-progress-rail__number" aria-hidden="true">${shortLabel}</span>
-            <span class="section-progress-rail__label">${label}</span>
-          </a>
-        </li>
-      `).join("")}
-    </ol>
-  `;
-  document.body.append(rail);
 
   const links = new Map(
     Array.from(rail.querySelectorAll("[data-section-id]"))
       .map(link => [link.dataset.sectionId, link])
   );
-  const visibleSections = new Set();
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  let activeId = "";
-  let scrollTicking = false;
-  let focusTimer = 0;
 
   const setActive = (id) => {
-    if (!links.has(id) || activeId === id) return;
-    activeId = id;
     links.forEach((link, sectionId) => {
       const active = sectionId === id;
       link.classList.toggle("is-active", active);
@@ -55,6 +51,17 @@ export function initSectionProgressRail() {
       else link.removeAttribute("aria-current");
     });
   };
+
+  if (isSubpage) {
+    // Case study / subpage mode: WORK is active parent context
+    setActive("work");
+    return;
+  }
+
+  const visibleSections = new Set();
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let scrollTicking = false;
+  let focusTimer = 0;
 
   const syncActiveFromViewport = () => {
     const anchor = window.innerHeight * 0.44;
@@ -124,6 +131,7 @@ export function initSectionProgressRail() {
 
   links.forEach((link, id) => {
     link.addEventListener("click", event => {
+      if (isSubpage) return; // Allow normal link navigation to index.html#id
       event.preventDefault();
       navigateToSection(id);
     });

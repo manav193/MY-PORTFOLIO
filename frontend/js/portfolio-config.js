@@ -85,4 +85,8 @@ const portfolioConfig = Object.freeze({
   })
 });
 
-module.exports = portfolioConfig;
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = portfolioConfig;
+}
+export default portfolioConfig;
+export { portfolioConfig };

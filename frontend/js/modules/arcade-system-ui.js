@@ -42,7 +42,8 @@ export const ArcadeSystemUI = {
     }, { capture: true });
     
     // Monitor modal open/close to trigger focus refreshes
-    const observer = new MutationObserver(() => {
+    if (typeof MutationObserver !== 'undefined') {
+      const observer = new MutationObserver(() => {
       const modal = document.getElementById('arcade-confirm-modal');
       if (modal) {
         const isActive = modal.classList.contains('active');
@@ -65,16 +66,17 @@ export const ArcadeSystemUI = {
       }
     });
     
-    // Start observer after DOM binds
-    setTimeout(() => {
-      const modal = document.getElementById('arcade-confirm-modal');
-      if (modal) {
-        observer.observe(modal, { attributes: true, attributeFilter: ['class'] });
-      } else {
-        // Watch body in case modal is dynamically appended
-        observer.observe(document.body, { childList: true, subtree: true });
-      }
-    }, 500);
+      // Start observer after DOM binds
+      setTimeout(() => {
+        const modal = document.getElementById('arcade-confirm-modal');
+        if (modal) {
+          observer.observe(modal, { attributes: true, attributeFilter: ['class'] });
+        } else {
+          // Watch body in case modal is dynamically appended
+          observer.observe(document.body, { childList: true, subtree: true });
+        }
+      }, 500);
+    }
   },
 
   registerSystemListeners() {
@@ -164,7 +166,7 @@ export const ArcadeSystemUI = {
       const overlayMenu = appView.querySelector(
         '.snake-menu-paused, .snake-menu-gameover, .snake-menu-ready, ' +
         '.breakout-menu-paused, .breakout-menu-gameover, .breakout-menu-ready, .breakout-menu-levelclear, ' +
-        '.rt-title-screen, .rt-error-screen, .pixelpad-app, .palette-app'
+        '.palette-app'
       );
       container = overlayMenu || appView;
     } else if (this.rootElement && this.rootElement.classList.contains('active')) {

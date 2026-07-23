@@ -16,6 +16,22 @@ import { initProjectEnvironment } from "./modules/project-environment.js";
 import { ArcadeEnvironmentService } from "./modules/arcade-environment-service.js";
 import { Arcade3DPlanetEngine } from "./modules/arcade-3d-planet-engine.js";
 import ArcadeTransitions from "./modules/arcade-transitions.js";
+import { ArcadeModuleLoader } from "./arcade-module-loader.js";
+import { ArcadeOS } from "./arcade-os.js";
+import { ArcadeRegistry, registerAllArcadeApps } from "./arcade-apps.js";
+
+import { ExperienceController } from "./modules/experience-controller.js";
+import { GlobalPortfolioShell } from "./modules/global-portfolio-shell.js";
+import { ArcadeDeveloperMode } from "./modules/arcade-developer-mode.js";
+
+window.ArcadeExperience = ExperienceController;
+window.ArcadeModuleLoader = ArcadeModuleLoader;
+window.ArcadeOS = ArcadeOS;
+window.ArcadeRegistry = window.ArcadeRegistry || ArcadeRegistry;
+window.registerAllArcadeApps = registerAllArcadeApps;
+
+registerAllArcadeApps();
+ArcadeDeveloperMode.init();
 
 document.body.classList.add("is-loading");
 document.body.style.opacity = '0';
@@ -31,6 +47,7 @@ ArcadeEnvironmentService.init();
 Arcade3DPlanetEngine.init();
 ArcadeTransitions.init();
 initOS();
+GlobalPortfolioShell.init();
 initProjectEnvironment();
 initCursorSystem();
 initCommandPalette();
@@ -50,8 +67,30 @@ initTilt();
 initParallax();
 initContactForm();
 
+function hydrateTemplateTokens() {
+  const defaultName = "MANAV AGARWAL";
+  document.querySelectorAll('.brand').forEach(el => {
+    if (!el.textContent || el.textContent.includes('{{')) {
+      el.textContent = defaultName;
+    }
+  });
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  let node;
+  while ((node = walker.nextNode())) {
+    if (node.nodeValue && node.nodeValue.includes('{{')) {
+      node.nodeValue = node.nodeValue
+        .replace(/\{\{PORTFOLIO\.NAME\}\}/gi, defaultName)
+        .replace(/\{\{portfolio\.name\}\}/gi, defaultName)
+        .replace(/\{\{portfolio\.role\}\}/gi, "Creative Frontend Developer")
+        .replace(/\{\{portfolio\.location\}\}/gi, "Hyderabad, India")
+        .replace(/\{\{portfolio\.availability\}\}/gi, "Open to junior frontend roles and freelance projects");
+    }
+  }
+}
+hydrateTemplateTokens();
+
 function hydrateOptionalFullResImages(root = document) {
-  root.querySelectorAll('img[data-fullres-src]').forEach(img => {
+  const loadImage = img => {
     if (img.dataset.fullresState === 'loading' || img.dataset.fullresState === 'loaded') return;
     img.dataset.fullresState = 'loading';
     const resolvedSrc = new URL(img.dataset.fullresSrc, document.baseURI).href;
@@ -68,6 +107,26 @@ function hydrateOptionalFullResImages(root = document) {
       if (!img.getAttribute('src')) img.removeAttribute('src');
     };
     probe.src = resolvedSrc;
+  };
+
+  const images = Array.from(root.querySelectorAll('img[data-fullres-src]'));
+  if (!('IntersectionObserver' in window)) {
+    images.forEach(loadImage);
+    return;
+  }
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      observer.unobserve(entry.target);
+      loadImage(entry.target);
+    });
+  }, { rootMargin: '400px 0px' });
+
+  images.forEach(img => {
+    if (img.dataset.fullresState === 'loading' || img.dataset.fullresState === 'loaded') return;
+    img.dataset.fullresState = 'pending';
+    observer.observe(img);
   });
 }
 

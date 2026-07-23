@@ -109,14 +109,20 @@ export const ArcadeAchievements = {
     { id: 'ten_sessions', title: 'Ten Sessions', desc: 'Play 10 game sessions.', icon: '🕹️', category: 'PLAY', target: 10 },
     { id: 'one_hour', title: 'One Hour Played', desc: 'Play for 1 hour in total.', icon: '⏱️', category: 'PLAY', target: 3600 },
     { id: 'five_hours', title: 'Five Hours Played', desc: 'Play for 5 hours in total.', icon: '⏳', category: 'PLAY', target: 18000 },
-    { id: 'every_app', title: 'Played Every App', desc: 'Launch every game and creative tool once.', icon: '💫', category: 'PLAY', target: 5 },
+    { id: 'every_app', title: 'Played Every App', desc: 'Launch every game and creative tool once.', icon: '💫', category: 'PLAY', target: 11 },
 
-    // --- REACTION ---
-    { id: 'reaction_rookie', title: 'Reaction Rookie', desc: 'Complete a reaction test.', icon: '⚡', category: 'REACTION' },
-    { id: 'under_300', title: 'Under 300ms', desc: 'Achieve a score under 300ms.', icon: '🏹', category: 'REACTION' },
-    { id: 'under_200', title: 'Under 200ms', desc: 'Achieve a score under 200ms.', icon: '🎯', category: 'REACTION' },
-    { id: 'under_150', title: 'Under 150ms', desc: 'Achieve a score under 150ms.', icon: '🔥', category: 'REACTION' },
-    { id: 'three_fast', title: 'Three Fast Runs', desc: 'Achieve under 250ms three times.', icon: '⚡', category: 'REACTION', target: 3, hidden: true },
+    // --- PAC-MAZE ---
+    { id: 'pacmaze_dots', title: 'Dot Eater', desc: 'Eat 50 dots in PAC-MAZE.', icon: '🟡', category: 'PACMAZE' },
+    { id: 'pacmaze_power', title: 'Ghost Hunter', desc: 'Eat a ghost in PAC-MAZE.', icon: '👻', category: 'PACMAZE' },
+
+    // --- PIXEL PLUMBER ---
+    { id: 'plumber_flag', title: 'Flag Pole', desc: 'Reach the flag in Pixel Plumber.', icon: '🚩', category: 'PIXELPLUMBER' },
+
+    // --- FLAPPY BYTE ---
+    { id: 'flappy_pass', title: 'Gate Navigator', desc: 'Pass 5 laser gates in Flappy Byte.', icon: '🐤', category: 'FLAPPYBYTE' },
+
+    // --- SPACE WARS ---
+    { id: 'spacewars_kill', title: 'Star Defender', desc: 'Destroy 10 alien invaders in Space Wars.', icon: '🚀', category: 'SPACEWARS' },
 
     // --- SNAKE ---
     { id: 'snake_10', title: 'Score 10', desc: 'Score 10 points in Neon Snake.', icon: '🐍', category: 'SNAKE' },
@@ -130,9 +136,19 @@ export const ArcadeAchievements = {
     { id: 'breakout_1000', title: 'Score 1000', desc: 'Score 1000 points in Breakout.', icon: '💎', category: 'BREAKOUT' },
     { id: 'breakout_streak', title: 'No-Miss Streak', desc: 'Achieve a 15-brick hit streak.', icon: '💫', category: 'BREAKOUT', hidden: true },
 
+    // --- NEON PONG ---
+    { id: 'pong_win', title: 'Table Champion', desc: 'Win a match of Neon Pong.', icon: '🏓', category: 'NEONPONG' },
+
+    // --- VOID INVADERS ---
+    { id: 'invaders_wave', title: 'Fleet Destroyer', desc: 'Clear an alien wave in Void Invaders.', icon: '👾', category: 'VOIDINVADERS' },
+
+    // --- VECTOR DRIFT ---
+    { id: 'vector_rock', title: 'Asteroid Buster', desc: 'Destroy 10 asteroids in Vector Drift.', icon: '☄️', category: 'VECTORDRIFT' },
+
+    // --- BLOCK//DROP ---
+    { id: 'block_lines', title: 'Quad Clear', desc: 'Clear 4 lines at once in BLOCK//DROP.', icon: '🧱', category: 'BLOCKDROP' },
+
     // --- CREATIVE ---
-    { id: 'pixel_saved', title: 'Pixel Art Saved', desc: 'Save a canvas sketch in Pixel Pad.', icon: '🎨', category: 'CREATIVE' },
-    { id: 'five_arts', title: 'Five Artworks', desc: 'Save 5 artworks in Pixel Pad.', icon: '🖼️', category: 'CREATIVE', target: 5 },
     { id: 'palette_exported', title: 'Palette Exported', desc: 'Export a color scheme in Palette Lab.', icon: '🧪', category: 'CREATIVE' },
     { id: 'ten_palettes', title: 'Ten Palettes', desc: 'Export 10 color schemes.', icon: '🔬', category: 'CREATIVE', target: 10 },
 
@@ -142,6 +158,7 @@ export const ArcadeAchievements = {
     { id: 'preset_collector', title: 'Preset Collector', desc: 'Save 5 cabinet presets.', icon: '🗃️', category: 'CUSTOMIZATION', target: 5 },
     { id: 'random_variant', title: 'Random Variant', desc: 'Generate a random variant.', icon: '🎲', category: 'CUSTOMIZATION', hidden: true },
     { id: 'custom_marquee', title: 'Custom Marquee', desc: 'Save a custom marquee header text.', icon: '✨', category: 'CUSTOMIZATION' }
+    ,{ id: 'behind_cabinet', title: 'Behind the Cabinet', desc: 'Discover the NIMO-authorized Developer Core.', icon: '🔓', category: 'SYSTEM' }
   ],
 
   init() {
@@ -478,6 +495,10 @@ export const ArcadeAchievements = {
         window.ArcadeSystemUI.focusFirst();
       }
     }
+  },
+
+  open(view) {
+    this.renderAchievements(view);
   },
 
   renderAchievements(view) {

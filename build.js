@@ -1,12 +1,15 @@
-const fs = require('fs');
-const path = require('path');
-const esbuild = require('esbuild');
-const CleanCSS = require('clean-css');
-const HtmlMinifier = require('html-minifier-terser');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import esbuild from 'esbuild';
+import CleanCSS from 'clean-css';
+import * as HtmlMinifier from 'html-minifier-terser';
+import { portfolioConfig } from './frontend/js/portfolio-config.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const FRONTEND_DIR = path.join(__dirname, 'frontend');
-const portfolioConfig = require(path.join(FRONTEND_DIR, 'js', 'portfolio-config.js'));
-
 const DIST_DIR = path.join(__dirname, 'dist');
 
 // Read command line arguments or environment variables
@@ -80,7 +83,7 @@ async function buildJS() {
   });
 
   // 2. Minify deferred classic global scripts
-  const classicScripts = ['intro.js', 'arcade-os.js', 'arcade-apps.js', 'machine-bg.js', 'arcade-module-loader.js'];
+  const classicScripts = ['intro.js', 'machine-bg.js'];
   for (const script of classicScripts) {
     const srcPath = path.join(FRONTEND_DIR, 'js', script);
     if (fs.existsSync(srcPath)) {
@@ -142,30 +145,54 @@ function buildCSS() {
 function processHTMLContent(content, base, siteUrl, fileName) {
   let processed = content;
 
+  const nameUpper = String(portfolioConfig.name || 'MANAV AGARWAL').toUpperCase();
   const configTokens = {
     'portfolio.name': portfolioConfig.name,
+    'PORTFOLIO.NAME': nameUpper,
+    'Portfolio.Name': nameUpper,
     'portfolio.role': portfolioConfig.role,
+    'PORTFOLIO.ROLE': portfolioConfig.role,
     'portfolio.location': portfolioConfig.location,
+    'PORTFOLIO.LOCATION': portfolioConfig.location,
     'portfolio.availability': portfolioConfig.availability,
+    'PORTFOLIO.AVAILABILITY': portfolioConfig.availability,
     'portfolio.githubUrl': portfolioConfig.githubUrl,
+    'PORTFOLIO.GITHUBURL': portfolioConfig.githubUrl,
     'portfolio.email': portfolioConfig.email,
+    'PORTFOLIO.EMAIL': portfolioConfig.email,
     'portfolio.emailMailto': `mailto:${portfolioConfig.email}?subject=Project%20inquiry`,
+    'PORTFOLIO.EMAILMAILTO': `mailto:${portfolioConfig.email}?subject=Project%20inquiry`,
     'portfolio.resumePath': `${base}${portfolioConfig.resumePath}`,
+    'PORTFOLIO.RESUMEPATH': `${base}${portfolioConfig.resumePath}`,
     'portfolio.siteUrl': siteUrl,
-    'portfolio.socialImageUrl': `${siteUrl}${base}${portfolioConfig.socialImagePath}`
+    'PORTFOLIO.SITEURL': siteUrl,
+    'portfolio.socialImageUrl': `${siteUrl}${base}${portfolioConfig.socialImagePath}`,
+    'PORTFOLIO.SOCIALIMAGEURL': `${siteUrl}${base}${portfolioConfig.socialImagePath}`
   };
 
   for (const [projectId, project] of Object.entries(portfolioConfig.projects)) {
     configTokens[`projects.${projectId}.githubUrl`] = project.githubUrl;
     configTokens[`projects.${projectId}.liveUrl`] = project.liveUrl || '';
     configTokens[`projects.${projectId}.caseStudyPath`] = `${base}${project.caseStudyPath}`;
+    configTokens[`PROJECTS.${projectId.toUpperCase()}.GITHUBURL`] = project.githubUrl;
+    configTokens[`PROJECTS.${projectId.toUpperCase()}.CASESTUDYPATH`] = `${base}${project.caseStudyPath}`;
+  }
+
+  // Case-insensitive lookup map
+  const lowerMap = {};
+  for (const [k, v] of Object.entries(configTokens)) {
+    lowerMap[k.toLowerCase()] = v;
   }
 
   processed = processed.replace(/\{\{([\w.-]+)\}\}/g, (match, key) => {
-    if (!(key in configTokens)) {
-      throw new Error(`Unknown portfolio config token in ${fileName}: ${match}`);
+    const lowerKey = key.toLowerCase();
+    if (lowerKey in lowerMap) {
+      return lowerMap[lowerKey];
     }
-    return configTokens[key];
+    if (key in configTokens) {
+      return configTokens[key];
+    }
+    throw new Error(`Unknown portfolio config token in ${fileName}: ${match}`);
   });
   
   // 1. Replace hardcoded Vercel URL with dynamic SITE_URL + DEPLOY_BASE
@@ -307,9 +334,6 @@ function validateBuild(base, siteUrl) {
     '404.html',
     'js/main.js',
     'js/intro.js',
-    'js/arcade-os.js',
-    'js/arcade-apps.js',
-    'js/arcade-module-loader.js',
     'css/styles.css',
     'css/intro.css',
     'css/arcade-os.css',

@@ -319,9 +319,9 @@ body:not(.intro-skipped) .living-ambient-light {
 /* Base structural scaling */
 .cabinet-chassis.is-scaled {
   width: min(92vw, 1620px);
-  height: clamp(740px, 88vh, 880px);
+  height: clamp(900px, 95vh, 1080px);
   max-width: 1620px;
-  max-height: 880px;
+  max-height: 1080px;
   border-radius: 32px 32px 12px 12px; 
   box-shadow: 0 50px 100px -20px rgba(0,0,0,1), 0 20px 40px rgba(0,0,0,0.8);
 }
@@ -584,7 +584,7 @@ body:not(.intro-skipped) .living-ambient-light {
 
 .cabinet-chassis.is-scaled .cabinet-screen-bezel {
   width: 94%;
-  height: clamp(520px, 64vh, 650px);
+  height: clamp(660px, 78vh, 830px);
   margin: 6px auto 0;
   border-radius: 14px;
   background-color: #0d0d0f;
@@ -650,7 +650,7 @@ body:not(.intro-skipped) .living-ambient-light {
   top: 86px; /* Marquee top (36px) + height (44px) + bezel margin (6px) */
   left: calc(3% + 12px); /* 3% bezel left offset + 12px screen inset */
   width: calc(94% - 24px);
-  height: calc(clamp(520px, 64vh, 650px) - 24px);
+  height: calc(clamp(660px, 78vh, 830px) - 24px);
   border-radius: 6px;
 }
 

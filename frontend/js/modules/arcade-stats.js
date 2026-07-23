@@ -6,7 +6,7 @@ export const ArcadeStats = {
   data: null,
   activeSession: null,
 
-  APPROVED_GAME_IDS: ['reaction', 'snake', 'breakout', 'pixelpad', 'palettelab'],
+  APPROVED_GAME_IDS: ['pacmaze', 'pixelplumber', 'flappybyte', 'spacewars', 'snake', 'breakout', 'neonpong', 'voidinvaders', 'vectordrift', 'blockdrop', 'palettelab'],
 
   DEFAULT_STATS: {
     schemaVersion: 2,
@@ -20,10 +20,16 @@ export const ArcadeStats = {
     longestSessionSeconds: 0.0,
     averageSessionSeconds: 0.0,
     perGame: {
-      reaction: { launches: 0, playtimeSeconds: 0.0, lastPlayedAt: "", bestReactionMs: null },
+      pacmaze: { launches: 0, playtimeSeconds: 0.0, lastPlayedAt: "", highScore: 0 },
+      pixelplumber: { launches: 0, playtimeSeconds: 0.0, lastPlayedAt: "", highScore: 0 },
+      flappybyte: { launches: 0, playtimeSeconds: 0.0, lastPlayedAt: "", highScore: 0 },
+      spacewars: { launches: 0, playtimeSeconds: 0.0, lastPlayedAt: "", highScore: 0 },
       snake: { launches: 0, playtimeSeconds: 0.0, lastPlayedAt: "", highScore: 0, longestSurvivalSeconds: 0.0 },
       breakout: { launches: 0, playtimeSeconds: 0.0, lastPlayedAt: "", highScore: 0, highestLevel: 0, longestStreak: 0 },
-      pixelpad: { launches: 0, playtimeSeconds: 0.0, lastPlayedAt: "", artworksSaved: 0, longestSessionSeconds: 0.0 },
+      neonpong: { launches: 0, playtimeSeconds: 0.0, lastPlayedAt: "", highScore: 0 },
+      voidinvaders: { launches: 0, playtimeSeconds: 0.0, lastPlayedAt: "", highScore: 0 },
+      vectordrift: { launches: 0, playtimeSeconds: 0.0, lastPlayedAt: "", highScore: 0 },
+      blockdrop: { launches: 0, playtimeSeconds: 0.0, lastPlayedAt: "", highScore: 0 },
       palettelab: { launches: 0, playtimeSeconds: 0.0, lastPlayedAt: "", palettesExported: 0, uniquePalettesGenerated: 0 }
     },
     recentSessions: []
@@ -48,30 +54,17 @@ export const ArcadeStats = {
       window.ArcadeEventBus.on('GAME_COMPLETED', (data) => {
         if (data && data.diagnostic) return;
         if (data && data.id && this.APPROVED_GAME_IDS.includes(data.id)) {
-          this.recordCompletion(data.id);
           this.endSession('completed');
         }
       });
 
-      window.ArcadeEventBus.on('REACTION_SCORE', (data) => {
-        if (data && data.diagnostic) return;
-        if (data && typeof data.score === 'number') {
-          this.recordScore('reaction', data.score);
-        }
-      });
-
-      window.ArcadeEventBus.on('SNAKE_SCORE', (data) => {
-        if (data && data.diagnostic) return;
-        if (data && typeof data.score === 'number') {
-          this.recordScore('snake', data.score);
-        }
-      });
-
-      window.ArcadeEventBus.on('BREAKOUT_SCORE', (data) => {
-        if (data && data.diagnostic) return;
-        if (data && typeof data.score === 'number') {
-          this.recordScore('breakout', data.score);
-        }
+      ['PACMAZE', 'PIXELPLUMBER', 'FLAPPYBYTE', 'SPACEWARS', 'SNAKE', 'BREAKOUT', 'NEONPONG', 'VOIDINVADERS', 'VECTORDRIFT', 'BLOCKDROP'].forEach(gameKey => {
+        window.ArcadeEventBus.on(`${gameKey}_SCORE`, (data) => {
+          if (data && data.diagnostic) return;
+          if (data && typeof data.score === 'number') {
+            this.recordScore(gameKey.toLowerCase(), data.score);
+          }
+        });
       });
 
       window.ArcadeEventBus.on('BREAKOUT_LEVEL_CLEARED', (data) => {
@@ -86,10 +79,6 @@ export const ArcadeStats = {
         if (data && typeof data.streak === 'number') {
           this.recordBreakoutStreak(data.streak);
         }
-      });
-
-      window.ArcadeEventBus.on('PIXELPAD_SAVED', () => {
-        this.recordCreativeAction('pixelpad');
       });
 
       window.ArcadeEventBus.on('PALETTE_EXPORTED', () => {
@@ -147,7 +136,6 @@ export const ArcadeStats = {
 
     // Check if we need migration from V1 (or unversioned structure)
     if (!this.data.schemaVersion || this.data.schemaVersion < 2) {
-      console.log("Migrating stats schema from V1 to V2...");
       const v2 = JSON.parse(JSON.stringify(this.DEFAULT_STATS));
 
       // Preserve currentCredits
@@ -183,17 +171,17 @@ export const ArcadeStats = {
 
       // Preserve legacy best scores
       const legacyReactionBest = localStorage.getItem('arcade_reaction_best');
-      if (legacyReactionBest !== null) {
+      if (legacyReactionBest !== null && v2.perGame.reaction) {
         v2.perGame.reaction.bestReactionMs = parseFloat(legacyReactionBest);
       }
 
       const legacySnakeBest = localStorage.getItem('arcade_snake_best');
-      if (legacySnakeBest !== null) {
+      if (legacySnakeBest !== null && v2.perGame.snake) {
         v2.perGame.snake.highScore = parseInt(legacySnakeBest, 10);
       }
 
       const legacyBreakoutBest = localStorage.getItem('arcade_breakout_best');
-      if (legacyBreakoutBest !== null) {
+      if (legacyBreakoutBest !== null && v2.perGame.breakout) {
         v2.perGame.breakout.highScore = parseInt(legacyBreakoutBest, 10);
       }
 
@@ -205,24 +193,36 @@ export const ArcadeStats = {
         if (legacyLastPlayed) v2.lastPlayedGameId = legacyLastPlayed;
       }
 
+      // Ensure every approved game ID has a default perGame object
+      for (const gid of this.APPROVED_GAME_IDS) {
+        if (!v2.perGame[gid]) {
+          v2.perGame[gid] = { launches: 0, playtimeSeconds: 0.0, lastPlayedAt: "", highScore: 0 };
+        }
+      }
+
       this.data = v2;
       this.saveToStorage();
     }
   },
 
   saveToStorage() {
-    this.data.schemaVersion = 2;
-    localStorage.setItem('arcade_machine_stats', JSON.stringify(this.data));
+    try {
+      if (!this.data) return;
+      this.data.schemaVersion = 2;
+      localStorage.setItem('arcade_machine_stats', JSON.stringify(this.data));
 
-    // Explicitly update legacy keys for backward compatibility
-    if (this.data.perGame.reaction.bestReactionMs !== null) {
-      localStorage.setItem('arcade_reaction_best', this.data.perGame.reaction.bestReactionMs.toString());
-    }
-    if (this.data.perGame.snake.highScore > 0) {
-      localStorage.setItem('arcade_snake_best', this.data.perGame.snake.highScore.toString());
-    }
-    if (this.data.perGame.breakout.highScore > 0) {
-      localStorage.setItem('arcade_breakout_best', this.data.perGame.breakout.highScore.toString());
+      // Explicitly update legacy keys for backward compatibility
+      if (this.data.perGame?.reaction?.bestReactionMs != null) {
+        localStorage.setItem('arcade_reaction_best', this.data.perGame.reaction.bestReactionMs.toString());
+      }
+      if (this.data.perGame?.snake?.highScore > 0) {
+        localStorage.setItem('arcade_snake_best', this.data.perGame.snake.highScore.toString());
+      }
+      if (this.data.perGame?.breakout?.highScore > 0) {
+        localStorage.setItem('arcade_breakout_best', this.data.perGame.breakout.highScore.toString());
+      }
+    } catch (err) {
+      console.warn('[ArcadeStats] saveToStorage caught nonfatal error:', err);
     }
   },
 
@@ -440,6 +440,10 @@ export const ArcadeStats = {
   // ============================================================================
   // VIEW RENDERING
   // ============================================================================
+  open(view) {
+    this.renderStats(view);
+  },
+
   renderStats(view) {
     if (!view) return;
 
@@ -448,10 +452,16 @@ export const ArcadeStats = {
 
     const d = this.data;
     const gameTitles = {
-      reaction: "Reaction Test",
+      pacmaze: "PAC-MAZE",
+      pixelplumber: "Pixel Plumber",
+      flappybyte: "Flappy Byte",
+      spacewars: "Space Wars",
       snake: "Neon Snake",
       breakout: "Breakout",
-      pixelpad: "Pixel Pad",
+      neonpong: "Neon Pong",
+      voidinvaders: "Void Invaders",
+      vectordrift: "Vector Drift",
+      blockdrop: "BLOCK//DROP",
       palettelab: "Palette Lab"
     };
 
@@ -483,12 +493,12 @@ export const ArcadeStats = {
             <h3 style="margin: 0 0 6px 0; color: #38bdf8; font-size:9px; border-bottom:1px solid rgba(56,189,248,0.2); padding-bottom:4px; letter-spacing:0.08em;">PER-GAME DISTRIBUTION</h3>
             <div style="display:flex; flex-direction:column; gap:5px;">
               ${this.APPROVED_GAME_IDS.map(gid => {
-                const pg = d.perGame[gid];
+                const pg = d.perGame[gid] || { playtimeSeconds: 0, launches: 0 };
                 const pct = d.totalPlaytime > 0 ? Math.round((pg.playtimeSeconds / d.totalPlaytime) * 100) : 0;
                 return `
                   <div>
                     <div style="display:flex; justify-content:space-between; font-size:8px;">
-                      <span style="font-weight:bold;">${gameTitles[gid]}</span>
+                      <span style="font-weight:bold;">${gameTitles[gid] || gid}</span>
                       <span style="opacity:0.8;">${pg.launches} launches (${pct}%)</span>
                     </div>
                     <div style="background: rgba(255,255,255,0.08); height:5px; border-radius:3px; margin-top:2px; overflow:hidden;">
@@ -523,7 +533,7 @@ export const ArcadeStats = {
 
                   return `
                     <li style="display:flex; justify-content:space-between; font-size:8px; background: rgba(0,0,0,0.15); padding:3px 5px; border-radius:2px;">
-                      <span>[${date}] <strong>${gameTitles[s.gameId]}</strong> ${badges}</span>
+                      <span>[${date}] <strong>${gameTitles[s.gameId] || s.gameId}</strong> ${badges}</span>
                       <span>${s.durationSeconds}s (${s.result}) &bull; score: ${s.score}</span>
                     </li>
                   `;
@@ -557,31 +567,17 @@ export const ArcadeStats = {
               </tr>
             </thead>
             <tbody>
-              <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); height: 28px;">
-                <td><strong>Reaction Test</strong></td>
-                <td style="color: #fbbf24;">${d.perGame.reaction.bestReactionMs !== null ? Math.round(d.perGame.reaction.bestReactionMs) + 'ms' : '--'}</td>
-                <td style="text-align: right; opacity:0.6;">Lowest ms is best</td>
-              </tr>
-              <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); height: 28px;">
-                <td><strong>Neon Snake</strong></td>
-                <td style="color: #fbbf24;">${d.perGame.snake.highScore} pts</td>
-                <td style="text-align: right; opacity:0.6;">Highest score is best</td>
-              </tr>
-              <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); height: 28px;">
-                <td><strong>Breakout</strong></td>
-                <td style="color: #fbbf24;">${d.perGame.breakout.highScore} pts</td>
-                <td style="text-align: right; opacity:0.6;">Max Level: ${d.perGame.breakout.highestLevel || 1} &bull; Max Streak: ${d.perGame.breakout.longestStreak || 0}</td>
-              </tr>
-              <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); height: 28px;">
-                <td><strong>Pixel Pad</strong></td>
-                <td style="color: #fbbf24;">${d.perGame.pixelpad.artworksSaved || 0} saved</td>
-                <td style="text-align: right; opacity:0.6;">Longest session: ${Math.round(d.perGame.pixelpad.longestSessionSeconds || 0)}s</td>
-              </tr>
-              <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); height: 28px;">
-                <td><strong>Palette Lab</strong></td>
-                <td style="color: #fbbf24;">${d.perGame.palettelab.palettesExported || 0} exported</td>
-                <td style="text-align: right; opacity:0.6;">Unique generated: ${d.perGame.palettelab.uniquePalettesGenerated || 0}</td>
-              </tr>
+              ${this.APPROVED_GAME_IDS.map(gid => {
+                const pg = d.perGame[gid] || {};
+                const scoreStr = pg.highScore !== undefined ? `${pg.highScore} pts` : '--';
+                return `
+                  <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); height: 24px;">
+                    <td><strong>${(this.GAME_TITLES && this.GAME_TITLES[gid]) || gid.toUpperCase()}</strong></td>
+                    <td style="color: #fbbf24;">${scoreStr}</td>
+                    <td style="text-align: right; opacity:0.6;">${pg.launches || 0} launches</td>
+                  </tr>
+                `;
+              }).join('')}
             </tbody>
           </table>
           <p style="font-size: 8px; opacity: 0.5; margin-top: 10px; text-align: center;">Note: Leaderboards reflect verified Local Records saved on this cabinet.</p>

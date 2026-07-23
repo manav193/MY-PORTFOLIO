@@ -124,8 +124,6 @@ export function initOS() {
       if (konamiIndex === konami.length) {
         if (window.ArcadeOS && typeof window.ArcadeOS.showConfirmModal === 'function') {
           window.ArcadeOS.showConfirmModal("ACCESS GRANTED: You found the developer easter egg. This portfolio was handcrafted with 100% Vanilla JS.", null, null);
-        } else {
-          console.log("ACCESS GRANTED: You found the developer easter egg. This portfolio was handcrafted with 100% Vanilla JS.");
         }
         document.documentElement.style.setProperty('--aurora-1', '#ff00ff'); 
         document.documentElement.style.setProperty('--aurora-2', '#00ffff'); 

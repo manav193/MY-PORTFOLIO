@@ -7,6 +7,14 @@
 
 import { fetchNimoBackendReply } from '../services/nimo-api.js';
 
+export const NIMO_PERSONA = {
+  name: 'NIMO',
+  identity: 'female AI companion & system intelligence',
+  gender: 'female',
+  tone: 'smart, confident, warm, slightly futuristic, witty',
+  voiceGender: 'female'
+};
+
 // ==========================================
 // 1. PORTFOLIO & PROJECT ENTITY DATABASE
 // ==========================================
@@ -880,14 +888,39 @@ const INTENT_REGISTRY = [
     })
   },
 
-  // 11. NIMO Definition & Identity
+  // 11. Arcade NIMO service authorization (session-scoped UX secret)
+  {
+    id: 'arcade_nimo_override',
+    priority: 99,
+    matches: (text) => matchesAnyPhrase(text, [
+      'unlock arcade override', 'arcade override', 'nimo override', 'service access',
+      'show deeper arcade secret', 'authorize developer mode', 'override arcade'
+    ]),
+    handler: (text, entities, locationCtx, isHindi, isHinglish) => {
+      const authorization = window.ArcadeDeveloperMode?.authorizeFromNimo();
+      if (isHinglish) {
+        return {
+          intentId: 'arcade_nimo_override',
+          text: `${authorization?.text || 'Override accepted.'}\n\nService authorization mil gayi hai. Developer Mode abhi bhi OFF hai.`,
+          actions: authorization?.actions || []
+        };
+      }
+      return {
+        intentId: 'arcade_nimo_override',
+        text: `${authorization?.text || 'Override accepted.'}\n\nAuthorization: **${authorization?.code || 'SESSION GRANTED'}**\nDeveloper Mode remains OFF until you open the cabinet service layer.`,
+        actions: authorization?.actions || []
+      };
+    }
+  },
+
+  // 11b. NIMO Definition & Identity
   {
     id: 'nimo_identity',
     priority: 98,
     matches: (text) => matchesAnyPhrase(text, ['what is nimo', 'who is nimo', 'tell me about nimo', 'explain nimo', 'what exactly are you']),
     handler: () => ({
       intentId: 'nimo_identity',
-      text: `**NIMO** is the local-first, website-aware assistant built into this portfolio. I can help you navigate the site, explore projects, explain case studies, answer common web-development questions, and understand what you're currently viewing.`,
+      text: `**NIMO** is the local-first, website-aware female AI companion built into this portfolio. I can help you navigate the site, explore projects, explain case studies, answer common web-development questions, and understand what you're currently viewing.`,
       actions: [
         { label: 'What can you do?', query: 'What can you do?' },
         { label: 'Take me to Projects', navigate: 'index.html#work' }
@@ -1257,7 +1290,7 @@ const INTENT_REGISTRY = [
     id: 'smalltalk_greeting',
     priority: 30,
     matches: (text) => matchesAnyPhrase(text, ['hi', 'hello', 'hey', 'yo', 'good morning', 'good afternoon', 'good evening', 'howdy', 'greetings']),
-    handler: () => {
+    handler: (text) => {
       const GREETINGS = [
         "Hey! 👋 What would you like to explore?",
         "Hey there! I’m **NIMO**. Want to explore a project, Arcade, or something about the portfolio?",
@@ -1301,7 +1334,7 @@ const INTENT_REGISTRY = [
     id: 'secret_tip',
     priority: 15,
     matches: (text) => matchesAnyPhrase(text, ['secret', 'tell me a secret', 'tell me secret', 'any secret', 'do you know a secret', 'show me a secret', 'hidden tip', 'easter egg']),
-    handler: () => {
+    handler: (text) => {
       const SECRET_TIPS = [
         "Here’s a secret: you can play Arcade with a controller. 🎮",
         "Secret unlocked: you can access me from almost any page on this website.",
@@ -1312,13 +1345,15 @@ const INTENT_REGISTRY = [
         "You found a hidden tip: ask me to take you directly to a project by its name."
       ];
       const tip = SECRET_TIPS[Math.floor(Math.random() * SECRET_TIPS.length)];
+      const arcadeSecretAsked = /arcade|cabinet|machine|deeper/i.test(text);
       return {
         intentId: 'secret_tip',
-        text: tip,
-        actions: [
-          { label: 'Open Arcade', navigate: 'arcade' },
-          { label: 'View Projects', navigate: 'index.html#work' }
-        ]
+        text: arcadeSecretAsked
+          ? `The cabinet has a service layer that normal menus do not advertise. I can authorize it, but only for this session.`
+          : `${tip}\n\nSome secrets are attached to the cabinet itself. Ask me about a deeper Arcade secret if you want a clue.`,
+        actions: arcadeSecretAsked
+          ? [{ label: 'AUTHORIZE SERVICE ACCESS', query: 'Show deeper Arcade secret' }]
+          : [{ label: 'Ask about the cabinet', query: 'Do you know a deeper Arcade secret?' }]
       };
     }
   },
@@ -1856,7 +1891,8 @@ export function initNimo() {
     ConversationalContext,
     detectLanguageStyle,
     setSessionLanguage,
-    getSessionLanguage
+    getSessionLanguage,
+    authorizeArcadeDeveloperMode: () => window.ArcadeDeveloperMode?.authorizeFromNimo()
   };
   if (document.getElementById('nimo-widget')) return;
 
@@ -2044,6 +2080,9 @@ export function initNimo() {
         btn.addEventListener('click', () => {
           if (act.navigate) executeNavigation(act.navigate);
           if (act.query) handleUserMessage(act.query);
+          if (act.action === 'openArcadeServiceAccess') {
+            window.ArcadeDeveloperMode?.openServiceAccess();
+          }
         });
         actionsDiv.appendChild(btn);
       });
@@ -2139,10 +2178,23 @@ function createWidgetDOM() {
 
   container.innerHTML = `
     <button id="nimo-launcher" class="nimo-launcher" aria-label="Open AI Assistant NIMO" aria-expanded="false">
-      <div class="nimo-launcher-icon">
-        ${logoSVG}
+      <div class="nimo-mascot" aria-hidden="true">
+        <span class="nimo-mascot-halo"></span>
+        <span class="nimo-mascot-antenna"></span>
+        <span class="nimo-mascot-head">
+          <span class="nimo-mascot-ear nimo-mascot-ear-left"></span>
+          <span class="nimo-mascot-ear nimo-mascot-ear-right"></span>
+          <span class="nimo-mascot-face">
+            <span class="nimo-mascot-eye"></span>
+            <span class="nimo-mascot-eye"></span>
+          </span>
+        </span>
+        <span class="nimo-mascot-body"><span>N</span></span>
+        <span class="nimo-mascot-arm nimo-mascot-arm-left"></span>
+        <span class="nimo-mascot-arm nimo-mascot-arm-right"></span>
+        <span class="nimo-mascot-thruster"></span>
       </div>
-      <span class="nimo-launcher-label">NIMO AI</span>
+      <span class="sr-only">NIMO AI</span>
     </button>
 
     <div id="nimo-panel" class="nimo-panel" role="dialog" aria-label="NIMO Assistant" aria-hidden="true">

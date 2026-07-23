@@ -1,8 +1,19 @@
 // js/arcade-module-loader.js
-// Handles dynamic ESM imports for non-module scripts like arcade-os.js (Phase 4B)
+// Handles dynamic ESM imports for ArcadeOS modules and games
 
-window.ArcadeModuleLoader = {
-  import(modulePath) {
-    return import(modulePath);
+export const ArcadeModuleLoader = {
+  async import(modulePath) {
+    try {
+      return await import(modulePath);
+    } catch (err) {
+      console.warn(`[ArcadeModuleLoader] Dynamic import failed for ${modulePath}:`, err);
+      throw err;
+    }
   }
 };
+
+if (typeof window !== 'undefined') {
+  window.ArcadeModuleLoader = ArcadeModuleLoader;
+}
+
+export default ArcadeModuleLoader;

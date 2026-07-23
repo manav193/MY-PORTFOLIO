@@ -288,7 +288,7 @@ export const ArcadeCustomizer = {
   
   applyConfig(config) {
     const chassis = document.querySelector('.cabinet-chassis');
-    if (!chassis) return;
+    if (!chassis || !chassis.style || typeof chassis.style.setProperty !== 'function') return;
     
     // Map variables directly to .cabinet-chassis scope
     chassis.style.setProperty('--machine-accent', config.accentColor);
@@ -361,6 +361,9 @@ export const ArcadeCustomizer = {
   },
   
   open(view) {
+    if (!this.initialized || !this.persistedConfig) {
+      this.init();
+    }
     this.snapshotConfig = { ...this.persistedConfig };
     this.draftConfig = { ...this.persistedConfig };
     this.applyConfig(this.draftConfig);

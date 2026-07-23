@@ -151,88 +151,23 @@
     // SAFE SINGLE SOURCE OF TRUTH (0 to 1)
     const safeProgress = Number.isFinite(currentProgress) ? Math.min(1, Math.max(0, currentProgress)) : 0;
     
-    // Add physical corners if we've started moving (unless user explicitly exited Arcade)
-    if (window.ArcadeOS?.userExited) {
-      chassis.classList.remove('is-scaled');
-      osVisible = false;
-      if (window.ArcadeOS) window.ArcadeOS.osVisible = false;
-    } else if (safeProgress > 0.05) {
+    // Scale cabinet chassis when moving down track
+    if (safeProgress > 0.05) {
       chassis.classList.add('is-scaled');
-      
-      // Ensure ArcadeOS and apps are fully loaded before booting to prevent race conditions
-      if (!hasBootedOS && window.ArcadeOS && window.ArcadeRegistry && window.ArcadeRegistry.getAll().length > 0) {
-        hasBootedOS = true;
-        window.ArcadeOS.boot();
-        osVisible = true;
-        window.ArcadeOS.osVisible = true;
-      }
-    } else {
+    } else if (window.ArcadeExperience?.getState() === 'PORTFOLIO') {
       chassis.classList.remove('is-scaled');
     }
     
-    // ===== OS LIFECYCLE SYNCHRONIZATION (HYSTERESIS) =====
-    if (hasBootedOS && window.ArcadeOS && !window.ArcadeOS.userExited) {
-      const osLayer = document.getElementById('arcade-os');
-      const bootLoader = document.querySelector('.boot-loader');
-      
-      if (osVisible) {
-        // Check if we should suspend the OS
-        if (safeProgress < OS_CLOSE_THRESHOLD) {
-          // Destroy any active app and return to HOME
-          if (window.ArcadeOS.state === 'APP' || window.ArcadeOS.state === 'LOADING') {
-            window.ArcadeOS.forceGoHome();
-          }
-          
-          // Hide the OS layer with a fade
-          if (osLayer) {
-            osLayer.style.transition = 'opacity 0.3s ease';
-            osLayer.style.opacity = '0';
-          }
-          
-          // Show boot loader again
-          if (bootLoader) {
-            bootLoader.classList.remove('is-hidden');
-          }
-          
-          osVisible = false;
-          window.ArcadeOS.osVisible = false;
-          if (window.ArcadeHardware) {
-            window.ArcadeHardware.clearAllTimers();
-            window.ArcadeHardware.updateOled('OFF');
-          }
-        }
-      } else {
-        // Check if we should reopen the OS
-        if (safeProgress > OS_REOPEN_THRESHOLD) {
-          // Show OS layer
-          if (osLayer) {
-            osLayer.style.transition = 'opacity 0.3s ease';
-            osLayer.style.opacity = '1';
-          }
-          
-          // Hide boot loader
-          if (bootLoader) {
-            bootLoader.classList.add('is-hidden');
-          }
-          
-          // Ensure OS state is preserved if already in APP or LOADING
-          if (window.ArcadeOS.state !== 'APP' && window.ArcadeOS.state !== 'LOADING' && window.ArcadeOS.state !== 'HOME') {
-            window.ArcadeOS.state = 'HOME';
-            const homeView = document.getElementById('arcade-home');
-            const appView = document.getElementById('arcade-app-view');
-            const loadingView = document.getElementById('arcade-loading');
-            if (homeView) homeView.classList.add('active');
-            if (appView) { appView.classList.remove('active'); }
-            if (loadingView) loadingView.classList.remove('active');
-            window.ArcadeOS.renderHome();
-          }
-          
-          osVisible = true;
-          window.ArcadeOS.osVisible = true;
-          if (window.ArcadeHardware) {
-            window.ArcadeHardware.setState(window.ArcadeOS.state);
-          }
-        }
+    // ===== OS LIFECYCLE SYNCHRONIZATION WITH HYSTERESIS =====
+    if (targetProgress >= 0.40) {
+      window.ArcadeBootController?.prewarm();
+    }
+    if (window.ArcadeExperience) {
+      const expState = window.ArcadeExperience.getState();
+      if (targetProgress >= OS_REOPEN_THRESHOLD && expState === 'PORTFOLIO') {
+        window.ArcadeExperience.enterArcadeExperience('scroll');
+      } else if (targetProgress <= OS_CLOSE_THRESHOLD && expState !== 'PORTFOLIO' && expState !== 'ARCADE_EXITING') {
+        window.ArcadeExperience.exitArcadeExperience('scroll');
       }
     }
 

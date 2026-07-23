@@ -1,22 +1,24 @@
 {
   "name": "portfolio",
   "version": "1.0.0",
+  "type": "module",
   "scripts": {
     "build": "node build.js",
     "build:root": "node build.js --base /",
     "build:subdir": "node build.js --base /portfolio/",
     "preview": "npx vite preview --port 4173",
-    "verify": "node test-dock-navigation.js"
+    "verify": "playwright test tests/global-shell-regression.spec.js",
+    "test:arcade": "playwright test tests/arcade-regression.spec.js",
+    "test:experience": "playwright test tests/experience-audio.spec.js",
+    "test:developer": "playwright test tests/developer-mode.spec.js",
+    "test:production": "playwright test tests/final-production-qa.spec.js --config=playwright.production.config.js"
   },
   "dependencies": {
-    "canvas": "^3.2.3",
     "clean-css": "^5.3.3",
     "esbuild": "^0.28.1",
-    "html-minifier-terser": "^7.2.0",
-    "pdf-export-images": "^1.2.0",
-    "pdfjs-dist": "^6.1.200"
+    "html-minifier-terser": "^7.2.0"
   },
   "devDependencies": {
-    "puppeteer": "^25.3.0"
+    "@playwright/test": "^1.61.1"
   }
 }

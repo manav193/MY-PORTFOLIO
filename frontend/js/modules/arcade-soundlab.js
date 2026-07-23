@@ -21,6 +21,8 @@ export const ArcadeSoundLab = {
     const profile = ArcadeAudio.getProfile();
     const muted = !settings.soundEnabled;
     const volume = typeof settings.volume === 'number' ? settings.volume : 0.5;
+    const sfxVolume = typeof settings.sfxVolume === 'number' ? settings.sfxVolume : ArcadeAudio.sfxVolume;
+    const musicVolume = typeof settings.musicVolume === 'number' ? settings.musicVolume : ArcadeAudio.musicVolume;
     const reducedAudio = !!settings.reducedAudio;
 
     view.innerHTML = `
@@ -66,6 +68,16 @@ export const ArcadeSoundLab = {
               <input id="soundlab-volume" type="range" min="0" max="1" step="0.05" value="${volume}" data-arcade-focusable data-arcade-control="range" aria-valuetext="${Math.round(volume * 100)} percent">
               <span id="soundlab-volume-readout">${Math.round(volume * 100)}%</span>
             </div>
+            <div class="setting-item">
+              <label for="soundlab-sfx-volume">SFX</label>
+              <input id="soundlab-sfx-volume" type="range" min="0" max="1" step="0.05" value="${sfxVolume}" data-arcade-focusable data-arcade-control="range" aria-valuetext="${Math.round(sfxVolume * 100)} percent">
+              <span id="soundlab-sfx-readout">${Math.round(sfxVolume * 100)}%</span>
+            </div>
+            <div class="setting-item">
+              <label for="soundlab-music-volume">Music</label>
+              <input id="soundlab-music-volume" type="range" min="0" max="1" step="0.05" value="${musicVolume}" data-arcade-focusable data-arcade-control="range" aria-valuetext="${Math.round(musicVolume * 100)} percent">
+              <span id="soundlab-music-readout">${Math.round(musicVolume * 100)}%</span>
+            </div>
             <button class="sys-btn" id="soundlab-mute-btn" data-arcade-focusable aria-pressed="${muted}">${muted ? 'MASTER MUTED' : 'MASTER ENABLED'}</button>
             <button class="sys-btn" id="soundlab-reduced-btn" data-arcade-focusable aria-pressed="${reducedAudio}">${reducedAudio ? 'REDUCED AUDIO ON' : 'REDUCED AUDIO OFF'}</button>
             <button class="sys-btn danger-btn" id="soundlab-reset-btn" data-arcade-focusable>RESET SOUND PROFILE</button>
@@ -108,6 +120,21 @@ export const ArcadeSoundLab = {
       volume.setAttribute('aria-valuetext', `${pct} percent`);
       this.setStatus(`Master volume ${pct}%.`);
     });
+
+    const bindChannelVolume = (id, readoutId, setter, label) => {
+      const control = view.querySelector(id);
+      control?.addEventListener('input', () => {
+        const value = parseFloat(control.value);
+        setter.call(ArcadeAudio, value);
+        const pct = Math.round(value * 100);
+        const readout = view.querySelector(readoutId);
+        if (readout) readout.textContent = `${pct}%`;
+        control.setAttribute('aria-valuetext', `${pct} percent`);
+        this.setStatus(`${label} volume ${pct}%.`);
+      });
+    };
+    bindChannelVolume('#soundlab-sfx-volume', '#soundlab-sfx-readout', ArcadeAudio.setSfxVolume, 'SFX');
+    bindChannelVolume('#soundlab-music-volume', '#soundlab-music-readout', ArcadeAudio.setMusicVolume, 'Music');
 
     view.querySelector('#soundlab-mute-btn')?.addEventListener('click', () => {
       const settings = window.ArcadeStorage?.get(window.ArcadeStorage.KEYS.SETTINGS) || {};

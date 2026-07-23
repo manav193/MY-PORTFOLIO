@@ -666,7 +666,6 @@ export const ArcadeEnvironmentService = {
     const simCtx = { ...base, ...overrides };
     this.state.context = simCtx;
     this.applyEnvironmentToDOM(simCtx);
-    console.log('[ArcadeEnv] Simulated context applied:', simCtx);
     return simCtx;
   },
 

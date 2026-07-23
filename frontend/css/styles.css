@@ -767,6 +767,14 @@ body:has(.cabinet-chassis.is-scaled) .theme-dock {
   pointer-events: none;
 }
 
+@media (orientation: landscape) and (max-height: 500px) {
+  body.arcade-active .os-dock {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
 /* ABSOLUTE CENTERED ARCHITECTURE (LUXURY PADDING) */
 .system-architecture {
   position: relative;
@@ -1514,32 +1522,192 @@ body:has(.cabinet-chassis.is-scaled) .nimo-widget {
 
 .nimo-launcher {
   position: fixed;
-  bottom: 96px;
-  right: 32px;
+  bottom: 88px;
+  right: 28px;
   z-index: 10001;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 18px;
-  border-radius: 100px;
-  background: rgba(11, 16, 32, 0.94);
-  backdrop-filter: blur(24px) saturate(140%);
-  -webkit-backdrop-filter: blur(24px) saturate(150%);
-  border: 1px solid rgba(6, 182, 212, 0.4);
-  color: #f8fafc;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
+  width: 72px;
+  height: 88px;
+  padding: 0;
+  border: 0;
+  background: transparent;
   cursor: pointer;
-  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.35), 0 0 15px rgba(6, 182, 212, 0.2);
-  transition: transform 0.3s var(--spring), border-color 0.3s, box-shadow 0.3s;
+  filter: drop-shadow(0 10px 18px rgba(2, 6, 23, 0.65));
+  transition: transform 0.3s var(--spring), filter 0.3s ease;
+}
+
+.nimo-widget.nimo-override-active .nimo-launcher {
+  border-color: rgba(255, 94, 58, .72);
+  box-shadow: 0 0 0 1px rgba(69, 220, 255, .24), 0 0 22px rgba(255, 76, 39, .22);
+}
+.nimo-widget.nimo-override-active .nimo-status::after {
+  content: " // OVERRIDE ACTIVE";
+  color: #ff765e;
 }
 
 .nimo-launcher:hover {
-  transform: translateY(-3px);
-  border-color: rgba(6, 182, 212, 0.8);
-  box-shadow: 0 6px 24px rgba(139, 92, 246, 0.5), 0 0 22px rgba(6, 182, 212, 0.4);
+  transform: translateY(-5px) scale(1.05);
+  filter: drop-shadow(0 12px 24px rgba(6, 182, 212, 0.42));
+}
+
+.nimo-mascot {
+  position: relative;
+  display: block;
+  width: 72px;
+  height: 86px;
+  animation: nimoMascotFloat 3.4s ease-in-out infinite;
+}
+
+.nimo-mascot-halo {
+  position: absolute;
+  left: 12px;
+  bottom: 3px;
+  width: 48px;
+  height: 12px;
+  border: 1px solid rgba(103, 232, 249, 0.55);
+  border-radius: 50%;
+  box-shadow: 0 0 14px rgba(6, 182, 212, 0.45);
+  animation: nimoHaloPulse 2s ease-in-out infinite;
+}
+
+.nimo-mascot-antenna {
+  position: absolute;
+  top: 2px;
+  left: 35px;
+  width: 2px;
+  height: 11px;
+  background: linear-gradient(#67e8f9, #8b5cf6);
+}
+
+.nimo-mascot-antenna::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #67e8f9;
+  box-shadow: 0 0 9px #22d3ee;
+}
+
+.nimo-mascot-head {
+  position: absolute;
+  top: 11px;
+  left: 14px;
+  width: 44px;
+  height: 34px;
+  border: 1px solid rgba(165, 180, 252, 0.7);
+  border-radius: 17px 17px 14px 14px;
+  background: linear-gradient(145deg, #dbeafe 0%, #818cf8 42%, #312e81 100%);
+  box-shadow: inset 0 1px 5px rgba(255,255,255,.65), 0 0 14px rgba(99,102,241,.5);
+}
+
+.nimo-mascot-face {
+  position: absolute;
+  inset: 6px 5px 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 10px;
+  background: #07111f;
+  border: 1px solid rgba(34, 211, 238, 0.4);
+}
+
+.nimo-mascot-eye {
+  position: relative;
+  width: 7px;
+  height: 9px;
+  border-radius: 55% 55% 45% 45%;
+  background: #a5f3fc;
+  box-shadow: 0 0 7px #22d3ee;
+  animation: nimoBlink 5s infinite;
+}
+
+.nimo-mascot-eye::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  width: 8px;
+  height: 3px;
+  border-top: 1px solid #c4b5fd;
+  border-radius: 50%;
+  transform: rotate(-8deg);
+}
+
+.nimo-mascot-eye + .nimo-mascot-eye::after {
+  transform: rotate(8deg);
+}
+
+.nimo-mascot-ear {
+  position: absolute;
+  top: 9px;
+  width: 6px;
+  height: 16px;
+  background: #4338ca;
+  border: 1px solid #818cf8;
+}
+
+.nimo-mascot-ear-left { left: -6px; border-radius: 6px 1px 1px 6px; }
+.nimo-mascot-ear-right { right: -6px; border-radius: 1px 6px 6px 1px; }
+
+.nimo-mascot-body {
+  position: absolute;
+  top: 43px;
+  left: 23px;
+  width: 26px;
+  height: 29px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px 8px 12px 12px;
+  color: #ecfeff;
+  font: 800 13px/1 var(--font-mono);
+  background: linear-gradient(160deg, #7c3aed, #0e7490);
+  border: 1px solid rgba(165, 243, 252, 0.6);
+  box-shadow: inset 0 0 8px rgba(255,255,255,.15), 0 0 11px rgba(6,182,212,.4);
+}
+
+.nimo-mascot-arm {
+  position: absolute;
+  top: 48px;
+  width: 7px;
+  height: 23px;
+  border-radius: 7px;
+  background: linear-gradient(#818cf8, #155e75);
+  transform-origin: top center;
+}
+
+.nimo-mascot-arm-left { left: 15px; transform: rotate(15deg); }
+.nimo-mascot-arm-right { right: 15px; transform: rotate(-15deg); }
+.nimo-launcher:hover .nimo-mascot-arm-right { animation: nimoWave .7s ease-in-out 2; }
+
+.nimo-mascot-thruster {
+  position: absolute;
+  top: 70px;
+  left: 29px;
+  width: 14px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at top, #fff 0 12%, #67e8f9 35%, rgba(59,130,246,0) 75%);
+  filter: blur(.4px);
+}
+
+@keyframes nimoMascotFloat {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-7px) rotate(1deg); }
+}
+
+@keyframes nimoHaloPulse {
+  50% { opacity: .45; transform: scale(.85); }
+}
+
+@keyframes nimoBlink {
+  0%, 45%, 49%, 100% { transform: scaleY(1); }
+  47% { transform: scaleY(.12); }
+}
+
+@keyframes nimoWave {
+  50% { transform: rotate(-55deg); }
 }
 
 .nimo-panel {
@@ -1782,7 +1950,7 @@ body:has(.cabinet-chassis.is-scaled) .nimo-widget {
   .nimo-launcher {
     bottom: 90px;
     right: 20px;
-    padding: 8px 14px;
+    padding: 0;
   }
   .nimo-panel {
     bottom: 144px;

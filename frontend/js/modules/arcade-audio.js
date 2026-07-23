@@ -27,14 +27,24 @@ function createFallbackAudio() {
     previewNodes: new Set(),
     profileId: 'minimal',
     masterVolume: 0.5,
+    sfxVolume: 0.8,
+    musicVolume: 0.35,
     muted: true,
     unsupported: true,
     initFromGesture() { return false; },
     setProfile(profileId) { this.profileId = profileId || 'minimal'; },
     getProfile() { return this.profileId; },
     setMasterVolume(value) { this.masterVolume = Math.max(0, Math.min(1, Number(value) || 0)); },
+    setSfxVolume(value) { this.sfxVolume = Math.max(0, Math.min(1, Number(value) || 0)); },
+    setMusicVolume(value) { this.musicVolume = Math.max(0, Math.min(1, Number(value) || 0)); },
     setMuted(value) { this.muted = !!value; },
     play() {},
+    playSequence() {},
+    playGameSfx() {},
+    startLoop() {},
+    updateLoop() {},
+    stopLoop() {},
+    stopOwner() {},
     preview() {},
     stopPreview() {},
     suspend() {},
@@ -49,5 +59,6 @@ export const ArcadeAudioStorage = window.ArcadeStorage || fallbackStorage;
 if (!window.ArcadeAudio) {
   window.ArcadeAudio = ArcadeAudio;
 }
+window.ArcadeAudioManager = ArcadeAudio;
 
 export default ArcadeAudio;
