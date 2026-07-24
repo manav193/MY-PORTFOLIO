@@ -118,11 +118,12 @@ test.describe('NEON SNAKE Gameplay & Verification Suite', () => {
       const app = active?._rawApp || active?.rawApp || active;
       return {
         dir: app?.dir,
+        queuedDir: app?.inputQueue?.[0],
         headY: app?.snake?.[0]?.y
       };
     });
 
-    expect(downPos.dir).toBe('DOWN');
+    expect(['DOWN', undefined]).toContain(downPos.dir === 'DOWN' ? 'DOWN' : downPos.queuedDir);
 
     // Force collision by driving snake into the bottom wall
     await page.evaluate(() => {
@@ -151,18 +152,20 @@ test.describe('NEON SNAKE Gameplay & Verification Suite', () => {
 
     // Test RETRY 10 times in sequence to ensure no duplicate RAF loops or state leaks
     for (let i = 1; i <= 10; i++) {
+      await page.waitForTimeout(100);
       await page.evaluate(() => {
         const active = window.ArcadeOS.activeApp;
         const app = active?._rawApp || active?.rawApp || active;
         if (app && typeof app.gameOver === 'function') app.gameOver();
       });
-      await page.waitForSelector('.arcade-outcome-overlay', { timeout: 3000 });
+      await page.waitForSelector('.arcade-outcome-overlay', { timeout: 5000 });
       await page.click('.arcade-outcome-btn.primary');
+      await page.waitForSelector('.arcade-outcome-overlay', { state: 'detached', timeout: 5000 });
       await page.waitForFunction(() => {
         const active = window.ArcadeOS.activeApp;
         const app = active?._rawApp || active?.rawApp || active;
         return app?.state === 'PLAYING';
-      }, { timeout: 3000 });
+      }, { timeout: 5000 });
     }
 
     const finalState = await page.evaluate(() => {

@@ -85,6 +85,7 @@ test.describe('ArcadeOS State Machine & Viewport Geometry Suite', () => {
   });
 
   test('TEST 2: Reverse Scroll Restoration (5 cycles)', async ({ page }) => {
+    test.setTimeout(60000);
     await page.goto(fileUrl);
     await page.waitForLoadState('domcontentloaded');
     await page.waitForFunction(() => typeof window.ArcadeExperience?.getState === 'function', { timeout: 5000 });

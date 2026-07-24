@@ -4292,13 +4292,28 @@ class BlockDropApp {
     this.highScore = this.storage.get('arcade_blockdrop_best', 0);
     this.state = 'READY';
     this.active = false;
-    this.rafId = null;
+    this.destroyed = false;
 
     this.cols = 10;
-    this.rows = 18;
-    this.cellSize = 18;
-    this.playfieldWidth = this.cols * this.cellSize;
-    this.playfieldHeight = this.rows * this.cellSize;
+    this.rows = 20;
+    this.cellSize = 20;
+    this.boardX = 0;
+    this.boardY = 0;
+    this.boardW = 200;
+    this.boardH = 400;
+    this.dpr = 1;
+
+    this.rafId = null;
+    this.lastDropTime = 0;
+
+    this.score = 0;
+    this.linesCleared = 0;
+    this.level = 1;
+    this.combo = 0;
+
+    this.nextQueue = [];
+    this.heldType = null;
+    this.canHold = true;
 
     this.shapes = {
       I: [[1,1,1,1]],
@@ -4309,21 +4324,25 @@ class BlockDropApp {
       T: [[0,1,0],[1,1,1]],
       Z: [[1,1,0],[0,1,1]]
     };
-    this.colors = { I: '#06b6d4', J: '#3b82f6', L: '#f97316', O: '#eab308', S: '#22c55e', T: '#a855f7', Z: '#ef4444' };
+    this.colors = {
+      I: '#06b6d4',
+      J: '#3b82f6',
+      L: '#f97316',
+      O: '#eab308',
+      S: '#22c55e',
+      T: '#a855f7',
+      Z: '#ef4444'
+    };
+
     this.grid = Array(this.rows).fill(null).map(() => Array(this.cols).fill(0));
     this.piece = null;
   }
 
   mount() {
     this.active = true;
+    this.destroyed = false;
     this.container.innerHTML = `
       <div class="app-blockdrop" id="bd-game-container" tabindex="0">
-        <div id="bd-hud" class="bd-hud">
-          <div class="hud-item">SCORE <span id="bd-score">0</span></div>
-          <div class="hud-item">HI <span id="bd-high">${this.highScore}</span></div>
-          <div class="hud-item">HOLD <span id="bd-hold">—</span></div>
-          <div class="hud-item">NEXT <span id="bd-next">—</span></div>
-        </div>
         <div class="canvas-wrapper">
           <canvas id="bd-canvas"></canvas>
         </div>
@@ -4333,15 +4352,17 @@ class BlockDropApp {
 
     this.gameContainer = this.container.querySelector('#bd-game-container');
     this.canvas = this.container.querySelector('#bd-canvas');
+    this.canvasWrapper = this.container.querySelector('.canvas-wrapper');
     this.ctx = this.canvas.getContext('2d');
     this.overlay = this.container.querySelector('#bd-overlay-view');
-    this.hudScore = this.container.querySelector('#bd-score');
-    this.hudHold = this.container.querySelector('#bd-hold');
-    this.hudNext = this.container.querySelector('#bd-next');
 
     this.gameContainer.focus({ preventScroll: true });
+
+    // Initial resize calculation BEFORE rendering READY screen
+    this.resizeCanvas();
+
     this.resizeObserver = new ResizeObserver(() => this.resizeCanvas());
-    this.resizeObserver.observe(this.container);
+    this.resizeObserver.observe(this.canvasWrapper || this.container);
 
     this.bus.on('ARCADE_LEFT', () => this.move(-1));
     this.bus.on('ARCADE_RIGHT', () => this.move(1));
@@ -4352,28 +4373,76 @@ class BlockDropApp {
     this.bus.on('ARCADE_ACTION_X', () => this.rotate());
     this.bus.on('ARCADE_ACTION_B', () => this.holdPiece());
 
+    this.keydownHandler = (e) => {
+      if (!this.active || this.destroyed) return;
+      const key = e.key;
+
+      if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'w', 'a', 's', 'd', 'W', 'A', 'S', 'D', ' ', 'c', 'C', 'Shift', 'x', 'X'].includes(key)) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (key === 'ArrowLeft' || key === 'a' || key === 'A') this.move(-1);
+        else if (key === 'ArrowRight' || key === 'd' || key === 'D') this.move(1);
+        else if (key === 'ArrowUp' || key === 'w' || key === 'W' || key === 'x' || key === 'X') this.rotate();
+        else if (key === 'ArrowDown' || key === 's' || key === 'S') this.drop();
+        else if (key === ' ' || key === 'Enter') this.hardDrop();
+        else if (key === 'c' || key === 'C' || key === 'Shift') this.holdPiece();
+      } else if (key === 'Escape') {
+        e.preventDefault();
+        this.togglePause();
+      }
+    };
+    document.addEventListener('keydown', this.keydownHandler);
+
     this.transitionToState('READY');
   }
 
   resizeCanvas() {
-    if (!this.canvas || !this.active || this.destroyed) return;
-    const w = this.container.clientWidth;
-    const h = this.container.clientHeight;
+    if (!this.canvas) return;
+    const parent = this.canvasWrapper || this.container;
+    const w = parent.clientWidth || this.container.clientWidth || 600;
+    const h = parent.clientHeight || this.container.clientHeight || 400;
     if (!w || !h) return;
 
+    // Standard 10 columns x 20 rows visible playfield
+    this.cols = 10;
+    this.rows = 20;
+
+    // Use 94% of safe CRT area to ensure full visibility above bottom blind curve
+    const availW = w * 0.94;
+    const availH = h * 0.94;
+
+    // Side panel width calculation
+    const sideW = Math.max(90, Math.floor(w * 0.20));
+    const availBoardW = availW - (2 * sideW) - 20;
+    const availBoardH = availH - 20;
+
+    let cellSize = Math.floor(Math.min(availBoardW / this.cols, availBoardH / this.rows));
+    if (cellSize < 12) cellSize = 12;
+    this.cellSize = cellSize;
+
+    this.boardW = this.cols * this.cellSize;
+    this.boardH = this.rows * this.cellSize;
+
+    // Center board horizontally and vertically within safe CRT viewport
+    this.boardX = Math.floor((w - this.boardW) / 2);
+    this.boardY = Math.floor((h - this.boardH) / 2);
+
+    this.leftPanelW = sideW;
+    this.leftPanelX = Math.max(10, this.boardX - sideW - 14);
+
+    this.rightPanelW = sideW;
+    this.rightPanelX = Math.min(w - sideW - 10, this.boardX + this.boardW + 14);
+
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    this.canvas.style.width = '100%';
-    this.canvas.style.height = '100%';
+    this.dpr = dpr;
+
+    this.canvas.style.width = w + 'px';
+    this.canvas.style.height = h + 'px';
     this.canvas.style.display = 'block';
 
     this.canvas.width = Math.round(w * dpr);
     this.canvas.height = Math.round(h * dpr);
-
-    const worldScale = Math.min(w / this.playfieldWidth, h / this.playfieldHeight);
-    this.dpr = dpr;
-    this.worldScale = worldScale;
-    this.offsetX = (w - this.playfieldWidth * worldScale) / 2;
-    this.offsetY = (h - this.playfieldHeight * worldScale) / 2;
 
     this.draw();
   }
@@ -4381,6 +4450,17 @@ class BlockDropApp {
   transitionToState(nextState) {
     this.state = nextState;
     if (nextState === 'READY') {
+      this.score = 0;
+      this.grid = Array(this.rows).fill(null).map(() => Array(this.cols).fill(0));
+      this.linesCleared = 0;
+      this.level = 1;
+      this.combo = 0;
+      this.nextQueue = [];
+      this.heldType = null;
+      this.canHold = true;
+      this.refillNextQueue();
+      this.draw();
+
       this.overlay.className = 'bd-overlay-active';
       this.overlay.innerHTML = `
         <div class="bd-menu">
@@ -4402,9 +4482,11 @@ class BlockDropApp {
     this.linesCleared = 0;
     this.level = 1;
     this.combo = 0;
-    this.nextType = null;
+    this.nextQueue = [];
     this.heldType = null;
     this.canHold = true;
+
+    this.refillNextQueue();
     this.spawnPiece();
 
     this.state = 'PLAYING';
@@ -4416,59 +4498,98 @@ class BlockDropApp {
     this.bus.emit('GAME_LAUNCHED', { id: 'blockdrop' });
   }
 
-  spawnPiece(forcedType = null) {
+  refillNextQueue() {
     const keys = Object.keys(this.shapes);
-    const type = forcedType || this.nextType || keys[Math.floor(Math.random() * keys.length)];
-    this.nextType = keys[Math.floor(Math.random() * keys.length)];
+    while (this.nextQueue.length < 5) {
+      const bag = [...keys].sort(() => Math.random() - 0.5);
+      this.nextQueue.push(...bag);
+    }
+  }
+
+  spawnPiece(forcedType = null) {
+    this.refillNextQueue();
+    const type = forcedType || this.nextQueue.shift();
     this.piece = {
       type,
       matrix: this.shapes[type].map(row => [...row]),
       color: this.colors[type],
-      x: Math.floor(this.cols / 2) - 1,
+      x: Math.floor((this.cols - this.shapes[type][0].length) / 2),
       y: 0
     };
     if (this.gameContainer) this.gameContainer.dataset.pieceMatrix = JSON.stringify(this.piece.matrix);
-    if (this.hudNext) this.hudNext.textContent = this.nextType;
   }
 
   move(dir) {
-    if (this.state !== 'PLAYING') return;
+    if (this.state !== 'PLAYING' || !this.piece) return;
+    const now = performance.now();
+    if (this._lastMoveTime && now - this._lastMoveTime < 40) return;
+    this._lastMoveTime = now;
+
     this.piece.x += dir;
-    if (this.collide()) this.piece.x -= dir;
-    else this.audio.playGameSfx('blockdrop', 'move', { cooldown: 55 });
+    if (this.collide()) {
+      this.piece.x -= dir;
+    } else {
+      this.audio.playGameSfx('blockdrop', 'move', { cooldown: 55 });
+    }
   }
 
   rotate() {
-    if (this.state !== 'PLAYING') return;
+    if (this.state !== 'PLAYING' || !this.piece) return;
+    const now = performance.now();
+    if (this._lastRotateTime && now - this._lastRotateTime < 80) return;
+    this._lastRotateTime = now;
+
     const m = this.piece.matrix;
     const rotated = m[0].map((_, i) => m.map(row => row[i]).reverse());
-    const old = this.piece.matrix;
     const oldX = this.piece.x;
-    this.piece.matrix = rotated;
-    for (const kick of [0, -1, 1, -2, 2]) {
-      this.piece.x = oldX + kick;
-      if (!this.collide()) {
+    const oldY = this.piece.y;
+    const oldMatrix = this.piece.matrix;
+
+    // SRS Wall Kick Candidate Offsets
+    const kickOffsets = [
+      [0, 0],
+      [-1, 0],
+      [1, 0],
+      [-2, 0],
+      [2, 0],
+      [0, -1],
+      [-1, -1],
+      [1, -1],
+      [0, -2]
+    ];
+
+    for (const [dx, dy] of kickOffsets) {
+      if (!this.collideAt(oldX + dx, oldY + dy, rotated)) {
+        this.piece.x = oldX + dx;
+        this.piece.y = oldY + dy;
+        this.piece.matrix = rotated;
         if (this.gameContainer) this.gameContainer.dataset.pieceMatrix = JSON.stringify(this.piece.matrix);
         this.audio.playGameSfx('blockdrop', 'rotate');
         return;
       }
     }
+
     this.piece.x = oldX;
-    this.piece.matrix = old;
+    this.piece.y = oldY;
+    this.piece.matrix = oldMatrix;
   }
 
   holdPiece() {
     if (this.state !== 'PLAYING' || !this.canHold || !this.piece) return;
+    const now = performance.now();
+    if (this._lastHoldTime && now - this._lastHoldTime < 100) return;
+    this._lastHoldTime = now;
+
     const outgoing = this.piece.type;
     const incoming = this.heldType;
     this.heldType = outgoing;
     this.canHold = false;
-    if (this.hudHold) this.hudHold.textContent = outgoing;
+    this.audio.playGameSfx('blockdrop', 'hold', { cooldown: 90 });
     this.spawnPiece(incoming || null);
   }
 
   drop() {
-    if (this.state !== 'PLAYING') return;
+    if (this.state !== 'PLAYING' || !this.piece) return;
     this.piece.y++;
     if (this.collide()) {
       this.piece.y--;
@@ -4481,13 +4602,21 @@ class BlockDropApp {
       this.start();
       return;
     }
-    while (!this.collide()) this.piece.y++;
-    this.piece.y--;
+    if (this.state !== 'PLAYING' || !this.piece) return;
+
+    let ghostY = this.piece.y;
+    while (!this.collideAt(this.piece.x, ghostY + 1, this.piece.matrix)) {
+      ghostY++;
+    }
+    const dist = ghostY - this.piece.y;
+    this.score += dist * 2;
+    this.piece.y = ghostY;
     this.audio.playGameSfx('blockdrop', 'hardDrop');
     this.lockPiece();
   }
 
   collide() {
+    if (!this.piece) return false;
     const { matrix, x, y } = this.piece;
     for (let r = 0; r < matrix.length; r++) {
       for (let c = 0; c < matrix[r].length; c++) {
@@ -4495,7 +4624,22 @@ class BlockDropApp {
           const newX = x + c;
           const newY = y + r;
           if (newX < 0 || newX >= this.cols || newY >= this.rows) return true;
-          if (newY >= 0 && this.grid[newY][newX]) return true;
+          if (newY >= 0 && this.grid[newY] && this.grid[newY][newX]) return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  collideAt(x, y, matrix) {
+    if (!matrix) return true;
+    for (let r = 0; r < matrix.length; r++) {
+      for (let c = 0; c < matrix[r].length; c++) {
+        if (matrix[r][c]) {
+          const newX = x + c;
+          const newY = y + r;
+          if (newX < 0 || newX >= this.cols || newY >= this.rows) return true;
+          if (newY >= 0 && this.grid[newY] && this.grid[newY][newX]) return true;
         }
       }
     }
@@ -4503,10 +4647,11 @@ class BlockDropApp {
   }
 
   lockPiece() {
+    if (!this.piece) return;
     const { matrix, x, y, color } = this.piece;
     for (let r = 0; r < matrix.length; r++) {
       for (let c = 0; c < matrix[r].length; c++) {
-        if (matrix[r][c] && y + r >= 0) {
+        if (matrix[r][c] && y + r >= 0 && y + r < this.rows && x + c >= 0 && x + c < this.cols) {
           this.grid[y + r][x + c] = color;
         }
       }
@@ -4515,7 +4660,10 @@ class BlockDropApp {
     this.clearLines();
     this.spawnPiece();
     this.canHold = true;
-    if (this.collide()) this.gameOver();
+
+    if (this.collide()) {
+      this.gameOver();
+    }
   }
 
   clearLines() {
@@ -4540,8 +4688,20 @@ class BlockDropApp {
         this.score += 1000;
         markOutcome(this, 'victory', 'perfect-clear');
       }
-      if (this.hudScore) this.hudScore.textContent = this.score;
-    } else this.combo = 0;
+    } else {
+      this.combo = 0;
+    }
+  }
+
+  togglePause() {
+    if (this.state === 'PLAYING') {
+      this.state = 'PAUSED';
+      this.cancelLoop();
+    } else if (this.state === 'PAUSED') {
+      this.state = 'PLAYING';
+      this.lastDropTime = performance.now();
+      this.gameLoop(performance.now());
+    }
   }
 
   gameLoop(timestamp) {
@@ -4550,7 +4710,8 @@ class BlockDropApp {
 
     const devScale = window.ArcadeDeveloperMode?.getSpeedScale?.() || 1;
     const gravityModifier = hasDevModifier('blockdrop', 'gravity_speed') ? 0.58 : 1;
-    const gravityMs = Math.max(90, 520 - (this.level - 1) * 42) * gravityModifier / devScale;
+    const gravityMs = Math.max(80, 500 - (this.level - 1) * 38) * gravityModifier / devScale;
+
     if (timestamp - this.lastDropTime > gravityMs) {
       this.lastDropTime = timestamp;
       this.drop();
@@ -4596,75 +4757,177 @@ class BlockDropApp {
     });
   }
 
+  drawMiniPiece(ctx, type, startX, startY, miniCellSize) {
+    if (!type || !this.shapes[type]) return;
+    const matrix = this.shapes[type];
+    const color = this.colors[type];
+    const mW = matrix[0].length * miniCellSize;
+    const mH = matrix.length * miniCellSize;
+    const ox = startX + Math.floor((miniCellSize * 4 - mW) / 2);
+    const oy = startY + Math.floor((miniCellSize * 4 - mH) / 2);
+
+    for (let r = 0; r < matrix.length; r++) {
+      for (let c = 0; c < matrix[r].length; c++) {
+        if (matrix[r][c]) {
+          const px = ox + c * miniCellSize + 1;
+          const py = oy + r * miniCellSize + 1;
+          const s = miniCellSize - 2;
+
+          ctx.fillStyle = color;
+          ctx.beginPath();
+          ctx.roundRect(px, py, s, s, 2);
+          ctx.fill();
+        }
+      }
+    }
+  }
+
   draw() {
-    if (!this.ctx || !this.active || this.destroyed || !this.grid || !this.grid[0]) return;
-    const w = this.container.clientWidth;
-    const h = this.container.clientHeight;
+    if (!this.ctx || !this.active || this.destroyed || !this.grid) return;
+    const parent = this.canvasWrapper || this.container;
+    const w = parent.clientWidth || this.container.clientWidth || 600;
+    const h = parent.clientHeight || this.container.clientHeight || 400;
     const dpr = this.dpr || 1;
 
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    // Full canvas background
     this.ctx.fillStyle = '#060913';
     this.ctx.fillRect(0, 0, w, h);
 
-    this.ctx.save();
-    this.ctx.translate(this.offsetX || 0, this.offsetY || 0);
-    this.ctx.scale(this.worldScale || 1, this.worldScale || 1);
+    const cs = this.cellSize || 20;
+    const bx = this.boardX || 0;
+    const by = this.boardY || 0;
+    const bw = this.boardW || (10 * cs);
+    const bh = this.boardH || (20 * cs);
 
-    // Grid background lines
+    // =========================================================================
+    // 1. LEFT SIDE PANEL (HOLD & STATS)
+    // =========================================================================
+    const lX = this.leftPanelX || 10;
+    const lW = this.leftPanelW || 100;
+
+    this.ctx.fillStyle = '#0a0f24';
+    this.ctx.strokeStyle = 'rgba(6, 182, 212, 0.3)';
+    this.ctx.lineWidth = 1.5;
+    this.ctx.beginPath();
+    this.ctx.roundRect(lX, by, lW, bh, 6);
+    this.ctx.fill();
+    this.ctx.stroke();
+
+    // HOLD Header
+    this.ctx.font = 'bold 10px "JetBrains Mono", monospace';
+    this.ctx.fillStyle = '#06b6d4';
+    this.ctx.textAlign = 'center';
+    this.ctx.fillText('HOLD', lX + lW / 2, by + 18);
+
+    // HOLD Mini Box
+    const miniCs = Math.max(6, Math.floor(lW / 5));
+    const holdBoxX = lX + Math.floor((lW - miniCs * 4) / 2);
+    const holdBoxY = by + 26;
+
+    this.ctx.fillStyle = '#060a17';
+    this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+    this.ctx.beginPath();
+    this.ctx.roundRect(holdBoxX, holdBoxY, miniCs * 4, miniCs * 4, 4);
+    this.ctx.fill();
+    this.ctx.stroke();
+
+    if (this.heldType) {
+      this.drawMiniPiece(this.ctx, this.heldType, holdBoxX, holdBoxY, miniCs);
+    } else {
+      this.ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+      this.ctx.font = '9px "JetBrains Mono", monospace';
+      this.ctx.fillText('EMPTY', lX + lW / 2, holdBoxY + miniCs * 2.2);
+    }
+
+    // STATS: LEVEL & LINES
+    const statY1 = holdBoxY + miniCs * 4 + 22;
+    this.ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+    this.ctx.font = '8px "JetBrains Mono", monospace';
+    this.ctx.fillText('LEVEL', lX + lW / 2, statY1);
+    this.ctx.fillStyle = '#ffffff';
+    this.ctx.font = 'bold 14px "JetBrains Mono", monospace';
+    this.ctx.fillText(String(this.level), lX + lW / 2, statY1 + 16);
+
+    const statY2 = statY1 + 38;
+    this.ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+    this.ctx.font = '8px "JetBrains Mono", monospace';
+    this.ctx.fillText('LINES', lX + lW / 2, statY2);
+    this.ctx.fillStyle = '#22c55e';
+    this.ctx.font = 'bold 14px "JetBrains Mono", monospace';
+    this.ctx.fillText(String(this.linesCleared), lX + lW / 2, statY2 + 16);
+
+    // =========================================================================
+    // 2. CENTER PLAYFIELD BOARD
+    // =========================================================================
+    this.ctx.fillStyle = '#080c1b';
+    this.ctx.fillRect(bx, by, bw, bh);
+
+    this.ctx.strokeStyle = 'rgba(59, 130, 246, 0.4)';
+    this.ctx.lineWidth = 2;
+    this.ctx.strokeRect(bx, by, bw, bh);
+
+    // Grid lines inside playfield
     this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
     this.ctx.lineWidth = 1;
     for (let r = 0; r <= this.rows; r++) {
       this.ctx.beginPath();
-      this.ctx.moveTo(0, r * this.cellSize);
-      this.ctx.lineTo(this.playfieldWidth, r * this.cellSize);
+      this.ctx.moveTo(bx, by + r * cs);
+      this.ctx.lineTo(bx + bw, by + r * cs);
       this.ctx.stroke();
     }
     for (let c = 0; c <= this.cols; c++) {
       this.ctx.beginPath();
-      this.ctx.moveTo(c * this.cellSize, 0);
-      this.ctx.lineTo(c * this.cellSize, this.playfieldHeight);
+      this.ctx.moveTo(bx + c * cs, by);
+      this.ctx.lineTo(bx + c * cs, by + bh);
       this.ctx.stroke();
     }
 
     const drawBlock = (c, r, color) => {
-      const x = c * this.cellSize + 1;
-      const y = r * this.cellSize + 1;
-      const s = this.cellSize - 2;
+      const px = bx + c * cs + 1;
+      const py = by + r * cs + 1;
+      const s = cs - 2;
 
       this.ctx.fillStyle = color;
       this.ctx.shadowColor = color;
-      this.ctx.shadowBlur = 5;
+      this.ctx.shadowBlur = 4;
       this.ctx.beginPath();
-      this.ctx.roundRect(x, y, s, s, 2);
+      this.ctx.roundRect(px, py, s, s, 2);
       this.ctx.fill();
       this.ctx.shadowBlur = 0;
 
       this.ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-      this.ctx.fillRect(x + 2, y + 2, s - 4, 2);
-
+      this.ctx.fillRect(px + 2, py + 2, s - 4, 2);
       this.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-      this.ctx.fillRect(x + 2, y + s - 4, s - 4, 2);
+      this.ctx.fillRect(px + 2, py + s - 4, s - 4, 2);
     };
 
+    // Draw settled blocks
     for (let r = 0; r < this.rows; r++) {
       for (let c = 0; c < this.cols; c++) {
-        if (this.grid[r][c]) {
+        if (this.grid[r] && this.grid[r][c]) {
           drawBlock(c, r, this.grid[r][c]);
         }
       }
     }
 
+    // Draw Ghost piece & Active piece
     if (this.piece) {
       const { matrix, x, y, color } = this.piece;
       let ghostY = y;
       while (!this.collideAt(x, ghostY + 1, matrix)) ghostY++;
-      this.ctx.globalAlpha = 0.2;
+
+      // Ghost piece (alpha = 0.25)
+      this.ctx.globalAlpha = 0.25;
       for (let r = 0; r < matrix.length; r++) {
         for (let c = 0; c < matrix[r].length; c++) {
           if (matrix[r][c]) drawBlock(x + c, ghostY + r, color);
         }
       }
-      this.ctx.globalAlpha = 1;
+      this.ctx.globalAlpha = 1.0;
+
+      // Active piece
       for (let r = 0; r < matrix.length; r++) {
         for (let c = 0; c < matrix[r].length; c++) {
           if (matrix[r][c]) {
@@ -4674,23 +4937,59 @@ class BlockDropApp {
       }
     }
 
-    this.ctx.restore();
-  }
+    // =========================================================================
+    // 3. RIGHT SIDE PANEL (NEXT QUEUE & SCORE)
+    // =========================================================================
+    const rX = this.rightPanelX || (w - 110);
+    const rW = this.rightPanelW || 100;
 
-  collideAt(x, y, matrix) {
-    const current = this.piece;
-    if (!current) return true;
-    const oldX = current.x;
-    const oldY = current.y;
-    const oldMatrix = current.matrix;
-    current.x = x;
-    current.y = y;
-    current.matrix = matrix;
-    const result = this.collide();
-    current.x = oldX;
-    current.y = oldY;
-    current.matrix = oldMatrix;
-    return result;
+    this.ctx.fillStyle = '#0a0f24';
+    this.ctx.strokeStyle = 'rgba(59, 130, 246, 0.3)';
+    this.ctx.lineWidth = 1.5;
+    this.ctx.beginPath();
+    this.ctx.roundRect(rX, by, rW, bh, 6);
+    this.ctx.fill();
+    this.ctx.stroke();
+
+    // NEXT Header
+    this.ctx.font = 'bold 10px "JetBrains Mono", monospace';
+    this.ctx.fillStyle = '#3b82f6';
+    this.ctx.textAlign = 'center';
+    this.ctx.fillText('NEXT', rX + rW / 2, by + 18);
+
+    // RENDER NEXT 3 PIECES IN QUEUE
+    for (let n = 0; n < 3; n++) {
+      const nextT = this.nextQueue[n];
+      const nBoxY = by + 26 + n * (miniCs * 4 + 6);
+
+      this.ctx.fillStyle = '#060a17';
+      this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+      this.ctx.beginPath();
+      this.ctx.roundRect(rX + Math.floor((rW - miniCs * 4) / 2), nBoxY, miniCs * 4, miniCs * 4, 3);
+      this.ctx.fill();
+      this.ctx.stroke();
+
+      if (nextT) {
+        this.drawMiniPiece(this.ctx, nextT, rX + Math.floor((rW - miniCs * 4) / 2), nBoxY, miniCs);
+      }
+    }
+
+    // STATS: SCORE & BEST
+    const scoreY1 = by + 26 + 3 * (miniCs * 4 + 6) + 16;
+    this.ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+    this.ctx.font = '8px "JetBrains Mono", monospace';
+    this.ctx.fillText('SCORE', rX + rW / 2, scoreY1);
+    this.ctx.fillStyle = '#3b82f6';
+    this.ctx.font = 'bold 13px "JetBrains Mono", monospace';
+    this.ctx.fillText(String(this.score), rX + rW / 2, scoreY1 + 16);
+
+    const scoreY2 = scoreY1 + 38;
+    this.ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+    this.ctx.font = '8px "JetBrains Mono", monospace';
+    this.ctx.fillText('BEST', rX + rW / 2, scoreY2);
+    this.ctx.fillStyle = '#fbbf24';
+    this.ctx.font = 'bold 13px "JetBrains Mono", monospace';
+    this.ctx.fillText(String(this.highScore), rX + rW / 2, scoreY2 + 16);
   }
 
   cancelLoop() {
