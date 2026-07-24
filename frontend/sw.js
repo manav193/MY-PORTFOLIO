@@ -1,4 +1,4 @@
-const cacheName = "manav-portfolio-v22";
+const cacheName = "manav-portfolio-v23";
 const assets = [
   "./",
   "./index.html",
@@ -84,34 +84,54 @@ function validateAssetResponse(request, response) {
     });
   }
 
-  if (!response.ok) return response;
-
   return response;
+}
+
+function shouldPreferNetwork(request, requestUrl) {
+  const pathname = requestUrl.pathname.toLowerCase();
+  return request.mode === "navigate"
+    || request.destination === "script"
+    || request.destination === "style"
+    || pathname.endsWith(".js")
+    || pathname.endsWith(".css")
+    || pathname.endsWith(".json")
+    || pathname.endsWith(".webmanifest");
+}
+
+async function networkFirst(request) {
+  try {
+    const networkResponse = validateAssetResponse(request, await fetch(request, { cache: "no-cache" }));
+    if (networkResponse.ok) {
+      const cache = await caches.open(cacheName);
+      await cache.put(request, networkResponse.clone());
+    }
+    return networkResponse;
+  } catch (error) {
+    return (await caches.match(request, { ignoreSearch: true }))
+      || (request.mode === "navigate" ? await caches.match("./index.html") : null)
+      || (request.mode === "navigate" ? await caches.match("./404.html") : null)
+      || new Response("Offline and resource is not cached.", {
+        status: 503,
+        headers: { "Content-Type": "text/plain; charset=utf-8" }
+      });
+  }
 }
 
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
+
   const requestUrl = new URL(event.request.url);
   if (requestUrl.origin !== self.location.origin) return;
 
-  if (event.request.mode === "navigate") {
-    event.respondWith((async () => {
-      try {
-        const response = await fetch(event.request);
-        if (response.ok) {
-          const cache = await caches.open(cacheName);
-          await cache.put(event.request, response.clone());
-        }
-        return response;
-      } catch (error) {
-        return (await caches.match(event.request, { ignoreSearch: true }))
-          || (await caches.match("./index.html"))
-          || (await caches.match("./404.html"));
-      }
-    })());
+  // Production correctness first: HTML, JS and CSS always check Vercel before cache.
+  // This prevents an old service-worker cache from making a successful Git deploy
+  // look unsynced while still keeping an offline fallback.
+  if (shouldPreferNetwork(event.request, requestUrl)) {
+    event.respondWith(networkFirst(event.request));
     return;
   }
 
+  // Static media can stay fast with stale-while-revalidate behavior.
   const network = fetch(event.request).then(async (networkResponse) => {
     const response = validateAssetResponse(event.request, networkResponse);
     if (response.ok) {
