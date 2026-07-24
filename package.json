@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "node scripts/production-build.mjs",
-    "build:root": "node scripts/production-build.mjs --base /",
-    "build:subdir": "node scripts/production-build.mjs --base /portfolio/",
+    "build": "node build.js",
+    "build:root": "node build.js --base /",
+    "build:subdir": "node build.js --base /portfolio/",
     "preview": "npx vite preview --port 4173",
     "verify": "playwright test tests/global-shell-regression.spec.js",
     "test:arcade": "playwright test tests/arcade-regression.spec.js",
