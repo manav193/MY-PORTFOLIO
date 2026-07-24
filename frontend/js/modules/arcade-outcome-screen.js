@@ -1,29 +1,10 @@
 /**
- * ARCADE OS - SHARED OUTCOME SYSTEM (v1.1)
+ * ARCADE OS - SHARED OUTCOME SYSTEM (v1.0)
  * Polished, animated outcome screens for Game Over, Victory, Level Complete, Wave Clear, and New High Score.
  */
 
 export class ArcadeOutcomeScreen {
   static currentOverlay = null;
-  static inputCleanup = null;
-
-  static getTargetContainer() {
-    let root = document.getElementById('arcade-system-overlay-root');
-    if (root) return root;
-
-    const appView = document.getElementById('arcade-app-view');
-    const safeViewport = appView?.closest('.arcade-viewport-safe') || appView?.parentElement;
-
-    if (safeViewport) {
-      root = document.createElement('div');
-      root.id = 'arcade-system-overlay-root';
-      root.setAttribute('aria-live', 'polite');
-      safeViewport.appendChild(root);
-      return root;
-    }
-
-    return appView || document.getElementById('arcade-os') || document.body;
-  }
 
   static show(config = {}) {
     const {
@@ -42,11 +23,15 @@ export class ArcadeOutcomeScreen {
       customButtons = null
     } = config;
 
-    // Dismiss any existing overlay and its global input handler.
+    // Dismiss any existing overlay
     this.hide();
 
-    const targetContainer = this.getTargetContainer();
-    if (!targetContainer) return null;
+    const targetContainer =
+      document.getElementById('arcade-system-overlay-root') ||
+      document.getElementById('arcade-app-view') ||
+      document.getElementById('arcade-os') ||
+      document.body;
+    if (!targetContainer) return;
 
     // Check Developer / Cheat Mode status
     const isCheated = !!(game?.cheated || window.ArcadeDeveloperMode?.hasActiveCheats?.(gameId));
@@ -91,9 +76,6 @@ export class ArcadeOutcomeScreen {
     const overlay = document.createElement('div');
     overlay.id = 'arcade-outcome-overlay';
     overlay.className = `arcade-outcome-overlay outcome-${outcome.toLowerCase()} ${themeClass}`;
-    overlay.setAttribute('role', 'dialog');
-    overlay.setAttribute('aria-modal', 'true');
-    overlay.setAttribute('aria-label', displayTitle || 'Arcade outcome');
     if (accentColor) overlay.style.setProperty('--outcome-accent', accentColor);
 
     overlay.innerHTML = `
@@ -143,16 +125,9 @@ export class ArcadeOutcomeScreen {
   }
 
   static hide() {
-    if (this.inputCleanup) {
-      this.inputCleanup();
-      this.inputCleanup = null;
-    }
-
     if (this.currentOverlay) {
       this.currentOverlay.remove();
       this.currentOverlay = null;
-    } else {
-      document.getElementById('arcade-outcome-overlay')?.remove();
     }
   }
 
@@ -198,7 +173,6 @@ export class ArcadeOutcomeScreen {
       const duration = 600;
       const startTime = performance.now();
       const step = (now) => {
-        if (!el.isConnected) return;
         const elapsed = now - startTime;
         const progress = Math.min(1, elapsed / duration);
         const current = Math.floor(numericTarget * progress);
@@ -218,11 +192,11 @@ export class ArcadeOutcomeScreen {
     if (!btnNodes.length) return;
 
     let focusedIdx = 0;
-    btnNodes[focusedIdx].focus({ preventScroll: true });
+    btnNodes[focusedIdx].focus();
 
     const focusBtn = (idx) => {
       focusedIdx = (idx + btnNodes.length) % btnNodes.length;
-      btnNodes[focusedIdx].focus({ preventScroll: true });
+      btnNodes[focusedIdx].focus();
     };
 
     const handleAction = (btn) => {
@@ -234,7 +208,7 @@ export class ArcadeOutcomeScreen {
       } else if (action === 'next' && callbacks.onNext) {
         callbacks.onNext();
       } else if (action === 'home') {
-        callbacks.onHome?.();
+        if (callbacks.onHome) callbacks.onHome();
       }
     };
 
@@ -247,30 +221,27 @@ export class ArcadeOutcomeScreen {
     });
 
     const keyHandler = (e) => {
-      if (!ArcadeOutcomeScreen.currentOverlay) return;
+      if (!ArcadeOutcomeScreen.currentOverlay) {
+        window.removeEventListener('keydown', keyHandler);
+        return;
+      }
 
       if (['ArrowRight', 'ArrowDown'].includes(e.key)) {
         e.preventDefault();
-        e.stopPropagation();
         focusBtn(focusedIdx + 1);
       } else if (['ArrowLeft', 'ArrowUp'].includes(e.key)) {
         e.preventDefault();
-        e.stopPropagation();
         focusBtn(focusedIdx - 1);
       } else if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        e.stopPropagation();
         handleAction(btnNodes[focusedIdx]);
       } else if (e.key === 'Escape') {
         e.preventDefault();
-        e.stopPropagation();
-        ArcadeOutcomeScreen.hide();
-        callbacks.onHome?.();
+        focusBtn(0);
       }
     };
 
-    window.addEventListener('keydown', keyHandler, { capture: true });
-    this.inputCleanup = () => window.removeEventListener('keydown', keyHandler, { capture: true });
+    window.addEventListener('keydown', keyHandler);
   }
 }
 
