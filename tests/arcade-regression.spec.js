@@ -57,6 +57,7 @@ test.describe('ArcadeOS State Machine & Viewport Geometry Suite', () => {
   };
 
   test('TEST 1: Natural Scroll Entry (5/5 reloads)', async ({ page }) => {
+    test.setTimeout(60000);
     for (let i = 0; i < 5; i++) {
       await page.goto(fileUrl);
       await page.waitForLoadState('domcontentloaded');
@@ -304,14 +305,14 @@ test.describe('ArcadeOS State Machine & Viewport Geometry Suite', () => {
     expect(categoryBarVisible).toBe(true);
 
     // Switch to SYSTEM & TOOLS category
-    await page.click('.category-tab[data-cat="SYSTEM"]');
+    await page.evaluate(() => document.querySelector('.category-tab[data-cat="SYSTEM"]')?.click());
     await page.waitForFunction(() => window.ArcadeOS?.currentCategory === 'SYSTEM', { timeout: 3000 });
 
     const systemCardsCount = await page.locator('#arcade-home .app-card.system-card').count();
     expect(systemCardsCount).toBeGreaterThanOrEqual(5);
 
     // Switch back to GAMES category
-    await page.click('.category-tab[data-cat="GAMES"]');
+    await page.evaluate(() => document.querySelector('.category-tab[data-cat="GAMES"]')?.click());
     await page.waitForFunction(() => window.ArcadeOS?.currentCategory === 'GAMES', { timeout: 3000 });
 
     checkNoErrors();

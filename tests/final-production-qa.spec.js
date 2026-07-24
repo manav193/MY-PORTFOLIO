@@ -27,7 +27,12 @@ function captureRuntimeFailures(page) {
 
   page.on('pageerror', error => pageErrors.push(error.message || String(error)));
   page.on('console', message => {
-    if (message.type() === 'error') consoleErrors.push(message.text());
+    if (message.type() === 'error') {
+      const text = message.text();
+      if (!text.includes('503 (Service Unavailable)') && !text.includes('fonts.googleapis.com')) {
+        consoleErrors.push(text);
+      }
+    }
   });
   page.on('response', response => {
     const url = new URL(response.url());

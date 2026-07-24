@@ -2264,17 +2264,33 @@ class NeonSnakeApp {
     this.highScore = this.storage.get('arcade_snake_best', 0);
     this.state = 'READY';
     this.active = false;
-    this.gridWidth = 20;
-    this.gridHeight = 20;
+    this.destroyed = false;
+
+    // Landscape board grid setup
+    this.gridWidth = 24;
+    this.gridHeight = 16;
+    this.cellSize = 20;
+    this.offsetX = 0;
+    this.offsetY = 0;
+    this.dpr = 1;
+
     this.rafId = null;
     this.lastTickTime = 0;
-    this.tickRate = 118;
+    this.tickRate = 110;
+    this.score = 0;
+    this.foodCount = 0;
+
+    this.dir = 'RIGHT';
+    this.nextDir = 'RIGHT';
+    this.inputQueue = [];
+
     this.snake = [];
     this.food = { x: 0, y: 0 };
   }
 
   mount() {
     this.active = true;
+    this.destroyed = false;
     this.container.innerHTML = `
       <div class="app-neon-snake" id="snake-game-container" tabindex="0">
         <div id="snake-hud" class="snake-hud-hidden">
@@ -2290,13 +2306,30 @@ class NeonSnakeApp {
 
     this.gameContainer = this.container.querySelector('#snake-game-container');
     this.canvas = this.container.querySelector('#snake-canvas');
+    this.canvasWrapper = this.container.querySelector('.canvas-wrapper');
     this.ctx = this.canvas.getContext('2d');
     this.overlay = this.container.querySelector('#snake-overlay-view');
     this.hud = this.container.querySelector('#snake-hud');
 
     this.gameContainer.focus({ preventScroll: true });
+
+    // Deterministic state reset BEFORE resize / draw
+    this.dir = 'RIGHT';
+    this.nextDir = 'RIGHT';
+    this.inputQueue = [];
+    this.score = 0;
+    this.foodCount = 0;
+
+    const midX = Math.floor(this.gridWidth / 2);
+    const midY = Math.floor(this.gridHeight / 2);
+    this.snake = [{ x: midX, y: midY }, { x: midX - 1, y: midY }, { x: midX - 2, y: midY }];
+    this.spawnFood();
+
+    // Perform initial viewport measurement & canvas setup
+    this.resizeCanvas();
+
     this.resizeObserver = new ResizeObserver(() => this.resizeCanvas());
-    this.resizeObserver.observe(this.container);
+    this.resizeObserver.observe(this.canvasWrapper || this.container);
 
     this.upHandler = () => this.handleDirection('UP');
     this.downHandler = () => this.handleDirection('DOWN');
@@ -2311,12 +2344,23 @@ class NeonSnakeApp {
     this.bus.on('ARCADE_ACTION_A', () => this.handleConfirm());
 
     this.keydownHandler = (e) => {
-      if (!this.active) return;
-      if (e.key === 'ArrowUp' || e.key === 'w') this.handleDirection('UP');
-      if (e.key === 'ArrowDown' || e.key === 's') this.handleDirection('DOWN');
-      if (e.key === 'ArrowLeft' || e.key === 'a') this.handleDirection('LEFT');
-      if (e.key === 'ArrowRight' || e.key === 'd') this.handleDirection('RIGHT');
-      if (e.key === 'Escape') this.togglePause();
+      if (!this.active || this.destroyed) return;
+      const key = e.key;
+
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd', 'W', 'A', 'S', 'D'].includes(key)) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (key === 'ArrowUp' || key === 'w' || key === 'W') this.handleDirection('UP');
+        if (key === 'ArrowDown' || key === 's' || key === 'S') this.handleDirection('DOWN');
+        if (key === 'ArrowLeft' || key === 'a' || key === 'A') this.handleDirection('LEFT');
+        if (key === 'ArrowRight' || key === 'd' || key === 'D') this.handleDirection('RIGHT');
+      } else if (key === ' ' || key === 'Enter') {
+        e.preventDefault();
+        this.handleConfirm();
+      } else if (key === 'Escape') {
+        e.preventDefault();
+        this.togglePause();
+      }
     };
     document.addEventListener('keydown', this.keydownHandler);
 
@@ -2346,42 +2390,68 @@ class NeonSnakeApp {
 
   resizeCanvas() {
     if (!this.canvas) return;
-    const w = this.container.clientWidth;
-    const h = this.container.clientHeight;
+    const parent = this.canvasWrapper || this.container;
+    const w = parent.clientWidth || this.container.clientWidth || 600;
+    const h = parent.clientHeight || this.container.clientHeight || 400;
     if (!w || !h) return;
 
+    // Use full CRT safe viewport landscape aspect ratio (24 x 16 grid)
+    this.gridWidth = 24;
+    this.gridHeight = 16;
+
+    // Use 94% of safe area to ensure clean border inset
+    const availW = w * 0.94;
+    const availH = h * 0.94;
+
+    let cellSize = Math.floor(Math.min(availW / this.gridWidth, availH / this.gridHeight));
+    if (cellSize < 12) cellSize = 12;
+    this.cellSize = cellSize;
+
+    const boardWidth = this.gridWidth * this.cellSize;
+    const boardHeight = this.gridHeight * this.cellSize;
+
+    this.offsetX = Math.floor((w - boardWidth) / 2);
+    this.offsetY = Math.floor((h - boardHeight) / 2);
+
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    this.canvas.style.width = '100%';
-    this.canvas.style.height = '100%';
+    this.dpr = dpr;
+
+    this.canvas.style.width = w + 'px';
+    this.canvas.style.height = h + 'px';
     this.canvas.style.display = 'block';
 
     this.canvas.width = Math.round(w * dpr);
     this.canvas.height = Math.round(h * dpr);
 
-    this.cellSize = w / this.gridWidth;
-    this.gridHeight = Math.floor(h / this.cellSize);
-
-    this.dpr = dpr;
     this.draw();
   }
 
   handleDirection(dir) {
     if (this.state !== 'PLAYING') return;
     const opposites = { UP: 'DOWN', DOWN: 'UP', LEFT: 'RIGHT', RIGHT: 'LEFT' };
-    if (dir !== opposites[this.dir]) {
-      this.nextDir = dir;
-      this.audio.playGameSfx('snake', 'turn', { cooldown: 70 });
+    const lastDir = this.inputQueue.length ? this.inputQueue[this.inputQueue.length - 1] : this.dir;
+    if (dir !== lastDir && dir !== opposites[lastDir]) {
+      if (this.inputQueue.length < 2) {
+        this.inputQueue.push(dir);
+        this.audio.playGameSfx('snake', 'turn', { cooldown: 70 });
+      }
     }
   }
 
   handleConfirm() {
-    if (this.state === 'READY' || this.state === 'GAME_OVER') this.start();
+    if (this.state === 'READY' || this.state === 'GAME_OVER') {
+      this.start();
+    }
   }
 
   togglePause() {
     if (this.state === 'PLAYING') {
       this.state = 'PAUSED';
       this.cancelLoop();
+    } else if (this.state === 'PAUSED') {
+      this.state = 'PLAYING';
+      this.lastTickTime = performance.now();
+      this.gameLoop(performance.now());
     }
   }
 
@@ -2391,9 +2461,14 @@ class NeonSnakeApp {
       this.score = 0;
       this.dir = 'RIGHT';
       this.nextDir = 'RIGHT';
-      this.snake = [{ x: 10, y: 10 }, { x: 9, y: 10 }, { x: 8, y: 10 }];
-      this.food = { x: 14, y: 10 };
+      this.inputQueue = [];
+
+      const midX = Math.floor(this.gridWidth / 2);
+      const midY = Math.floor(this.gridHeight / 2);
+      this.snake = [{ x: midX, y: midY }, { x: midX - 1, y: midY }, { x: midX - 2, y: midY }];
+      this.spawnFood();
       this.draw();
+
       this.overlay.className = 'snake-overlay-active';
       this.overlay.innerHTML = `
         <div class="snake-menu">
@@ -2411,15 +2486,21 @@ class NeonSnakeApp {
 
   start() {
     this.score = 0;
-    this.snake = [{ x: 10, y: 10 }, { x: 9, y: 10 }, { x: 8, y: 10 }];
+    this.foodCount = 0;
     this.dir = 'RIGHT';
     this.nextDir = 'RIGHT';
+    this.inputQueue = [];
+
+    const midX = Math.floor(this.gridWidth / 2);
+    const midY = Math.floor(this.gridHeight / 2);
+    this.snake = [{ x: midX, y: midY }, { x: midX - 1, y: midY }, { x: midX - 2, y: midY }];
     this.spawnFood();
 
     this.state = 'PLAYING';
     if (this.hud) this.hud.className = 'snake-hud-active';
     this.overlay.className = '';
     this.overlay.innerHTML = '';
+
     this.cancelLoop();
     this.lastTickTime = performance.now();
     this.gameLoop(performance.now());
@@ -2427,10 +2508,20 @@ class NeonSnakeApp {
   }
 
   spawnFood() {
-    this.food = {
-      x: Math.floor(Math.random() * this.gridWidth),
-      y: Math.floor(Math.random() * this.gridHeight)
-    };
+    const occupied = new Set(this.snake.map(s => `${s.x},${s.y}`));
+    const emptyCells = [];
+    for (let x = 0; x < this.gridWidth; x++) {
+      for (let y = 0; y < this.gridHeight; y++) {
+        if (!occupied.has(`${x},${y}`)) {
+          emptyCells.push({ x, y });
+        }
+      }
+    }
+    if (emptyCells.length > 0) {
+      this.food = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+    } else {
+      this.food = { x: 0, y: 0 };
+    }
   }
 
   gameLoop(timestamp) {
@@ -2438,8 +2529,9 @@ class NeonSnakeApp {
     this.rafId = requestAnimationFrame((t) => this.gameLoop(t));
 
     const devScale = window.ArcadeDeveloperMode?.getSpeedScale?.() || 1;
-    const pace = Math.max(68, 118 - Math.floor(this.score / 30) * 7);
+    const pace = Math.max(68, 110 - Math.floor(this.score / 30) * 6);
     this.tickRate = this.snakeSlowTime ? pace * 1.35 : pace;
+
     if (timestamp - this.lastTickTime >= this.tickRate / devScale) {
       this.lastTickTime = timestamp;
       this.update();
@@ -2448,7 +2540,9 @@ class NeonSnakeApp {
   }
 
   update() {
-    this.dir = this.nextDir;
+    if (this.inputQueue.length > 0) {
+      this.dir = this.inputQueue.shift();
+    }
     const head = { ...this.snake[0] };
 
     if (this.dir === 'UP') head.y--;
@@ -2456,6 +2550,7 @@ class NeonSnakeApp {
     if (this.dir === 'LEFT') head.x--;
     if (this.dir === 'RIGHT') head.x++;
 
+    // Wall collision
     if (head.x < 0 || head.x >= this.gridWidth || head.y < 0 || head.y >= this.gridHeight) {
       if (hasDevModifier('snake', 'invincible_walls')) {
         head.x = (head.x + this.gridWidth) % this.gridWidth;
@@ -2466,17 +2561,23 @@ class NeonSnakeApp {
       }
     }
 
-    if (this.snake.some(s => s.x === head.x && s.y === head.y)) {
+    // Check if food will be eaten
+    const isEating = (head.x === this.food.x && head.y === this.food.y);
+
+    // Self collision check (exclude tail if tail will move away)
+    const checkSegments = isEating ? this.snake : this.snake.slice(0, -1);
+    if (checkSegments.some(s => s.x === head.x && s.y === head.y)) {
       this.gameOver();
       return;
     }
 
     this.snake.unshift(head);
 
-    if (head.x === this.food.x && head.y === this.food.y) {
+    if (isEating) {
       this.score += (this.snakeScoreMultiplier || hasDevModifier('snake', 'score_multiplier')) ? 20 : 10;
       this.foodCount = (this.foodCount || 0) + 1;
       this.audio.playGameSfx('snake', 'eat');
+
       if (this.foodCount % 5 === 0) {
         const buff = this.foodCount % 10 === 0
           ? new PowerUpDefinition({ id: 'shorten', icon: '−', effect: 'Shorter tail', activate: app => app.snake.splice(Math.max(3, app.snake.length - 3)), deactivate: () => {}, duration: 1200 })
@@ -2487,6 +2588,7 @@ class NeonSnakeApp {
     } else {
       this.snake.pop();
     }
+
     const scoreEl = this.container.querySelector('#hud-score');
     if (scoreEl) scoreEl.textContent = String(this.score);
   }
@@ -2527,72 +2629,102 @@ class NeonSnakeApp {
 
   draw() {
     if (!this.ctx || !this.active || this.destroyed) return;
-    const w = this.container.clientWidth;
-    const h = this.container.clientHeight;
+    const parent = this.canvasWrapper || this.container;
+    const w = parent.clientWidth || this.container.clientWidth || 600;
+    const h = parent.clientHeight || this.container.clientHeight || 400;
     const dpr = this.dpr || 1;
 
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    // Fill canvas background
     this.ctx.fillStyle = '#060f0a';
     this.ctx.fillRect(0, 0, w, h);
 
+    const cs = this.cellSize || 20;
+    const ox = this.offsetX || 0;
+    const oy = this.offsetY || 0;
+    const bw = this.gridWidth * cs;
+    const bh = this.gridHeight * cs;
+
+    // Draw board playfield background
+    this.ctx.fillStyle = '#08170e';
+    this.ctx.fillRect(ox, oy, bw, bh);
+
+    // Draw board border
+    this.ctx.strokeStyle = 'rgba(16, 185, 129, 0.4)';
+    this.ctx.lineWidth = 2;
+    this.ctx.strokeRect(ox, oy, bw, bh);
+
+    // Draw grid lines inside board playfield
     this.ctx.strokeStyle = 'rgba(52, 211, 153, 0.08)';
     this.ctx.lineWidth = 1;
-    for (let x = 0; x <= w; x += this.cellSize || 24) {
+    for (let col = 0; col <= this.gridWidth; col++) {
+      const gx = ox + col * cs;
       this.ctx.beginPath();
-      this.ctx.moveTo(x, 0);
-      this.ctx.lineTo(x, h);
+      this.ctx.moveTo(gx, oy);
+      this.ctx.lineTo(gx, oy + bh);
       this.ctx.stroke();
     }
-    for (let y = 0; y <= h; y += this.cellSize || 24) {
+    for (let row = 0; row <= this.gridHeight; row++) {
+      const gy = oy + row * cs;
       this.ctx.beginPath();
-      this.ctx.moveTo(0, y);
-      this.ctx.lineTo(w, y);
+      this.ctx.moveTo(ox, gy);
+      this.ctx.lineTo(ox + bw, gy);
       this.ctx.stroke();
     }
 
     if (!this.snake?.length || !this.food) return;
 
-    this.ctx.fillStyle = '#ef4444';
-    this.ctx.shadowColor = '#ef4444';
-    this.ctx.shadowBlur = 10;
+    // Draw food with pulsing neon red/orange glow
+    const foodPulse = (cs - 2) * (0.82 + 0.18 * Math.sin(performance.now() / 140));
+    const foodOffset = (cs - foodPulse) / 2;
+    const foodX = ox + this.food.x * cs + foodOffset;
+    const foodY = oy + this.food.y * cs + foodOffset;
 
-    const pulse = (this.cellSize - 2) * (0.8 + 0.2 * Math.sin(performance.now() / 150));
-    const offset = (this.cellSize - pulse) / 2;
-    this.ctx.fillRect(this.food.x * this.cellSize + offset, this.food.y * this.cellSize + offset, pulse, pulse);
+    this.ctx.fillStyle = '#ef4444';
+    this.ctx.shadowColor = '#f97316';
+    this.ctx.shadowBlur = 12;
+    this.ctx.fillRect(foodX, foodY, foodPulse, foodPulse);
     this.ctx.shadowBlur = 0;
 
+    // Draw Snake segments
     this.snake.forEach((s, i) => {
+      const segX = ox + s.x * cs;
+      const segY = oy + s.y * cs;
+
       if (i === 0) {
+        // Head: bright neon green
         this.ctx.fillStyle = '#10b981';
         this.ctx.shadowColor = '#34d399';
-        this.ctx.shadowBlur = 8;
-        this.ctx.fillRect(s.x * this.cellSize, s.y * this.cellSize, this.cellSize, this.cellSize);
+        this.ctx.shadowBlur = 10;
+        this.ctx.fillRect(segX, segY, cs, cs);
         this.ctx.shadowBlur = 0;
 
         // Snake eyes
         this.ctx.fillStyle = '#ffffff';
-        const eyeSize = Math.max(2, this.cellSize * 0.15);
+        const eyeSize = Math.max(2, cs * 0.16);
 
-        let e1x = s.x * this.cellSize + this.cellSize * 0.2;
-        let e1y = s.y * this.cellSize + this.cellSize * 0.2;
-        let e2x = s.x * this.cellSize + this.cellSize * 0.6;
-        let e2y = s.y * this.cellSize + this.cellSize * 0.2;
+        let e1x = segX + cs * 0.2;
+        let e1y = segY + cs * 0.2;
+        let e2x = segX + cs * 0.6;
+        let e2y = segY + cs * 0.2;
 
         if (this.dir === 'UP' || this.dir === 'DOWN') {
-           e1x = s.x * this.cellSize + this.cellSize * 0.2;
-           e2x = s.x * this.cellSize + this.cellSize * 0.6;
-           e1y = e2y = s.y * this.cellSize + (this.dir === 'DOWN' ? this.cellSize * 0.6 : this.cellSize * 0.2);
+          e1x = segX + cs * 0.2;
+          e2x = segX + cs * 0.6;
+          e1y = e2y = segY + (this.dir === 'DOWN' ? cs * 0.6 : cs * 0.2);
         } else {
-           e1y = s.y * this.cellSize + this.cellSize * 0.2;
-           e2y = s.y * this.cellSize + this.cellSize * 0.6;
-           e1x = e2x = s.x * this.cellSize + (this.dir === 'RIGHT' ? this.cellSize * 0.6 : this.cellSize * 0.2);
+          e1y = segY + cs * 0.2;
+          e2y = segY + cs * 0.6;
+          e1x = e2x = segX + (this.dir === 'RIGHT' ? cs * 0.6 : cs * 0.2);
         }
 
         this.ctx.fillRect(e1x, e1y, eyeSize, eyeSize);
         this.ctx.fillRect(e2x, e2y, eyeSize, eyeSize);
       } else {
+        // Body: darker neon green segments
         this.ctx.fillStyle = '#047857';
-        this.ctx.fillRect(s.x * this.cellSize + 1, s.y * this.cellSize + 1, this.cellSize - 2, this.cellSize - 2);
+        this.ctx.fillRect(segX + 1, segY + 1, cs - 2, cs - 2);
       }
     });
   }

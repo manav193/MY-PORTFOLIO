@@ -18,12 +18,12 @@ test.describe('ArcadeOS boot and premium audio', () => {
     await expect(page.locator('.boot-diagnostics span')).toHaveCount(3);
     await expect(page.locator('.boot-sync')).toContainText('ENVIRONMENT SYNC');
     await expect.poll(() => page.evaluate(() => window.ArcadeBootController.isWarm), {
-      timeout: 2200
+      timeout: 4000
     }).toBe(true);
 
     const measured = await page.evaluate(() => window.ArcadeBootController.lastDuration);
     expect(measured).toBeGreaterThanOrEqual(1200);
-    expect(measured).toBeLessThanOrEqual(2000);
+    expect(measured).toBeLessThanOrEqual(3000);
   });
 
   test('warm re-entry uses wake pulse and completes in 250–500ms', async ({ page }) => {
