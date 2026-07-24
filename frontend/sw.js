@@ -1,4 +1,4 @@
-const cacheName = "manav-portfolio-v24";
+const cacheName = "manav-portfolio-v22";
 const assets = [
   "./",
   "./index.html",
@@ -61,28 +61,12 @@ self.addEventListener("install", (event) => {
 });
 
 self.addEventListener("activate", (event) => {
-  event.waitUntil((async () => {
-    const keys = await caches.keys();
-    await Promise.all(keys
+  event.waitUntil(
+    caches.keys().then((keys) => Promise.all(keys
       .filter((key) => key.startsWith("manav-portfolio-") && key !== cacheName)
-      .map((key) => caches.delete(key)));
-
-    await self.clients.claim();
-
-    // A previous cache-first worker could keep an already-open tab on stale JS/CSS.
-    // Reload controlled portfolio tabs once when this new worker takes over so the
-    // next request is guaranteed to use the network-first strategy below.
-    const clients = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
-    await Promise.all(clients.map((client) => {
-      try {
-        const url = new URL(client.url);
-        if (url.origin !== self.location.origin) return Promise.resolve();
-        return client.navigate(client.url).catch(() => undefined);
-      } catch (_) {
-        return Promise.resolve();
-      }
-    }));
-  })());
+      .map((key) => caches.delete(key))))
+  );
+  self.clients.claim();
 });
 
 function validateAssetResponse(request, response) {
@@ -100,52 +84,34 @@ function validateAssetResponse(request, response) {
     });
   }
 
+  if (!response.ok) return response;
+
   return response;
-}
-
-function shouldPreferNetwork(request, requestUrl) {
-  const pathname = requestUrl.pathname.toLowerCase();
-  return request.mode === "navigate"
-    || request.destination === "script"
-    || request.destination === "style"
-    || pathname.endsWith(".js")
-    || pathname.endsWith(".css")
-    || pathname.endsWith(".json")
-    || pathname.endsWith(".webmanifest");
-}
-
-async function networkFirst(request) {
-  try {
-    const networkResponse = validateAssetResponse(request, await fetch(request, { cache: "no-cache" }));
-    if (networkResponse.ok) {
-      const cache = await caches.open(cacheName);
-      await cache.put(request, networkResponse.clone());
-    }
-    return networkResponse;
-  } catch (error) {
-    return (await caches.match(request, { ignoreSearch: true }))
-      || (request.mode === "navigate" ? await caches.match("./index.html") : null)
-      || (request.mode === "navigate" ? await caches.match("./404.html") : null)
-      || new Response("Offline and resource is not cached.", {
-        status: 503,
-        headers: { "Content-Type": "text/plain; charset=utf-8" }
-      });
-  }
 }
 
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
-
   const requestUrl = new URL(event.request.url);
   if (requestUrl.origin !== self.location.origin) return;
 
-  // Production correctness first: HTML, JS and CSS always check Vercel before cache.
-  if (shouldPreferNetwork(event.request, requestUrl)) {
-    event.respondWith(networkFirst(event.request));
+  if (event.request.mode === "navigate") {
+    event.respondWith((async () => {
+      try {
+        const response = await fetch(event.request);
+        if (response.ok) {
+          const cache = await caches.open(cacheName);
+          await cache.put(event.request, response.clone());
+        }
+        return response;
+      } catch (error) {
+        return (await caches.match(event.request, { ignoreSearch: true }))
+          || (await caches.match("./index.html"))
+          || (await caches.match("./404.html"));
+      }
+    })());
     return;
   }
 
-  // Static media can stay fast with stale-while-revalidate behavior.
   const network = fetch(event.request).then(async (networkResponse) => {
     const response = validateAssetResponse(event.request, networkResponse);
     if (response.ok) {
