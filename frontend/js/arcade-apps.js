@@ -1,8 +1,4 @@
-/**
- * ARCADE OS PLATFORM - APPLICATIONS & GAME LIBRARY
- * Cleaned & upgraded arcade suite:
- * Includes: PAC-MAZE, Pixel Plumber, Flappy Byte, Space Wars, Neon Snake, Breakout (Fixed Ball Out), Neon Pong, Void Invaders, Vector Drift, BLOCK//DROP, Palette Lab
- */
+import { ArcadeOutcomeScreen } from "./modules/arcade-outcome-screen.js";
 
 export class PowerUpDefinition {
   constructor({ id, duration = 6000, icon = '◆', effect = '', activate = () => {}, deactivate = () => {} }) {
@@ -500,26 +496,32 @@ class PacMazeApp {
     clearGameBuffs(this);
     markOutcome(this, 'gameover', 'maze-collapse');
     this.state = 'GAME_OVER';
-    if (this.score > this.highScore) {
+
+    const isCheated = !!(this.cheated || window.ArcadeDeveloperMode?.hasActiveCheats?.('pacmaze'));
+    const isNewHigh = this.score > this.highScore && !isCheated;
+    if (isNewHigh) {
       this.highScore = this.score;
       this.storage.set('arcade_pacmaze_best', this.highScore);
     }
     this.bus.emit('PACMAZE_SCORE', { score: this.score });
     this.bus.emit('GAME_COMPLETED', { id: 'pacmaze' });
 
-    this.overlay.className = 'pacmaze-overlay-active';
-    this.overlay.innerHTML = `
-      <div class="pacmaze-menu">
-        <h2>GAME OVER</h2>
-        <div class="pacmaze-score">${this.score}</div>
-        <button class="pacmaze-btn primary" id="pm-retry">PLAY AGAIN</button>
-        <button class="pacmaze-btn" id="pm-exit">EXIT</button>
-      </div>
-    `;
-    const pmRetry = this.overlay.querySelector('#pm-retry');
-    if (pmRetry) pmRetry.onclick = () => this.start();
-    const pmExit = this.overlay.querySelector('#pm-exit');
-    if (pmExit) pmExit.onclick = () => (window.ArcadeOS || globalThis.ArcadeOS)?.goHome();
+    ArcadeOutcomeScreen.show({
+      game: this,
+      gameId: 'pacmaze',
+      outcome: 'GAME_OVER',
+      title: 'GAME OVER',
+      subtitle: 'PAC-MAN WAS DEFEATED',
+      accentColor: '#f43f5e',
+      isNewHighScore: isNewHigh,
+      stats: [
+        { label: 'SCORE', value: this.score, highlight: true },
+        { label: 'BEST', value: this.highScore },
+        { label: 'MAZE', value: this.level || 1 }
+      ],
+      onRetry: () => this.start(),
+      onHome: () => (window.ArcadeOS || globalThis.ArcadeOS)?.goHome()
+    });
   }
 
   victory() {
@@ -528,31 +530,36 @@ class PacMazeApp {
     clearGameBuffs(this);
     markOutcome(this, 'victory', 'maze-cleared');
     this.state = 'VICTORY';
-    if (this.score > this.highScore) {
+
+    const isCheated = !!(this.cheated || window.ArcadeDeveloperMode?.hasActiveCheats?.('pacmaze'));
+    const isNewHigh = this.score > this.highScore && !isCheated;
+    if (isNewHigh) {
       this.highScore = this.score;
       this.storage.set('arcade_pacmaze_best', this.highScore);
     }
     this.bus.emit('PACMAZE_SCORE', { score: this.score });
     this.bus.emit('GAME_COMPLETED', { id: 'pacmaze' });
-    this.audio.playGameSfx('pacmaze', 'victory');
 
-    this.overlay.className = 'pacmaze-overlay-active';
-    this.overlay.innerHTML = `
-      <div class="pacmaze-menu">
-        <h2>MAZE CLEARED</h2>
-        <div class="pacmaze-score">SCORE ${this.score}</div>
-        <div class="pacmaze-hi">BEST ${this.highScore}</div>
-        <button class="pacmaze-btn primary" id="pm-next">NEXT MAZE</button>
-        <button class="pacmaze-btn" id="pm-replay">REPLAY</button>
-        <button class="pacmaze-btn" id="pm-home">HOME</button>
-      </div>
-    `;
-    const pmNext = this.overlay.querySelector('#pm-next');
-    if (pmNext) pmNext.onclick = () => { this.level++; this.start(); };
-    const pmReplay = this.overlay.querySelector('#pm-replay');
-    if (pmReplay) pmReplay.onclick = () => this.start();
-    const pmHome = this.overlay.querySelector('#pm-home');
-    if (pmHome) pmHome.onclick = () => (window.ArcadeOS || globalThis.ArcadeOS)?.goHome();
+    ArcadeOutcomeScreen.show({
+      game: this,
+      gameId: 'pacmaze',
+      outcome: 'MAZE_CLEARED',
+      title: 'MAZE CLEARED!',
+      subtitle: 'ALL PELLETS CONSUMED',
+      accentColor: '#eab308',
+      isNewHighScore: isNewHigh,
+      stats: [
+        { label: 'FINAL SCORE', value: this.score, highlight: true },
+        { label: 'BONUS', value: 500 },
+        { label: 'BEST', value: this.highScore }
+      ],
+      onNext: () => {
+        this.level = (this.level || 1) + 1;
+        this.start();
+      },
+      onRetry: () => this.start(),
+      onHome: () => (window.ArcadeOS || globalThis.ArcadeOS)?.goHome()
+    });
   }
 
   draw() {
@@ -1082,26 +1089,33 @@ class PixelPlumberApp {
     clearGameBuffs(this);
     markOutcome(this, 'gameover', 'plumber-impact');
     this.audio.playGameSfx('pixelplumber', 'defeat');
-    if (this.score > this.highScore) {
+
+    const isCheated = !!(this.cheated || window.ArcadeDeveloperMode?.hasActiveCheats?.('pixelplumber'));
+    const isNewHigh = this.score > this.highScore && !isCheated;
+    if (isNewHigh) {
       this.highScore = this.score;
       this.storage.set('arcade_plumber_best', this.highScore);
     }
     this.bus.emit('PIXELPLUMBER_SCORE', { score: this.score });
     this.bus.emit('GAME_COMPLETED', { id: 'pixelplumber' });
 
-    this.overlay.className = 'plumber-overlay-active';
-    this.overlay.innerHTML = `
-      <div class="plumber-menu">
-        <h2>GAME OVER</h2>
-        <div class="plumber-score">${this.score}</div>
-        <button class="plumber-btn primary" id="pp-retry">RETRY</button>
-        <button class="plumber-btn" id="pp-exit">EXIT</button>
-      </div>
-    `;
-    const ppRetry = this.overlay.querySelector('#pp-retry');
-    if (ppRetry) ppRetry.onclick = () => this.start();
-    const ppExit = this.overlay.querySelector('#pp-exit');
-    if (ppExit) ppExit.onclick = () => (window.ArcadeOS || globalThis.ArcadeOS)?.goHome();
+    ArcadeOutcomeScreen.show({
+      game: this,
+      gameId: 'pixelplumber',
+      outcome: 'GAME_OVER',
+      title: 'GAME OVER',
+      subtitle: 'PLUMBER FELL IN ACTION',
+      accentColor: '#ef4444',
+      isNewHighScore: isNewHigh,
+      stats: [
+        { label: 'SCORE', value: this.score, highlight: true },
+        { label: 'COINS', value: this.coins || 0 },
+        { label: 'LEVEL', value: this.level || 1 },
+        { label: 'BEST', value: this.highScore }
+      ],
+      onRetry: () => this.start(),
+      onHome: () => (window.ArcadeOS || globalThis.ArcadeOS)?.goHome()
+    });
   }
 
   victory() {
@@ -1111,23 +1125,36 @@ class PixelPlumberApp {
     markOutcome(this, 'victory', 'level-complete');
     this.score += 500;
     this.audio.playGameSfx('pixelplumber', 'victory');
-    if (this.score > this.highScore) {
+
+    const isCheated = !!(this.cheated || window.ArcadeDeveloperMode?.hasActiveCheats?.('pixelplumber'));
+    const isNewHigh = this.score > this.highScore && !isCheated;
+    if (isNewHigh) {
       this.highScore = this.score;
       this.storage.set('arcade_plumber_best', this.highScore);
     }
     this.bus.emit('PIXELPLUMBER_SCORE', { score: this.score });
     this.bus.emit('GAME_COMPLETED', { id: 'pixelplumber' });
 
-    this.overlay.className = 'plumber-overlay-active';
-    this.overlay.innerHTML = `
-      <div class="plumber-menu">
-        <h2>FLAG REACHED!</h2>
-        <div class="plumber-score">FINAL SCORE: ${this.score}</div>
-        <button class="plumber-btn primary" id="pp-retry">PLAY AGAIN</button>
-      </div>
-    `;
-    const ppRetry2 = this.overlay.querySelector('#pp-retry');
-    if (ppRetry2) ppRetry2.onclick = () => this.start();
+    ArcadeOutcomeScreen.show({
+      game: this,
+      gameId: 'pixelplumber',
+      outcome: 'LEVEL_COMPLETE',
+      title: 'LEVEL COMPLETE!',
+      subtitle: 'FLAGPOLE REACHED SUCCESSFULLY',
+      accentColor: '#10b981',
+      isNewHighScore: isNewHigh,
+      stats: [
+        { label: 'FINAL SCORE', value: this.score, highlight: true },
+        { label: 'COINS', value: this.coins || 0 },
+        { label: 'BEST', value: this.highScore }
+      ],
+      onNext: () => {
+        this.level = (this.level || 1) + 1;
+        this.start();
+      },
+      onRetry: () => this.start(),
+      onHome: () => (window.ArcadeOS || globalThis.ArcadeOS)?.goHome()
+    });
   }
 
   draw() {
@@ -1465,25 +1492,30 @@ class FlappyByteApp {
     clearGameBuffs(this);
     markOutcome(this, 'gameover', 'collision-fall');
 
-    if (this.score > this.highScore) {
+    const isCheated = !!(this.cheated || window.ArcadeDeveloperMode?.hasActiveCheats?.('flappybyte'));
+    const isNewHigh = this.score > this.highScore && !isCheated;
+    if (isNewHigh) {
       this.highScore = this.score;
       this.storage.set('arcade_flappy_best', this.highScore);
-      this.audio.playGameSfx('flappybyte', 'highScore');
     }
     this.bus.emit('FLAPPYBYTE_SCORE', { score: this.score });
     this.bus.emit('GAME_COMPLETED', { id: 'flappybyte' });
 
-    this.overlay.className = 'flappy-overlay-active';
-    this.overlay.innerHTML = `
-      <div class="flappy-menu">
-        <h2>CRASH!</h2>
-        <div class="flappy-score">${this.score}</div>
-        <button class="flappy-btn primary" id="fb-retry">FLAP AGAIN</button>
-      </div>
-    `;
-    const fbRetry = this.overlay.querySelector('#fb-retry');
-    if (fbRetry) fbRetry.onclick = () => this.start();
-    addOutcomeHome(this);
+    ArcadeOutcomeScreen.show({
+      game: this,
+      gameId: 'flappybyte',
+      outcome: isNewHigh ? 'NEW_HIGH_SCORE' : 'GAME_OVER',
+      title: isNewHigh ? 'NEW HIGH SCORE!' : 'GAME OVER',
+      subtitle: 'SYSTEM COLLISION DETECTED',
+      accentColor: '#0ea5e9',
+      isNewHighScore: isNewHigh,
+      stats: [
+        { label: 'SCORE', value: this.score, highlight: true },
+        { label: 'BEST', value: this.highScore }
+      ],
+      onRetry: () => this.start(),
+      onHome: () => (window.ArcadeOS || globalThis.ArcadeOS)?.goHome()
+    });
   }
 
   draw() {
@@ -1976,24 +2008,31 @@ class SpaceWarsApp {
     clearGameBuffs(this);
     markOutcome(this, 'gameover', 'ship-explosion');
 
-    if (this.score > this.highScore) {
+    const isCheated = !!(this.cheated || window.ArcadeDeveloperMode?.hasActiveCheats?.('spacewars'));
+    const isNewHigh = this.score > this.highScore && !isCheated;
+    if (isNewHigh) {
       this.highScore = this.score;
       this.storage.set('arcade_spacewars_best', this.highScore);
     }
     this.bus.emit('SPACEWARS_SCORE', { score: this.score });
     this.bus.emit('GAME_COMPLETED', { id: 'spacewars' });
 
-    this.overlay.className = 'sw-overlay-active';
-    this.overlay.innerHTML = `
-      <div class="sw-menu">
-        <h2>DESTROYED!</h2>
-        <div class="sw-score">${this.score}</div>
-        <button class="sw-btn primary" id="sw-retry">RETRY WARS</button>
-      </div>
-    `;
-    const swRetry = this.overlay.querySelector('#sw-retry');
-    if (swRetry) swRetry.onclick = () => this.start();
-    addOutcomeHome(this);
+    ArcadeOutcomeScreen.show({
+      game: this,
+      gameId: 'spacewars',
+      outcome: 'GAME_OVER',
+      title: 'MISSION FAILED',
+      subtitle: 'STARFIGHTER DESTROYED',
+      accentColor: '#f97316',
+      isNewHighScore: isNewHigh,
+      stats: [
+        { label: 'SCORE', value: this.score, highlight: true },
+        { label: 'WAVE', value: this.wave || 1 },
+        { label: 'BEST', value: this.highScore }
+      ],
+      onRetry: () => this.start(),
+      onHome: () => (window.ArcadeOS || globalThis.ArcadeOS)?.goHome()
+    });
   }
 
   draw() {
@@ -2458,24 +2497,32 @@ class NeonSnakeApp {
     this.audio.playGameSfx('snake', 'defeat');
     clearGameBuffs(this);
     markOutcome(this, 'gameover', 'snake-dissolve');
-    if (this.score > this.highScore) {
+
+    const isCheated = !!(this.cheated || window.ArcadeDeveloperMode?.hasActiveCheats?.('snake'));
+    const isNewHigh = this.score > this.highScore && !isCheated;
+    if (isNewHigh) {
       this.highScore = this.score;
       this.storage.set('arcade_snake_best', this.highScore);
     }
     this.bus.emit('SNAKE_SCORE', { score: this.score });
     this.bus.emit('GAME_COMPLETED', { id: 'snake' });
 
-    this.overlay.className = 'snake-overlay-active';
-    this.overlay.innerHTML = `
-      <div class="snake-menu">
-        <h2>GAME OVER</h2>
-        <div class="snake-score">${this.score}</div>
-        <button class="snake-btn primary" id="sn-retry">PLAY AGAIN</button>
-      </div>
-    `;
-    const snRetry = this.overlay.querySelector('#sn-retry');
-    if (snRetry) snRetry.onclick = () => this.start();
-    addOutcomeHome(this);
+    ArcadeOutcomeScreen.show({
+      game: this,
+      gameId: 'snake',
+      outcome: isNewHigh ? 'NEW_HIGH_SCORE' : 'GAME_OVER',
+      title: isNewHigh ? 'NEW HIGH SCORE!' : 'GAME OVER',
+      subtitle: 'GRID BOUNDARY COLLISION',
+      accentColor: '#22c55e',
+      isNewHighScore: isNewHigh,
+      stats: [
+        { label: 'SCORE', value: this.score, highlight: true },
+        { label: 'LENGTH', value: this.snake ? this.snake.length : 1 },
+        { label: 'BEST', value: this.highScore }
+      ],
+      onRetry: () => this.start(),
+      onHome: () => (window.ArcadeOS || globalThis.ArcadeOS)?.goHome()
+    });
   }
 
   draw() {
@@ -2889,11 +2936,46 @@ class BreakoutApp {
       }
     }
     if (this.bricks.length && this.bricks.every(brick => !brick.active)) {
-      markOutcome(this, 'victory', 'board-cleared');
-      this.audio.playGameSfx('breakout', 'levelClear');
-      this.level++;
-      this.initLevel();
+      this.victory();
     }
+  }
+
+  victory() {
+    this.cancelLoop();
+    this.state = 'VICTORY';
+    clearGameBuffs(this);
+    markOutcome(this, 'victory', 'board-cleared');
+
+    const isCheated = !!(this.cheated || window.ArcadeDeveloperMode?.hasActiveCheats?.('breakout'));
+    const isNewHigh = this.score > this.highScore && !isCheated;
+    if (isNewHigh) {
+      this.highScore = this.score;
+      this.storage.set('arcade_breakout_best', this.highScore);
+    }
+    this.bus.emit('BREAKOUT_SCORE', { score: this.score });
+    this.bus.emit('GAME_COMPLETED', { id: 'breakout' });
+
+    ArcadeOutcomeScreen.show({
+      game: this,
+      gameId: 'breakout',
+      outcome: 'BOARD_CLEARED',
+      title: 'BOARD CLEARED!',
+      subtitle: 'ALL BRICKS DEMOLISHED',
+      accentColor: '#a855f7',
+      isNewHighScore: isNewHigh,
+      stats: [
+        { label: 'FINAL SCORE', value: this.score, highlight: true },
+        { label: 'LEVEL', value: this.level || 1 },
+        { label: 'BEST', value: this.highScore }
+      ],
+      onNext: () => {
+        this.level = (this.level || 1) + 1;
+        this.initLevel();
+        this.startLoop();
+      },
+      onRetry: () => this.start(),
+      onHome: () => (window.ArcadeOS || globalThis.ArcadeOS)?.goHome()
+    });
   }
 
   gameOver() {
@@ -2902,23 +2984,32 @@ class BreakoutApp {
     this.audio.playGameSfx('breakout', 'defeat');
     clearGameBuffs(this);
     markOutcome(this, 'gameover', 'ball-lost');
-    if (this.score > this.highScore) {
+
+    const isCheated = !!(this.cheated || window.ArcadeDeveloperMode?.hasActiveCheats?.('breakout'));
+    const isNewHigh = this.score > this.highScore && !isCheated;
+    if (isNewHigh) {
       this.highScore = this.score;
       this.storage.set('arcade_breakout_best', this.highScore);
     }
     this.bus.emit('BREAKOUT_SCORE', { score: this.score });
     this.bus.emit('GAME_COMPLETED', { id: 'breakout' });
 
-    this.overlay.className = 'breakout-overlay-active';
-    this.overlay.innerHTML = `
-      <div class="breakout-menu-ready">
-        <h2>GAME OVER</h2>
-        <div class="breakout-final-score">${this.score}</div>
-        <button class="breakout-menu-btn primary" id="bk-retry">PLAY AGAIN</button>
-      </div>
-    `;
-    this.overlay.querySelector('#bk-retry').onclick = () => this.start();
-    addOutcomeHome(this);
+    ArcadeOutcomeScreen.show({
+      game: this,
+      gameId: 'breakout',
+      outcome: 'GAME_OVER',
+      title: 'GAME OVER',
+      subtitle: 'ALL BALLS LOST',
+      accentColor: '#ec4899',
+      isNewHighScore: isNewHigh,
+      stats: [
+        { label: 'SCORE', value: this.score, highlight: true },
+        { label: 'LEVEL', value: this.level || 1 },
+        { label: 'BEST', value: this.highScore }
+      ],
+      onRetry: () => this.start(),
+      onHome: () => (window.ArcadeOS || globalThis.ArcadeOS)?.goHome()
+    });
   }
 
   draw() {
@@ -3195,21 +3286,26 @@ class NeonPongApp {
     if (this.p1Score >= 7 || this.p2Score >= 7) {
       this.cancelLoop();
       this.state = 'GAME_OVER';
-      const winner = this.p1Score >= 7 ? 'P1 WINS!' : 'CPU WINS!';
+      const isP1Winner = this.p1Score >= 7;
       this.audio.playGameSfx('neonpong', 'victory');
-      markOutcome(this, 'victory', 'match-win');
+      markOutcome(this, isP1Winner ? 'victory' : 'gameover', 'match-win');
       this.bus.emit('NEONPONG_SCORE', { score: this.p1Score });
       this.bus.emit('GAME_COMPLETED', { id: 'neonpong' });
 
-      this.overlay.className = 'pong-overlay-active';
-      this.overlay.innerHTML = `
-        <div class="pong-menu">
-          <h2>${winner}</h2>
-          <button class="pong-btn primary" id="np-retry">PLAY AGAIN</button>
-        </div>
-      `;
-      this.overlay.querySelector('#np-retry').onclick = () => this.start();
-      addOutcomeHome(this);
+      ArcadeOutcomeScreen.show({
+        game: this,
+        gameId: 'neonpong',
+        outcome: isP1Winner ? 'VICTORY' : 'DEFEAT',
+        title: isP1Winner ? 'VICTORY!' : 'DEFEAT',
+        subtitle: isP1Winner ? 'PLAYER 1 VICTORIOUS' : 'CPU TOURNAMENT WINNER',
+        accentColor: '#06b6d4',
+        stats: [
+          { label: 'PLAYER 1', value: this.p1Score, highlight: isP1Winner },
+          { label: 'CPU / P2', value: this.p2Score, highlight: !isP1Winner }
+        ],
+        onRetry: () => this.start(),
+        onHome: () => (window.ArcadeOS || globalThis.ArcadeOS)?.goHome()
+      });
     } else {
       this.resetBall();
     }
@@ -3531,23 +3627,32 @@ class VoidInvadersApp {
     this.audio.playGameSfx('voidinvaders', 'defeat');
     clearGameBuffs(this);
     markOutcome(this, 'gameover', 'cannon-explosion');
-    if (this.score > this.highScore) {
+
+    const isCheated = !!(this.cheated || window.ArcadeDeveloperMode?.hasActiveCheats?.('voidinvaders'));
+    const isNewHigh = this.score > this.highScore && !isCheated;
+    if (isNewHigh) {
       this.highScore = this.score;
       this.storage.set('arcade_invaders_best', this.highScore);
     }
     this.bus.emit('VOIDINVADERS_SCORE', { score: this.score });
     this.bus.emit('GAME_COMPLETED', { id: 'voidinvaders' });
 
-    this.overlay.className = 'vi-overlay-active';
-    this.overlay.innerHTML = `
-      <div class="vi-menu">
-        <h2>OVERRUN!</h2>
-        <div class="vi-score">${this.score}</div>
-        <button class="vi-btn primary" id="vi-retry">DEFEND AGAIN</button>
-      </div>
-    `;
-    this.overlay.querySelector('#vi-retry').onclick = () => this.start();
-    addOutcomeHome(this);
+    ArcadeOutcomeScreen.show({
+      game: this,
+      gameId: 'voidinvaders',
+      outcome: 'GAME_OVER',
+      title: 'DEFENSE BREACHED',
+      subtitle: 'VOID INVADERS REACHED SURFACE',
+      accentColor: '#8b5cf6',
+      isNewHighScore: isNewHigh,
+      stats: [
+        { label: 'SCORE', value: this.score, highlight: true },
+        { label: 'WAVE', value: this.wave || 1 },
+        { label: 'BEST', value: this.highScore }
+      ],
+      onRetry: () => this.start(),
+      onHome: () => (window.ArcadeOS || globalThis.ArcadeOS)?.goHome()
+    });
   }
 
   draw() {
@@ -3919,24 +4024,30 @@ class VectorDriftApp {
     clearGameBuffs(this);
     markOutcome(this, 'gameover', 'ship-fragmentation');
 
-    if (this.score > this.highScore) {
+    const isCheated = !!(this.cheated || window.ArcadeDeveloperMode?.hasActiveCheats?.('vectordrift'));
+    const isNewHigh = this.score > this.highScore && !isCheated;
+    if (isNewHigh) {
       this.highScore = this.score;
       this.storage.set('arcade_vectordrift_best', this.highScore);
     }
     this.bus.emit('VECTOR_SCORE', { score: this.score });
     this.bus.emit('GAME_COMPLETED', { id: 'vectordrift' });
 
-    this.overlay.className = 'vd-overlay-active';
-    this.overlay.innerHTML = `
-      <div class="vd-menu">
-        <h2>DESTROYED!</h2>
-        <div class="vd-score">${this.score}</div>
-        <button class="vd-btn primary" id="vd-retry">RETRY</button>
-      </div>
-    `;
-    const vdRetry = this.overlay.querySelector('#vd-retry');
-    if (vdRetry) vdRetry.onclick = () => this.start();
-    addOutcomeHome(this);
+    ArcadeOutcomeScreen.show({
+      game: this,
+      gameId: 'vectordrift',
+      outcome: isNewHigh ? 'NEW_HIGH_SCORE' : 'GAME_OVER',
+      title: isNewHigh ? 'NEW HIGH SCORE!' : 'GAME OVER',
+      subtitle: 'ASTEROID FIELD COLLISION',
+      accentColor: '#38bdf8',
+      isNewHighScore: isNewHigh,
+      stats: [
+        { label: 'SCORE', value: this.score, highlight: true },
+        { label: 'BEST', value: this.highScore }
+      ],
+      onRetry: () => this.start(),
+      onHome: () => (window.ArcadeOS || globalThis.ArcadeOS)?.goHome()
+    });
   }
 
   draw() {
@@ -4325,23 +4436,32 @@ class BlockDropApp {
     this.audio.playGameSfx('blockdrop', 'defeat');
     clearGameBuffs(this);
     markOutcome(this, 'gameover', 'board-lockout');
-    if (this.score > this.highScore) {
+
+    const isCheated = !!(this.cheated || window.ArcadeDeveloperMode?.hasActiveCheats?.('blockdrop'));
+    const isNewHigh = this.score > this.highScore && !isCheated;
+    if (isNewHigh) {
       this.highScore = this.score;
       this.storage.set('arcade_blockdrop_best', this.highScore);
     }
     this.bus.emit('BLOCKDROP_SCORE', { score: this.score });
     this.bus.emit('GAME_COMPLETED', { id: 'blockdrop' });
 
-    this.overlay.className = 'bd-overlay-active';
-    this.overlay.innerHTML = `
-      <div class="bd-menu">
-        <h2>TOP OUT!</h2>
-        <div class="bd-score">${this.score}</div>
-        <button class="bd-btn primary" id="bd-retry">PLAY AGAIN</button>
-      </div>
-    `;
-    this.overlay.querySelector('#bd-retry').onclick = () => this.start();
-    addOutcomeHome(this);
+    ArcadeOutcomeScreen.show({
+      game: this,
+      gameId: 'blockdrop',
+      outcome: isNewHigh ? 'NEW_HIGH_SCORE' : 'GAME_OVER',
+      title: isNewHigh ? 'NEW HIGH SCORE!' : 'TOP OUT!',
+      subtitle: 'MATRIX CAPACITY EXCEEDED',
+      accentColor: '#3b82f6',
+      isNewHighScore: isNewHigh,
+      stats: [
+        { label: 'SCORE', value: this.score, highlight: true },
+        { label: 'LINES', value: this.linesCleared || 0 },
+        { label: 'BEST', value: this.highScore }
+      ],
+      onRetry: () => this.start(),
+      onHome: () => (window.ArcadeOS || globalThis.ArcadeOS)?.goHome()
+    });
   }
 
   draw() {

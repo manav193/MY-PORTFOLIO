@@ -133,16 +133,54 @@ export const ArcadeBootController = {
   }
 };
 
+export function isCaseStudyPage() {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return false;
+
+  const path = (window.location.pathname || '').toLowerCase();
+
+  if (path.includes('/case-studies/') || path.includes('project-') || path.includes('case-study')) {
+    return true;
+  }
+
+  if (document.body?.hasAttribute('data-project-theme') || document.documentElement?.hasAttribute('data-project-theme')) {
+    return true;
+  }
+
+  if (document.body?.classList.contains('case-study-page') || document.body?.classList.contains('cs-body') || document.body?.classList.contains('project-page')) {
+    return true;
+  }
+
+  if (document.querySelector('.cs-container, .project-hero, .cs-hero, .cs-wrapper, .case-study-container')) {
+    return true;
+  }
+
+  if (document.getElementById('home') || document.getElementById('intro-sequence')) {
+    return false;
+  }
+
+  return false;
+}
+
 export const GlobalPortfolioShell = {
   init() {
     if (shellInitialized) return;
     shellInitialized = true;
+
+    if (isCaseStudyPage()) {
+      this.removeUnwantedCaseStudyShell();
+      this.ensureGlobalNimo();
+      return;
+    }
 
     this.ensureGlobalDock();
     this.ensureGlobalPalette();
     this.ensureGlobalNimo();
     this.ensureGlobalStatusRail();
     this.ensureDockSync();
+  },
+
+  removeUnwantedCaseStudyShell() {
+    document.querySelectorAll('.os-dock, [data-theme-dock], .section-progress-rail').forEach(el => el.remove());
   },
 
   ensureGlobalDock() {

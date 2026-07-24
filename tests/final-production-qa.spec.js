@@ -114,7 +114,7 @@ test.describe('Final production QA', () => {
       expect(await page.title(), `${path} has an empty title`).not.toBe('');
       await expect(page.locator('main')).toBeVisible();
       await expect(page.locator('h1')).toHaveCount(1);
-      await expect(page.locator('.os-dock')).toBeVisible();
+      await expect(page.locator('.os-dock')).toHaveCount(0);
       await expect(page.locator('#nimo-widget')).toBeAttached();
 
       const structure = await page.evaluate(() => {

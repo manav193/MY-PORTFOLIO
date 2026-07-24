@@ -219,7 +219,7 @@ export const ArcadeDeveloperMode = {
       indicator = document.createElement('div');
       indicator.id = 'arcade-cheat-indicator';
       indicator.className = 'arcade-cheat-indicator';
-      document.getElementById('arcade-os')?.appendChild(indicator);
+      (document.getElementById('arcade-os') || document.body).appendChild(indicator);
     }
     indicator.textContent = 'DEV MODIFIED // SCORE INVALID';
   },

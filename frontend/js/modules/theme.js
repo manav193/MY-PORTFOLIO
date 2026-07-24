@@ -1,6 +1,10 @@
 const storageKey = "portfolio-theme";
 
 export function initTheme() {
+  if (document.body?.hasAttribute('data-project-theme') || document.documentElement?.hasAttribute('data-project-theme')) {
+    return;
+  }
+
   const root = document.documentElement;
   const button = document.querySelector("[data-theme-toggle]");
   const icon = document.querySelector("[data-theme-icon]");

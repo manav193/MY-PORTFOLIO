@@ -115,21 +115,15 @@ test.describe('Global Portfolio Shell & Arcade Boot Suite', () => {
     await expect(page.locator('.os-dock')).toHaveCount(1);
   });
 
-  test('TEST E: Case Study Global Shell & Parent Context', async ({ page }) => {
+  test('TEST E: Case Study Only Shows NIMO (Zero Dock/Palette/Rail)', async ({ page }) => {
     await page.goto('http://localhost:8085/assets/case-studies/veldora-bites.html');
     await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(300);
 
-    await expect(page.locator('.os-dock')).toBeVisible();
-    await expect(page.locator('[data-theme-dock]')).toBeVisible();
     await expect(page.locator('#nimo-launcher')).toBeVisible();
-    await expect(page.locator('.section-progress-rail')).toBeVisible();
 
-    // WORK active as parent context
-    const workDock = page.locator('.dock-item[data-dock-action="work"]');
-    await expect(workDock).toHaveClass(/dock-active/);
-
-    const workRail = page.locator('.section-progress-rail__link[data-section-id="work"]');
-    await expect(workRail).toHaveClass(/is-active/);
+    await expect(page.locator('.os-dock')).toHaveCount(0);
+    await expect(page.locator('[data-theme-dock]')).toHaveCount(0);
+    await expect(page.locator('.section-progress-rail')).toHaveCount(0);
   });
 });
