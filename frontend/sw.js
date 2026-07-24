@@ -1,4 +1,4 @@
-const cacheName = "manav-portfolio-v23";
+const cacheName = "manav-portfolio-v24";
 const assets = [
   "./",
   "./index.html",
@@ -61,12 +61,28 @@ self.addEventListener("install", (event) => {
 });
 
 self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) => Promise.all(keys
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys
       .filter((key) => key.startsWith("manav-portfolio-") && key !== cacheName)
-      .map((key) => caches.delete(key))))
-  );
-  self.clients.claim();
+      .map((key) => caches.delete(key)));
+
+    await self.clients.claim();
+
+    // A previous cache-first worker could keep an already-open tab on stale JS/CSS.
+    // Reload controlled portfolio tabs once when this new worker takes over so the
+    // next request is guaranteed to use the network-first strategy below.
+    const clients = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+    await Promise.all(clients.map((client) => {
+      try {
+        const url = new URL(client.url);
+        if (url.origin !== self.location.origin) return Promise.resolve();
+        return client.navigate(client.url).catch(() => undefined);
+      } catch (_) {
+        return Promise.resolve();
+      }
+    }));
+  })());
 });
 
 function validateAssetResponse(request, response) {
@@ -124,8 +140,6 @@ self.addEventListener("fetch", (event) => {
   if (requestUrl.origin !== self.location.origin) return;
 
   // Production correctness first: HTML, JS and CSS always check Vercel before cache.
-  // This prevents an old service-worker cache from making a successful Git deploy
-  // look unsynced while still keeping an offline fallback.
   if (shouldPreferNetwork(event.request, requestUrl)) {
     event.respondWith(networkFirst(event.request));
     return;
