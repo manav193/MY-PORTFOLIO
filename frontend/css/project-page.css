@@ -266,7 +266,6 @@
   transform: scale(0.985); box-shadow: var(--shadow-soft);
 }
 
-100% { filter: hue-rotate(45deg); } }
 
 /* 8. PromptAI: Tiny AI Signal Pulse */
 [data-project-theme="promptai"] .project-hero-image::before {
