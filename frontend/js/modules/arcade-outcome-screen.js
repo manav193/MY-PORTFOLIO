@@ -1,16 +1,49 @@
 /**
- * ARCADE OS - SHARED OUTCOME SYSTEM (v1.0)
+ * ARCADE OS - SHARED OUTCOME SYSTEM (v1.1)
  * Polished, animated outcome screens for Game Over, Victory, Level Complete, Wave Clear, and New High Score.
  */
 
 export class ArcadeOutcomeScreen {
   static currentOverlay = null;
 
+  static getHost() {
+    const safeViewport = document.querySelector('.arcade-viewport-safe');
+    if (safeViewport) {
+      let root = document.getElementById('arcade-system-overlay-root');
+      if (!root) {
+        root = document.createElement('div');
+        root.id = 'arcade-system-overlay-root';
+        root.setAttribute('aria-live', 'polite');
+      }
+
+      // The game app view is rewritten with innerHTML whenever a game mounts.
+      // Keeping the shared outcome layer inside that view makes it disposable.
+      // Mount it directly under the stable CRT safe viewport instead.
+      if (root.parentElement !== safeViewport) safeViewport.appendChild(root);
+
+      Object.assign(root.style, {
+        position: 'absolute',
+        inset: '0',
+        width: '100%',
+        height: '100%',
+        zIndex: '10000',
+        pointerEvents: 'none',
+        overflow: 'hidden'
+      });
+
+      return root;
+    }
+
+    return document.getElementById('arcade-app-view') ||
+      document.getElementById('arcade-os') ||
+      document.body;
+  }
+
   static show(config = {}) {
     const {
       game = null,
       gameId = '',
-      outcome = 'GAME_OVER', // GAME_OVER, VICTORY, LEVEL_COMPLETE, WAVE_COMPLETE, MAZE_CLEARED, BOARD_CLEARED, SECTOR_SECURED, DEFEAT, NEW_HIGH_SCORE
+      outcome = 'GAME_OVER',
       title = null,
       subtitle = null,
       stats = [],
@@ -23,21 +56,14 @@ export class ArcadeOutcomeScreen {
       customButtons = null
     } = config;
 
-    // Dismiss any existing overlay
     this.hide();
 
-    const targetContainer =
-      document.getElementById('arcade-system-overlay-root') ||
-      document.getElementById('arcade-app-view') ||
-      document.getElementById('arcade-os') ||
-      document.body;
-    if (!targetContainer) return;
+    const targetContainer = this.getHost();
+    if (!targetContainer) return null;
 
-    // Check Developer / Cheat Mode status
     const isCheated = !!(game?.cheated || window.ArcadeDeveloperMode?.hasActiveCheats?.(gameId));
     const validHighScore = isNewHighScore && !isCheated;
 
-    // Title & Subtitle Defaults
     let displayTitle = title;
     let displaySubtitle = subtitle;
 
@@ -55,7 +81,6 @@ export class ArcadeOutcomeScreen {
       }
     }
 
-    // Default Buttons
     let buttons = customButtons;
     if (!buttons || !buttons.length) {
       buttons = [];
@@ -72,11 +97,29 @@ export class ArcadeOutcomeScreen {
       buttons.push({ label: 'ARCADE HOME', action: 'home', primary: false, icon: '⌂' });
     }
 
-    // Create Overlay Container
     const overlay = document.createElement('div');
     overlay.id = 'arcade-outcome-overlay';
     overlay.className = `arcade-outcome-overlay outcome-${outcome.toLowerCase()} ${themeClass}`;
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-label', displayTitle || 'Arcade outcome');
     if (accentColor) overlay.style.setProperty('--outcome-accent', accentColor);
+
+    // Inline geometry is intentional: outcome visibility must not depend on a
+    // game-specific overlay class or on stylesheet ordering.
+    Object.assign(overlay.style, {
+      position: 'absolute',
+      inset: '0',
+      width: '100%',
+      height: '100%',
+      zIndex: '10001',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      visibility: 'visible',
+      opacity: '1',
+      pointerEvents: 'auto'
+    });
 
     overlay.innerHTML = `
       <div class="arcade-outcome-vignette"></div>
@@ -108,13 +151,8 @@ export class ArcadeOutcomeScreen {
     targetContainer.appendChild(overlay);
     this.currentOverlay = overlay;
 
-    // Trigger Audio SFX
     this.playAudio(game, outcome, validHighScore);
-
-    // Animate Number Tally
     this.animateStats(overlay);
-
-    // Setup Focus & Input Handling
     this.setupInputs(overlay, {
       onRetry,
       onNext,
@@ -125,10 +163,9 @@ export class ArcadeOutcomeScreen {
   }
 
   static hide() {
-    if (this.currentOverlay) {
-      this.currentOverlay.remove();
-      this.currentOverlay = null;
-    }
+    const overlay = this.currentOverlay || document.getElementById('arcade-outcome-overlay');
+    overlay?.remove();
+    this.currentOverlay = null;
   }
 
   static playAudio(game, outcome, validHighScore) {
@@ -173,6 +210,7 @@ export class ArcadeOutcomeScreen {
       const duration = 600;
       const startTime = performance.now();
       const step = (now) => {
+        if (!el.isConnected) return;
         const elapsed = now - startTime;
         const progress = Math.min(1, elapsed / duration);
         const current = Math.floor(numericTarget * progress);
@@ -192,11 +230,11 @@ export class ArcadeOutcomeScreen {
     if (!btnNodes.length) return;
 
     let focusedIdx = 0;
-    btnNodes[focusedIdx].focus();
+    btnNodes[focusedIdx].focus({ preventScroll: true });
 
     const focusBtn = (idx) => {
       focusedIdx = (idx + btnNodes.length) % btnNodes.length;
-      btnNodes[focusedIdx].focus();
+      btnNodes[focusedIdx].focus({ preventScroll: true });
     };
 
     const handleAction = (btn) => {
@@ -208,7 +246,7 @@ export class ArcadeOutcomeScreen {
       } else if (action === 'next' && callbacks.onNext) {
         callbacks.onNext();
       } else if (action === 'home') {
-        if (callbacks.onHome) callbacks.onHome();
+        callbacks.onHome?.();
       }
     };
 
