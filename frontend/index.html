@@ -55,53 +55,79 @@
 
   <!-- JSON-LD Schema -->
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "ProfilePage",
-        "@id": "{{portfolio.siteUrl}}/#portfolio",
-        "url": "{{portfolio.siteUrl}}/",
-        "name": "Manav Agarwal - Creative Frontend Developer Portfolio",
-        "mainEntity": { "@id": "{{portfolio.siteUrl}}/#manav" }
-      },
-      {
-        "@type": "Person",
-        "@id": "{{portfolio.siteUrl}}/#manav",
-        "name": "{{portfolio.name}}",
-        "jobTitle": "{{portfolio.role}}",
-        "homeLocation": { "@type": "Place", "name": "{{portfolio.location}}" },
-        "url": "{{portfolio.siteUrl}}/",
-        "sameAs": ["{{portfolio.githubUrl}}"],
-        "knowsAbout": ["Frontend development", "UI/UX design", "Browser games", "Graphic design", "Video editing"]
-      },
-      {
-        "@type": "WebSite",
-        "@id": "{{portfolio.siteUrl}}/#website",
-        "url": "{{portfolio.siteUrl}}/",
-        "name": "Manav Agarwal Portfolio",
-        "author": { "@id": "{{portfolio.siteUrl}}/#manav" }
-      },
-      {
-        "@type": "SoftwareApplication",
-        "name": "ArcadeOS",
-        "applicationCategory": "WebApplication",
-        "operatingSystem": "Modern web browser",
-        "url": "{{portfolio.siteUrl}}/project-arcade-os.html",
-        "author": { "@id": "{{portfolio.siteUrl}}/#manav" }
-      },
-      {
-        "@type": "ItemList",
-        "name": "Selected projects",
-        "itemListElement": [
-          { "@type": "ListItem", "position": 1, "url": "{{portfolio.siteUrl}}/project-arcade-os.html", "name": "ArcadeOS" },
-          { "@type": "ListItem", "position": 2, "url": "https://tool-verse-theta.vercel.app/", "name": "ToolVerse" },
-          { "@type": "ListItem", "position": 3, "url": "https://selfyy.vercel.app/", "name": "SELFYY" }
-        ]
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "ProfilePage",
+      "@id": "{{portfolio.siteUrl}}/#portfolio",
+      "url": "{{portfolio.siteUrl}}/",
+      "name": "Manav Agarwal - Creative Frontend Developer Portfolio",
+      "mainEntity": {
+        "@id": "{{portfolio.siteUrl}}/#manav"
       }
-    ]
-  }
-  </script>
+    },
+    {
+      "@type": "Person",
+      "@id": "{{portfolio.siteUrl}}/#manav",
+      "name": "{{portfolio.name}}",
+      "jobTitle": "{{portfolio.role}}",
+      "homeLocation": {
+        "@type": "Place",
+        "name": "{{portfolio.location}}"
+      },
+      "url": "{{portfolio.siteUrl}}/",
+      "sameAs": [
+        "{{portfolio.githubUrl}}"
+      ],
+      "knowsAbout": [
+        "Frontend development",
+        "UI/UX design",
+        "Browser games",
+        "Graphic design",
+        "Video editing"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "{{portfolio.siteUrl}}/#website",
+      "url": "{{portfolio.siteUrl}}/",
+      "name": "Manav Agarwal Portfolio",
+      "author": {
+        "@id": "{{portfolio.siteUrl}}/#manav"
+      }
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "ArcadeOS",
+      "applicationCategory": "WebApplication",
+      "operatingSystem": "Modern web browser",
+      "url": "{{portfolio.siteUrl}}/project-arcade-os.html",
+      "author": {
+        "@id": "{{portfolio.siteUrl}}/#manav"
+      }
+    },
+    {
+      "@type": "ItemList",
+      "name": "Selected projects",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "url": "{{portfolio.siteUrl}}/project-arcade-os.html",
+          "name": "ArcadeOS"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "url": "https://tool-verse-theta.vercel.app/",
+          "name": "ToolVerse"
+        }
+      ]
+    }
+  ]
+}
+</script>
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to content</a>
@@ -368,7 +394,7 @@
               <dl class="project-evidence">
                 <div><dt>Role</dt><dd>Product design, frontend systems, interaction engineering</dd></div>
                 <div><dt>Challenge</dt><dd>Unify keyboard, pointer, touch, cabinet, and gamepad input without stale listeners or trapped navigation.</dd></div>
-                <div><dt>Result</dt><dd>Three games, two creative tools, eight system routes, offline support, and focused regression coverage in a dependency-light build.</dd></div>
+                <div><dt>Result</dt><dd>Multiple playable games, creative tools, system routes, offline support, and focused regression coverage in a dependency-light build.</dd></div>
               </dl>
               <div class="project-tech" aria-label="Technologies"><span>Vanilla JS</span><span>Canvas</span><span>Web Audio</span><span>PWA</span><span>Gamepad API</span></div>
               <div class="project-actions">
@@ -411,22 +437,10 @@
             </div>
           </article>
 
-          <article class="project-card reveal-up" data-project-id="selfyy" data-project-status="live">
-            <div class="project-media"><img src="images/selfyy-preview.webp" alt="SELFYY cinematic memory website on desktop" width="1600" height="900" loading="lazy"></div>
-            <div class="project-body">
-              <div class="project-heading-row"><span class="project-index">04</span><span class="project-type">Personal web platform</span><span class="project-status status-live">Live</span></div>
-              <h3>SELFYY</h3>
-              <p class="project-value">A cinematic memory website platform for building personal birthday, wedding, invitation, and portfolio experiences.</p>
-              <dl class="project-evidence"><div><dt>Role</dt><dd>Product design, UI systems, and frontend development</dd></div><div><dt>Challenge</dt><dd>Deliver emotional storytelling, personalization, themes, sharing, and gallery interactions without a heavyweight framework.</dd></div><div><dt>Capability</dt><dd>Responsive production deployment with theme automation, Web Share, lightbox, keyboard support, and reduced motion.</dd></div></dl>
-              <div class="project-tech"><span>Vanilla JS</span><span>CSS Grid</span><span>LocalStorage</span><span>Web Share</span><span>Vercel</span></div>
-              <div class="project-actions"><a href="https://selfyy.vercel.app/" class="btn-primary" target="_blank" rel="noopener noreferrer">Live Demo</a><a href="https://github.com/manav193/SELFYY" class="btn-secondary" target="_blank" rel="noopener noreferrer">GitHub</a><a href="project-selfyy.html" class="btn-secondary">Case Study</a></div>
-            </div>
-          </article>
-
           <article class="project-card reveal-up" data-project-id="shift-zero" data-project-status="in-development">
             <div class="project-media"><img src="images/sz_screens.png" alt="SHIFT ZERO game interface and system screens" width="1600" height="900" loading="lazy"></div>
             <div class="project-body">
-              <div class="project-heading-row"><span class="project-index">05</span><span class="project-type">Game architecture</span><span class="project-status status-progress">In Development</span></div>
+              <div class="project-heading-row"><span class="project-index">04</span><span class="project-type">Game architecture</span><span class="project-status status-progress">In Development</span></div>
               <h3>SHIFT-ZERO</h3>
               <p class="project-value">A mobile-first Godot game foundation for one-touch gravity shifting and rule-changing modifiers.</p>
               <dl class="project-evidence"><div><dt>Role</dt><dd>Game systems planning, UI direction, and architecture</dd></div><div><dt>Challenge</dt><dd>Prepare a maintainable game foundation for modifiers, offline play, accessibility, services, and ethical monetization.</dd></div><div><dt>Current result</dt><dd>M0 foundation complete with five dependency-checked layers, data-driven configuration, service interfaces, documentation, and CI. Core gameplay is the next milestone.</dd></div></dl>
@@ -438,7 +452,7 @@
           <article class="project-card reveal-up" data-project-id="love" data-project-status="archived">
             <div class="project-media"><img src="images/love_new.png" alt="LOVE interactive memory timeline interface" width="1600" height="900" loading="lazy"></div>
             <div class="project-body">
-              <div class="project-heading-row"><span class="project-index">06</span><span class="project-type">Narrative web experiment</span><span class="project-status">Archived</span></div>
+              <div class="project-heading-row"><span class="project-index">05</span><span class="project-type">Narrative web experiment</span><span class="project-status">Archived</span></div>
               <h3>LOVE</h3>
               <p class="project-value">An immersive narrative website exploring paced scrolling, photography, ambient audio, and personal timeline storytelling.</p>
               <dl class="project-evidence"><div><dt>Role</dt><dd>Creative direction, motion design, and frontend development</dd></div><div><dt>Challenge</dt><dd>Create emotional pacing while keeping media, motion, and responsive galleries usable across devices.</dd></div><div><dt>Capability</dt><dd>Canvas details, CSS Grid galleries, native audio controls, date-driven content, and motion-aware interaction.</dd></div></dl>
@@ -450,7 +464,7 @@
           <article class="project-card reveal-up" data-project-id="velora-bites" data-project-status="prototype">
             <div class="project-media"><img src="images/velora_desktop.png" alt="Velora Bites responsive fine-dining interface prototype" width="1200" height="800" loading="lazy"></div>
             <div class="project-body">
-              <div class="project-heading-row"><span class="project-index">07</span><span class="project-type">UI/UX design prototype</span><span class="project-status status-progress">Prototype</span></div>
+              <div class="project-heading-row"><span class="project-index">06</span><span class="project-type">UI/UX design prototype</span><span class="project-status status-progress">Prototype</span></div>
               <h3>Velora Bites</h3>
               <p class="project-value">A responsive fine-dining interface concept that translates luxury hospitality into a clear editorial reservation journey.</p>
               <dl class="project-evidence"><div><dt>Role</dt><dd>UI/UX design, responsive system, interaction direction</dd></div><div><dt>Challenge</dt><dd>Preserve an editorial luxury tone without sacrificing hierarchy, mobile readability, or conversion clarity.</dd></div><div><dt>Capability</dt><dd>Reusable visual tokens, responsive layouts, menu storytelling, and polished interaction states.</dd></div></dl>
@@ -462,7 +476,7 @@
           <article class="project-card reveal-up" data-project-id="nintendo" data-project-status="prototype">
             <div class="project-media"><img src="images/nintendo.jpg" alt="Nintendo Switch gaming interface UI concept" width="1600" height="900" loading="lazy"></div>
             <div class="project-body">
-              <div class="project-heading-row"><span class="project-index">08</span><span class="project-type">Gaming UI concept</span><span class="project-status status-progress">Prototype</span></div>
+              <div class="project-heading-row"><span class="project-index">07</span><span class="project-type">Gaming UI concept</span><span class="project-status status-progress">Prototype</span></div>
               <h3>Nintendo UI</h3>
               <p class="project-value">A conceptual redesign of the Nintendo console user interface, modernizing visual density, navigation speed, and spatial interactions.</p>
               <dl class="project-evidence"><div><dt>Role</dt><dd>UI/UX design, spatial layout, visual system</dd></div><div><dt>Challenge</dt><dd>Modernize navigation and game library visual density while retaining playful brand identity.</dd></div><div><dt>Capability</dt><dd>Console UI design, visual hierarchy, spatial interaction, responsive prototyping.</dd></div></dl>
@@ -474,7 +488,7 @@
           <article class="project-card reveal-up" data-project-id="nike" data-project-status="prototype">
             <div class="project-media"><img src="images/nike.png" alt="Nike Air Zoom Pegasus 41 e-commerce UI concept" width="1600" height="900" loading="lazy"></div>
             <div class="project-body">
-              <div class="project-heading-row"><span class="project-index">09</span><span class="project-type">E-commerce UI concept</span><span class="project-status status-progress">Prototype</span></div>
+              <div class="project-heading-row"><span class="project-index">08</span><span class="project-type">E-commerce UI concept</span><span class="project-status status-progress">Prototype</span></div>
               <h3>Nike Website UI</h3>
               <p class="project-value">A high-performance e-commerce interaction model focused on sports branding, dynamic typography, and product storytelling.</p>
               <dl class="project-evidence"><div><dt>Role</dt><dd>Product design, interaction direction, visual architecture</dd></div><div><dt>Challenge</dt><dd>Combine high-octane brand aesthetics with seamless e-commerce product exploration.</dd></div><div><dt>Capability</dt><dd>E-commerce UX, motion interaction, brand visual systems, responsive UI.</dd></div></dl>

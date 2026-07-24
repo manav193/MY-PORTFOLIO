@@ -27,7 +27,7 @@ const PROJECTS_DB = [
     category: 'system',
     type: 'Interactive portfolio system',
     tech: ['Vanilla JS', 'Canvas 2D', 'Web Audio API', 'PWA', 'Gamepad API'],
-    summary: 'A modular browser-based operating system built with Vanilla JS, featuring 3 playable retro games, 2 creative tools, persistent profiles, cabinet customization, and unified input handlers.',
+    summary: 'A modular browser-based operating system built with Vanilla JS, featuring multiple playable games, creative tools, persistent profiles, cabinet customization, and unified input handlers.',
     caseStudy: 'project-arcade-os.html',
     liveUrl: '#intro-sequence'
   },
@@ -52,17 +52,6 @@ const PROJECTS_DB = [
     summary: 'A privacy-first PWA delivering 70+ PDF, image, text, developer, student, and calculator tools with private local browser processing.',
     caseStudy: 'project-toolverse.html',
     liveUrl: 'https://tool-verse-theta.vercel.app/'
-  },
-  {
-    id: 'selfyy',
-    name: 'SELFYY',
-    aliases: ['selfyy', 'selfy', 'cinematic memory', 'memory site', 'personal web platform', 'सेलफ़ी'],
-    category: 'web',
-    type: 'Personal web platform',
-    tech: ['Vanilla JS', 'CSS Grid', 'LocalStorage', 'Web Share', 'Vercel'],
-    summary: 'A cinematic memory website platform for building personal birthday, wedding, invitation, and portfolio experiences.',
-    caseStudy: 'project-selfyy.html',
-    liveUrl: 'https://selfyy.vercel.app/'
   },
   {
     id: 'shift-zero',

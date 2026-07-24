@@ -2,8 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const projects = [
-  { id: 'toolverse', title: 'ToolVerse', tagline: 'Engineering Case Study', theme: 'toolverse', next: 'selfyy', prev: 'nike', nextTitle: 'SELFYY', prevTitle: 'Nike Air Zoom', img: 'images/toolverse_4.png', img2: 'images/toolverse_1.png', link: 'https://tool-verse-theta.vercel.app/' },
-  { id: 'selfyy', title: 'SELFYY', tagline: 'Edge Routing Architecture', theme: 'selfyy', next: 'love-journey', prev: 'toolverse', nextTitle: 'Love Journey', prevTitle: 'ToolVerse', img: 'images/project-nexus.svg', img2: 'images/project-nexus.svg', link: 'https://selfyy.vercel.app/' },
+  { id: 'toolverse', title: 'ToolVerse', tagline: 'Engineering Case Study', theme: 'toolverse', next: 'love-journey', prev: 'nike', nextTitle: 'Love Journey', prevTitle: 'Nike Air Zoom', img: 'images/toolverse_4.png', img2: 'images/toolverse_1.png', link: 'https://tool-verse-theta.vercel.app/' },
   { id: 'love-journey', title: 'Love Journey', tagline: 'Immersive WebGL Experience', theme: 'love', next: 'shift-zero', prev: 'selfyy', nextTitle: 'SHIFT ZERO', prevTitle: 'SELFYY', img: 'images/love_1.png', img2: 'images/love_1.png', link: '#' },
   { id: 'shift-zero', title: 'SHIFT ZERO', tagline: 'Game HUD Design', theme: 'shift-zero', next: 'nintendo', prev: 'love-journey', nextTitle: 'Nintendo OS', prevTitle: 'Love Journey', img: 'images/sz_menu.png', img2: 'images/sz_menu.png', link: '#' },
   { id: 'nintendo', title: 'Nintendo OS', tagline: 'Spatial Navigation Interface', theme: 'nintendo', next: 'velora-bites', prev: 'shift-zero', nextTitle: 'Velora Bites', prevTitle: 'SHIFT ZERO', img: 'images/nintendo.jpg', img2: 'images/nintendo.jpg', link: '#' },

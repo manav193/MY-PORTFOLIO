@@ -10,7 +10,7 @@ const { assert, openPage } = require('./test-helpers');
       statuses: [...document.querySelectorAll('#work .project-status')].map(node => node.textContent.trim()),
       copy: document.querySelector('#work')?.innerText || ''
     }));
-    assert(result.names.slice(0, 5).join('|') === 'MY-PORTFOLIO / ArcadeOS|ToolVerse|SELFYY|SHIFT-ZERO|LOVE', `Unexpected project order: ${result.names.join(', ')}`);
+    assert(result.names.slice(0, 5).join('|') === 'MY-PORTFOLIO / ArcadeOS|ToolVerse|SHIFT-ZERO|LOVE|Velora Bites', `Unexpected project order: ${result.names.join(', ')}`);
     assert(result.githubLinks >= 5, 'Project-specific GitHub links are missing.');
     assert(result.caseStudy, 'ArcadeOS case study link is missing.');
     assert(result.statuses.some(status => /In Development/i.test(status)), 'Development status is missing.');

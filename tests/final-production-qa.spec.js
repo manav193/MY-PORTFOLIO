@@ -7,7 +7,6 @@ const caseStudyPages = [
   'project-nimo.html',
   'project-nintendo.html',
   'project-promptai.html',
-  'project-selfyy.html',
   'project-shift-zero.html',
   'project-toolverse.html',
   'project-velora-bites.html'

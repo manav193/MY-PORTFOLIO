@@ -266,13 +266,7 @@
   transform: scale(0.985); box-shadow: var(--shadow-soft);
 }
 
-/* 7. SELFYY: Gentle Gradient Ambient Shift */
-[data-project-theme="selfyy"] .project-hero-image::before {
-  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 10;
-  background: linear-gradient(45deg, rgba(255,100,100,0.05), rgba(100,100,255,0.05));
-  mix-blend-mode: overlay; animation: selfyyShift 10s infinite alternate linear;
-}
-@keyframes selfyyShift { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(45deg); } }
+100% { filter: hue-rotate(45deg); } }
 
 /* 8. PromptAI: Tiny AI Signal Pulse */
 [data-project-theme="promptai"] .project-hero-image::before {
@@ -316,13 +310,6 @@
   --p-accent-glow: rgba(251, 191, 36, 0.2);
   --p-ambient: radial-gradient(circle at 50% -20%, rgba(225, 29, 72, 0.25), transparent 60%);
   --color-bg: #1a050f;
-}
-
-[data-project-theme="selfyy"] {
-  --p-accent: #f8fafc;
-  --p-accent-glow: rgba(248, 250, 252, 0.2);
-  --p-ambient: radial-gradient(circle at 50% -20%, rgba(139, 92, 246, 0.2), transparent 60%);
-  --color-bg: #0f0b29;
 }
 
 [data-project-theme="shift-zero"] {

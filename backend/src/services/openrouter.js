@@ -10,7 +10,7 @@ const SYSTEM_PROMPT = `You are NIMO, a local-first, website-aware portfolio assi
 
 PORTFOLIO SUMMARY:
 - Owner: Manav Agarwal (Creative Frontend Developer)
-- Key Projects: Arcade OS (browser game OS), ToolVerse (70+ PWA tools), SELFYY (cinematic memories), SHIFT-ZERO (Godot game UI), LOVE (narrative experiment), Velora Bites (fine dining UI), Nintendo UI (console redesign), Nike Website UI (e-commerce).
+- Key Projects: Arcade OS (browser game OS), ToolVerse (70+ PWA tools), SHIFT-ZERO (Godot game UI), LOVE (narrative experiment), Velora Bites (fine dining UI), Nintendo UI (console redesign), Nike Website UI (e-commerce).
 - Key Skills: Frontend Engineering (HTML5, Vanilla JS, ES Modules, CSS Grid), UI/UX Design (Figma), PWA & Node SSG, Game Architecture (Canvas, Web Audio, Gamepad API).
 
 BEHAVIOR RULES:
