@@ -1,4 +1,4 @@
-const cacheName = "manav-portfolio-v21";
+const cacheName = "manav-portfolio-v22";
 const assets = [
   "./",
   "./index.html",
@@ -21,7 +21,6 @@ const assets = [
   "./project-arcade-os.html",
   "./project-nimo.html",
   "./project-toolverse.html",
-  "./project-selfyy.html",
   "./project-love-journey.html",
   "./project-promptai.html",
   "./project-shift-zero.html",
@@ -48,7 +47,6 @@ const assets = [
   "./images/arcade-achievements.webp",
   "./images/arcade-soundlab.webp",
   "./images/arcade-diagnostics.webp",
-  "./images/selfyy-preview.webp",
   "./icons/favicon.svg",
   "./icons/apple-touch-icon.svg",
   "./assets/og-image.jpg",
