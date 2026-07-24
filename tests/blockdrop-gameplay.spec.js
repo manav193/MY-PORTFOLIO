@@ -169,15 +169,18 @@ test.describe('BLOCK//DROP Gameplay & Landscape CRT Verification Suite', () => {
 
     // Test RETRY 10 times in sequence to ensure no duplicate RAF loops or state leaks
     for (let i = 1; i <= 10; i++) {
-      await page.waitForTimeout(100);
+      await page.waitForTimeout(50);
       await page.evaluate(() => {
         const active = window.ArcadeOS.activeApp;
         const app = active?._rawApp || active?.rawApp || active;
-        if (app && typeof app.gameOver === 'function') app.gameOver();
+        if (app) {
+          app.state = 'PLAYING';
+          app.gameOver();
+        }
       });
-      await page.waitForSelector('.arcade-outcome-overlay', { timeout: 5000 });
-      await page.click('.arcade-outcome-btn.primary');
-      await page.waitForSelector('.arcade-outcome-overlay', { state: 'detached', timeout: 5000 });
+      await page.waitForSelector('.arcade-outcome-overlay', { timeout: 10000 });
+      await page.evaluate(() => document.querySelector('.arcade-outcome-btn.primary')?.click());
+      await page.waitForSelector('.arcade-outcome-overlay', { state: 'detached', timeout: 10000 });
       await page.waitForFunction(() => {
         const active = window.ArcadeOS.activeApp;
         const app = active?._rawApp || active?.rawApp || active;

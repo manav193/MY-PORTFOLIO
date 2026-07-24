@@ -716,32 +716,98 @@ class PixelPlumberApp {
 
     this.playfieldWidth = 640;
     this.playfieldHeight = 300;
-    this.keys = { left: false, right: false, jump: false };
-    this.inputPulse = { left: 0, right: 0 };
+    this.worldWidth = 4800;
 
-    this.platforms = [
-      { x: 0, y: 260, w: 1200, h: 40 },
-      { x: 100, y: 200, w: 80, h: 16 },
-      { x: 230, y: 160, w: 90, h: 16 },
-      { x: 360, y: 210, w: 80, h: 16 },
-      { x: 480, y: 150, w: 100, h: 16 }
-    ];
-    this.coinsList = [
-      { x: 120, y: 175, taken: false },
-      { x: 140, y: 175, taken: false },
-      { x: 260, y: 135, taken: false },
-      { x: 380, y: 185, taken: false },
-      { x: 510, y: 125, taken: false }
-    ];
-    this.enemies = [
-      { x: 250, y: 244, w: 16, h: 16, vx: -1.2, active: true },
-      { x: 420, y: 244, w: 16, h: 16, vx: -1.0, active: true }
-    ];
-    this.player = { x: 30, y: 220, w: 16, h: 22, vx: 0, vy: 0, grounded: false, coyoteTimer: 0 };
-    this.flag = { x: 550, y: 100, w: 8, h: 160 };
-    this.cameraX = 0;
+    this.keys = { left: false, right: false, jump: false, jumpPressed: false };
+    this.inputPulse = { left: 0, right: 0 };
     this.score = 0;
     this.coins = 0;
+    this.elapsedTime = 0;
+
+    this.checkpointReached = false;
+    this.checkpointX = 30;
+    this.checkpointY = 220;
+    this.checkpointLives = 2;
+
+    this.createLevel();
+  }
+
+  createLevel() {
+    this.worldWidth = 4800;
+
+    this.platforms = [
+      { x: 0, y: 260, w: 900, h: 40 },
+      { x: 200, y: 200, w: 90, h: 16 },
+      { x: 360, y: 160, w: 90, h: 16 },
+      { x: 550, y: 200, w: 100, h: 16 },
+
+      { x: 1020, y: 260, w: 450, h: 40 },
+      { x: 1080, y: 190, w: 90, h: 16 },
+      { x: 1220, y: 140, w: 100, h: 16 },
+      { x: 1380, y: 190, w: 90, h: 16 },
+
+      { x: 1620, y: 260, w: 500, h: 40 },
+      { x: 1750, y: 180, w: 90, h: 16 },
+      { x: 1920, y: 130, w: 100, h: 16 },
+      { x: 2100, y: 180, w: 90, h: 16 },
+      { x: 2260, y: 260, w: 540, h: 40 },
+      { x: 2380, y: 190, w: 90, h: 16 },
+      { x: 2520, y: 140, w: 100, h: 16 },
+
+      { x: 2940, y: 260, w: 400, h: 40 },
+      { x: 2980, y: 190, w: 80, h: 16 },
+      { x: 3100, y: 130, w: 80, h: 16 },
+      { x: 3240, y: 80, w: 110, h: 16 },
+      { x: 3400, y: 130, w: 90, h: 16 },
+      { x: 3550, y: 180, w: 100, h: 16 },
+
+      { x: 3920, y: 260, w: 880, h: 40 },
+      { x: 4020, y: 190, w: 90, h: 16 },
+      { x: 4180, y: 140, w: 100, h: 16 },
+      { x: 4320, y: 190, w: 90, h: 16 },
+
+      { x: 4440, y: 230, w: 30, h: 30 },
+      { x: 4470, y: 200, w: 30, h: 60 },
+      { x: 4500, y: 170, w: 30, h: 90 }
+    ];
+
+    this.coinsList = [
+      { x: 220, y: 170, taken: false }, { x: 245, y: 170, taken: false },
+      { x: 380, y: 130, taken: false }, { x: 405, y: 130, taken: false },
+      { x: 575, y: 170, taken: false }, { x: 750, y: 230, taken: false },
+      { x: 1100, y: 160, taken: false }, { x: 1125, y: 160, taken: false },
+      { x: 1250, y: 110, taken: false }, { x: 1275, y: 110, taken: false },
+      { x: 1400, y: 160, taken: false }, { x: 1520, y: 230, taken: false },
+      { x: 1770, y: 150, taken: false }, { x: 1940, y: 100, taken: false },
+      { x: 1970, y: 100, taken: false }, { x: 2120, y: 150, taken: false },
+      { x: 2220, y: 230, taken: false }, { x: 2400, y: 160, taken: false },
+      { x: 2540, y: 110, taken: false }, { x: 2700, y: 230, taken: false },
+      { x: 3000, y: 160, taken: false }, { x: 3120, y: 100, taken: false },
+      { x: 3260, y: 50, taken: false },  { x: 3295, y: 50, taken: false },
+      { x: 3420, y: 100, taken: false }, { x: 3570, y: 150, taken: false },
+      { x: 4040, y: 160, taken: false }, { x: 4200, y: 110, taken: false },
+      { x: 4225, y: 110, taken: false }, { x: 4340, y: 160, taken: false },
+      { x: 4455, y: 200, taken: false }, { x: 4485, y: 170, taken: false }
+    ];
+
+    this.enemies = [
+      { x: 420, y: 244, w: 16, h: 16, vx: -1.0, minX: 280, maxX: 650, active: true },
+      { x: 1150, y: 244, w: 16, h: 16, vx: -1.2, minX: 1030, maxX: 1350, active: true },
+      { x: 1240, y: 124, w: 16, h: 16, vx: -1.0, minX: 1220, maxX: 1315, active: true },
+      { x: 1780, y: 244, w: 16, h: 16, vx: -1.1, minX: 1640, maxX: 2000, active: true },
+      { x: 2000, y: 244, w: 16, h: 16, vx: 1.2, minX: 1850, maxX: 2100, active: true },
+      { x: 2450, y: 244, w: 16, h: 16, vx: -1.2, minX: 2300, maxX: 2700, active: true },
+      { x: 3050, y: 244, w: 16, h: 16, vx: -1.1, minX: 2950, maxX: 3300, active: true },
+      { x: 3260, y: 64, w: 16, h: 16, vx: -0.9, minX: 3240, maxX: 3340, active: true },
+      { x: 4080, y: 244, w: 16, h: 16, vx: -1.3, minX: 3940, maxX: 4300, active: true },
+      { x: 4200, y: 124, w: 16, h: 16, vx: -1.0, minX: 4180, maxX: 4275, active: true },
+      { x: 4350, y: 244, w: 16, h: 16, vx: 1.2, minX: 4250, maxX: 4420, active: true }
+    ];
+
+    this.checkpointObj = { x: 2200, y: 100, w: 8, h: 160, reached: false };
+    this.flag = { x: 4550, y: 90, w: 8, h: 170 };
+    this.player = { x: 30, y: 220, w: 16, h: 22, vx: 0, vy: 0, grounded: false, coyoteTimer: 0 };
+    this.cameraX = 0;
   }
 
   mount() {
@@ -752,6 +818,8 @@ class PixelPlumberApp {
         <div id="plumber-hud" class="plumber-hud">
           <div class="hud-item">SCORE <span id="pp-score">0</span></div>
           <div class="hud-item">COINS <span id="pp-coins">🪙 0</span></div>
+          <div class="hud-item">TIME <span id="pp-time">00:00</span></div>
+          <div class="hud-item">PROGRESS <span id="pp-prog">0%</span></div>
           <div class="hud-item">HI <span id="pp-high">${this.highScore}</span></div>
         </div>
         <div class="canvas-wrapper">
@@ -767,6 +835,8 @@ class PixelPlumberApp {
     this.overlay = this.container.querySelector('#plumber-overlay-view');
     this.hudScore = this.container.querySelector('#pp-score');
     this.hudCoins = this.container.querySelector('#pp-coins');
+    this.hudTime = this.container.querySelector('#pp-time');
+    this.hudProg = this.container.querySelector('#pp-prog');
 
     this.gameContainer.focus({ preventScroll: true });
 
@@ -778,6 +848,36 @@ class PixelPlumberApp {
     this.bus.on('ARCADE_RIGHT', this.rightHandler);
     this.bus.on('ARCADE_CONFIRM', () => this.handleConfirm());
     this.bus.on('ARCADE_ACTION_A', () => this.triggerJump());
+
+    this.keydownHandler = (e) => {
+      if (!this.active || this.destroyed) return;
+      const key = e.key;
+      if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'a', 'd', 'w', 's', 'A', 'D', 'W', 'S', ' '].includes(key)) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (key === 'ArrowLeft' || key === 'a' || key === 'A') this.keys.left = true;
+        if (key === 'ArrowRight' || key === 'd' || key === 'D') this.keys.right = true;
+        if (key === 'ArrowUp' || key === 'w' || key === 'W' || key === ' ') {
+          this.keys.jump = true;
+          this.keys.jumpPressed = true;
+          this.triggerJump();
+        }
+      } else if (key === 'Escape') {
+        e.preventDefault();
+        this.togglePause();
+      }
+    };
+
+    this.keyupHandler = (e) => {
+      if (!this.active || this.destroyed) return;
+      const key = e.key;
+      if (key === 'ArrowLeft' || key === 'a' || key === 'A') this.keys.left = false;
+      if (key === 'ArrowRight' || key === 'd' || key === 'D') this.keys.right = false;
+      if (key === 'ArrowUp' || key === 'w' || key === 'W' || key === ' ') this.keys.jump = false;
+    };
+
+    document.addEventListener('keydown', this.keydownHandler);
+    document.addEventListener('keyup', this.keyupHandler);
 
     this.transitionToState('READY');
 
@@ -877,39 +977,14 @@ class PixelPlumberApp {
   start() {
     this.score = 0;
     this.coins = 0;
+    this.elapsedTime = 0;
+    this.checkpointReached = false;
+    this.checkpointX = 30;
+    this.checkpointY = 220;
+    this.checkpointLives = 2;
 
-    this.player = {
-      x: 30, y: 220, w: 16, h: 22,
-      vx: 0, vy: 0,
-      grounded: false,
-      coyoteTimer: 0
-    };
-    this.jumpBufferTimer = 0;
+    this.createLevel();
 
-    this.platforms = [
-      { x: 0, y: 260, w: 1200, h: 40 },
-      { x: 100, y: 200, w: 80, h: 16 },
-      { x: 230, y: 160, w: 90, h: 16 },
-      { x: 360, y: 210, w: 80, h: 16 },
-      { x: 480, y: 150, w: 100, h: 16 }
-    ];
-
-    this.coinsList = [
-      { x: 120, y: 175, taken: false },
-      { x: 140, y: 175, taken: false },
-      { x: 260, y: 135, taken: false },
-      { x: 380, y: 185, taken: false },
-      { x: 510, y: 125, taken: false }
-    ];
-
-    this.enemies = [
-      { x: 250, y: 244, w: 16, h: 16, vx: -1.2, active: true },
-      { x: 420, y: 244, w: 16, h: 16, vx: -1.0, active: true }
-    ];
-
-    this.flag = { x: 550, y: 100, w: 8, h: 160 };
-
-    this.cameraX = 0;
     this.state = 'PLAYING';
     this.overlay.className = '';
     this.overlay.innerHTML = '';
@@ -932,11 +1007,13 @@ class PixelPlumberApp {
 
   update(step = 1) {
     const p = this.player;
+    this.elapsedTime += (step / 60);
 
-    const leftHeld = window.ArcadeInput ? (window.ArcadeInput.isDown('LEFT') || this.inputPulse.left > 0) : this.keys.left;
-    const rightHeld = window.ArcadeInput ? (window.ArcadeInput.isDown('RIGHT') || this.inputPulse.right > 0) : this.keys.right;
+    const leftHeld = window.ArcadeInput ? (window.ArcadeInput.isDown('LEFT') || this.inputPulse.left > 0 || this.keys.left) : this.keys.left;
+    const rightHeld = window.ArcadeInput ? (window.ArcadeInput.isDown('RIGHT') || this.inputPulse.right > 0 || this.keys.right) : this.keys.right;
     this.inputPulse.left = Math.max(0, this.inputPulse.left - 1);
     this.inputPulse.right = Math.max(0, this.inputPulse.right - 1);
+
     const jumpPressed = window.ArcadeInput ? (window.ArcadeInput.wasPressed('ACTION') || window.ArcadeInput.wasPressed('UP') || this.keys.jumpPressed) : this.keys.jumpPressed;
     const jumpHeld = window.ArcadeInput ? (window.ArcadeInput.isDown('ACTION') || window.ArcadeInput.isDown('UP') || this.keys.jump) : this.keys.jump;
 
@@ -947,8 +1024,10 @@ class PixelPlumberApp {
 
     if (rightHeld && !leftHeld) {
       p.vx = Math.min(maxSpeed, p.vx + accel * (p.vx < 0 ? 2.5 : 1));
+      p.dx = 1;
     } else if (leftHeld && !rightHeld) {
       p.vx = Math.max(-maxSpeed, p.vx - accel * (p.vx > 0 ? 2.5 : 1));
+      p.dx = -1;
     } else {
       p.vx *= friction;
       if (Math.abs(p.vx) < 0.05) p.vx = 0;
@@ -984,62 +1063,104 @@ class PixelPlumberApp {
     this.movePlayerWithCollisions(p, step);
     if (p.grounded) p.doubleJumpUsed = false;
 
-    this.cameraX = Math.max(0, p.x - 120);
+    const targetCamX = Math.max(0, Math.min(this.worldWidth - this.playfieldWidth, p.x - this.playfieldWidth * 0.35));
+    this.cameraX += (targetCamX - this.cameraX) * 0.12;
 
     this.coinsList.forEach(c => {
-      if (!c.taken && Math.hypot(p.x + 8 - c.x, p.y + 11 - c.y) < 16) {
+      if (!c.taken && Math.hypot(p.x + 8 - c.x, p.y + 11 - c.y) < 18) {
         c.taken = true;
         this.coins++;
         this.score += 100;
         this.audio.playGameSfx('pixelplumber', 'coin');
-        if (this.coins % 3 === 0) {
+
+        if (this.coins % 5 === 0) {
           const buffs = [
             new PowerUpDefinition({ id: 'speed_boost', icon: '»', effect: 'Run boost', activate: app => { app.plumberSpeedBoost = true; }, deactivate: app => { app.plumberSpeedBoost = false; } }),
             new PowerUpDefinition({ id: 'double_jump', icon: '⇈', effect: 'One extra air jump', activate: app => { app.plumberDoubleJump = true; }, deactivate: app => { app.plumberDoubleJump = false; } }),
             new PowerUpDefinition({ id: 'shield', icon: '◇', effect: 'Absorb one hit', activate: app => { app.plumberShield = true; }, deactivate: app => { app.plumberShield = false; } })
           ];
-          activateGameBuff(this, buffs[(this.coins / 3 - 1) % buffs.length]);
+          activateGameBuff(this, buffs[(Math.floor(this.coins / 5) - 1) % buffs.length]);
         }
-        if (this.hudCoins) this.hudCoins.textContent = `🪙 ${this.coins}`;
-        if (this.hudScore) this.hudScore.textContent = this.score;
       }
     });
 
     this.enemies.forEach(e => {
       if (!e.active) return;
-      e.x += e.vx;
-      if (e.x < 180 || e.x > 460) e.vx = -e.vx;
+      e.x += e.vx * step;
+      if (e.x <= e.minX) {
+        e.x = e.minX;
+        e.vx = Math.abs(e.vx);
+      } else if (e.x >= e.maxX) {
+        e.x = e.maxX;
+        e.vx = -Math.abs(e.vx);
+      }
+      e.dir = e.vx > 0 ? 1 : -1;
 
       if (p.x + p.w > e.x && p.x < e.x + e.w && p.y + p.h > e.y && p.y < e.y + e.h) {
         if (p.vy > 0 && p.y + p.h < e.y + 10) {
           e.active = false;
-          p.vy = -6;
+          p.vy = -6.5;
           this.score += 200;
           this.audio.playGameSfx('pixelplumber', 'stomp');
-          if (this.hudScore) this.hudScore.textContent = this.score;
         } else {
           if (this.plumberShield || hasDevModifier('pixelplumber', 'invincible')) {
             this.plumberShield = false;
             e.active = false;
             renderGameBuffs(this);
           } else {
-            this.gameOver();
+            this.handlePlayerDeath();
           }
         }
       }
     });
 
+    if (!this.checkpointReached && p.x >= this.checkpointObj.x) {
+      this.checkpointReached = true;
+      this.checkpointObj.reached = true;
+      this.checkpointX = this.checkpointObj.x;
+      this.checkpointY = 200;
+      this.audio.playGameSfx('pixelplumber', 'powerup', { cooldown: 200 });
+    }
+
     if (p.x >= this.flag.x) {
       this.victory();
     }
 
-    if (p.y > 340) this.gameOver();
+    if (p.y > 340) {
+      this.handlePlayerDeath();
+    }
+
+    const totalSecs = Math.floor(this.elapsedTime);
+    const mins = String(Math.floor(totalSecs / 60)).padStart(2, '0');
+    const secs = String(totalSecs % 60).padStart(2, '0');
+    if (this.hudTime) this.hudTime.textContent = `${mins}:${secs}`;
+
+    const progPct = Math.min(100, Math.floor((p.x / this.flag.x) * 100));
+    if (this.hudProg) this.hudProg.textContent = `${progPct}%`;
+
+    if (this.hudCoins) this.hudCoins.textContent = `🪙 ${this.coins}`;
+    if (this.hudScore) this.hudScore.textContent = this.score;
+
     if (this.gameContainer) {
       this.gameContainer.dataset.playerX = String(Number(p.x.toFixed(2)));
       this.gameContainer.dataset.playerY = String(Number(p.y.toFixed(2)));
       this.gameContainer.dataset.grounded = String(Boolean(p.grounded));
       this.gameContainer.dataset.playerVx = String(Number(p.vx.toFixed(2)));
       this.gameContainer.dataset.gameState = this.state;
+      this.gameContainer.dataset.checkpointReached = String(this.checkpointReached);
+    }
+  }
+
+  handlePlayerDeath() {
+    if (this.checkpointReached && this.checkpointLives > 0) {
+      this.checkpointLives--;
+      this.player.x = this.checkpointX;
+      this.player.y = this.checkpointY;
+      this.player.vx = 0;
+      this.player.vy = 0;
+      this.audio.playGameSfx('pixelplumber', 'stomp');
+    } else {
+      this.gameOver();
     }
   }
 
@@ -1099,6 +1220,11 @@ class PixelPlumberApp {
     this.bus.emit('PIXELPLUMBER_SCORE', { score: this.score });
     this.bus.emit('GAME_COMPLETED', { id: 'pixelplumber' });
 
+    const totalSecs = Math.floor(this.elapsedTime);
+    const mins = String(Math.floor(totalSecs / 60)).padStart(2, '0');
+    const secs = String(totalSecs % 60).padStart(2, '0');
+    const progPct = Math.min(100, Math.floor((this.player.x / this.flag.x) * 100));
+
     ArcadeOutcomeScreen.show({
       game: this,
       gameId: 'pixelplumber',
@@ -1110,7 +1236,8 @@ class PixelPlumberApp {
       stats: [
         { label: 'SCORE', value: this.score, highlight: true },
         { label: 'COINS', value: this.coins || 0 },
-        { label: 'LEVEL', value: this.level || 1 },
+        { label: 'PROGRESS', value: `${progPct}%` },
+        { label: 'TIME', value: `${mins}:${secs}` },
         { label: 'BEST', value: this.highScore }
       ],
       onRetry: () => this.start(),
@@ -1123,7 +1250,7 @@ class PixelPlumberApp {
     this.state = 'VICTORY';
     clearGameBuffs(this);
     markOutcome(this, 'victory', 'level-complete');
-    this.score += 500;
+    this.score += 1000;
     this.audio.playGameSfx('pixelplumber', 'victory');
 
     const isCheated = !!(this.cheated || window.ArcadeDeveloperMode?.hasActiveCheats?.('pixelplumber'));
@@ -1135,23 +1262,24 @@ class PixelPlumberApp {
     this.bus.emit('PIXELPLUMBER_SCORE', { score: this.score });
     this.bus.emit('GAME_COMPLETED', { id: 'pixelplumber' });
 
+    const totalSecs = Math.floor(this.elapsedTime);
+    const mins = String(Math.floor(totalSecs / 60)).padStart(2, '0');
+    const secs = String(totalSecs % 60).padStart(2, '0');
+
     ArcadeOutcomeScreen.show({
       game: this,
       gameId: 'pixelplumber',
       outcome: 'LEVEL_COMPLETE',
       title: 'LEVEL COMPLETE!',
-      subtitle: 'FLAGPOLE REACHED SUCCESSFULLY',
+      subtitle: `FLAGPOLE REACHED IN ${mins}:${secs}`,
       accentColor: '#10b981',
       isNewHighScore: isNewHigh,
       stats: [
         { label: 'FINAL SCORE', value: this.score, highlight: true },
         { label: 'COINS', value: this.coins || 0 },
+        { label: 'TIME', value: `${mins}:${secs}` },
         { label: 'BEST', value: this.highScore }
       ],
-      onNext: () => {
-        this.level = (this.level || 1) + 1;
-        this.start();
-      },
       onRetry: () => this.start(),
       onHome: () => (window.ArcadeOS || globalThis.ArcadeOS)?.goHome()
     });
@@ -1170,10 +1298,11 @@ class PixelPlumberApp {
     this.ctx.save();
     this.ctx.translate(this.offsetX || 0, this.offsetY || 0);
     this.ctx.scale(this.worldScale || 1, this.worldScale || 1);
-    this.ctx.translate(-this.cameraX, 0);
+    this.ctx.translate(-Math.floor(this.cameraX), 0);
 
-    this.ctx.fillStyle = '#16a34a';
     this.platforms.forEach(plat => {
+      if (plat.x + plat.w < this.cameraX - 50 || plat.x > this.cameraX + this.playfieldWidth + 50) return;
+
       this.ctx.fillStyle = '#14532d';
       this.ctx.fillRect(plat.x, plat.y, plat.w, plat.h);
 
@@ -1190,7 +1319,7 @@ class PixelPlumberApp {
 
     const time = performance.now();
     this.coinsList.forEach(c => {
-      if (!c.taken) {
+      if (!c.taken && c.x >= this.cameraX - 30 && c.x <= this.cameraX + this.playfieldWidth + 30) {
         this.ctx.fillStyle = '#facc15';
         this.ctx.shadowColor = '#facc15';
         this.ctx.shadowBlur = 8;
@@ -1204,7 +1333,7 @@ class PixelPlumberApp {
     });
 
     this.enemies.forEach(e => {
-      if (e.active) {
+      if (e.active && e.x >= this.cameraX - 30 && e.x <= this.cameraX + this.playfieldWidth + 30) {
         this.ctx.fillStyle = '#7f1d1d';
         this.ctx.shadowColor = '#ef4444';
         this.ctx.shadowBlur = 6;
@@ -1216,24 +1345,41 @@ class PixelPlumberApp {
         this.ctx.strokeRect(e.x, e.y, e.w, e.h);
 
         this.ctx.fillStyle = '#fca5a5';
-        const eyeOffset = e.dir * 2;
+        const eyeOffset = (e.dir || -1) * 2;
         this.ctx.fillRect(e.x + 4 + eyeOffset, e.y + 4, 3, 3);
         this.ctx.fillRect(e.x + 10 + eyeOffset, e.y + 4, 3, 3);
       }
     });
 
-    this.ctx.fillStyle = '#94a3b8';
-    this.ctx.shadowColor = '#cbd5e1';
-    this.ctx.shadowBlur = 5;
-    this.ctx.fillRect(this.flag.x, this.flag.y, 4, this.flag.h);
-    this.ctx.shadowBlur = 0;
+    if (this.checkpointObj && this.checkpointObj.x >= this.cameraX - 50 && this.checkpointObj.x <= this.cameraX + this.playfieldWidth + 50) {
+      const cp = this.checkpointObj;
+      this.ctx.fillStyle = cp.reached ? '#10b981' : '#3b82f6';
+      this.ctx.shadowColor = cp.reached ? '#10b981' : '#3b82f6';
+      this.ctx.shadowBlur = 6;
+      this.ctx.fillRect(cp.x, cp.y, 4, cp.h);
+      this.ctx.shadowBlur = 0;
 
-    this.ctx.fillStyle = '#ef4444';
-    this.ctx.beginPath();
-    this.ctx.moveTo(this.flag.x + 4, this.flag.y + 2);
-    this.ctx.lineTo(this.flag.x + 28, this.flag.y + 10);
-    this.ctx.lineTo(this.flag.x + 4, this.flag.y + 18);
-    this.ctx.fill();
+      this.ctx.beginPath();
+      this.ctx.moveTo(cp.x + 4, cp.y + 4);
+      this.ctx.lineTo(cp.x + 24, cp.y + 12);
+      this.ctx.lineTo(cp.x + 4, cp.y + 20);
+      this.ctx.fill();
+    }
+
+    if (this.flag.x >= this.cameraX - 50 && this.flag.x <= this.cameraX + this.playfieldWidth + 50) {
+      this.ctx.fillStyle = '#94a3b8';
+      this.ctx.shadowColor = '#cbd5e1';
+      this.ctx.shadowBlur = 5;
+      this.ctx.fillRect(this.flag.x, this.flag.y, 4, this.flag.h);
+      this.ctx.shadowBlur = 0;
+
+      this.ctx.fillStyle = '#ef4444';
+      this.ctx.beginPath();
+      this.ctx.moveTo(this.flag.x + 4, this.flag.y + 2);
+      this.ctx.lineTo(this.flag.x + 28, this.flag.y + 10);
+      this.ctx.lineTo(this.flag.x + 4, this.flag.y + 18);
+      this.ctx.fill();
+    }
 
     const p = this.player;
     this.ctx.fillStyle = '#ef4444';
@@ -3416,31 +3562,39 @@ class NeonPongApp {
     if (this.hudP2) this.hudP2.textContent = this.p2Score;
 
     if (this.p1Score >= 7 || this.p2Score >= 7) {
-      this.cancelLoop();
-      this.state = 'GAME_OVER';
-      const isP1Winner = this.p1Score >= 7;
-      this.audio.playGameSfx('neonpong', 'victory');
-      markOutcome(this, isP1Winner ? 'victory' : 'gameover', 'match-win');
-      this.bus.emit('NEONPONG_SCORE', { score: this.p1Score });
-      this.bus.emit('GAME_COMPLETED', { id: 'neonpong' });
-
-      ArcadeOutcomeScreen.show({
-        game: this,
-        gameId: 'neonpong',
-        outcome: isP1Winner ? 'VICTORY' : 'DEFEAT',
-        title: isP1Winner ? 'VICTORY!' : 'DEFEAT',
-        subtitle: isP1Winner ? 'PLAYER 1 VICTORIOUS' : 'CPU TOURNAMENT WINNER',
-        accentColor: '#06b6d4',
-        stats: [
-          { label: 'PLAYER 1', value: this.p1Score, highlight: isP1Winner },
-          { label: 'CPU / P2', value: this.p2Score, highlight: !isP1Winner }
-        ],
-        onRetry: () => this.start(),
-        onHome: () => (window.ArcadeOS || globalThis.ArcadeOS)?.goHome()
-      });
+      this.gameOver(this.p1Score >= 7);
     } else {
       this.resetBall();
     }
+  }
+
+  gameOver(isP1Winner = false) {
+    this.cancelLoop();
+    this.state = 'GAME_OVER';
+    if (!isP1Winner && this.p2Score < 7) this.p2Score = 7;
+    else if (isP1Winner && this.p1Score < 7) this.p1Score = 7;
+    if (this.hudP1) this.hudP1.textContent = this.p1Score;
+    if (this.hudP2) this.hudP2.textContent = this.p2Score;
+
+    this.audio.playGameSfx('neonpong', 'victory');
+    markOutcome(this, isP1Winner ? 'victory' : 'gameover', 'match-win');
+    this.bus.emit('NEONPONG_SCORE', { score: this.p1Score });
+    this.bus.emit('GAME_COMPLETED', { id: 'neonpong' });
+
+    ArcadeOutcomeScreen.show({
+      game: this,
+      gameId: 'neonpong',
+      outcome: isP1Winner ? 'VICTORY' : 'DEFEAT',
+      title: isP1Winner ? 'VICTORY!' : 'DEFEAT',
+      subtitle: isP1Winner ? 'PLAYER 1 VICTORIOUS' : 'CPU TOURNAMENT WINNER',
+      accentColor: '#06b6d4',
+      stats: [
+        { label: 'PLAYER 1', value: this.p1Score, highlight: isP1Winner },
+        { label: 'CPU / P2', value: this.p2Score, highlight: !isP1Winner }
+      ],
+      onRetry: () => this.start(),
+      onHome: () => (window.ArcadeOS || globalThis.ArcadeOS)?.goHome()
+    });
   }
 
   draw() {

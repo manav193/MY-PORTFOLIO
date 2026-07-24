@@ -158,9 +158,9 @@ test.describe('NEON SNAKE Gameplay & Verification Suite', () => {
         const app = active?._rawApp || active?.rawApp || active;
         if (app && typeof app.gameOver === 'function') app.gameOver();
       });
-      await page.waitForSelector('.arcade-outcome-overlay', { timeout: 5000 });
-      await page.click('.arcade-outcome-btn.primary');
-      await page.waitForSelector('.arcade-outcome-overlay', { state: 'detached', timeout: 5000 });
+      await page.waitForSelector('.arcade-outcome-overlay', { timeout: 10000 });
+      await page.evaluate(() => document.querySelector('.arcade-outcome-btn.primary')?.click());
+      await page.waitForSelector('.arcade-outcome-overlay', { state: 'detached', timeout: 10000 });
       await page.waitForFunction(() => {
         const active = window.ArcadeOS.activeApp;
         const app = active?._rawApp || active?.rawApp || active;

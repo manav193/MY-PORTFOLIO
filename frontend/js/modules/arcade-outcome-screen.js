@@ -26,7 +26,11 @@ export class ArcadeOutcomeScreen {
     // Dismiss any existing overlay
     this.hide();
 
-    const targetContainer = game?.overlay || game?.container || document.getElementById('arcade-os') || document.body;
+    const targetContainer =
+      document.getElementById('arcade-system-overlay-root') ||
+      document.getElementById('arcade-app-view') ||
+      document.getElementById('arcade-os') ||
+      document.body;
     if (!targetContainer) return;
 
     // Check Developer / Cheat Mode status
@@ -233,8 +237,7 @@ export class ArcadeOutcomeScreen {
         handleAction(btnNodes[focusedIdx]);
       } else if (e.key === 'Escape') {
         e.preventDefault();
-        ArcadeOutcomeScreen.hide();
-        if (callbacks.onHome) callbacks.onHome();
+        focusBtn(0);
       }
     };
 
