@@ -13,7 +13,6 @@ const portfolioConfig = Object.freeze({
     'arcade-os',
     'nimo',
     'toolverse',
-    'selfyy',
     'veldora-bites',
     'shift-zero',
     'love',
@@ -39,12 +38,6 @@ const portfolioConfig = Object.freeze({
       liveUrl: 'https://tool-verse-theta.vercel.app/',
       githubUrl: 'https://github.com/manav193/ToolVerse',
       caseStudyPath: 'project-toolverse.html'
-    }),
-    selfyy: Object.freeze({
-      status: 'Live',
-      liveUrl: 'https://selfyy.vercel.app/',
-      githubUrl: 'https://github.com/manav193/SELFYY',
-      caseStudyPath: 'project-selfyy.html'
     }),
     'veldora-bites': Object.freeze({
       status: 'Live',
