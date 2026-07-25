@@ -27,7 +27,7 @@ const PROJECTS_DB = [
     category: 'system',
     type: 'Interactive portfolio system',
     tech: ['Vanilla JS', 'Canvas 2D', 'Web Audio API', 'PWA', 'Gamepad API'],
-    summary: 'A modular browser-based operating system built with Vanilla JS, featuring multiple playable games, creative tools, persistent profiles, cabinet customization, and unified input handlers.',
+    summary: 'A modular desktop-first browser operating system built with Vanilla JS, featuring multiple playable games, creative tools, persistent profiles, cabinet customization, and unified input handlers. The live cabinet is available on desktop and laptop only.',
     caseStudy: 'project-arcade-os.html',
     liveUrl: '#intro-sequence'
   },
@@ -677,6 +677,51 @@ const ConversationalContext = {
 // ==========================================
 
 const INTENT_REGISTRY = [
+  // ArcadeOS device availability and location
+  {
+    id: 'arcade_device_availability',
+    priority: 114,
+    matches: (text) => matchesAnyPhrase(text, [
+      'where is arcade', 'where is the arcade', 'where can i find arcade',
+      'how can i access arcade', 'how do i open arcade', 'can i play arcade on mobile',
+      'why is arcade not opening', 'arcade available', 'arcade on mobile', 'arcade on phone',
+      'arcade kaha hai', 'arcade kahan hai', 'arcade kidhar hai', 'arcade kaise khole',
+      'arcade mobile par', 'arcade phone par'
+    ]),
+    handler: (text, entities, locationCtx, isHindi, isHinglish) => {
+      const available = typeof window.isDesktopArcadeAvailable === 'function'
+        ? window.isDesktopArcadeAvailable()
+        : window.matchMedia?.('(min-width: 1024px) and (hover: hover) and (pointer: fine)').matches;
+
+      if (isHindi) {
+        return {
+          intentId: 'arcade_device_availability',
+          text: available
+            ? 'ArcadeOS इसी पोर्टफोलियो के कस्टम कैबिनेट में है। पूरा अनुभव डेस्कटॉप या लैपटॉप के लिए बनाया गया है—Enter Arcade बटन या Arcade dock icon इस्तेमाल करें।'
+            : 'ArcadeOS मोबाइल और टैबलेट पर जानबूझकर बंद रखा गया है। पूरा कैबिनेट, गेम्स, ऑडियो और कंट्रोल अनुभव डेस्कटॉप या लैपटॉप पर उपलब्ध है।',
+          actions: available ? [{ label: 'Open Arcade', navigate: 'arcade' }] : [{ label: 'View ArcadeOS Case Study', navigate: 'project-arcade-os.html' }]
+        };
+      }
+
+      if (isHinglish) {
+        return {
+          intentId: 'arcade_device_availability',
+          text: available
+            ? 'ArcadeOS isi portfolio ke custom cabinet mein hai. Full experience desktop ya laptop ke liye designed hai—Enter Arcade button ya Arcade dock icon use karo.'
+            : 'ArcadeOS mobile aur tablet par intentionally disabled hai. Full cabinet, games, audio aur controls ka experience desktop ya laptop par available hai.',
+          actions: available ? [{ label: 'Open Arcade', navigate: 'arcade' }] : [{ label: 'View ArcadeOS Case Study', navigate: 'project-arcade-os.html' }]
+        };
+      }
+
+      return {
+        intentId: 'arcade_device_availability',
+        text: available
+          ? 'ArcadeOS is inside the custom cabinet on this portfolio. The full experience is designed for desktop and laptop—use the Enter Arcade button or the Arcade dock icon.'
+          : 'ArcadeOS is intentionally disabled on mobile and tablet. You can experience the full cabinet, games, audio, and controls on a desktop or laptop.',
+        actions: available ? [{ label: 'Open Arcade', navigate: 'arcade' }] : [{ label: 'View ArcadeOS Case Study', navigate: 'project-arcade-os.html' }]
+      };
+    }
+  },
   // 1. NIMO Creator
   {
     id: 'nimo_creator',
@@ -1062,7 +1107,18 @@ const INTENT_REGISTRY = [
       if (matchesAnyPhrase(text, ['go to contact', 'take me to contact', 'open contact', 'show contact', 'contact section'])) {
         return { intentId: 'navigation', target: 'contact', text: "Opening the Contact section.", navigateTarget: 'index.html#contact' };
       }
-      return { intentId: 'navigation', target: 'arcade', text: "Opening Arcade OS! Launching cabinet interface...", navigateTarget: 'arcade' };
+      const available = typeof window.isDesktopArcadeAvailable === 'function'
+      ? window.isDesktopArcadeAvailable()
+      : window.matchMedia?.('(min-width: 1024px) and (hover: hover) and (pointer: fine)').matches;
+    if (!available) {
+      return {
+        intentId: 'navigation',
+        target: 'arcade',
+        text: 'ArcadeOS is intentionally disabled on mobile and tablet. You can experience it on a desktop or laptop.',
+        actions: [{ label: 'View ArcadeOS Case Study', navigate: 'project-arcade-os.html' }]
+      };
+    }
+    return { intentId: 'navigation', target: 'arcade', text: "Opening Arcade OS! Launching cabinet interface...", navigateTarget: 'arcade' };
     }
   },
 
@@ -2261,6 +2317,10 @@ export function initNimo() {
 
 function executeNavigation(target) {
   if (target === 'arcade') {
+    if (typeof window.isDesktopArcadeAvailable === 'function' && !window.isDesktopArcadeAvailable()) {
+      window.showArcadeDesktopNotice?.();
+      return;
+    }
     if (typeof window.enterArcade === 'function') {
       window.enterArcade();
     } else {

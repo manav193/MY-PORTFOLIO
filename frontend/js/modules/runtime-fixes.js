@@ -159,7 +159,9 @@ function installArcadeDesktopStyles() {
   const style = document.createElement('style');
   style.id = 'arcade-desktop-only-styles';
   style.textContent = `
-    body.arcade-mobile-disabled ${ARCADE_TRIGGER_SELECTOR} {
+    body.arcade-mobile-disabled [data-enter-arcade],
+    body.arcade-mobile-disabled [data-arcade-desktop-only],
+    body.arcade-mobile-disabled [data-dock-action="arcade"] {
       cursor: not-allowed !important;
       opacity: 0.58 !important;
       filter: saturate(0.55);
