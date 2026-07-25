@@ -1,0 +1,171 @@
+name: Finalize desktop-only ArcadeOS
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/desktop-arcade-finalize.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Normalize desktop-only ArcadeOS source
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path, old, new):
+              p = Path(path)
+              text = p.read_text()
+              if old not in text:
+                  raise SystemExit(f"Expected source fragment missing in {path}: {old[:80]!r}")
+              p.write_text(text.replace(old, new, 1))
+
+          replace_once(
+              'frontend/js/modules/runtime-fixes.js',
+              '    body.arcade-mobile-disabled ${ARCADE_TRIGGER_SELECTOR} {',
+              '''    body.arcade-mobile-disabled [data-enter-arcade],
+              body.arcade-mobile-disabled [data-arcade-desktop-only],
+              body.arcade-mobile-disabled [data-dock-action="arcade"] {'''
+          )
+
+          replace_once(
+              'frontend/index.html',
+              'A modular browser-based operating system with playable games, creative tools, persistent profiles, cabinet customization, diagnostics, and unified input.',
+              'A modular browser-based operating system with playable games, creative tools, persistent profiles, cabinet customization, diagnostics, and unified input. The full live cabinet is designed for desktop and laptop; mobile and tablet visitors retain the portfolio and case study without launching the game runtime.'
+          )
+
+          replace_once(
+              'frontend/index.html',
+              '<a href="#intro-sequence" class="btn-primary" data-enter-arcade>Live Demo</a>',
+              '<a href="#intro-sequence" class="btn-primary" data-enter-arcade>Desktop Demo</a>'
+          )
+
+          replace_once(
+              'frontend/js/modules/nimo.js',
+              "summary: 'A modular browser-based operating system built with Vanilla JS, featuring multiple playable games, creative tools, persistent profiles, cabinet customization, and unified input handlers.',",
+              "summary: 'A modular desktop-first browser operating system built with Vanilla JS, featuring multiple playable games, creative tools, persistent profiles, cabinet customization, and unified input handlers. The live cabinet is available on desktop and laptop only.',"
+          )
+
+          marker = 'const INTENT_REGISTRY = [\n'
+          intent = '''const INTENT_REGISTRY = [
+            // ArcadeOS device availability and location
+            {
+              id: 'arcade_device_availability',
+              priority: 114,
+              matches: (text) => matchesAnyPhrase(text, [
+                'where is arcade', 'where is the arcade', 'where can i find arcade',
+                'how can i access arcade', 'how do i open arcade', 'can i play arcade on mobile',
+                'why is arcade not opening', 'arcade available', 'arcade on mobile', 'arcade on phone',
+                'arcade kaha hai', 'arcade kahan hai', 'arcade kidhar hai', 'arcade kaise khole',
+                'arcade mobile par', 'arcade phone par'
+              ]),
+              handler: (text, entities, locationCtx, isHindi, isHinglish) => {
+                const available = typeof window.isDesktopArcadeAvailable === 'function'
+                  ? window.isDesktopArcadeAvailable()
+                  : window.matchMedia?.('(min-width: 1024px) and (hover: hover) and (pointer: fine)').matches;
+
+                if (isHindi) {
+                  return {
+                    intentId: 'arcade_device_availability',
+                    text: available
+                      ? 'ArcadeOS इसी पोर्टफोलियो के कस्टम कैबिनेट में है। पूरा अनुभव डेस्कटॉप या लैपटॉप के लिए बनाया गया है—Enter Arcade बटन या Arcade dock icon इस्तेमाल करें।'
+                      : 'ArcadeOS मोबाइल और टैबलेट पर जानबूझकर बंद रखा गया है। पूरा कैबिनेट, गेम्स, ऑडियो और कंट्रोल अनुभव डेस्कटॉप या लैपटॉप पर उपलब्ध है।',
+                    actions: available ? [{ label: 'Open Arcade', navigate: 'arcade' }] : [{ label: 'View ArcadeOS Case Study', navigate: 'project-arcade-os.html' }]
+                  };
+                }
+
+                if (isHinglish) {
+                  return {
+                    intentId: 'arcade_device_availability',
+                    text: available
+                      ? 'ArcadeOS isi portfolio ke custom cabinet mein hai. Full experience desktop ya laptop ke liye designed hai—Enter Arcade button ya Arcade dock icon use karo.'
+                      : 'ArcadeOS mobile aur tablet par intentionally disabled hai. Full cabinet, games, audio aur controls ka experience desktop ya laptop par available hai.',
+                    actions: available ? [{ label: 'Open Arcade', navigate: 'arcade' }] : [{ label: 'View ArcadeOS Case Study', navigate: 'project-arcade-os.html' }]
+                  };
+                }
+
+                return {
+                  intentId: 'arcade_device_availability',
+                  text: available
+                    ? 'ArcadeOS is inside the custom cabinet on this portfolio. The full experience is designed for desktop and laptop—use the Enter Arcade button or the Arcade dock icon.'
+                    : 'ArcadeOS is intentionally disabled on mobile and tablet. You can experience the full cabinet, games, audio, and controls on a desktop or laptop.',
+                  actions: available ? [{ label: 'Open Arcade', navigate: 'arcade' }] : [{ label: 'View ArcadeOS Case Study', navigate: 'project-arcade-os.html' }]
+                };
+              }
+            },
+          '''
+          replace_once('frontend/js/modules/nimo.js', marker, intent)
+
+          replace_once(
+              'frontend/js/modules/nimo.js',
+              '      return { intentId: \'navigation\', target: \'arcade\', text: "Opening Arcade OS! Launching cabinet interface...", navigateTarget: \'arcade\' };',
+              '''      const available = typeof window.isDesktopArcadeAvailable === 'function'
+                ? window.isDesktopArcadeAvailable()
+                : window.matchMedia?.('(min-width: 1024px) and (hover: hover) and (pointer: fine)').matches;
+              if (!available) {
+                return {
+                  intentId: 'navigation',
+                  target: 'arcade',
+                  text: 'ArcadeOS is intentionally disabled on mobile and tablet. You can experience it on a desktop or laptop.',
+                  actions: [{ label: 'View ArcadeOS Case Study', navigate: 'project-arcade-os.html' }]
+                };
+              }
+              return { intentId: 'navigation', target: 'arcade', text: "Opening Arcade OS! Launching cabinet interface...", navigateTarget: 'arcade' };'''
+          )
+
+          replace_once(
+              'frontend/js/modules/nimo.js',
+              "  if (target === 'arcade') {\n    if (typeof window.enterArcade === 'function') {",
+              "  if (target === 'arcade') {\n    if (typeof window.isDesktopArcadeAvailable === 'function' && !window.isDesktopArcadeAvailable()) {\n      window.showArcadeDesktopNotice?.();\n      return;\n    }\n    if (typeof window.enterArcade === 'function') {"
+          )
+
+          test = Path('tests/arcade-desktop-only.spec.js')
+          test.write_text('''import { test, expect } from '@playwright/test';
+
+          test.describe('ArcadeOS desktop-only delivery', () => {
+            test('mobile blocks ArcadeOS entry and explains desktop availability', async ({ page }) => {
+              await page.setViewportSize({ width: 390, height: 844 });
+              await page.goto('/');
+              const trigger = page.locator('[data-enter-arcade]').first();
+              await expect(trigger).toHaveAttribute('aria-disabled', 'true');
+              await trigger.click();
+              await expect(page.locator('[data-arcade-desktop-toast]')).toContainText('desktop-only');
+              await expect(page.locator('body')).not.toHaveClass(/arcade-active/);
+            });
+
+            test('desktop keeps ArcadeOS entry enabled', async ({ page }) => {
+              await page.setViewportSize({ width: 1440, height: 900 });
+              await page.goto('/');
+              const trigger = page.locator('[data-enter-arcade]').first();
+              await expect(trigger).not.toHaveAttribute('aria-disabled', 'true');
+            });
+          });
+          ''')
+          PY
+
+      - name: Validate source
+        run: |
+          git diff --check
+          npm ci
+          npm run build
+
+      - name: Commit finalized behavior
+        run: |
+          if git diff --quiet; then
+            echo "No changes required."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add frontend/index.html frontend/js/modules/runtime-fixes.js frontend/js/modules/nimo.js tests/arcade-desktop-only.spec.js
+          git commit -m "Finalize desktop-only ArcadeOS and NIMO guidance"
+          git push origin HEAD:main
