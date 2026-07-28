@@ -7,8 +7,7 @@ function getBackendUrl() {
   if (typeof window !== 'undefined' && window.NIMO_BACKEND_URL) return window.NIMO_BACKEND_URL;
   if (typeof window !== 'undefined' && window.location.hostname === 'localhost') return '/api/nimo/chat';
 
-  // Retain the verified production endpoint until NIMO Core is deployed and smoke-tested.
-  return 'https://nimo-backend.manav-nimo.workers.dev/api/nimo/chat';
+  return 'https://nimo-core.manav-nimo.workers.dev/api/nimo/chat';
 }
 
 function getBoundedHistory() {
