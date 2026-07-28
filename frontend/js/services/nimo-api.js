@@ -30,7 +30,9 @@ function getBoundedHistory() {
 
 export async function fetchNimoBackendReply(userMessage, context = {}) {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 12000);
+  // The Worker may try multiple providers sequentially; keep this budget above
+  // its bounded failover window so the browser does not cancel valid retries.
+  const timeoutId = setTimeout(() => controller.abort(), 26000);
 
   try {
     const payload = {
