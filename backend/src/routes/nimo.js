@@ -1,14 +1,15 @@
-// Sliding window rate limiter map (IP -> timestamps array)
+import { queryOpenRouter } from '../services/openrouter.js';
+
+// Development fallback only. NIMO Core supports a distributed Cloudflare limiter binding.
 const ipRateMap = new Map();
 
 function isRateLimited(ip) {
   if (!ip) return false;
   const now = Date.now();
-  const windowMs = 60000; // 1 minute
+  const windowMs = 60000;
   const maxRequests = 10;
-
   let timestamps = ipRateMap.get(ip) || [];
-  timestamps = timestamps.filter(t => now - t < windowMs);
+  timestamps = timestamps.filter(timestamp => now - timestamp < windowMs);
 
   if (timestamps.length >= maxRequests) {
     ipRateMap.set(ip, timestamps);
@@ -17,15 +18,25 @@ function isRateLimited(ip) {
 
   timestamps.push(now);
   ipRateMap.set(ip, timestamps);
+  if (ipRateMap.size > 2000) ipRateMap.clear();
   return false;
+}
+
+function safeHistory(value) {
+  if (!Array.isArray(value)) return [];
+  return value
+    .slice(-10)
+    .filter(item => item && (item.role === 'user' || item.role === 'assistant') && typeof item.content === 'string')
+    .map(item => ({ role: item.role, content: item.content.trim().slice(0, 1000) }))
+    .filter(item => item.content);
 }
 
 export async function handleNimoChatRoute(request, env = {}, corsHeaders = {}) {
   try {
-    let bodyData = null;
+    let bodyData;
     try {
       bodyData = await request.json();
-    } catch (e) {
+    } catch {
       return new Response(JSON.stringify({ success: false, error: 'Invalid JSON payload' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json', ...corsHeaders }
@@ -44,45 +55,47 @@ export async function handleNimoChatRoute(request, env = {}, corsHeaders = {}) {
       });
     }
 
-    const { message, context } = bodyData || {};
-
+    const { message, context, history } = bodyData || {};
     if (!message || typeof message !== 'string' || !message.trim()) {
-      return new Response(JSON.stringify({
-        success: false,
-        reply: null,
-        error: 'Message parameter is required.'
-      }), {
+      return new Response(JSON.stringify({ success: false, reply: null, error: 'Message parameter is required.' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json', ...corsHeaders }
       });
     }
 
-    if (message.trim().length > 350) {
+    if (message.trim().length > 1000) {
       return new Response(JSON.stringify({
         success: false,
         reply: "Whoa, that’s a whole novel 😭 Keep it shorter and I’ll take a look. ⚡",
-        error: 'Input exceeds maximum length of 350 characters.'
+        error: 'Input exceeds maximum length of 1000 characters.'
       }), {
         status: 400,
         headers: { 'Content-Type': 'application/json', ...corsHeaders }
       });
     }
 
-    const sanitizedMessage = message.trim().substring(0, 350);
+    const sanitizedMessage = message.trim().slice(0, 1000);
+    const idPattern = /^[a-z0-9][a-z0-9-]{0,63}$/;
+    const cleanId = (value, fallback) => {
+      const normalized = typeof value === 'string' ? value.trim().toLowerCase() : '';
+      return idPattern.test(normalized) ? normalized : fallback;
+    };
     const sanitizedContext = {
-      page: context?.page ? String(context.page).substring(0, 100) : 'home',
-      section: context?.section ? String(context.section).substring(0, 100) : 'work',
-      project: context?.project ? String(context.project).substring(0, 100) : null,
-      language: context?.language ? String(context.language).substring(0, 20) : 'en'
+      page: cleanId(context?.pageId || context?.page, 'home'),
+      section: cleanId(context?.sectionId || context?.section, 'work'),
+      project: cleanId(context?.projectId || context?.project, null),
+      language: ['en', 'hi', 'hinglish'].includes(context?.language) ? context.language : 'en'
     };
 
-    const result = await queryOpenRouter(sanitizedMessage, sanitizedContext, env);
+    // The legacy provider ignores history today; accepting and validating it keeps the client contract migration-safe.
+    const result = await queryOpenRouter(sanitizedMessage, { ...sanitizedContext, history: safeHistory(history) }, env);
 
     if (!result.success) {
+      console.error(JSON.stringify({ event: 'legacy_nimo_failure', error: result.error || 'unknown' }));
       return new Response(JSON.stringify({
         success: false,
         reply: null,
-        error: result.error || 'Extended assistant service unavailable'
+        error: 'Extended assistant service unavailable'
       }), {
         status: 503,
         headers: { 'Content-Type': 'application/json', ...corsHeaders }
@@ -92,14 +105,12 @@ export async function handleNimoChatRoute(request, env = {}, corsHeaders = {}) {
     return new Response(JSON.stringify({
       success: true,
       reply: result.reply,
-      actions: [
-        { label: 'View Projects', navigate: 'index.html#work' }
-      ]
+      actions: [{ label: 'View Projects', navigate: 'index.html#work' }]
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json', ...corsHeaders }
     });
-  } catch (err) {
+  } catch {
     return new Response(JSON.stringify({
       success: false,
       reply: null,
