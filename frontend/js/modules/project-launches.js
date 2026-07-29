@@ -13,5 +13,9 @@ export function initProjectLaunch(){
   }
   if(path.endsWith('/project-promptai.html')||path.endsWith('project-promptai.html')){
     loadLaunch({css:'assets/case-studies/prompt-launch.css',js:'assets/case-studies/prompt-launch.js',activeClass:'prompt-launch-active'});
+    return;
+  }
+  if(path.endsWith('/project-toolverse.html')||path.endsWith('project-toolverse.html')){
+    loadLaunch({css:'assets/case-studies/toolverse-launch.css',js:'assets/case-studies/toolverse-launch.js',activeClass:'toolverse-launch-active'});
   }
 }
