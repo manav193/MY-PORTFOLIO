@@ -1,4 +1,4 @@
-const cacheName = "manav-portfolio-v24";
+const cacheName = "manav-portfolio-v25";
 const assets = [
   "./",
   "./index.html",
@@ -7,7 +7,6 @@ const assets = [
   "./css/intro.css",
   "./css/arcade-os.css",
   "./css/project-page.css",
-  "./assets/project-stack.css",
   "./js/main.js",
   "./js/intro.js",
   "./js/modules/arcade-audio.js",
@@ -86,6 +85,7 @@ function validateAssetResponse(request, response) {
   }
 
   if (!response.ok) return response;
+
   return response;
 }
 
