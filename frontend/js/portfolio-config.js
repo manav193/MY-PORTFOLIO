@@ -10,23 +10,9 @@ const portfolioConfig = Object.freeze({
   deployedPortfolioUrl: 'https://my-portfolio-mu-jade-52.vercel.app',
   socialImagePath: 'assets/manav-agarwal-portfolio-og.jpg',
   featuredProjectIds: [
-    'arcade-os',
-    'nimo',
-    'toolverse',
-    'shift-zero',
-    'love',
-    'velora-bites',
-    'nintendo',
-    'nike',
-    'fate-ai',
-    'flora-and-flavor',
-    'veldora-bites',
-    'prompt-ai',
-    'multi-api-system',
-    'resume-ai',
-    'route-73-night-shift',
-    'aurora-control-ui',
-    'shift-zero-ui'
+    'arcade-os','nimo','toolverse','shift-zero','love','velora-bites','nintendo','nike',
+    'fate-ai','flora-and-flavor','veldora-bites','prompt-ai','multi-api-system','resume-ai',
+    'route-73-night-shift','aurora-control-ui','shift-zero-ui'
   ],
   projects: Object.freeze({
     'arcade-os': Object.freeze({ status: 'Live', liveUrl: '#intro-sequence', githubUrl: 'https://github.com/manav193/MY-PORTFOLIO', caseStudyPath: 'project-arcade-os.html' }),
@@ -37,20 +23,18 @@ const portfolioConfig = Object.freeze({
     'velora-bites': Object.freeze({ status: 'Prototype', liveUrl: null, githubUrl: 'https://github.com/manav193/VELORA-BITES-UI', caseStudyPath: 'project-velora-bites.html' }),
     nintendo: Object.freeze({ status: 'Prototype', liveUrl: null, githubUrl: 'https://github.com/manav193/NITENDO-UI', caseStudyPath: 'project-nintendo.html' }),
     nike: Object.freeze({ status: 'Prototype', liveUrl: null, githubUrl: 'https://github.com/manav193', caseStudyPath: 'project-nike.html' }),
-    'fate-ai': Object.freeze({ status: 'In Development', liveUrl: null, githubUrl: 'https://github.com/manav193/FATE-AI', caseStudyPath: 'index.html#work' }),
-    'flora-and-flavor': Object.freeze({ status: 'Portfolio Concept', liveUrl: null, githubUrl: 'https://github.com/manav193/Flora-and-Flavor', caseStudyPath: 'index.html#work' }),
+    'fate-ai': Object.freeze({ status: 'In Development', liveUrl: null, githubUrl: 'https://github.com/manav193/FATE-AI', caseStudyPath: 'project-fate-ai.html' }),
+    'flora-and-flavor': Object.freeze({ status: 'Portfolio Concept', liveUrl: null, githubUrl: 'https://github.com/manav193/Flora-and-Flavor', caseStudyPath: 'project-flora-and-flavor.html' }),
     'veldora-bites': Object.freeze({ status: 'Live', liveUrl: 'https://veldora-bites.vercel.app/', githubUrl: 'https://github.com/manav193/VELDORA-BITES', caseStudyPath: 'assets/case-studies/veldora-bites.html' }),
     'prompt-ai': Object.freeze({ status: 'Product Concept', liveUrl: null, githubUrl: 'https://github.com/manav193/Prompt-Aii', caseStudyPath: 'project-promptai.html' }),
-    'multi-api-system': Object.freeze({ status: 'Earlier Prototype', liveUrl: null, githubUrl: 'https://github.com/manav193/Multi_API_system', caseStudyPath: 'index.html#work' }),
-    'resume-ai': Object.freeze({ status: 'Android Concept', liveUrl: null, githubUrl: 'https://github.com/manav193/resume-ai', caseStudyPath: 'index.html#work' }),
+    'multi-api-system': Object.freeze({ status: 'Earlier Prototype', liveUrl: null, githubUrl: 'https://github.com/manav193/Multi_API_system', caseStudyPath: 'project-multi-api-system.html' }),
+    'resume-ai': Object.freeze({ status: 'Android Concept', liveUrl: null, githubUrl: 'https://github.com/manav193/resume-ai', caseStudyPath: 'project-resume-ai.html' }),
     'route-73-night-shift': Object.freeze({ status: 'Game Concept', liveUrl: null, githubUrl: 'https://github.com/manav193/Route-73-Night-Shift', caseStudyPath: 'index.html#work' }),
-    'aurora-control-ui': Object.freeze({ status: 'UI Prototype', liveUrl: null, githubUrl: 'https://github.com/manav193/AURORA-CONTROL-UI', caseStudyPath: 'index.html#work' }),
-    'shift-zero-ui': Object.freeze({ status: 'Design Prototype', liveUrl: null, githubUrl: 'https://github.com/manav193/SHIFT-ZERO-UI', caseStudyPath: 'project-shift-zero.html' })
+    'aurora-control-ui': Object.freeze({ status: 'UI Prototype', liveUrl: null, githubUrl: 'https://github.com/manav193/AURORA-CONTROL-UI', caseStudyPath: 'project-aurora-control-ui.html' }),
+    'shift-zero-ui': Object.freeze({ status: 'Design Prototype', liveUrl: null, githubUrl: 'https://github.com/manav193/SHIFT-ZERO-UI', caseStudyPath: 'project-shift-zero-ui.html' })
   })
 });
 
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = portfolioConfig;
-}
+if (typeof module !== 'undefined' && module.exports) module.exports = portfolioConfig;
 export default portfolioConfig;
 export { portfolioConfig };
