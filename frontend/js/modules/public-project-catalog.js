@@ -154,6 +154,18 @@ function experimentCard(project) {
   </article>`;
 }
 
+function augmentExistingExperiment(experiments, project) {
+  const card = [...experiments.querySelectorAll('.experiment-card')]
+    .find(node => node.querySelector('h4')?.textContent.trim().toLowerCase() === project.title.toLowerCase());
+  if (!card) return false;
+
+  const actions = card.querySelector('.experiment-card__actions');
+  if (actions && !actions.querySelector(`a[href="${project.github}"]`)) {
+    actions.insertAdjacentHTML('beforeend', `<a href="${escapeHtml(project.github)}" target="_blank" rel="noopener noreferrer">View GitHub</a>`);
+  }
+  return true;
+}
+
 export function initPublicProjectCatalog() {
   const showcase = document.querySelector('[data-project-showcase]');
   if (showcase) {
@@ -164,8 +176,8 @@ export function initPublicProjectCatalog() {
 
   const experiments = document.querySelector('.experiments-grid');
   if (experiments) {
-    const existingText = experiments.textContent.toLowerCase();
-    const markup = PUBLIC_PROJECTS.experiments.filter(project => !existingText.includes(project.title.toLowerCase())).map(experimentCard).join('');
+    const missing = PUBLIC_PROJECTS.experiments.filter(project => !augmentExistingExperiment(experiments, project));
+    const markup = missing.map(experimentCard).join('');
     if (markup) experiments.insertAdjacentHTML('beforeend', markup);
   }
 }
