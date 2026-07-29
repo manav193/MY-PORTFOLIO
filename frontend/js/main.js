@@ -14,6 +14,7 @@ import { initArcadeCinematicScene } from "./modules/arcade-cinematic-scene.js";
 import { initArcadeHardwareInputFixes } from "./modules/arcade-hardware-input-fixes.js";
 import { initProjectEnvironment } from "./modules/project-environment.js";
 import { initPublicProjectCatalog } from "./modules/public-project-catalog.js";
+import { initProjectLaunch } from "./modules/project-launches.js";
 import { ArcadeEnvironmentService } from "./modules/arcade-environment-service.js";
 import { Arcade3DPlanetEngine } from "./modules/arcade-3d-planet-engine.js";
 import ArcadeTransitions from "./modules/arcade-transitions.js";
@@ -53,6 +54,7 @@ initOS();
 
 GlobalPortfolioShell.init();
 initProjectEnvironment();
+initProjectLaunch();
 initCursorSystem();
 initCommandPalette();
 
