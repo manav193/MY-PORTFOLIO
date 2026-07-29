@@ -1,4 +1,4 @@
-const cacheName = "manav-portfolio-v29";
+const cacheName = "manav-portfolio-v30";
 const assets = [
   "./",
   "./index.html",
