@@ -17,5 +17,9 @@ export function initProjectLaunch(){
   }
   if(path.endsWith('/project-toolverse.html')||path.endsWith('project-toolverse.html')){
     loadLaunch({css:'assets/case-studies/toolverse-launch.css',js:'assets/case-studies/toolverse-launch.js',activeClass:'toolverse-launch-active'});
+    return;
+  }
+  if(path.endsWith('/project-shift-zero.html')||path.endsWith('project-shift-zero.html')){
+    loadLaunch({css:'assets/case-studies/shiftzero-launch.css',js:'assets/case-studies/shiftzero-launch.js',activeClass:'shiftzero-launch-active'});
   }
 }
