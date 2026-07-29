@@ -29,5 +29,9 @@ export function initProjectLaunch(){
   }
   if(path.endsWith('/project-velora-bites.html')||path.endsWith('project-velora-bites.html')){
     loadLaunch({css:'assets/case-studies/veldora-launch.css',js:'assets/case-studies/veldora-launch.js',activeClass:'veldora-launch-active'});
+    return;
+  }
+  if(path.endsWith('/project-arcade-os.html')||path.endsWith('project-arcade-os.html')){
+    loadLaunch({css:'assets/case-studies/arcade-launch.css',js:'assets/case-studies/arcade-launch.js',activeClass:'arcade-launch-active'});
   }
 }
