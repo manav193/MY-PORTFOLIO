@@ -25,5 +25,9 @@ export function initProjectLaunch(){
   }
   if(path.endsWith('/project-nimo.html')||path.endsWith('project-nimo.html')){
     loadLaunch({css:'assets/case-studies/nimo-launch.css',js:'assets/case-studies/nimo-launch.js',activeClass:'nimo-launch-active'});
+    return;
+  }
+  if(path.endsWith('/project-velora-bites.html')||path.endsWith('project-velora-bites.html')){
+    loadLaunch({css:'assets/case-studies/veldora-launch.css',js:'assets/case-studies/veldora-launch.js',activeClass:'veldora-launch-active'});
   }
 }
