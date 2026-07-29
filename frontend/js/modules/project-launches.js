@@ -7,6 +7,10 @@ export function initProjectLaunch(){
     loadLaunch({css:'../../assets/case-studies/fate-launch.css',js:'../../assets/case-studies/fate-launch.js',activeClass:'fate-launch-active'});
     return;
   }
+  if(path.includes('/assets/case-studies/public-project.html')&&params.get('id')==='flora-and-flavor'){
+    loadLaunch({css:'../../assets/case-studies/flora-launch.css',js:'../../assets/case-studies/flora-launch.js',activeClass:'flora-launch-active'});
+    return;
+  }
   if(path.endsWith('/project-promptai.html')||path.endsWith('project-promptai.html')){
     loadLaunch({css:'assets/case-studies/prompt-launch.css',js:'assets/case-studies/prompt-launch.js',activeClass:'prompt-launch-active'});
   }
