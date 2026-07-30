@@ -1,4 +1,4 @@
-const cacheName = "manav-portfolio-v41";
+const cacheName = "manav-portfolio-v42";
 const assets = [
   "./",
   "./index.html",
@@ -7,6 +7,8 @@ const assets = [
   "./css/intro.css",
   "./css/arcade-os.css",
   "./css/project-page.css",
+  "./css/boot-experience.css",
+  "./css/adaptive-ui.css",
   "./js/main.js",
   "./js/intro.js",
   "./js/modules/arcade-audio.js",
@@ -17,12 +19,13 @@ const assets = [
   "./js/modules/arcade-stats.js",
   "./js/modules/arcade-achievements.js",
   "./js/modules/arcade-customizer.js",
-  "./js/machine-bg.js",
   "./assets/case-studies/project-experience.css",
   "./assets/case-studies/nimo-premium.css",
   "./assets/case-studies/nimo-case-study-lab.js",
   "./assets/case-studies/flagship-showcase.css",
   "./assets/case-studies/flagship-showcase.js",
+  "./data/project-manifests.json",
+  "./data/project-knowledge.json",
   "./project-arcade-os.html",
   "./project-nimo.html",
   "./project-toolverse.html",

@@ -1,0 +1,66 @@
+[
+  {
+    "id": "arcade-os", "name": "Arcade OS", "version": "3.0.0", "type": "operating-system",
+    "description": "The central interactive portfolio operating system and ecosystem shell.",
+    "icon": "arcade", "entry": "index.html#intro-sequence", "knowledge": "project-knowledge.json#arcade-os",
+    "status": "stable", "capabilities": ["portfolio navigation", "project discovery", "playable browser experiences"],
+    "keywords": ["portfolio", "arcade", "operating system"], "relatedModules": ["nimo", "toolverse"],
+    "navigation": { "backToArcade": "index.html#intro-sequence", "askNimo": "index.html#nimo-widget" }
+  },
+  {
+    "id": "nimo", "name": "NIMO", "version": "0.2.0", "type": "assistant-module",
+    "description": "Local-first ecosystem intelligence for discovery, context, and structured host actions.",
+    "icon": "nimo", "entry": "index.html#nimo-widget", "knowledge": "project-knowledge.json#nimo",
+    "status": "stable", "capabilities": ["project discovery", "multilingual assistance", "context resolution"],
+    "keywords": ["assistant", "nimo", "search projects"], "relatedModules": ["arcade-os", "toolverse"],
+    "navigation": { "backToArcade": "index.html#intro-sequence", "askNimo": "index.html#nimo-widget" }
+  },
+  {
+    "id": "toolverse", "name": "ToolVerse", "version": "1.0.0", "type": "utility-module",
+    "description": "Seventy private browser-powered utilities for images, PDFs, text, development, and calculations.",
+    "icon": "tools", "entry": "https://tool-verse-theta.vercel.app/", "knowledge": "project-knowledge.json#toolverse",
+    "status": "stable", "capabilities": ["compress images", "merge PDFs", "text tools", "browser calculators"],
+    "keywords": ["compress image", "merge pdf", "browser tools", "utilities"], "relatedModules": ["arcade-os", "nimo"],
+    "navigation": { "backToArcade": "index.html#projects", "openRelatedProject": "project-toolverse.html", "askNimo": "index.html#nimo-widget" }
+  },
+  {
+    "id": "shift-zero", "name": "SHIFT-ZERO", "version": "0.1.0", "type": "game-module",
+    "description": "A mobile-first Godot gravity-shifting game foundation and HUD system.",
+    "icon": "game", "entry": "project-shift-zero.html", "knowledge": "project-knowledge.json#shift-zero",
+    "status": "beta", "capabilities": ["gravity game", "game architecture", "HUD design"],
+    "keywords": ["gravity game", "godot", "shift zero"], "relatedModules": ["arcade-os"],
+    "navigation": { "backToArcade": "index.html#projects", "askNimo": "index.html#nimo-widget" }
+  },
+  {
+    "id": "love", "name": "LOVE", "version": "1.0.0", "type": "narrative-module",
+    "description": "An immersive narrative web experiment with paced scrolling and ambient audio.",
+    "icon": "story", "entry": "project-love-journey.html", "knowledge": "project-knowledge.json#love",
+    "status": "maintenance", "capabilities": ["narrative experience", "ambient audio"],
+    "keywords": ["love journey", "narrative website"], "relatedModules": ["arcade-os"],
+    "navigation": { "backToArcade": "index.html#projects", "askNimo": "index.html#nimo-widget" }
+  },
+  {
+    "id": "velora-bites", "name": "Velora Bites", "version": "1.0.0", "type": "design-module",
+    "description": "A responsive fine-dining product and reservation interface concept.",
+    "icon": "restaurant", "entry": "project-velora-bites.html", "knowledge": "project-knowledge.json#velora-bites",
+    "status": "stable", "capabilities": ["restaurant interface", "reservation journey", "responsive design"],
+    "keywords": ["restaurant", "fine dining", "velora bites"], "relatedModules": ["arcade-os"],
+    "navigation": { "backToArcade": "index.html#projects", "askNimo": "index.html#nimo-widget" }
+  },
+  {
+    "id": "nintendo", "name": "Nintendo UI", "version": "1.0.0", "type": "design-module",
+    "description": "A conceptual console interface redesign focused on navigation speed and spatial interaction.",
+    "icon": "console", "entry": "project-nintendo.html", "knowledge": "project-knowledge.json#nintendo",
+    "status": "stable", "capabilities": ["console interface", "UX design"],
+    "keywords": ["nintendo", "console ui", "switch ui"], "relatedModules": ["arcade-os"],
+    "navigation": { "backToArcade": "index.html#projects", "askNimo": "index.html#nimo-widget" }
+  },
+  {
+    "id": "nike", "name": "Nike Website UI", "version": "1.0.0", "type": "design-module",
+    "description": "A sports e-commerce interface concept centered on product storytelling.",
+    "icon": "commerce", "entry": "project-nike.html", "knowledge": "project-knowledge.json#nike",
+    "status": "stable", "capabilities": ["e-commerce interface", "sports branding"],
+    "keywords": ["nike", "e-commerce ui", "sports website"], "relatedModules": ["arcade-os"],
+    "navigation": { "backToArcade": "index.html#projects", "askNimo": "index.html#nimo-widget" }
+  }
+]

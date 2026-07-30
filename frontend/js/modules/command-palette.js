@@ -6,6 +6,7 @@ export function initCommandPalette() {
   const input = root?.querySelector("#cmd-input");
   const results = root?.querySelector("#cmd-results");
   const themeAction = root?.querySelector("#cmd-theme-toggle");
+  const adaptationAction = root?.querySelector("#cmd-adaptation");
 
   if (!root || !trigger || !input || !results) return;
 
@@ -74,6 +75,7 @@ export function initCommandPalette() {
     selectedIndex = 0;
     selectItem(0);
     requestAnimationFrame(() => input.focus({ preventScroll: true }));
+    window.dispatchEvent(new CustomEvent('adaptive:event', { detail: { type: 'commandPaletteOpened', moduleId: 'arcade-os', detail: {} } }));
   };
 
   const activateTheme = () => {
@@ -113,7 +115,9 @@ export function initCommandPalette() {
     });
     item.addEventListener("click", () => {
       if (item === themeAction) activateTheme();
+      if (item === adaptationAction) window.openAdaptiveSettings?.();
       runAction(item.dataset.cmdAction);
+      window.dispatchEvent(new CustomEvent('adaptive:event', { detail: { type: 'commandExecuted', moduleId: 'arcade-os', detail: { command: item.id || 'navigation' } } }));
       close();
     });
   });

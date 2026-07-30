@@ -30,6 +30,8 @@ import { GlobalPortfolioShell, isCaseStudyPage } from "./modules/global-portfoli
 import { ArcadeDeveloperMode } from "./modules/arcade-developer-mode.js";
 import { initFlagshipExperiences } from "./modules/flagship-experiences.js";
 import { initProductProofGallery } from "./modules/product-proof-gallery.js";
+import { initBootExperience } from "./modules/boot-experience.js";
+import { initAdaptiveHost } from "./shared/adaptive/adaptive-host.js";
 
 const caseStudy = isCaseStudyPage();
 if (document.body.dataset.projectTheme === "arcade-os") {
@@ -77,6 +79,8 @@ requestAnimationFrame(() => requestAnimationFrame(() => {
   document.body.classList.remove("is-loading");
 }));
 
+if (!caseStudy) initBootExperience();
+
 initTheme();
 
 if (!caseStudy) {
@@ -88,6 +92,12 @@ if (!caseStudy) {
 }
 
 GlobalPortfolioShell.init();
+window.ArcadeAdaptive = initAdaptiveHost({
+  moduleId: 'arcade-os',
+  projectSelector: '[data-project-id]',
+  searchSelector: '#cmd-input, #nimo-input',
+  fabricContainer: '#machine-bg'
+});
 initProjectEnvironment();
 initProjectLaunch();
 initCursorSystem();

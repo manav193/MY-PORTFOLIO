@@ -6,6 +6,8 @@
  */
 
 import { fetchNimoBackendReply } from '../services/nimo-api.js';
+import { createNimoEngine, createProjectEvent, createProjectFederation, normalizeAdaptiveSessionContext } from '../nimo-core/index.js';
+import { LEGACY_PROJECTS_DB, PROJECT_MODULE_DEFINITIONS } from '../generated/project-federation.js';
 
 export const NIMO_PERSONA = {
   name: 'NIMO',
@@ -19,91 +21,19 @@ export const NIMO_PERSONA = {
 // 1. PORTFOLIO & PROJECT ENTITY DATABASE
 // ==========================================
 
-const PROJECTS_DB = [
-  {
-    id: 'arcade-os',
-    name: 'MY-PORTFOLIO / ArcadeOS',
-    aliases: ['arcade os', 'arcadeos', 'arcade', 'cabinet', 'games os', 'retro games', 'game os', 'आर्केड'],
-    category: 'system',
-    type: 'Interactive portfolio system',
-    tech: ['Vanilla JS', 'Canvas 2D', 'Web Audio API', 'PWA', 'Gamepad API'],
-    summary: 'A modular desktop-first browser operating system built with Vanilla JS, featuring multiple playable games, creative tools, persistent profiles, cabinet customization, and unified input handlers. The live cabinet is available on desktop and laptop only.',
-    caseStudy: 'project-arcade-os.html',
-    liveUrl: '#intro-sequence'
-  },
-  {
-    id: 'nimo',
-    name: 'NIMO Assistant',
-    aliases: ['nimo assistant', 'nimo ai', 'nimo project', 'nimo case study', 'nimo page', 'नीमो'],
-    category: 'system',
-    type: 'Interactive assistant system',
-    tech: ['Vanilla JS', 'Intent NLU', 'Context Resolver', 'Multilingual', 'ES Modules'],
-    summary: 'A local-first, website-aware portfolio assistant that understands natural-language navigation, project questions, case-study context, developer concepts, and trilingual English/Hindi/Hinglish queries.',
-    caseStudy: 'project-nimo.html',
-    liveUrl: '#nimo-widget'
-  },
-  {
-    id: 'toolverse',
-    name: 'ToolVerse',
-    aliases: ['toolverse', 'tollverse', 'tool verse', 'tools', 'pdf tools', 'pwa tools', 'utility tools', 'टूलवर्स'],
-    category: 'web',
-    type: 'Web application / PWA',
-    tech: ['HTML', 'CSS', 'Vanilla JS', 'Node SSG', 'Playwright'],
-    summary: 'A privacy-first PWA delivering 70+ PDF, image, text, developer, student, and calculator tools with private local browser processing.',
-    caseStudy: 'project-toolverse.html',
-    liveUrl: 'https://tool-verse-theta.vercel.app/'
-  },
-  {
-    id: 'shift-zero',
-    name: 'SHIFT-ZERO',
-    aliases: ['shift zero', 'shiftzero', 'godot game', 'hud design', 'gravity shift', 'शिफ्ट जीरो'],
-    category: 'game',
-    type: 'Game architecture & HUD design',
-    tech: ['Godot 4', 'GDScript', 'Python', 'CI', 'Architecture'],
-    summary: 'A mobile-first Godot game foundation for one-touch gravity shifting and rule-changing modifiers paired with a high-contrast HUD UI language.',
-    caseStudy: 'project-shift-zero.html'
-  },
-  {
-    id: 'love',
-    name: 'LOVE',
-    aliases: ['love', 'love journey', 'narrative site', 'narrative experiment', 'लव जर्नी'],
-    category: 'web',
-    type: 'Narrative web experiment',
-    tech: ['HTML', 'CSS Grid', 'Canvas', 'Web Audio'],
-    summary: 'An immersive narrative website exploring paced scrolling, photography, ambient audio, and personal timeline storytelling.',
-    caseStudy: 'project-love-journey.html'
-  },
-  {
-    id: 'velora-bites',
-    name: 'Velora Bites',
-    aliases: ['velora bites', 'velora', 'restaurant ui', 'dining ui', 'luxury restaurant', 'वेलोरा बाइट्स', 'रेस्टोरेंट बाइट्स'],
-    category: 'ui',
-    type: 'UI/UX design prototype',
-    tech: ['Figma', 'Responsive UI', 'Design Systems', 'Prototyping'],
-    summary: 'A responsive fine-dining interface concept that translates luxury hospitality into a clear editorial reservation journey.',
-    caseStudy: 'project-velora-bites.html'
-  },
-  {
-    id: 'nintendo',
-    name: 'Nintendo UI',
-    aliases: ['nintendo', 'nintendo ui', 'nintedno', 'nintendo switch', 'switch ui', 'nintendo os', 'console ui', 'निंटेंडो'],
-    category: 'ui',
-    type: 'Gaming UI concept',
-    tech: ['Figma', 'Console UI', 'UX Design', 'Design Systems'],
-    summary: 'A conceptual redesign of the Nintendo console user interface, modernizing visual density, navigation speed, and spatial interactions.',
-    caseStudy: 'project-nintendo.html'
-  },
-  {
-    id: 'nike',
-    name: 'Nike Website UI',
-    aliases: ['nike', 'nike ui', 'nik ui', 'nike air zoom', 'pegasus 41', 'nike website', 'e-commerce ui', 'नाइकी'],
-    category: 'ui',
-    type: 'E-commerce UI concept',
-    tech: ['Figma', 'E-Commerce', 'Sports Branding', 'Motion UI'],
-    summary: 'A high-performance e-commerce interaction model focused on sports branding, dynamic typography, and product storytelling.',
-    caseStudy: 'project-nike.html'
-  }
-];
+const PROJECTS_DB = LEGACY_PROJECTS_DB;
+
+// Phase 1 compatibility bridge: the shared core receives normalized portfolio
+// knowledge, while the proven host intent registry remains first in the chain.
+// The core returns structured actions only; this module continues to own DOM,
+// navigation, Arcade events, widget behavior, and remote fallback execution.
+const projectFederation = createProjectFederation();
+PROJECT_MODULE_DEFINITIONS.forEach(({ manifest, knowledge }) => projectFederation.registerModule(manifest, knowledge));
+const sharedNimoEngine = createNimoEngine({ federation: projectFederation });
+
+export function processSharedQuery(rawInput, hostContext = {}) {
+  return sharedNimoEngine.respond(rawInput, hostContext);
+}
 
 const PORTFOLIO_KNOWLEDGE = {
   owner: {
@@ -1788,6 +1718,26 @@ function processUserQuery(rawInput) {
     }
   }
 
+  // Shared-core fallback for reusable project intelligence introduced after
+  // the legacy registry. Existing portfolio and Arcade behavior therefore
+  // remains backward compatible throughout Phase 1.
+  const sharedResponse = processSharedQuery(rawInput, {
+    currentProjectId: activeCS?.id || locationCtx?.id || null,
+    currentPage: locationCtx?.title || locationCtx?.type || null,
+    currentSection: entities.section || null
+  });
+  if (!['fallback', 'current_context'].includes(sharedResponse.intent) && sharedResponse.confidence >= 0.7) {
+    return {
+      intentId: `shared_${sharedResponse.intent}`,
+      text: sharedResponse.text,
+      actions: sharedResponse.actions.map(action => ({
+        label: action.label,
+        ...(action.type === 'navigate' ? { navigate: action.target } : {}),
+        ...(action.type === 'arcade-event' ? { action: action.event } : {})
+      }))
+    };
+  }
+
   // Multilingual Honest Fallback
   let fallbackRes = {
     intentId: 'fallback',
@@ -2041,6 +1991,14 @@ export function initNimo() {
     getSessionLanguage,
     isCodeGenerationRequest,
     sanitizeCodeOutput,
+    sharedCore: sharedNimoEngine,
+    projectFederation,
+    searchProjects: query => projectFederation.search(query),
+    processSharedQuery,
+    getAdaptiveContext: () => {
+      try { return normalizeAdaptiveSessionContext(window.adaptiveSession?.getSummary?.()); }
+      catch { return null; }
+    },
     authorizeArcadeDeveloperMode: () => window.ArcadeDeveloperMode?.authorizeFromNimo()
   };
   if (document.getElementById('nimo-widget')) return;
@@ -2122,6 +2080,7 @@ export function initNimo() {
     panel.removeAttribute('aria-hidden');
     launcher.setAttribute('aria-expanded', 'true');
     input.focus();
+    window.dispatchEvent(new CustomEvent('nimo:project-event', { detail: createProjectEvent('nimoActivated', { moduleId: 'arcade-os' }) }));
   }
 
   function closePanel() {
@@ -2129,6 +2088,7 @@ export function initNimo() {
     panel.classList.remove('active');
     panel.setAttribute('aria-hidden', 'true');
     launcher.setAttribute('aria-expanded', 'false');
+    window.dispatchEvent(new CustomEvent('nimo:project-event', { detail: createProjectEvent('nimoDeactivated', { moduleId: 'arcade-os' }) }));
   }
 
   window.NIMO.openNimo = openPanel;

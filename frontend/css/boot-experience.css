@@ -1,0 +1,113 @@
+.system-boot {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  color: #e8e9ed;
+  background: #050609;
+  opacity: 0;
+  transition: opacity 320ms ease;
+}
+.system-boot.is-running { opacity: 1; }
+.system-boot.is-complete { opacity: 0; pointer-events: none; }
+body.system-boot-active { overflow: hidden; }
+.system-boot__surface {
+  position: relative;
+  width: min(86vw, 680px);
+  min-height: 290px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 1.05rem;
+}
+.system-boot__line,
+.system-boot__calibration-line {
+  position: absolute;
+  left: 50%;
+  width: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(167,139,250,.82), rgba(226,232,240,.6), transparent);
+  transform: translateX(-50%);
+}
+.system-boot__line { top: 18%; transition: width 520ms cubic-bezier(.2,.75,.25,1); }
+.system-boot.is-running .system-boot__line { width: min(70vw, 520px); }
+.system-boot__calibration-line { top: 72%; opacity: 0; }
+.system-boot[data-stage='calibration'] .system-boot__calibration-line {
+  width: min(74vw, 560px);
+  opacity: .72;
+  animation: system-calibration-sweep 440ms ease both;
+}
+.system-boot__mark {
+  display: flex;
+  align-items: baseline;
+  gap: .5rem;
+  color: #f3f4f6;
+  font: 500 clamp(1.7rem, 5vw, 3rem)/1 Inter, sans-serif;
+  letter-spacing: .24em;
+  opacity: 0;
+  transform: translateY(5px);
+  transition: opacity 380ms ease, transform 380ms ease;
+}
+.system-boot__mark strong { color: #a78bfa; font-weight: 650; }
+.system-boot[data-stage='mark'] .system-boot__mark,
+.system-boot[data-stage='modules'] .system-boot__mark,
+.system-boot[data-stage='calibration'] .system-boot__mark { opacity: 1; transform: none; }
+.system-boot__status {
+  min-height: 1rem;
+  margin: 0;
+  color: #8e94a3;
+  font: 500 .7rem/1.4 'JetBrains Mono', monospace;
+  letter-spacing: .16em;
+}
+.system-boot__modules { display: flex; gap: .55rem; min-height: .45rem; }
+.system-boot__modules i {
+  width: .38rem; height: .38rem; border-radius: 50%;
+  background: #5f6470; opacity: .22; transform: scale(.7);
+  transition: opacity 260ms ease, transform 260ms ease, background-color 260ms ease;
+}
+.system-boot[data-stage='modules'] .system-boot__modules i,
+.system-boot[data-stage='calibration'] .system-boot__modules i {
+  opacity: .8; transform: scale(1); background: #8b5cf6;
+}
+.system-boot__modules i:nth-child(2n) { transition-delay: 55ms; }
+.system-boot__modules i:nth-child(3n) { transition-delay: 100ms; }
+.system-boot-wrench {
+  width: min(54vw, 300px);
+  opacity: .42;
+  transform: rotate(-2.4deg);
+  transform-origin: center;
+}
+.system-boot-wrench svg { display: block; width: 100%; height: auto; }
+.system-boot__skip {
+  position: absolute;
+  right: clamp(1rem, 3vw, 2rem);
+  bottom: clamp(1rem, 3vw, 2rem);
+  min-height: 44px;
+  padding: .65rem .9rem;
+  color: #b8bcc7;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: .55rem;
+  cursor: pointer;
+}
+.system-boot__skip:hover { color: #fff; border-color: rgba(167,139,250,.6); }
+.system-boot__skip:focus-visible { outline: 3px solid #a78bfa; outline-offset: 3px; }
+@keyframes system-calibration-sweep {
+  from { transform: translateX(-70%) scaleX(.18); }
+  to { transform: translateX(-50%) scaleX(1); }
+}
+@media (max-width: 600px) {
+  .system-boot__surface { width: 92vw; min-height: 250px; }
+  .system-boot__mark { letter-spacing: .15em; }
+  .system-boot-wrench { width: min(72vw, 280px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .system-boot { transition-duration: 100ms; }
+  .system-boot__line { width: min(70vw, 520px); transition: none; }
+  .system-boot__mark { opacity: 1; transform: none; transition: opacity 100ms ease; }
+  .system-boot__modules i { transition: opacity 100ms ease; transform: none; }
+  .system-boot__calibration-line { display: none; }
+  .system-boot-wrench { transform: none; }
+}

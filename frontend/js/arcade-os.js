@@ -3679,6 +3679,11 @@ const ArcadeOSObj = {
             </div>
             <button id="setting-reset-credits-btn" class="sys-btn" data-arcade-focusable data-arcade-action="reset-credits">RESET CREDITS</button>
           </div>
+          <div class="settings-group" style="background:rgba(255,255,255,0.03); padding:10px; border-radius:8px; border:1px solid rgba(56,189,248,0.2); display:flex; flex-direction:column; gap:8px;">
+            <h3 style="font-size:10px; color:#38bdf8; margin:0; letter-spacing:0.1em;">SYSTEM ADAPTATION</h3>
+            <p style="font-size:8px; line-height:1.45; opacity:0.75;">Local interaction and motion preferences. No behavioral data leaves this browser.</p>
+            <button id="setting-adaptation-btn" class="sys-btn" data-arcade-focusable data-arcade-action="adaptation">OPEN ADAPTATION SETTINGS</button>
+          </div>
           <div class="settings-group" style="background:rgba(255,255,255,0.03); padding:10px; border-radius:8px; border:1px solid rgba(56,189,248,0.2); display:flex; flex-direction:column; gap:5px;">
             <h3 style="font-size:10px; color:#38bdf8; margin:0 0 6px 0; letter-spacing:0.1em;">🛠️ SAFETY & RESET UTILITIES</h3>
             <button id="setting-replay-onboarding-btn" class="sys-btn" data-arcade-focusable data-arcade-action="replay-onboarding">REPLAY CONTROL GUIDE</button>
@@ -3695,6 +3700,7 @@ const ArcadeOSObj = {
     `;
 
     view.querySelector('#settings-back-btn').addEventListener('click', () => this.goHome());
+    view.querySelector('#setting-adaptation-btn')?.addEventListener('click', () => window.openAdaptiveSettings?.());
 
     const bSlider = view.querySelector('#setting-brightness');
     bSlider.addEventListener('input', () => {

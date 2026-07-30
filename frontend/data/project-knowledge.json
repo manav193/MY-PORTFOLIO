@@ -1,0 +1,29 @@
+{
+  "version": "1.0.0",
+  "sources": [
+    { "id": "arcade-os-knowledge", "application": "arcade-os", "version": "3.0.0", "projects": [
+      { "id": "arcade-os", "name": "MY-PORTFOLIO / ArcadeOS", "aliases": ["arcade os", "arcadeos", "arcade", "cabinet", "portfolio"], "category": "system", "type": "Interactive portfolio system", "summary": "A modular desktop-first browser operating system with playable games, creative tools, persistent profiles, cabinet customization, and unified input handlers.", "technologies": ["Vanilla JS", "Canvas 2D", "Web Audio API", "PWA", "Gamepad API"], "capabilities": ["portfolio navigation", "project discovery", "playable browser experiences"], "routes": { "open": "index.html#intro-sequence", "caseStudy": "project-arcade-os.html" }, "limitations": ["The live cabinet is available on desktop and laptop only."], "supportedActions": ["lookup", "navigate", "arcade-event"] }
+    ]},
+    { "id": "nimo-knowledge", "application": "nimo", "version": "0.2.0", "projects": [
+      { "id": "nimo", "name": "NIMO Assistant", "aliases": ["nimo", "nimo assistant", "nimo ai", "portfolio assistant"], "category": "system", "type": "Interactive assistant system", "summary": "A local-first, website-aware assistant for navigation, project questions, case-study context, developer concepts, and English, Hindi, or Hinglish queries.", "technologies": ["Vanilla JS", "Intent NLU", "Context Resolver", "ES Modules"], "capabilities": ["project discovery", "multilingual assistance", "structured host actions"], "routes": { "open": "index.html#nimo-widget", "caseStudy": "project-nimo.html" }, "limitations": ["Remote AI is optional and host-controlled."], "supportedActions": ["lookup", "navigate"] }
+    ]},
+    { "id": "toolverse-knowledge", "application": "toolverse", "version": "1.0.0", "projects": [
+      { "id": "toolverse", "name": "ToolVerse", "aliases": ["toolverse", "tool verse", "browser tools", "utility tools"], "category": "web", "type": "Web application / PWA", "summary": "A privacy-first PWA delivering browser-based PDF, image, text, developer, student, and calculator tools.", "technologies": ["HTML", "CSS", "Vanilla JS", "Node SSG", "Playwright"], "capabilities": ["compress images", "merge PDFs", "text tools", "browser calculators"], "routes": { "open": "https://tool-verse-theta.vercel.app/", "caseStudy": "project-toolverse.html" }, "limitations": ["Detailed tool facts are owned by ToolVerse's generated knowledge file."], "supportedActions": ["lookup", "navigate"] }
+    ]},
+    { "id": "shift-zero-knowledge", "application": "shift-zero", "version": "0.1.0", "projects": [
+      { "id": "shift-zero", "name": "SHIFT-ZERO", "aliases": ["shift zero", "gravity shift", "gravity game", "godot game"], "category": "game", "type": "Game architecture and HUD design", "summary": "A mobile-first Godot game foundation for one-touch gravity shifting and rule-changing modifiers with a high-contrast HUD.", "technologies": ["Godot 4", "GDScript", "Python", "CI"], "capabilities": ["gravity game", "game architecture", "HUD design"], "routes": { "caseStudy": "project-shift-zero.html" }, "supportedActions": ["lookup", "navigate"] }
+    ]},
+    { "id": "love-knowledge", "application": "love", "version": "1.0.0", "projects": [
+      { "id": "love", "name": "LOVE", "aliases": ["love", "love journey", "narrative site"], "category": "web", "type": "Narrative web experiment", "summary": "An immersive narrative website exploring paced scrolling, photography, ambient audio, and personal timeline storytelling.", "technologies": ["HTML", "CSS Grid", "Canvas", "Web Audio"], "capabilities": ["narrative experience", "ambient audio"], "routes": { "caseStudy": "project-love-journey.html" }, "supportedActions": ["lookup", "navigate"] }
+    ]},
+    { "id": "velora-bites-knowledge", "application": "velora-bites", "version": "1.0.0", "projects": [
+      { "id": "velora-bites", "name": "Velora Bites", "aliases": ["velora bites", "velora", "restaurant", "restaurant ui", "fine dining"], "category": "ui", "type": "UI/UX design prototype", "summary": "A responsive fine-dining interface concept translating luxury hospitality into a clear editorial reservation journey.", "technologies": ["Figma", "Responsive UI", "Design Systems", "Prototyping"], "capabilities": ["restaurant interface", "reservation journey", "responsive design"], "routes": { "caseStudy": "project-velora-bites.html" }, "supportedActions": ["lookup", "navigate"] }
+    ]},
+    { "id": "nintendo-knowledge", "application": "nintendo", "version": "1.0.0", "projects": [
+      { "id": "nintendo", "name": "Nintendo UI", "aliases": ["nintendo", "nintendo ui", "switch ui", "console ui"], "category": "ui", "type": "Gaming UI concept", "summary": "A conceptual console interface redesign focused on visual density, navigation speed, and spatial interaction.", "technologies": ["Figma", "Console UI", "UX Design", "Design Systems"], "capabilities": ["console interface", "UX design"], "routes": { "caseStudy": "project-nintendo.html" }, "supportedActions": ["lookup", "navigate"] }
+    ]},
+    { "id": "nike-knowledge", "application": "nike", "version": "1.0.0", "projects": [
+      { "id": "nike", "name": "Nike Website UI", "aliases": ["nike", "nike ui", "nike website", "e-commerce ui"], "category": "ui", "type": "E-commerce UI concept", "summary": "A high-performance e-commerce interaction model focused on sports branding, dynamic typography, and product storytelling.", "technologies": ["Figma", "E-Commerce", "Sports Branding", "Motion UI"], "capabilities": ["e-commerce interface", "sports branding"], "routes": { "caseStudy": "project-nike.html" }, "supportedActions": ["lookup", "navigate"] }
+    ]}
+  ]
+}
