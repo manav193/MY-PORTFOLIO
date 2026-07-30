@@ -40,6 +40,12 @@ qaStyle.href = "/assets/case-studies/qa-layout-fixes.css";
 qaStyle.dataset.qaLayoutFixes = "true";
 document.head.appendChild(qaStyle);
 
+const uiStackStyle = document.createElement("link");
+uiStackStyle.rel = "stylesheet";
+uiStackStyle.href = "/assets/case-studies/ui-project-stack.css";
+uiStackStyle.dataset.uiProjectStackStyles = "true";
+document.head.appendChild(uiStackStyle);
+
 window.ArcadeExperience = ExperienceController;
 window.ArcadeModuleLoader = ArcadeModuleLoader;
 window.ArcadeOS = ArcadeOS;
