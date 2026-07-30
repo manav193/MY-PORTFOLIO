@@ -1,4 +1,3 @@
-const STANDALONE_URL = 'https://manav193.github.io/ARCADE-OS/';
 const REPOSITORY_URL = 'https://github.com/manav193/ARCADE-OS';
 
 export function initArcadeStandaloneBridge() {
@@ -13,19 +12,22 @@ export function initArcadeStandaloneBridge() {
     const launcher = event.target.closest('[data-launch-standalone-arcade]');
     if (!launcher) return;
     event.preventDefault();
-    launchStandalone();
+    openRepository();
   });
 
   window.ArcadeStandalone = {
-    url: STANDALONE_URL,
     repository: REPOSITORY_URL,
-    launch: launchStandalone
+    openRepository
   };
 }
 
-function launchStandalone() {
-  const opened = window.open(STANDALONE_URL, '_blank', 'noopener,noreferrer');
-  if (!opened) window.location.assign(STANDALONE_URL);
+function openRepository() {
+  const opened = window.open(REPOSITORY_URL, '_blank');
+  if (opened) {
+    try { opened.opener = null; } catch {}
+  } else {
+    window.location.assign(REPOSITORY_URL);
+  }
 }
 
 function updateProjectCard() {
@@ -45,16 +47,16 @@ function updateProjectCard() {
   const actions = card.querySelector('.project-actions');
   if (!actions) return;
 
-  let live = actions.querySelector('[data-launch-standalone-arcade]');
-  if (!live) {
-    live = document.createElement('a');
-    live.href = STANDALONE_URL;
-    live.target = '_blank';
-    live.rel = 'noopener noreferrer';
-    live.className = 'btn-primary arcade-standalone-launch';
-    live.dataset.launchStandaloneArcade = '';
-    live.textContent = 'Launch ArcadeOS 2.0';
-    actions.prepend(live);
+  let source = actions.querySelector('[data-launch-standalone-arcade]');
+  if (!source) {
+    source = document.createElement('a');
+    source.href = REPOSITORY_URL;
+    source.target = '_blank';
+    source.rel = 'noopener noreferrer';
+    source.className = 'btn-primary arcade-standalone-launch';
+    source.dataset.launchStandaloneArcade = '';
+    source.textContent = 'Open Standalone Repository';
+    actions.prepend(source);
   }
 
   const repo = [...actions.querySelectorAll('a')].find(link => link.textContent.trim().toLowerCase() === 'github');
@@ -72,11 +74,11 @@ function updateCabinetBootActions() {
   const choices = document.querySelector('.boot-choice');
   if (!choices || choices.querySelector('[data-launch-standalone-arcade]')) return;
   const link = document.createElement('a');
-  link.href = STANDALONE_URL;
+  link.href = REPOSITORY_URL;
   link.target = '_blank';
   link.rel = 'noopener noreferrer';
   link.dataset.launchStandaloneArcade = '';
-  link.textContent = 'OPEN ARCADEOS 2.0';
+  link.textContent = 'OPEN ARCADEOS REPOSITORY';
   choices.insertBefore(link, choices.lastElementChild);
 }
 
@@ -87,12 +89,12 @@ function mountCabinetLinkPanel() {
   panel.className = 'arcade-standalone-panel';
   panel.dataset.standaloneLinkPanel = '';
   panel.innerHTML = `
-    <span class="arcade-standalone-panel__status"><i></i> STANDALONE BUILD LINKED</span>
+    <span class="arcade-standalone-panel__status"><i></i> SOURCE REPOSITORY LINKED</span>
     <div>
       <strong>ARCADEOS 2.0</strong>
-      <small>Independent repository runtime</small>
+      <small>Independent public repository</small>
     </div>
-    <button type="button" data-launch-standalone-arcade>LAUNCH ↗</button>
+    <button type="button" data-launch-standalone-arcade>OPEN ↗</button>
   `;
   screen.appendChild(panel);
 }
