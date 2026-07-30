@@ -9,6 +9,21 @@ export function initCommandPalette() {
 
   if (!root || !trigger || !input || !results) return;
 
+  if (!results.querySelector('[data-cmd-action="preview-nimo"]')) {
+    results.insertAdjacentHTML('beforeend', `
+      <div class="cmd-group">Projects</div>
+      <button class="cmd-item" data-cmd-action="preview-arcade"><span>Preview ArcadeOS</span><small>flagship interface</small></button>
+      <button class="cmd-item" data-cmd-action="preview-nimo"><span>Preview NIMO</span><small>portfolio intelligence</small></button>
+      <button class="cmd-item" data-cmd-action="preview-toolverse"><span>Preview ToolVerse</span><small>live utility product</small></button>
+      <button class="cmd-item" data-cmd-action="show-live"><span>Show live projects</span></button>
+      <div class="cmd-group">Review modes</div>
+      <button class="cmd-item" data-cmd-action="recruiter"><span>Start 60-second recruiter review</span></button>
+      <button class="cmd-item" data-cmd-action="mode-frontend"><span>Frontend recruiter mode</span></button>
+      <button class="cmd-item" data-cmd-action="mode-ai"><span>AI / Product reviewer mode</span></button>
+      <button class="cmd-item" data-cmd-action="mode-design"><span>UI / UX reviewer mode</span></button>
+    `);
+  }
+
   const items = Array.from(results.querySelectorAll(".cmd-item"));
   const groups = Array.from(results.querySelectorAll(".cmd-group"));
   let selectedIndex = 0;
@@ -69,6 +84,22 @@ export function initCommandPalette() {
     buttons[(currentIndex + 1 + buttons.length) % buttons.length].click();
   };
 
+  const runAction = (action) => {
+    const controller = window.PortfolioController;
+    if (!action || !controller) return;
+    const actions = {
+      'preview-arcade': () => controller.previewProject?.('arcade-os'),
+      'preview-nimo': () => controller.previewProject?.('nimo'),
+      'preview-toolverse': () => controller.previewProject?.('toolverse'),
+      'show-live': () => controller.showLive?.(),
+      recruiter: () => controller.recruiter?.(),
+      'mode-frontend': () => controller.setMode?.('frontend'),
+      'mode-ai': () => controller.setMode?.('ai'),
+      'mode-design': () => controller.setMode?.('design')
+    };
+    actions[action]?.();
+  };
+
   trigger.addEventListener("click", open);
   root.addEventListener("click", (event) => {
     if (event.target === root) close();
@@ -82,6 +113,7 @@ export function initCommandPalette() {
     });
     item.addEventListener("click", () => {
       if (item === themeAction) activateTheme();
+      runAction(item.dataset.cmdAction);
       close();
     });
   });
@@ -89,7 +121,8 @@ export function initCommandPalette() {
   input.addEventListener("input", () => {
     const query = input.value.trim().toLowerCase();
     items.forEach((item) => {
-      item.hidden = Boolean(query) && !item.textContent.toLowerCase().includes(query);
+      const searchText = `${item.textContent} ${item.dataset.cmdAction || ''}`.toLowerCase();
+      item.hidden = Boolean(query) && !searchText.includes(query);
     });
     updateGroups();
     selectItem(0);
