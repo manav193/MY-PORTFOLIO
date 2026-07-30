@@ -58,6 +58,15 @@ initProjectLaunch();
 initCursorSystem();
 initCommandPalette();
 
+const flagshipTheme = document.body.dataset.projectTheme;
+if (flagshipTheme === 'nimo' || flagshipTheme === 'arcade-os' || flagshipTheme === 'arcade') {
+  const style = document.createElement('link');
+  style.rel = 'stylesheet';
+  style.href = 'assets/case-studies/flagship-showcase.css';
+  document.head.appendChild(style);
+  import('../assets/case-studies/flagship-showcase.js').catch(() => {});
+}
+
 if (!isCaseStudyPage()) {
   initPublicProjectCatalog();
   initSectionProgressRail();
