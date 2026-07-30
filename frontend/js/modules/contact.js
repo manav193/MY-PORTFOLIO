@@ -22,7 +22,7 @@ export function initContactForm() {
   const status = document.querySelector("[data-form-status]");
   if (!form || !status) return;
 
-  const contactEmail = form.dataset.contactEmail || "monographicalpixel@gmail.com";
+  const contactEmail = form.dataset.contactEmail || "monographpixel@gmail.com";
   const submitButton = form.querySelector('button[type="submit"]');
 
   const setStatus = (message, tone = "neutral") => {
