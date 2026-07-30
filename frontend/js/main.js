@@ -90,45 +90,38 @@ const UI_STACK_IDS = ["velora-bites", "nintendo", "nike"];
 function maintainUiProjectStack() {
   if (caseStudy) return;
   const showcase = document.querySelector("[data-project-showcase]");
-  if (!showcase) return;
+  if (!showcase?.parentElement) return;
 
-  const cards = UI_STACK_IDS
-    .map((id, index) => {
-      const card = document.querySelector(`[data-project-id="${id}"]`);
-      if (!card) return null;
-      card.dataset.uiStack = "true";
-      card.style.setProperty("--ui-stack-index", String(index));
-      return card;
-    })
-    .filter(Boolean);
+  const cards = UI_STACK_IDS.map((id, index) => {
+    const card = document.querySelector(`[data-project-id="${id}"]`);
+    if (!card) return null;
+    card.dataset.uiStack = "true";
+    card.style.setProperty("--ui-stack-index", String(index));
+    return card;
+  }).filter(Boolean);
 
   if (!cards.length) return;
 
-  let stack = showcase.querySelector(":scope > .ui-project-stack");
+  let stack = showcase.parentElement.querySelector(":scope > .ui-project-stack");
   if (!stack) {
     stack = document.createElement("section");
     stack.className = "ui-project-stack";
     stack.dataset.uiProjectStack = "true";
     stack.setAttribute("aria-label", "UI and interface design projects");
+    stack.innerHTML = '<div class="ui-project-stack__heading"><span>UI / UX COLLECTION</span><h3>Interface studies, layered as a visual stack.</h3></div><div class="ui-project-stack__cards"></div>';
+    showcase.after(stack);
   }
 
-  const firstDirectCard = cards.find(card => card.parentElement === showcase);
-  if (!stack.isConnected) {
-    if (firstDirectCard) showcase.insertBefore(stack, firstDirectCard);
-    else showcase.appendChild(stack);
-  } else if (firstDirectCard) {
-    showcase.insertBefore(stack, firstDirectCard);
-  }
-
+  const host = stack.querySelector(".ui-project-stack__cards");
   cards.forEach(card => {
-    if (card.parentElement !== stack) stack.appendChild(card);
+    if (card.parentElement !== host) host.appendChild(card);
   });
 }
 
 function initUiProjectStack() {
   if (caseStudy) return;
-  const showcase = document.querySelector("[data-project-showcase]");
-  if (!showcase) return;
+  const work = document.querySelector("#work");
+  if (!work) return;
 
   let scheduled = false;
   const schedule = () => {
@@ -141,8 +134,7 @@ function initUiProjectStack() {
   };
 
   maintainUiProjectStack();
-  const observer = new MutationObserver(schedule);
-  observer.observe(showcase, { childList: true, subtree: false });
+  new MutationObserver(schedule).observe(work, { childList: true, subtree: true });
   window.addEventListener("resize", schedule, { passive: true });
 }
 
