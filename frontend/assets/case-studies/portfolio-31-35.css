@@ -1,0 +1,72 @@
+/* Suggestions 31–35: lightweight mobile shell and truthful runtime evidence. */
+.arcade-lite { display: none; }
+
+.interaction-lab {
+  width: min(1180px, calc(100% - 40px));
+  margin: 36px auto 96px;
+  padding: clamp(28px, 4vw, 52px);
+  border: 1px solid var(--color-border, rgba(255,255,255,.12));
+  border-radius: 30px;
+  background: linear-gradient(145deg, rgba(12,18,32,.92), rgba(8,11,20,.82));
+  box-shadow: 0 32px 90px rgba(0,0,0,.28);
+  overflow: hidden;
+}
+
+.interaction-lab__heading { max-width: 760px; margin-bottom: 30px; }
+.interaction-lab__heading p,
+.lab-card__head span { margin: 0 0 8px; font: 600 12px/1.2 "JetBrains Mono", monospace; letter-spacing: .12em; color: var(--color-accent, #7c8cff); }
+.interaction-lab__heading h2 { margin: 0 0 12px; font-size: clamp(28px, 4vw, 48px); line-height: 1.04; }
+.interaction-lab__heading > span { color: var(--color-text-secondary, #aeb6c8); }
+.interaction-lab__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+.input-demo, .runtime-tests { min-width: 0; padding: 24px; border: 1px solid rgba(255,255,255,.1); border-radius: 22px; background: rgba(5,9,17,.76); }
+.lab-card__head { display: flex; justify-content: space-between; gap: 18px; align-items: flex-start; margin-bottom: 20px; }
+.lab-card__head h3 { margin: 0; font-size: 21px; }
+.lab-card__head > i { width: 12px; height: 12px; border-radius: 50%; background: #596174; box-shadow: 0 0 0 6px rgba(89,97,116,.12); }
+.lab-card__head > i.is-online { background: #62e6a7; box-shadow: 0 0 0 6px rgba(98,230,167,.12), 0 0 22px rgba(98,230,167,.38); }
+.lab-card__head button { border: 1px solid rgba(255,255,255,.14); border-radius: 999px; padding: 9px 14px; color: inherit; background: rgba(255,255,255,.05); cursor: pointer; }
+.lab-card__head button:disabled { opacity: .55; cursor: wait; }
+.input-demo > p, .runtime-tests > p { color: var(--color-text-secondary, #aeb6c8); }
+.input-demo__readout { display: grid; grid-template-columns: 1.2fr .7fr 1fr; gap: 10px; margin: 20px 0; }
+.input-demo__readout > div { min-width: 0; padding: 12px; border-radius: 14px; background: rgba(255,255,255,.045); }
+.input-demo__readout span { display: block; margin-bottom: 7px; font-size: 11px; color: #8790a4; text-transform: uppercase; letter-spacing: .08em; }
+.input-demo__readout strong { display: block; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.input-demo__buttons { display: grid; grid-template-columns: repeat(8, 1fr); gap: 7px; margin: 16px 0; }
+.input-demo__buttons i { display: grid; place-items: center; aspect-ratio: 1; border-radius: 50%; border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.04); font: 600 11px/1 "JetBrains Mono", monospace; font-style: normal; transition: transform .16s ease, background .16s ease, box-shadow .16s ease; }
+.input-demo__buttons i.is-active { transform: translateY(-4px) scale(1.08); background: var(--color-accent, #7c8cff); box-shadow: 0 10px 24px rgba(96,112,255,.35); }
+.input-demo small { color: #858da0; }
+.runtime-tests__list { display: grid; gap: 9px; }
+.runtime-test { display: grid; grid-template-columns: 10px 1fr auto; gap: 12px; align-items: center; padding: 12px; border-radius: 14px; background: rgba(255,255,255,.04); }
+.runtime-test > i { width: 9px; height: 9px; border-radius: 50%; background: #ef6b6b; }
+.runtime-test.is-pass > i { background: #62e6a7; }
+.runtime-test.is-warn > i { background: #f0bd63; }
+.runtime-test strong, .runtime-test span { display: block; }
+.runtime-test span { margin-top: 3px; font-size: 12px; color: #8e97aa; }
+.runtime-test b { font: 600 10px/1 "JetBrains Mono", monospace; letter-spacing: .08em; color: #98a1b4; }
+.newsletter-disabled-note { display: grid; gap: 5px; padding: 16px 18px; border: 1px solid rgba(255,255,255,.1); border-radius: 14px; background: rgba(255,255,255,.035); }
+.newsletter-disabled-note span { color: var(--color-text-secondary, #aeb6c8); font-size: 13px; }
+
+@media (max-width: 900px) {
+  html.has-arcade-lite .arcade-lite { display: block; position: fixed; right: 14px; bottom: calc(14px + env(safe-area-inset-bottom)); z-index: 1200; }
+  .arcade-lite__launcher { display: grid; gap: 2px; min-width: 132px; padding: 12px 15px; border: 1px solid rgba(255,255,255,.16); border-radius: 17px; color: #f6f8ff; background: rgba(7,11,20,.92); backdrop-filter: blur(18px); box-shadow: 0 18px 50px rgba(0,0,0,.42); text-align: left; }
+  .arcade-lite__launcher span { font: 700 12px/1.2 "JetBrains Mono", monospace; letter-spacing: .08em; }
+  .arcade-lite__launcher small { color: #9ba5b9; }
+  .arcade-lite__sheet { position: absolute; right: 0; bottom: calc(100% + 10px); width: min(360px, calc(100vw - 28px)); padding: 18px; border: 1px solid rgba(255,255,255,.14); border-radius: 24px; background: rgba(6,10,18,.97); backdrop-filter: blur(24px); box-shadow: 0 28px 80px rgba(0,0,0,.52); }
+  .arcade-lite__head { display: flex; justify-content: space-between; gap: 14px; margin-bottom: 16px; }
+  .arcade-lite__head span { display: block; margin-bottom: 5px; font: 600 10px/1.2 "JetBrains Mono", monospace; letter-spacing: .1em; color: #8290ff; }
+  .arcade-lite__head strong { display: block; max-width: 245px; font-size: 17px; }
+  .arcade-lite__head button { width: 34px; height: 34px; border: 0; border-radius: 50%; color: inherit; background: rgba(255,255,255,.07); font-size: 22px; }
+  .arcade-lite__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+  .arcade-lite__grid button { display: grid; gap: 5px; min-height: 88px; padding: 14px; border: 1px solid rgba(255,255,255,.09); border-radius: 16px; color: inherit; background: rgba(255,255,255,.04); text-align: left; }
+  .arcade-lite__grid b { font-size: 14px; }
+  .arcade-lite__grid span, .arcade-lite__note { color: #939caf; font-size: 12px; }
+  .arcade-lite__note { margin: 14px 2px 0; }
+  .interaction-lab { width: calc(100% - 24px); margin: 24px auto 72px; padding: 22px 16px; border-radius: 24px; }
+  .interaction-lab__grid { grid-template-columns: 1fr; }
+  .input-demo, .runtime-tests { padding: 18px; }
+  .input-demo__readout { grid-template-columns: 1fr 1fr; }
+  .input-demo__readout > div:first-child { grid-column: 1 / -1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .input-demo__buttons i { transition: none; }
+}
