@@ -1,4 +1,4 @@
-const cacheName = "manav-portfolio-v34";
+const cacheName = "manav-portfolio-v35";
 const assets = [
   "./",
   "./index.html",
@@ -7,8 +7,13 @@ const assets = [
   "./css/intro.css",
   "./css/arcade-os.css",
   "./css/project-page.css",
+  "./css/project-experience.css",
+  "./css/nimo-premium.css",
   "./js/main.js",
   "./js/intro.js",
+  "./js/modules/project-environment.js",
+  "./js/modules/project-launches.js",
+  "./js/modules/nimo-case-study-lab.js",
   "./js/modules/arcade-audio.js",
   "./js/modules/arcade-soundlab.js",
   "./js/modules/arcade-diagnostics.js",
@@ -83,9 +88,7 @@ function validateAssetResponse(request, response) {
       headers: { "Content-Type": "text/plain; charset=utf-8" }
     });
   }
-
   if (!response.ok) return response;
-
   return response;
 }
 
