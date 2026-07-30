@@ -1,0 +1,213 @@
+/* Production QA overrides: layout rhythm, card interaction and project identity */
+
+/* Homepage work section --------------------------------------------------- */
+body:not([data-project-theme]) .work-section {
+  padding-top: 128px;
+  padding-bottom: 144px;
+}
+
+body:not([data-project-theme]) .work-section .section-header {
+  margin-bottom: 48px;
+}
+
+body:not([data-project-theme]) .flagship-pair {
+  margin-top: 0;
+  margin-bottom: 32px;
+}
+
+body:not([data-project-theme]) .project-showcase {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 32px;
+  margin: 0;
+  padding: 0;
+  min-height: 0;
+}
+
+body:not([data-project-theme]) .project-card,
+body:not([data-project-theme]) .flagship-pair .project-card {
+  position: relative;
+  top: auto;
+  min-height: 0;
+  margin: 0;
+  opacity: 1;
+  visibility: visible;
+  transform: translate3d(0, 0, 0);
+  transition: transform .45s var(--motion-momentum),
+              border-color .35s ease,
+              box-shadow .45s var(--motion-momentum),
+              background-color .35s ease;
+  will-change: transform;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  body:not([data-project-theme]) .project-card:hover,
+  body:not([data-project-theme]) .project-card:focus-within {
+    transform: translate3d(0, -12px, 0) scale(1.008);
+    border-color: color-mix(in srgb, var(--color-accent) 44%, var(--color-border-strong));
+    box-shadow: 0 34px 90px rgba(var(--shadow-rgb), .42),
+                0 0 0 1px rgba(var(--highlight-rgb), .08);
+    z-index: 12;
+  }
+
+  body:not([data-project-theme]) .project-card:hover .project-media img,
+  body:not([data-project-theme]) .project-card:focus-within .project-media img {
+    transform: scale(1.035);
+  }
+}
+
+body:not([data-project-theme]) .project-card .project-media img {
+  transition: transform .65s var(--motion-momentum), filter .4s ease;
+}
+
+/* UI/UX projects retain a deliberate sticky card stack on desktop. */
+@media (min-width: 901px) {
+  body:not([data-project-theme]) .project-card[data-ui-stack="true"] {
+    position: sticky;
+    top: calc(84px + (var(--ui-stack-index, 0) * 18px));
+    z-index: calc(20 + var(--ui-stack-index, 0));
+    margin-top: 28px;
+    box-shadow: 0 28px 76px rgba(var(--shadow-rgb), .34);
+  }
+
+  body:not([data-project-theme]) .project-card[data-ui-stack="true"] + .project-card[data-ui-stack="true"] {
+    margin-top: 42px;
+  }
+}
+
+/* Keep reveal animation available without leaving invisible layout ghosts. */
+body:not([data-project-theme]) .project-card.reveal-up:not(.visible) {
+  opacity: 1;
+  transform: translate3d(0, 18px, 0);
+}
+body:not([data-project-theme]) .project-card.reveal-up.visible {
+  transform: translate3d(0, 0, 0);
+}
+
+/* Case-study project environments --------------------------------------- */
+body[data-project-theme] {
+  isolation: isolate;
+  background: var(--case-bg, #09101b);
+}
+
+body[data-project-theme] .project-env-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  opacity: 1;
+  pointer-events: none;
+  overflow: hidden;
+  background: var(--case-environment);
+}
+
+body[data-project-theme] .project-env-bg::before,
+body[data-project-theme] .project-env-bg::after {
+  content: "";
+  position: absolute;
+  inset: -18%;
+  pointer-events: none;
+}
+
+body[data-project-theme] .project-env-bg::before {
+  background: var(--case-motif);
+  background-size: var(--case-motif-size, 72px 72px);
+  opacity: .52;
+  mask-image: linear-gradient(to bottom, #000 0 72%, transparent 100%);
+}
+
+body[data-project-theme] .project-env-bg::after {
+  background:
+    radial-gradient(circle at var(--px, 52%) var(--py, 22%), var(--case-glow, rgba(92,124,255,.18)), transparent 30%),
+    linear-gradient(to bottom, transparent 0 68%, rgba(3,7,14,.48) 100%);
+  transition: background .2s linear;
+}
+
+body[data-project-theme] .env-pattern-motifs,
+body[data-project-theme] .env-pattern-grid,
+body[data-project-theme] .env-ambient-gradient,
+body[data-project-theme] .env-glow-primary,
+body[data-project-theme] .env-glow-secondary,
+body[data-project-theme] .env-vignette {
+  opacity: .7;
+}
+
+body[data-project-theme="nimo"] {
+  --case-bg: #070b19;
+  --case-glow: rgba(94, 107, 255, .28);
+  --case-environment: radial-gradient(circle at 17% 12%, rgba(82,87,255,.25), transparent 33%), radial-gradient(circle at 88% 34%, rgba(23,211,255,.14), transparent 31%), linear-gradient(145deg,#070912,#101331 55%,#07131d);
+  --case-motif: linear-gradient(rgba(125,137,255,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(125,137,255,.09) 1px,transparent 1px);
+  --case-motif-size: 56px 56px;
+}
+body[data-project-theme="arcade"], body[data-project-theme="arcade-os"] {
+  --case-bg: #050b12;
+  --case-glow: rgba(31, 210, 255, .24);
+  --case-environment: radial-gradient(circle at 50% -10%,rgba(25,211,255,.22),transparent 38%),radial-gradient(circle at 82% 68%,rgba(104,76,255,.16),transparent 30%),linear-gradient(180deg,#03070d,#07131f 58%,#03080d);
+  --case-motif: linear-gradient(rgba(45,202,255,.1) 1px,transparent 1px),linear-gradient(90deg,rgba(45,202,255,.1) 1px,transparent 1px);
+  --case-motif-size: 64px 64px;
+}
+body[data-project-theme="toolverse"] {
+  --case-bg: #07101d;
+  --case-glow: rgba(73, 117, 255, .22);
+  --case-environment: radial-gradient(circle at 18% 18%,rgba(70,83,255,.22),transparent 34%),radial-gradient(circle at 84% 72%,rgba(0,197,255,.13),transparent 28%),linear-gradient(150deg,#07101d,#0c1730 58%,#07121e);
+  --case-motif: linear-gradient(rgba(126,153,255,.075) 1px,transparent 1px),linear-gradient(90deg,rgba(126,153,255,.075) 1px,transparent 1px);
+}
+body[data-project-theme="shift-zero"] {
+  --case-bg: #090b0e;
+  --case-glow: rgba(244, 74, 74, .2);
+  --case-environment: radial-gradient(circle at 80% 12%,rgba(255,54,54,.18),transparent 31%),radial-gradient(circle at 16% 68%,rgba(255,153,0,.10),transparent 25%),linear-gradient(155deg,#07080a,#161116 58%,#090b0e);
+  --case-motif: repeating-linear-gradient(135deg,rgba(255,84,84,.055) 0 1px,transparent 1px 28px);
+  --case-motif-size: auto;
+}
+body[data-project-theme="love"] {
+  --case-bg: #130a11;
+  --case-glow: rgba(255, 118, 177, .2);
+  --case-environment: radial-gradient(circle at 18% 15%,rgba(255,130,176,.22),transparent 32%),radial-gradient(circle at 85% 66%,rgba(156,95,255,.14),transparent 30%),linear-gradient(145deg,#130a11,#24101c 55%,#0e0b13);
+  --case-motif: radial-gradient(circle,rgba(255,210,227,.12) 0 1px,transparent 1.5px);
+  --case-motif-size: 38px 38px;
+}
+body[data-project-theme="velora"], body[data-project-theme="veldora"], body[data-project-theme="velora-bites"] {
+  --case-bg: #120e09;
+  --case-glow: rgba(219, 169, 89, .22);
+  --case-environment: radial-gradient(circle at 17% 12%,rgba(216,169,90,.24),transparent 31%),radial-gradient(circle at 88% 76%,rgba(118,70,31,.18),transparent 30%),linear-gradient(145deg,#130e08,#24190e 58%,#0d0b08);
+  --case-motif: repeating-linear-gradient(90deg,rgba(231,194,128,.055) 0 1px,transparent 1px 92px);
+  --case-motif-size: auto;
+}
+body[data-project-theme="nintendo"] {
+  --case-bg: #090d13;
+  --case-glow: rgba(245, 67, 67, .18);
+  --case-environment: radial-gradient(circle at 18% 18%,rgba(239,53,53,.2),transparent 30%),radial-gradient(circle at 84% 65%,rgba(32,151,255,.18),transparent 30%),linear-gradient(145deg,#080b10,#121825 58%,#080b10);
+  --case-motif: radial-gradient(circle,rgba(236,242,255,.12) 0 1.5px,transparent 2px);
+  --case-motif-size: 48px 48px;
+}
+body[data-project-theme="nike"] {
+  --case-bg: #100b08;
+  --case-glow: rgba(255, 101, 43, .24);
+  --case-environment: radial-gradient(circle at 78% 12%,rgba(255,92,31,.25),transparent 33%),radial-gradient(circle at 14% 72%,rgba(255,183,52,.12),transparent 29%),linear-gradient(145deg,#0d0907,#24130b 58%,#0a0908);
+  --case-motif: repeating-linear-gradient(120deg,rgba(255,143,76,.06) 0 1px,transparent 1px 46px);
+  --case-motif-size: auto;
+}
+body[data-project-theme="promptai"] {
+  --case-bg: #080b18;
+  --case-glow: rgba(154, 107, 255, .24);
+  --case-environment: radial-gradient(circle at 18% 12%,rgba(144,90,255,.24),transparent 33%),radial-gradient(circle at 85% 70%,rgba(30,188,255,.14),transparent 29%),linear-gradient(145deg,#080a15,#17112d 58%,#07121b);
+  --case-motif: linear-gradient(rgba(167,130,255,.075) 1px,transparent 1px),linear-gradient(90deg,rgba(167,130,255,.075) 1px,transparent 1px);
+  --case-motif-size: 60px 60px;
+}
+
+/* Grain is now a finishing layer rather than the whole visual identity. */
+body[data-project-theme] .project-env-bg .env-vignette {
+  mix-blend-mode: soft-light;
+  opacity: .35;
+}
+
+@media (max-width: 900px) {
+  body:not([data-project-theme]) .work-section { padding-top: 88px; padding-bottom: 96px; }
+  body:not([data-project-theme]) .project-showcase { gap: 22px; }
+  body:not([data-project-theme]) .project-card { position: relative !important; top: auto !important; margin: 0 !important; }
+  body[data-project-theme] .project-env-bg::before { opacity: .28; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body:not([data-project-theme]) .project-card,
+  body:not([data-project-theme]) .project-card .project-media img { transition: none; }
+}
