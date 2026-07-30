@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://my-portfolio-mu-jade-52.vercel.app/sitemap.xml
+Sitemap: https://manavagarwal.me/sitemap.xml
