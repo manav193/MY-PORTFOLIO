@@ -48,6 +48,8 @@ requestAnimationFrame(() => requestAnimationFrame(() => {
   document.body.classList.remove("is-loading");
 }));
 
+initTheme();
+
 if (!caseStudy) {
   registerAllArcadeApps();
   ArcadeDeveloperMode.init();
