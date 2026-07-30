@@ -10,6 +10,7 @@ import { initCommandPalette } from "./modules/command-palette.js";
 import { initSectionProgressRail } from "./modules/section-progress-rail.js";
 import { initNimo } from "./modules/nimo.js";
 import { initNimoExperienceUpgrades } from "./modules/nimo-experience-upgrades.js";
+import { initNimoArcade2630 } from "./modules/nimo-arcade-26-30.js";
 import { initRuntimeFixes } from "./modules/runtime-fixes.js";
 import { initArcadeCinematicScene } from "./modules/arcade-cinematic-scene.js";
 import { initArcadeHardwareInputFixes } from "./modules/arcade-hardware-input-fixes.js";
@@ -108,6 +109,7 @@ if (caseStudy) {
 
 initNimo();
 initNimoExperienceUpgrades();
+initNimoArcade2630();
 initFlagshipExperiences();
 initRuntimeFixes();
 
