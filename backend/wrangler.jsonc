@@ -4,6 +4,7 @@
   "compatibility_date": "2026-07-22",
   "vars": {
     "OPENROUTER_MODEL": "openrouter/free",
-    "ALLOWED_ORIGINS": "https://my-portfolio-mu-jade-52.vercel.app"
+    "PUBLIC_APP_URL": "https://manavagarwal.me",
+    "ALLOWED_ORIGINS": "https://manavagarwal.me,https://www.manavagarwal.me"
   }
 }
