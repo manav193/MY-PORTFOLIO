@@ -1,4 +1,4 @@
-const cacheName = "manav-portfolio-v38";
+const cacheName = "manav-portfolio-v39";
 const assets = [
   "./",
   "./index.html",
@@ -21,6 +21,8 @@ const assets = [
   "./assets/case-studies/project-experience.css",
   "./assets/case-studies/nimo-premium.css",
   "./assets/case-studies/nimo-case-study-lab.js",
+  "./assets/case-studies/flagship-showcase.css",
+  "./assets/case-studies/flagship-showcase.js",
   "./project-arcade-os.html",
   "./project-nimo.html",
   "./project-toolverse.html",
