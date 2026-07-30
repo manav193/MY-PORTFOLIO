@@ -33,4 +33,4 @@ Release candidate: `v1.0.0`
 - [x] Live production verification passed
 - [x] Annotated release tag pushed
 
-Production URL: `https://my-portfolio-mu-jade-52.vercel.app`
+Production URL: `https://manavagarwal.me`
