@@ -7,7 +7,7 @@ Vercel is the production platform for this repository.
 - Build command: `npm run build`
 - Output directory: `dist`
 - Base path: `/`
-- Canonical origin: `https://my-portfolio-mu-jade-52.vercel.app`
+- Canonical origin: `https://manavagarwal.me`
 
 The checked-in `vercel.json` is the source of truth. A push to `main` is expected to trigger the connected Vercel deployment.
 
@@ -34,7 +34,7 @@ node build.js --base / --site https://portfolio.example
 
 ## Secondary Configurations
 
-`netlify.toml`, `firebase.json`, and the GitHub Pages workflow are retained for compatibility. They are not the primary production path and must not replace the canonical Vercel origin without a coordinated metadata update.
+`netlify.toml`, `firebase.json`, and the GitHub Pages workflow are retained for compatibility. They are not the primary production path and must not replace the canonical custom domain without a coordinated metadata update.
 
 ## Service Worker
 
