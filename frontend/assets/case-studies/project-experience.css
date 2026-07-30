@@ -7,26 +7,91 @@ body[data-project-theme="arcade"]{--env-accent:255,64,220;--env-accent-2:73,238,
 body[data-project-theme="velora"],body[data-project-theme="veldora"]{--env-accent:255,196,104;--env-accent-2:184,102,255}
 body[data-project-theme="nike"]{--env-accent:255,255,255;--env-accent-2:255,91,91}
 body[data-project-theme="nintendo"]{--env-accent:255,72,72;--env-accent-2:72,156,255}
+body[data-project-theme="love"]{--env-accent:255,133,180;--env-accent-2:255,204,145}
+
 .project-env-bg{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:-2;background:#05060a;contain:strict}
 .project-env-bg::before{content:"";position:absolute;inset:-16%;background:radial-gradient(42rem 42rem at var(--px) var(--py),rgba(var(--env-accent),.16),transparent 62%),radial-gradient(32rem 32rem at calc(100% - var(--px)) calc(100% - var(--py)),rgba(var(--env-accent-2),.12),transparent 66%);transform:translate3d(calc(var(--sx)*1px),calc(var(--sy)*1px),0);will-change:transform}
 .project-env-bg::after{content:"";position:absolute;inset:0;opacity:.14;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:48px 48px;mask-image:radial-gradient(circle at var(--px) var(--py),#000 0,transparent 72%);transform:translateY(calc(var(--sy)*.25px))}
-.env-pattern-motifs{position:absolute;inset:0;opacity:.34;transform:translate3d(calc(var(--sx)*-.4px),calc(var(--sy)*-.4px),0)}
-.env-pattern-motifs::before,.env-pattern-motifs::after{content:"";position:absolute;border:1px solid rgba(var(--env-accent),.16);border-radius:999px;animation:envOrbit 18s linear infinite}
-.env-pattern-motifs::before{width:32vw;height:32vw;min-width:280px;min-height:280px;left:-8vw;top:18vh}
-.env-pattern-motifs::after{width:24vw;height:24vw;min-width:220px;min-height:220px;right:-5vw;bottom:5vh;animation-direction:reverse;animation-duration:24s}
+.env-ambient-gradient,.env-glow-primary,.env-glow-secondary,.env-pattern-grid,.env-pattern-motifs,.env-vignette{position:absolute;inset:0}
+.env-vignette{background:radial-gradient(circle at center,transparent 46%,rgba(0,0,0,.5) 100%)}
+.env-pattern-motifs{opacity:.42;transform:translate3d(calc(var(--sx)*-.4px),calc(var(--sy)*-.4px),0)}
+.env-pattern-motifs::before,.env-pattern-motifs::after{content:"";position:absolute}
+
+/* NIMO — neural graph, intent nodes and signal paths */
+body[data-project-theme="nimo"] .env-pattern-grid{opacity:.44;background-image:radial-gradient(circle,rgba(92,231,255,.32) 0 2px,transparent 2.5px),linear-gradient(35deg,transparent 49.5%,rgba(92,231,255,.08) 50%,transparent 50.5%),linear-gradient(145deg,transparent 49.5%,rgba(111,76,255,.08) 50%,transparent 50.5%);background-size:92px 92px,184px 184px,184px 184px;background-position:0 0,0 0,46px 46px;animation:nimoDrift 20s linear infinite}
+body[data-project-theme="nimo"] .env-pattern-motifs::before{width:34vw;height:34vw;min-width:280px;min-height:280px;left:-7vw;top:18vh;border:1px solid rgba(92,231,255,.16);border-radius:50%;box-shadow:0 0 0 38px rgba(92,231,255,.025),0 0 0 76px rgba(111,76,255,.02)}
+body[data-project-theme="nimo"] .env-pattern-motifs::after{width:11px;height:11px;border-radius:50%;right:20%;top:24%;background:rgb(92,231,255);box-shadow:-160px 90px 0 2px rgba(111,76,255,.7),-62px 210px 0 1px rgba(92,231,255,.75),110px 150px 0 2px rgba(111,76,255,.65),190px 285px 0 1px rgba(92,231,255,.7);animation:nodePulse 3.2s ease-in-out infinite}
+
+/* PromptAI — two model lanes converging into comparison output */
+body[data-project-theme="promptai"] .env-pattern-grid{opacity:.48;background:linear-gradient(90deg,transparent 0 11%,rgba(112,255,196,.08) 11.2% 11.5%,transparent 11.7% 48%,rgba(255,255,255,.09) 49.8% 50.2%,transparent 50.4% 88%,rgba(91,133,255,.08) 88.3% 88.6%,transparent 88.8%),repeating-linear-gradient(0deg,transparent 0 74px,rgba(255,255,255,.025) 75px 76px);animation:laneScan 9s linear infinite}
+body[data-project-theme="promptai"] .env-pattern-motifs::before,body[data-project-theme="promptai"] .env-pattern-motifs::after{top:21%;width:23vw;min-width:220px;height:44vh;border:1px solid rgba(255,255,255,.11);border-radius:24px;background:linear-gradient(180deg,rgba(var(--env-accent),.05),transparent 70%)}
+body[data-project-theme="promptai"] .env-pattern-motifs::before{left:8%;box-shadow:inset 0 3px 0 rgba(112,255,196,.32)}
+body[data-project-theme="promptai"] .env-pattern-motifs::after{right:8%;box-shadow:inset 0 3px 0 rgba(91,133,255,.32)}
+
+/* ToolVerse — modular utility matrix */
+body[data-project-theme="toolverse"] .env-pattern-grid{opacity:.52;background-image:linear-gradient(rgba(98,221,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(48,255,165,.07) 1px,transparent 1px);background-size:96px 96px;transform:perspective(700px) rotateX(58deg) translateY(31vh) scale(1.35);transform-origin:center bottom;animation:toolGrid 18s linear infinite}
+body[data-project-theme="toolverse"] .env-pattern-motifs::before{width:74px;height:74px;left:12%;top:19%;border:1px solid rgba(98,221,255,.22);border-radius:18px;box-shadow:104px 52px 0 -1px rgba(48,255,165,.08),208px 0 0 -1px rgba(98,221,255,.08),312px 92px 0 -1px rgba(48,255,165,.08),416px 28px 0 -1px rgba(98,221,255,.08),520px 118px 0 -1px rgba(48,255,165,.08)}
+body[data-project-theme="toolverse"] .env-pattern-motifs::after{width:3px;height:32vh;right:18%;top:10%;background:linear-gradient(transparent,rgba(48,255,165,.5),transparent);animation:toolScan 4.6s ease-in-out infinite}
+
+/* SHIFT-ZERO — gravity blocks, hazard bars and inversion geometry */
+body[data-project-theme="shift-zero"] .env-pattern-grid{opacity:.4;background:repeating-linear-gradient(135deg,rgba(255,73,73,.08) 0 14px,transparent 14px 34px),linear-gradient(rgba(255,169,54,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,169,54,.05) 1px,transparent 1px);background-size:auto,72px 72px,72px 72px;clip-path:polygon(0 0,48% 0,34% 100%,0 100%)}
+body[data-project-theme="shift-zero"] .env-pattern-motifs::before{width:118px;height:118px;left:15%;top:23%;border:2px solid rgba(255,73,73,.35);transform:rotate(45deg);box-shadow:125px -125px 0 -2px rgba(255,169,54,.12),250px 0 0 -2px rgba(255,73,73,.12),375px 125px 0 -2px rgba(255,169,54,.1);animation:gravityFlip 6s cubic-bezier(.7,0,.3,1) infinite}
+body[data-project-theme="shift-zero"] .env-pattern-motifs::after{left:0;right:0;top:50%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,73,73,.6),transparent);box-shadow:0 -92px rgba(255,169,54,.13),0 92px rgba(255,73,73,.12)}
+
+/* ArcadeOS — CRT scanlines, cabinet glow and pixel stars */
+body[data-project-theme="arcade"] .env-pattern-grid{opacity:.5;background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 5px),radial-gradient(circle at 16% 22%,rgba(255,64,220,.65) 0 2px,transparent 3px),radial-gradient(circle at 74% 34%,rgba(73,238,255,.7) 0 2px,transparent 3px),radial-gradient(circle at 42% 76%,rgba(255,255,255,.48) 0 1px,transparent 2px);background-size:auto,120px 120px,160px 160px,90px 90px;animation:crtRoll 8s linear infinite}
+body[data-project-theme="arcade"] .env-pattern-motifs::before{width:33vw;height:55vh;left:9%;top:16%;border:2px solid rgba(255,64,220,.18);border-radius:28px 28px 52px 52px;box-shadow:inset 0 0 42px rgba(73,238,255,.07),0 0 48px rgba(255,64,220,.06)}
+body[data-project-theme="arcade"] .env-pattern-motifs::after{width:18px;height:18px;right:14%;top:30%;background:rgba(73,238,255,.45);box-shadow:28px 0 rgba(255,64,220,.45),14px 14px rgba(255,255,255,.28),0 28px rgba(255,64,220,.45),28px 28px rgba(73,238,255,.45);animation:pixelBlink 2.2s steps(2,end) infinite}
+
+/* Velora / Veldora — table arcs, botanical linework and warm editorial rhythm */
+body[data-project-theme="velora"] .env-pattern-grid,body[data-project-theme="veldora"] .env-pattern-grid{opacity:.42;background:radial-gradient(ellipse at 18% 24%,transparent 0 42px,rgba(255,196,104,.14) 43px 44px,transparent 45px),radial-gradient(ellipse at 82% 76%,transparent 0 78px,rgba(184,102,255,.1) 79px 80px,transparent 81px),repeating-linear-gradient(90deg,transparent 0 118px,rgba(255,196,104,.025) 119px 120px)}
+body[data-project-theme="velora"] .env-pattern-motifs::before,body[data-project-theme="veldora"] .env-pattern-motifs::before{width:38vw;height:38vw;min-width:310px;min-height:310px;left:-12vw;top:22vh;border:1px solid rgba(255,196,104,.18);border-radius:50%;box-shadow:0 0 0 38px rgba(255,196,104,.025),0 0 0 76px rgba(184,102,255,.02)}
+body[data-project-theme="velora"] .env-pattern-motifs::after,body[data-project-theme="veldora"] .env-pattern-motifs::after{width:180px;height:280px;right:9%;top:16%;border-left:1px solid rgba(255,196,104,.18);border-radius:50%;transform:rotate(-24deg);box-shadow:-18px 0 0 -17px rgba(184,102,255,.2),18px 0 0 -17px rgba(255,196,104,.18);animation:leafSway 7s ease-in-out infinite}
+
+/* Nike — speed trails, launch arc and kinetic geometry */
+body[data-project-theme="nike"] .env-pattern-grid{opacity:.46;background:linear-gradient(115deg,transparent 0 39%,rgba(255,255,255,.09) 39.4% 39.7%,transparent 40.1% 46%,rgba(255,91,91,.09) 46.4% 46.7%,transparent 47.1%),repeating-linear-gradient(115deg,transparent 0 54px,rgba(255,255,255,.022) 55px 56px);animation:speedShift 7s linear infinite}
+body[data-project-theme="nike"] .env-pattern-motifs::before{width:54vw;height:22vw;min-height:150px;right:-10vw;top:20%;border-top:2px solid rgba(255,255,255,.25);border-radius:50%;transform:rotate(-14deg);box-shadow:0 -12px 0 -11px rgba(255,91,91,.5),0 -28px 0 -27px rgba(255,255,255,.22)}
+body[data-project-theme="nike"] .env-pattern-motifs::after{width:240px;height:2px;left:10%;bottom:24%;background:linear-gradient(90deg,transparent,rgba(255,91,91,.6),transparent);box-shadow:74px -38px rgba(255,255,255,.2),148px -76px rgba(255,91,91,.15);animation:trailRush 3.8s ease-in-out infinite}
+
+/* Nintendo — playful tiles, controller buttons and rounded forms */
+body[data-project-theme="nintendo"] .env-pattern-grid{opacity:.42;background:radial-gradient(circle at 18% 18%,rgba(255,72,72,.25) 0 18px,transparent 19px),radial-gradient(circle at 78% 28%,rgba(72,156,255,.22) 0 14px,transparent 15px),radial-gradient(circle at 68% 78%,rgba(255,255,255,.12) 0 10px,transparent 11px);background-size:180px 180px,220px 220px,140px 140px;animation:playfieldFloat 16s linear infinite}
+body[data-project-theme="nintendo"] .env-pattern-motifs::before{width:34vw;height:22vw;min-width:280px;min-height:180px;left:8%;top:22%;border:2px solid rgba(255,72,72,.2);border-radius:80px;background:linear-gradient(90deg,rgba(255,72,72,.035),transparent 46%,rgba(72,156,255,.035));box-shadow:inset 0 0 0 18px rgba(255,255,255,.015)}
+body[data-project-theme="nintendo"] .env-pattern-motifs::after{width:20px;height:20px;right:18%;top:30%;border-radius:50%;background:rgba(255,72,72,.45);box-shadow:28px 0 rgba(72,156,255,.45),14px 24px rgba(255,255,255,.25),-180px 78px 0 8px rgba(255,255,255,.08);animation:buttonBounce 3s ease-in-out infinite}
+
+/* LOVE — floating memories, timeline strands and warm particles */
+body[data-project-theme="love"] .env-pattern-grid{opacity:.44;background:radial-gradient(circle at 12% 18%,rgba(255,133,180,.28) 0 2px,transparent 3px),radial-gradient(circle at 72% 38%,rgba(255,204,145,.25) 0 2px,transparent 3px),radial-gradient(circle at 45% 82%,rgba(255,255,255,.16) 0 1px,transparent 2px);background-size:120px 120px,170px 170px,90px 90px;animation:memoryDust 20s linear infinite}
+body[data-project-theme="love"] .env-pattern-motifs::before{width:190px;height:230px;left:12%;top:20%;border:1px solid rgba(255,133,180,.2);border-radius:20px;transform:rotate(-7deg);box-shadow:150px 54px 0 -1px rgba(255,204,145,.08),300px -12px 0 -1px rgba(255,133,180,.07);animation:memoryFloat 7s ease-in-out infinite}
+body[data-project-theme="love"] .env-pattern-motifs::after{left:50%;top:6%;bottom:8%;width:1px;background:linear-gradient(transparent,rgba(255,133,180,.28),rgba(255,204,145,.22),transparent);box-shadow:-6px 130px 0 2px rgba(255,133,180,.42),6px 290px 0 2px rgba(255,204,145,.4),-4px 470px 0 2px rgba(255,255,255,.22)}
+
 .cs-editorial-section,.cs-hero-cinematic{position:relative;z-index:1}
 .cs-editorial-section{transform:translate3d(0,var(--section-shift,0),0)}
 .cs-premium-layout::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:linear-gradient(115deg,transparent 35%,rgba(var(--env-accent),.028) 50%,transparent 65%);background-size:220% 100%;animation:envSweep 14s ease-in-out infinite}
 [data-env-card]{position:relative;overflow:hidden}
 [data-env-card]::after{content:"";position:absolute;inset:-1px;pointer-events:none;background:radial-gradient(260px circle at var(--card-x,50%) var(--card-y,50%),rgba(var(--env-accent),.1),transparent 70%);opacity:0;transition:opacity .2s ease}
 [data-env-card]:hover::after{opacity:1}
-@keyframes envOrbit{to{transform:rotate(360deg)}}
-@keyframes envSweep{0%,100%{background-position:0 0}50%{background-position:100% 0}}
 
-/* Mobile and low-power devices keep the theme but avoid continuous GPU work. */
+@keyframes envSweep{0%,100%{background-position:0 0}50%{background-position:100% 0}}
+@keyframes nimoDrift{to{background-position:92px 92px,184px 0,230px 46px}}
+@keyframes nodePulse{50%{opacity:.35;transform:scale(1.25)}}
+@keyframes laneScan{50%{background-position:0 0,0 76px}}
+@keyframes toolGrid{to{background-position:0 96px,96px 0}}
+@keyframes toolScan{50%{transform:translateY(34vh);opacity:.25}}
+@keyframes gravityFlip{0%,38%{transform:rotate(45deg)}62%,100%{transform:rotate(225deg)}}
+@keyframes crtRoll{to{background-position:0 20px,120px 120px,-160px 160px,90px -90px}}
+@keyframes pixelBlink{50%{opacity:.3}}
+@keyframes leafSway{50%{transform:rotate(-18deg) translateY(10px)}}
+@keyframes speedShift{to{background-position:220px 0,110px 0}}
+@keyframes trailRush{50%{transform:translateX(140px);opacity:.3}}
+@keyframes playfieldFloat{to{background-position:180px 180px,-220px 220px,140px -140px}}
+@keyframes buttonBounce{50%{transform:translateY(12px)}}
+@keyframes memoryDust{to{background-position:120px 120px,-170px 170px,90px -90px}}
+@keyframes memoryFloat{50%{transform:rotate(-3deg) translateY(-16px)}}
+
+/* Mobile and low-power devices keep each project's visual identity without continuous GPU work. */
 .project-env-low-power .project-env-bg::before{inset:-8%;background:radial-gradient(26rem 26rem at 22% 18%,rgba(var(--env-accent),.11),transparent 68%),radial-gradient(24rem 24rem at 82% 76%,rgba(var(--env-accent-2),.08),transparent 70%);transform:none;will-change:auto}
-.project-env-low-power .project-env-bg::after{opacity:.07;background-size:64px 64px;mask-image:none;transform:none}
-.project-env-low-power .env-pattern-motifs{display:none}
+.project-env-low-power .project-env-bg::after{opacity:.05;background-size:72px 72px;mask-image:none;transform:none}
+.project-env-low-power .env-pattern-grid,.project-env-low-power .env-pattern-motifs,.project-env-low-power .env-pattern-motifs::before,.project-env-low-power .env-pattern-motifs::after{animation:none!important;transform:none!important}
+.project-env-low-power .env-pattern-motifs{display:block;opacity:.19}
 .project-env-low-power .cs-premium-layout::before{display:none}
 .project-env-low-power .cs-editorial-section{transform:none!important}
 .project-env-low-power [data-env-card]::after{display:none}
@@ -34,11 +99,12 @@ body[data-project-theme="nintendo"]{--env-accent:255,72,72;--env-accent-2:72,156
 @media(max-width:899px){
   .project-env-bg{position:absolute;min-height:100vh}
   .project-env-bg::before{filter:none}
+  .env-pattern-grid{opacity:.26!important}
+  .env-pattern-motifs{opacity:.16!important}
   .cs-editorial-section{content-visibility:auto;contain-intrinsic-size:1px 720px}
   .cs-overview-block,.cs-feature-grid li,.cs-split-half,.cs-hero-visual{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 }
-
 @media(prefers-reduced-motion:reduce){
-  .project-env-bg::before,.project-env-bg::after,.env-pattern-motifs,.cs-editorial-section{transform:none!important}
-  .env-pattern-motifs::before,.env-pattern-motifs::after,.cs-premium-layout::before{animation:none!important}
+  .project-env-bg::before,.project-env-bg::after,.env-pattern-grid,.env-pattern-motifs,.env-pattern-motifs::before,.env-pattern-motifs::after,.cs-editorial-section{transform:none!important;animation:none!important}
+  .cs-premium-layout::before{animation:none!important}
 }
