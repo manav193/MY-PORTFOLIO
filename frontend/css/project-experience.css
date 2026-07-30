@@ -1,0 +1,26 @@
+/* Project-relative interactive backgrounds and premium case-study motion */
+body[data-project-theme]{--px:50%;--py:34%;--sx:0;--sy:0;--env-accent:102,227,255;--env-accent-2:139,92,246;position:relative;isolation:isolate}
+body[data-project-theme="nimo"]{--env-accent:92,231,255;--env-accent-2:111,76,255}
+body[data-project-theme="promptai"]{--env-accent:112,255,196;--env-accent-2:91,133,255}
+body[data-project-theme="toolverse"]{--env-accent:98,221,255;--env-accent-2:48,255,165}
+body[data-project-theme="shift-zero"]{--env-accent:255,73,73;--env-accent-2:255,169,54}
+body[data-project-theme="arcade"]{--env-accent:255,64,220;--env-accent-2:73,238,255}
+body[data-project-theme="velora"],body[data-project-theme="veldora"]{--env-accent:255,196,104;--env-accent-2:184,102,255}
+body[data-project-theme="nike"]{--env-accent:255,255,255;--env-accent-2:255,91,91}
+body[data-project-theme="nintendo"]{--env-accent:255,72,72;--env-accent-2:72,156,255}
+.project-env-bg{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:-2;background:#05060a}
+.project-env-bg::before{content:"";position:absolute;inset:-20%;background:radial-gradient(42rem 42rem at var(--px) var(--py),rgba(var(--env-accent),.18),transparent 62%),radial-gradient(32rem 32rem at calc(100% - var(--px)) calc(100% - var(--py)),rgba(var(--env-accent-2),.14),transparent 66%);filter:blur(6px);transform:translate3d(calc(var(--sx)*1px),calc(var(--sy)*1px),0);transition:background .2s linear}
+.project-env-bg::after{content:"";position:absolute;inset:0;opacity:.18;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:44px 44px;mask-image:radial-gradient(circle at var(--px) var(--py),#000 0,transparent 72%);transform:translateY(calc(var(--sy)*.35px))}
+.env-pattern-motifs{position:absolute;inset:0;opacity:.45;transform:translate3d(calc(var(--sx)*-.55px),calc(var(--sy)*-.55px),0)}
+.env-pattern-motifs::before,.env-pattern-motifs::after{content:"";position:absolute;border:1px solid rgba(var(--env-accent),.2);border-radius:999px;filter:drop-shadow(0 0 22px rgba(var(--env-accent),.15));animation:envOrbit 14s linear infinite}
+.env-pattern-motifs::before{width:32vw;height:32vw;min-width:280px;min-height:280px;left:-8vw;top:18vh}
+.env-pattern-motifs::after{width:24vw;height:24vw;min-width:220px;min-height:220px;right:-5vw;bottom:5vh;animation-direction:reverse;animation-duration:18s}
+.cs-editorial-section,.cs-hero-cinematic{position:relative;z-index:1}
+.cs-editorial-section{transform:translate3d(0,var(--section-shift,0),0);transition:transform .18s linear}
+.cs-premium-layout::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:linear-gradient(115deg,transparent 35%,rgba(var(--env-accent),.035) 50%,transparent 65%);background-size:220% 100%;animation:envSweep 11s ease-in-out infinite}
+[data-env-card]{position:relative;overflow:hidden}
+[data-env-card]::after{content:"";position:absolute;inset:-1px;pointer-events:none;background:radial-gradient(300px circle at var(--card-x,50%) var(--card-y,50%),rgba(var(--env-accent),.12),transparent 70%);opacity:0;transition:opacity .25s ease}
+[data-env-card]:hover::after{opacity:1}
+@keyframes envOrbit{to{transform:rotate(360deg)}}
+@keyframes envSweep{0%,100%{background-position:0 0}50%{background-position:100% 0}}
+@media (prefers-reduced-motion:reduce){.project-env-bg::before,.project-env-bg::after,.env-pattern-motifs,.cs-editorial-section{transform:none!important}.env-pattern-motifs::before,.env-pattern-motifs::after,.cs-premium-layout::before{animation:none!important}}
