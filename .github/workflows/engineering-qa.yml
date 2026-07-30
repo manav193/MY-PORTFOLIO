@@ -1,0 +1,47 @@
+name: Engineering QA
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: engineering-qa-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality-gates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Check internal, asset and selected external links
+        run: npm run qa:links
+      - name: Enforce performance budgets
+        run: npm run qa:budget
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Responsive smoke, console gate and visual captures
+        run: npm run qa:engineering
+      - name: Upload visual regression captures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-regression-${{ github.sha }}
+          path: test-results/visual-regression
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ github.sha }}
+          path: playwright-report
+          if-no-files-found: ignore
+          retention-days: 7
