@@ -1,4 +1,5 @@
 import { initFinalTrust5154 } from "./final-trust-51-54.js";
+import { initCanonicalContactEmail } from "./canonical-contact-email.js";
 
 let finalLayerInitialized = false;
 
@@ -17,6 +18,7 @@ function initFinalLayer() {
 
 export function initContactForm() {
   initFinalLayer();
+  initCanonicalContactEmail();
 
   const form = document.querySelector("[data-contact-form]");
   const status = document.querySelector("[data-form-status]");
