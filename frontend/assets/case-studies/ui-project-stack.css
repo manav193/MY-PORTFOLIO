@@ -1,0 +1,60 @@
+/* Dedicated sticky stack for the UI/UX project trio. */
+body:not([data-project-theme]) .ui-project-stack {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  margin: 8px 0 56px;
+  padding: 0 0 clamp(220px, 32vh, 420px);
+  overflow: visible !important;
+  contain: none !important;
+  isolation: isolate;
+}
+
+body:not([data-project-theme]) .ui-project-stack > .project-card[data-ui-stack="true"] {
+  position: sticky !important;
+  top: calc(92px + (var(--ui-stack-index, 0) * 20px)) !important;
+  z-index: calc(30 + var(--ui-stack-index, 0)) !important;
+  width: 100%;
+  margin: 0 0 clamp(180px, 28vh, 360px) !important;
+  transform-origin: 50% 18%;
+  box-shadow: 0 34px 100px rgba(var(--shadow-rgb), .42),
+              0 0 0 1px rgba(var(--highlight-rgb), .07);
+  background-clip: padding-box;
+}
+
+body:not([data-project-theme]) .ui-project-stack > .project-card[data-ui-stack="true"]:nth-child(1) {
+  filter: saturate(.93) brightness(.94);
+}
+
+body:not([data-project-theme]) .ui-project-stack > .project-card[data-ui-stack="true"]:nth-child(2) {
+  filter: saturate(.97) brightness(.97);
+}
+
+body:not([data-project-theme]) .ui-project-stack > .project-card[data-ui-stack="true"]:last-child {
+  margin-bottom: 0 !important;
+  filter: none;
+}
+
+@media (hover: hover) and (pointer: fine) and (min-width: 901px) {
+  body:not([data-project-theme]) .ui-project-stack > .project-card[data-ui-stack="true"]:hover,
+  body:not([data-project-theme]) .ui-project-stack > .project-card[data-ui-stack="true"]:focus-within {
+    transform: translate3d(0, -10px, 0) scale(1.006) !important;
+  }
+}
+
+@media (max-width: 900px) {
+  body:not([data-project-theme]) .ui-project-stack {
+    display: grid;
+    gap: 22px;
+    margin: 0;
+    padding: 0;
+  }
+
+  body:not([data-project-theme]) .ui-project-stack > .project-card[data-ui-stack="true"] {
+    position: relative !important;
+    top: auto !important;
+    margin: 0 !important;
+    filter: none;
+  }
+}
