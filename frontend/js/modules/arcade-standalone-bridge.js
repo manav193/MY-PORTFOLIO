@@ -4,9 +4,15 @@ export function initArcadeStandaloneBridge() {
   if (document.documentElement.dataset.arcadeStandaloneBridge === 'ready') return;
   document.documentElement.dataset.arcadeStandaloneBridge = 'ready';
   injectStyles();
-  updateProjectCard();
-  updateCabinetBootActions();
-  mountCabinetLinkPanel();
+  refreshBridge();
+
+  let refreshFrame = 0;
+  const scheduleRefresh = () => {
+    cancelAnimationFrame(refreshFrame);
+    refreshFrame = requestAnimationFrame(refreshBridge);
+  };
+  const observer = new MutationObserver(scheduleRefresh);
+  observer.observe(document.body, { childList: true, subtree: true });
 
   document.addEventListener('click', event => {
     const launcher = event.target.closest('[data-launch-standalone-arcade]');
@@ -15,19 +21,33 @@ export function initArcadeStandaloneBridge() {
     openRepository();
   });
 
+  window.addEventListener('pagehide', () => {
+    observer.disconnect();
+    cancelAnimationFrame(refreshFrame);
+  }, { once: true });
+
   window.ArcadeStandalone = {
     repository: REPOSITORY_URL,
-    openRepository
+    openRepository,
+    refresh: refreshBridge
   };
 }
 
+function refreshBridge() {
+  updateProjectCard();
+  updateCabinetBootActions();
+  mountCabinetLinkPanel();
+}
+
 function openRepository() {
-  const opened = window.open(REPOSITORY_URL, '_blank');
-  if (opened) {
-    try { opened.opener = null; } catch {}
-  } else {
-    window.location.assign(REPOSITORY_URL);
-  }
+  const link = document.createElement('a');
+  link.href = REPOSITORY_URL;
+  link.target = '_blank';
+  link.rel = 'noopener noreferrer';
+  link.style.display = 'none';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
 }
 
 function updateProjectCard() {
@@ -60,7 +80,11 @@ function updateProjectCard() {
   }
 
   const repo = [...actions.querySelectorAll('a')].find(link => link.textContent.trim().toLowerCase() === 'github');
-  if (repo) repo.href = REPOSITORY_URL;
+  if (repo) {
+    repo.href = REPOSITORY_URL;
+    repo.target = '_blank';
+    repo.rel = 'noopener noreferrer';
+  }
 
   const embedded = actions.querySelector('[data-enter-arcade]');
   if (embedded) {
