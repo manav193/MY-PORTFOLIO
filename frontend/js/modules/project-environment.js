@@ -6,8 +6,9 @@ export function initProjectEnvironment() {
 
   if (!document.querySelector('link[data-project-experience]')) {
     const style = document.createElement('link');
+    const nestedCaseStudy = location.pathname.includes('/assets/case-studies/');
     style.rel = 'stylesheet';
-    style.href = 'css/project-experience.css';
+    style.href = nestedCaseStudy ? '../../css/project-experience.css' : 'css/project-experience.css';
     style.dataset.projectExperience = 'true';
     document.head.appendChild(style);
   }
@@ -16,14 +17,7 @@ export function initProjectEnvironment() {
     const env = document.createElement('div');
     env.className = 'project-env-bg';
     env.setAttribute('aria-hidden', 'true');
-    env.innerHTML = `
-      <div class="env-ambient-gradient"></div>
-      <div class="env-glow-primary"></div>
-      <div class="env-glow-secondary"></div>
-      <div class="env-pattern-grid"></div>
-      <div class="env-pattern-motifs"></div>
-      <div class="env-vignette"></div>
-    `;
+    env.innerHTML = `<div class="env-ambient-gradient"></div><div class="env-glow-primary"></div><div class="env-glow-secondary"></div><div class="env-pattern-grid"></div><div class="env-pattern-motifs"></div><div class="env-vignette"></div>`;
     body.prepend(env);
   }
 
@@ -42,7 +36,6 @@ export function initProjectEnvironment() {
       });
     };
     addEventListener('pointermove', updatePointer, { passive: true });
-
     const sections = [...document.querySelectorAll('.cs-editorial-section')];
     const updateScroll = () => {
       const center = innerHeight / 2;
@@ -65,9 +58,4 @@ export function initProjectEnvironment() {
     }, { passive: true });
   });
 }
-
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initProjectEnvironment);
-} else {
-  initProjectEnvironment();
-}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initProjectEnvironment); else initProjectEnvironment();
