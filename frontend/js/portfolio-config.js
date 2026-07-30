@@ -7,7 +7,7 @@ const portfolioConfig = Object.freeze({
   githubUrl: 'https://github.com/manav193',
   linkedinUrl: null,
   resumePath: 'Manav-Agarwal-Resume.pdf',
-  deployedPortfolioUrl: 'https://my-portfolio-mu-jade-52.vercel.app',
+  deployedPortfolioUrl: 'https://manavagarwal.me',
   socialImagePath: 'assets/manav-agarwal-portfolio-og.jpg',
   featuredProjectIds: ['arcade-os','nimo','toolverse','shift-zero','love','velora-bites','nintendo','nike','fate-ai','flora-and-flavor','veldora-bites','prompt-ai','multi-api-system','resume-ai','route-73-night-shift','aurora-control-ui','shift-zero-ui'],
   projects: Object.freeze({
