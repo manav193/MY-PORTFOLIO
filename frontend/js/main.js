@@ -22,10 +22,11 @@ import { ArcadeModuleLoader } from "./arcade-module-loader.js";
 import { ArcadeOS } from "./arcade-os.js";
 import { ArcadeRegistry, registerAllArcadeApps } from "./arcade-apps.js";
 import { ArcadeOutcomeScreen } from "./modules/arcade-outcome-screen.js";
-
 import { ExperienceController } from "./modules/experience-controller.js";
 import { GlobalPortfolioShell, isCaseStudyPage } from "./modules/global-portfolio-shell.js";
 import { ArcadeDeveloperMode } from "./modules/arcade-developer-mode.js";
+
+const caseStudy = isCaseStudyPage();
 
 window.ArcadeExperience = ExperienceController;
 window.ArcadeModuleLoader = ArcadeModuleLoader;
@@ -33,24 +34,25 @@ window.ArcadeOS = ArcadeOS;
 window.ArcadeRegistry = window.ArcadeRegistry || ArcadeRegistry;
 window.registerAllArcadeApps = registerAllArcadeApps;
 window.ArcadeOutcomeScreen = ArcadeOutcomeScreen;
-
-registerAllArcadeApps();
-ArcadeDeveloperMode.init();
+window.ArcadeEnvironmentService = ArcadeEnvironmentService;
+window.Arcade3DPlanetEngine = Arcade3DPlanetEngine;
 
 document.body.classList.add("is-loading");
-document.body.style.opacity = '0';
-document.body.style.transition = 'opacity 0.8s var(--motion-momentum)';
+document.body.style.opacity = "0";
+document.body.style.transition = "opacity 0.45s var(--motion-momentum)";
 requestAnimationFrame(() => requestAnimationFrame(() => {
-  document.body.style.opacity = '1';
+  document.body.style.opacity = "1";
   document.body.classList.remove("is-loading");
 }));
 
-window.ArcadeEnvironmentService = ArcadeEnvironmentService;
-window.Arcade3DPlanetEngine = Arcade3DPlanetEngine;
-ArcadeEnvironmentService.init();
-Arcade3DPlanetEngine.init();
-ArcadeTransitions.init();
-initOS();
+if (!caseStudy) {
+  registerAllArcadeApps();
+  ArcadeDeveloperMode.init();
+  ArcadeEnvironmentService.init();
+  Arcade3DPlanetEngine.init();
+  ArcadeTransitions.init();
+  initOS();
+}
 
 GlobalPortfolioShell.init();
 initProjectEnvironment();
@@ -59,15 +61,15 @@ initCursorSystem();
 initCommandPalette();
 
 const flagshipTheme = document.body.dataset.projectTheme;
-if (flagshipTheme === 'nimo' || flagshipTheme === 'arcade-os' || flagshipTheme === 'arcade') {
-  const style = document.createElement('link');
-  style.rel = 'stylesheet';
-  style.href = 'assets/case-studies/flagship-showcase.css';
+if (flagshipTheme === "nimo" || flagshipTheme === "arcade-os" || flagshipTheme === "arcade") {
+  const style = document.createElement("link");
+  style.rel = "stylesheet";
+  style.href = "assets/case-studies/flagship-showcase.css";
   document.head.appendChild(style);
-  import('../assets/case-studies/flagship-showcase.js').catch(() => {});
+  import("../assets/case-studies/flagship-showcase.js").catch(() => {});
 }
 
-if (!isCaseStudyPage()) {
+if (!caseStudy) {
   initPublicProjectCatalog();
   initSectionProgressRail();
   initDockController();
@@ -76,7 +78,7 @@ if (!isCaseStudyPage()) {
 initNimo();
 initRuntimeFixes();
 
-if (!isCaseStudyPage()) {
+if (!caseStudy) {
   initArcadeCinematicScene();
   initArcadeHardwareInputFixes();
 }
