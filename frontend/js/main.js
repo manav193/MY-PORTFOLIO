@@ -69,7 +69,7 @@ initCommandPalette();
 
 const proofStyle = document.createElement("link");
 proofStyle.rel = "stylesheet";
-proofStyle.href = caseStudy ? "assets/case-studies/product-proof-gallery.css" : "assets/case-studies/product-proof-gallery.css";
+proofStyle.href = "/assets/case-studies/product-proof-gallery.css";
 document.head.appendChild(proofStyle);
 initProductProofGallery();
 
