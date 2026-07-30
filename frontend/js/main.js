@@ -16,6 +16,7 @@ import { initPortfolioTrust4650 } from "./modules/portfolio-trust-46-50.js";
 import { initRuntimeFixes } from "./modules/runtime-fixes.js";
 import { initArcadeCinematicScene } from "./modules/arcade-cinematic-scene.js";
 import { initArcadeHardwareInputFixes } from "./modules/arcade-hardware-input-fixes.js";
+import { initArcadeStandaloneBridge } from "./modules/arcade-standalone-bridge.js";
 import { initProjectEnvironment } from "./modules/project-environment.js";
 import { initPublicProjectCatalog } from "./modules/public-project-catalog.js";
 import { initProjectLaunch } from "./modules/project-launches.js";
@@ -193,6 +194,7 @@ initRuntimeFixes();
 if (!caseStudy) {
   initArcadeCinematicScene();
   initArcadeHardwareInputFixes();
+  initArcadeStandaloneBridge();
 }
 
 initReveal();
