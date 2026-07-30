@@ -18,7 +18,7 @@ import { initPublicProjectCatalog } from "./modules/public-project-catalog.js";
 import { initProjectLaunch } from "./modules/project-launches.js";
 import { ArcadeEnvironmentService } from "./modules/arcade-environment-service.js";
 import { Arcade3DPlanetEngine } from "./modules/arcade-3d-planet-engine.js";
-import ArcadeTransitions from "./modules/arcade-transitions.js";
+import ArcadeTransitions from "./arcade-transitions.js";
 import { ArcadeModuleLoader } from "./arcade-module-loader.js";
 import { ArcadeOS } from "./arcade-os.js";
 import { ArcadeRegistry, registerAllArcadeApps } from "./arcade-apps.js";
@@ -33,6 +33,12 @@ const caseStudy = isCaseStudyPage();
 if (document.body.dataset.projectTheme === "arcade-os") {
   document.body.dataset.projectTheme = "arcade";
 }
+
+const qaStyle = document.createElement("link");
+qaStyle.rel = "stylesheet";
+qaStyle.href = "/assets/case-studies/qa-layout-fixes.css";
+qaStyle.dataset.qaLayoutFixes = "true";
+document.head.appendChild(qaStyle);
 
 window.ArcadeExperience = ExperienceController;
 window.ArcadeModuleLoader = ArcadeModuleLoader;
@@ -73,6 +79,15 @@ proofStyle.rel = "stylesheet";
 proofStyle.href = "/assets/case-studies/product-proof-gallery.css";
 document.head.appendChild(proofStyle);
 initProductProofGallery();
+
+if (!caseStudy) {
+  ["velora-bites", "nintendo", "nike"].forEach((id, index) => {
+    const card = document.querySelector(`[data-project-id="${id}"]`);
+    if (!card) return;
+    card.dataset.uiStack = "true";
+    card.style.setProperty("--ui-stack-index", String(index));
+  });
+}
 
 const flagshipTheme = document.body.dataset.projectTheme;
 if (flagshipTheme === "nimo" || flagshipTheme === "arcade") {
