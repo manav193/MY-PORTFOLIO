@@ -1,60 +1,129 @@
-/* Dedicated sticky stack for the UI/UX project trio. */
+/* Homepage project density + deterministic UI/UX stack. */
+
+/* Non-UI projects: two cards per row on desktop. */
+@media (min-width: 901px) {
+  body:not([data-project-theme]) .project-showcase {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    align-items: start;
+    gap: 28px !important;
+  }
+
+  body:not([data-project-theme]) .project-showcase > .project-card {
+    width: 100% !important;
+    min-width: 0;
+    height: 100%;
+    margin: 0 !important;
+  }
+
+  body:not([data-project-theme]) .project-showcase > .project-card .project-media {
+    aspect-ratio: 16 / 10;
+    min-height: 0;
+  }
+
+  body:not([data-project-theme]) .project-showcase > .project-card .project-content {
+    padding: clamp(22px, 2vw, 30px);
+  }
+}
+
+/* UI/UX stack is outside the regular project grid so sticky positioning is not
+   affected by grid reordering, filters, or reviewer modes. */
 body:not([data-project-theme]) .ui-project-stack {
   position: relative;
   display: block;
   width: 100%;
-  min-width: 0;
-  margin: 8px 0 56px;
-  padding: 0 0 clamp(220px, 32vh, 420px);
+  margin: clamp(72px, 9vw, 128px) 0 32px;
   overflow: visible !important;
   contain: none !important;
   isolation: isolate;
 }
 
-body:not([data-project-theme]) .ui-project-stack > .project-card[data-ui-stack="true"] {
+body:not([data-project-theme]) .ui-project-stack__heading {
+  max-width: 760px;
+  margin-bottom: 40px;
+}
+
+body:not([data-project-theme]) .ui-project-stack__heading span {
+  display: block;
+  margin-bottom: 10px;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  letter-spacing: .16em;
+  color: var(--color-accent);
+}
+
+body:not([data-project-theme]) .ui-project-stack__heading h3 {
+  margin: 0;
+  font-size: clamp(30px, 4vw, 54px);
+  line-height: 1.02;
+}
+
+body:not([data-project-theme]) .ui-project-stack__cards {
+  position: relative;
+  display: block;
+  min-height: calc(100vh + 980px);
+  padding-bottom: 40vh;
+  overflow: visible !important;
+  contain: none !important;
+}
+
+body:not([data-project-theme]) .ui-project-stack__cards > .project-card[data-ui-stack="true"] {
   position: sticky !important;
-  top: calc(92px + (var(--ui-stack-index, 0) * 20px)) !important;
-  z-index: calc(30 + var(--ui-stack-index, 0)) !important;
-  width: 100%;
-  margin: 0 0 clamp(180px, 28vh, 360px) !important;
-  transform-origin: 50% 18%;
-  box-shadow: 0 34px 100px rgba(var(--shadow-rgb), .42),
-              0 0 0 1px rgba(var(--highlight-rgb), .07);
-  background-clip: padding-box;
+  top: calc(88px + (var(--ui-stack-index, 0) * 28px)) !important;
+  z-index: calc(40 + var(--ui-stack-index, 0)) !important;
+  width: min(100%, 1180px) !important;
+  margin: 0 auto 42vh !important;
+  min-height: min(72vh, 760px);
+  transform: none !important;
+  overflow: hidden;
+  box-shadow: 0 34px 110px rgba(var(--shadow-rgb), .48),
+              0 0 0 1px rgba(var(--highlight-rgb), .08);
 }
 
-body:not([data-project-theme]) .ui-project-stack > .project-card[data-ui-stack="true"]:nth-child(1) {
-  filter: saturate(.93) brightness(.94);
+body:not([data-project-theme]) .ui-project-stack__cards > .project-card[data-ui-stack="true"]:nth-child(1) {
+  filter: brightness(.90) saturate(.90);
 }
 
-body:not([data-project-theme]) .ui-project-stack > .project-card[data-ui-stack="true"]:nth-child(2) {
-  filter: saturate(.97) brightness(.97);
+body:not([data-project-theme]) .ui-project-stack__cards > .project-card[data-ui-stack="true"]:nth-child(2) {
+  filter: brightness(.95) saturate(.96);
 }
 
-body:not([data-project-theme]) .ui-project-stack > .project-card[data-ui-stack="true"]:last-child {
+body:not([data-project-theme]) .ui-project-stack__cards > .project-card[data-ui-stack="true"]:last-child {
   margin-bottom: 0 !important;
   filter: none;
 }
 
 @media (hover: hover) and (pointer: fine) and (min-width: 901px) {
-  body:not([data-project-theme]) .ui-project-stack > .project-card[data-ui-stack="true"]:hover,
-  body:not([data-project-theme]) .ui-project-stack > .project-card[data-ui-stack="true"]:focus-within {
-    transform: translate3d(0, -10px, 0) scale(1.006) !important;
+  body:not([data-project-theme]) .ui-project-stack__cards > .project-card[data-ui-stack="true"]:hover,
+  body:not([data-project-theme]) .ui-project-stack__cards > .project-card[data-ui-stack="true"]:focus-within {
+    transform: translateY(-8px) scale(1.004) !important;
   }
 }
 
 @media (max-width: 900px) {
+  body:not([data-project-theme]) .project-showcase {
+    grid-template-columns: 1fr !important;
+  }
+
   body:not([data-project-theme]) .ui-project-stack {
+    margin: 56px 0 0;
+  }
+
+  body:not([data-project-theme]) .ui-project-stack__cards {
     display: grid;
+    grid-template-columns: 1fr;
     gap: 22px;
-    margin: 0;
+    min-height: 0;
     padding: 0;
   }
 
-  body:not([data-project-theme]) .ui-project-stack > .project-card[data-ui-stack="true"] {
+  body:not([data-project-theme]) .ui-project-stack__cards > .project-card[data-ui-stack="true"] {
     position: relative !important;
     top: auto !important;
+    width: 100% !important;
+    min-height: 0;
     margin: 0 !important;
     filter: none;
+    transform: none !important;
   }
 }
