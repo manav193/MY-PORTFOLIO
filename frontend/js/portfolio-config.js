@@ -3,7 +3,7 @@ const portfolioConfig = Object.freeze({
   role: 'Creative Frontend Developer',
   location: 'Hyderabad, India',
   availability: 'Open to junior frontend roles and freelance projects',
-  email: 'monographicalpixel@gmail.com',
+  email: 'monographpixel@gmail.com',
   githubUrl: 'https://github.com/manav193',
   linkedinUrl: null,
   resumePath: 'Manav-Agarwal-Resume.pdf',
