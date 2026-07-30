@@ -2,6 +2,8 @@
 
 A high-performance creative developer portfolio combining case studies, interactive UI work, a browser-based ArcadeOS experience, and the NIMO portfolio assistant.
 
+**Live portfolio:** [https://manavagarwal.me](https://manavagarwal.me)
+
 ## Highlights
 
 - Recruiter-focused project presentation and case studies
