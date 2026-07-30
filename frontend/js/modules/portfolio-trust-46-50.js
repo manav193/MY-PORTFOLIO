@@ -33,7 +33,11 @@ function applyProjectTrust() {
   document.querySelectorAll('[data-project-id]').forEach(card => {
     const config = PROJECT_TRUST[card.dataset.projectId];
     if (!config) return;
-    card.dataset.maturity = config.maturity;
+
+    if (card.dataset.maturity !== config.maturity) {
+      card.dataset.maturity = config.maturity;
+    }
+
     let badge = card.querySelector('[data-project-maturity]');
     if (!badge) {
       badge = document.createElement('span');
@@ -43,7 +47,9 @@ function applyProjectTrust() {
       if (heading?.classList?.contains('project-heading-row')) heading.appendChild(badge);
       else card.querySelector('.project-content')?.prepend(badge);
     }
-    if (badge) badge.textContent = config.maturity;
+    if (badge && badge.textContent !== config.maturity) {
+      badge.textContent = config.maturity;
+    }
 
     card.querySelectorAll('a[href*="github.com"]').forEach(link => {
       const actual = normalizeRepo(link.href);
@@ -52,8 +58,9 @@ function applyProjectTrust() {
         link.remove();
         return;
       }
-      link.href = expected;
-      link.setAttribute('aria-label', `Open exact ${card.querySelector('h3')?.textContent?.trim() || 'project'} repository on GitHub`);
+      if (link.href !== `${expected}/` && link.href !== expected) link.href = expected;
+      const label = `Open exact ${card.querySelector('h3')?.textContent?.trim() || 'project'} repository on GitHub`;
+      if (link.getAttribute('aria-label') !== label) link.setAttribute('aria-label', label);
     });
   });
 }
@@ -96,9 +103,11 @@ function mountHealthDashboard() {
   work.before(section);
 
   const refresh = async () => {
-    section.querySelector('[data-refresh-health]').disabled = true;
+    const refreshButton = section.querySelector('[data-refresh-health]');
+    refreshButton.disabled = true;
     await Promise.all(SERVICES.map(async service => {
       const card = section.querySelector(`[data-health-service="${service.id}"]`);
+      if (!card) return;
       card.className = 'deployment-health-card is-checking';
       card.querySelector('[data-health-state]').textContent = 'Checking latest endpoint…';
       const result = await probe(service);
@@ -108,7 +117,7 @@ function mountHealthDashboard() {
       card.querySelector('[data-health-state]').textContent = result.ok ? 'Operational' : (result.reason || `HTTP ${result.status}`);
       card.querySelector('[data-health-meta]').textContent = `${result.latency} ms · ${result.status ? `HTTP ${result.status}` : 'No response'}`;
     }));
-    section.querySelector('[data-refresh-health]').disabled = false;
+    refreshButton.disabled = false;
     section.dataset.checkedAt = new Date().toISOString();
   };
 
@@ -120,5 +129,17 @@ export function initPortfolioTrust4650() {
   applyProjectTrust();
   mountHealthDashboard();
   const work = document.querySelector('#work');
-  if (work) new MutationObserver(applyProjectTrust).observe(work, { childList: true, subtree: true });
+  if (!work) return;
+
+  let scheduled = false;
+  const scheduleTrustRefresh = () => {
+    if (scheduled) return;
+    scheduled = true;
+    requestAnimationFrame(() => {
+      scheduled = false;
+      applyProjectTrust();
+    });
+  };
+
+  new MutationObserver(scheduleTrustRefresh).observe(work, { childList: true, subtree: true });
 }
