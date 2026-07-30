@@ -79,13 +79,65 @@ proofStyle.href = "/assets/case-studies/product-proof-gallery.css";
 document.head.appendChild(proofStyle);
 initProductProofGallery();
 
-if (!caseStudy) {
-  ["velora-bites", "nintendo", "nike"].forEach((id, index) => {
-    const card = document.querySelector(`[data-project-id="${id}"]`);
-    if (!card) return;
-    card.dataset.uiStack = "true";
-    card.style.setProperty("--ui-stack-index", String(index));
+const UI_STACK_IDS = ["velora-bites", "nintendo", "nike"];
+
+function maintainUiProjectStack() {
+  if (caseStudy) return;
+  const showcase = document.querySelector("[data-project-showcase]");
+  if (!showcase) return;
+
+  const cards = UI_STACK_IDS
+    .map((id, index) => {
+      const card = document.querySelector(`[data-project-id="${id}"]`);
+      if (!card) return null;
+      card.dataset.uiStack = "true";
+      card.style.setProperty("--ui-stack-index", String(index));
+      return card;
+    })
+    .filter(Boolean);
+
+  if (!cards.length) return;
+
+  let stack = showcase.querySelector(":scope > .ui-project-stack");
+  if (!stack) {
+    stack = document.createElement("section");
+    stack.className = "ui-project-stack";
+    stack.dataset.uiProjectStack = "true";
+    stack.setAttribute("aria-label", "UI and interface design projects");
+  }
+
+  const firstDirectCard = cards.find(card => card.parentElement === showcase);
+  if (!stack.isConnected) {
+    if (firstDirectCard) showcase.insertBefore(stack, firstDirectCard);
+    else showcase.appendChild(stack);
+  } else if (firstDirectCard) {
+    showcase.insertBefore(stack, firstDirectCard);
+  }
+
+  cards.forEach(card => {
+    if (card.parentElement !== stack) stack.appendChild(card);
   });
+}
+
+function initUiProjectStack() {
+  if (caseStudy) return;
+  const showcase = document.querySelector("[data-project-showcase]");
+  if (!showcase) return;
+
+  let scheduled = false;
+  const schedule = () => {
+    if (scheduled) return;
+    scheduled = true;
+    requestAnimationFrame(() => {
+      scheduled = false;
+      maintainUiProjectStack();
+    });
+  };
+
+  maintainUiProjectStack();
+  const observer = new MutationObserver(schedule);
+  observer.observe(showcase, { childList: true, subtree: false });
+  window.addEventListener("resize", schedule, { passive: true });
 }
 
 const flagshipTheme = document.body.dataset.projectTheme;
@@ -111,6 +163,7 @@ initNimo();
 initNimoExperienceUpgrades();
 initNimoArcade2630();
 initFlagshipExperiences();
+initUiProjectStack();
 initRuntimeFixes();
 
 if (!caseStudy) {
