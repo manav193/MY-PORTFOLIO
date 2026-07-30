@@ -13,7 +13,7 @@ export default async function handler(req, res) {
   }
 
   const { name = '', email = '', message = '', website = '' } = req.body || {};
-  if (website) return json(res, 200, { ok: true }); // honeypot
+  if (website) return json(res, 200, { ok: true });
 
   const safeName = String(name).trim().slice(0, 100);
   const safeEmail = String(email).trim().slice(0, 160);
@@ -24,7 +24,7 @@ export default async function handler(req, res) {
   }
 
   const apiKey = process.env.RESEND_API_KEY;
-  const destination = process.env.CONTACT_EMAIL || 'monographicalpixel@gmail.com';
+  const destination = process.env.CONTACT_EMAIL || 'monographpixel@gmail.com';
   const from = process.env.CONTACT_FROM || 'Portfolio Contact <onboarding@resend.dev>';
   if (!apiKey) {
     return json(res, 503, { ok: false, error: 'Email delivery is not configured yet.', fallbackEmail: destination });
