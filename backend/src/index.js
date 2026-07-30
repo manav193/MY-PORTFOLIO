@@ -5,7 +5,8 @@ const DEFAULT_ALLOWED_ORIGINS = [
   'http://localhost:5500',
   'http://127.0.0.1:5500',
   'http://localhost:4173',
-  'https://my-portfolio-mu-jade-52.vercel.app'
+  'https://manavagarwal.me',
+  'https://www.manavagarwal.me'
 ];
 
 function getCorsInfo(request, env = {}) {
