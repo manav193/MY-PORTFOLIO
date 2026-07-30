@@ -1,5 +1,5 @@
 const PROJECT_TRUST = {
-  'arcade-os': { maturity: 'Interactive Prototype', repo: '' },
+  'arcade-os': { maturity: 'Interactive Prototype', repo: 'https://github.com/manav193/MY-PORTFOLIO' },
   nimo: { maturity: 'Live Product', repo: 'https://github.com/manav193/NIMO-CORE' },
   toolverse: { maturity: 'Live Product', repo: 'https://github.com/manav193/ToolVerse' },
   'shift-zero': { maturity: 'Interactive Prototype', repo: 'https://github.com/manav193/SHIFT-ZERO' },
@@ -34,9 +34,7 @@ function applyProjectTrust() {
     const config = PROJECT_TRUST[card.dataset.projectId];
     if (!config) return;
 
-    if (card.dataset.maturity !== config.maturity) {
-      card.dataset.maturity = config.maturity;
-    }
+    if (card.dataset.maturity !== config.maturity) card.dataset.maturity = config.maturity;
 
     let badge = card.querySelector('[data-project-maturity]');
     if (!badge) {
@@ -47,9 +45,7 @@ function applyProjectTrust() {
       if (heading?.classList?.contains('project-heading-row')) heading.appendChild(badge);
       else card.querySelector('.project-content')?.prepend(badge);
     }
-    if (badge && badge.textContent !== config.maturity) {
-      badge.textContent = config.maturity;
-    }
+    if (badge && badge.textContent !== config.maturity) badge.textContent = config.maturity;
 
     card.querySelectorAll('a[href*="github.com"]').forEach(link => {
       const actual = normalizeRepo(link.href);
@@ -71,25 +67,17 @@ async function probe(service) {
   const timer = setTimeout(() => controller.abort(), 7000);
   try {
     const response = await fetch(service.url(), {
-      method: 'GET',
-      cache: 'no-store',
-      signal: controller.signal,
+      method: 'GET', cache: 'no-store', signal: controller.signal,
       headers: { Accept: service.kind === 'worker' ? 'application/json' : 'text/html,application/xhtml+xml' }
     });
     return { ok: response.ok, status: response.status, latency: Math.round(performance.now() - started) };
   } catch (error) {
     return { ok: false, status: 0, latency: Math.round(performance.now() - started), reason: error?.name === 'AbortError' ? 'Timed out' : 'Unreachable' };
-  } finally {
-    clearTimeout(timer);
-  }
+  } finally { clearTimeout(timer); }
 }
 
 function healthMarkup(service) {
-  return `<article class="deployment-health-card is-checking" data-health-service="${service.id}">
-    <div><span class="deployment-health-dot" aria-hidden="true"></span><strong>${service.name}</strong></div>
-    <p data-health-state>Checking latest endpoint…</p>
-    <small data-health-meta>Live browser probe</small>
-  </article>`;
+  return `<article class="deployment-health-card is-checking" data-health-service="${service.id}"><div><span class="deployment-health-dot" aria-hidden="true"></span><strong>${service.name}</strong></div><p data-health-state>Checking latest endpoint…</p><small data-health-meta>Live browser probe</small></article>`;
 }
 
 function mountHealthDashboard() {
@@ -130,16 +118,11 @@ export function initPortfolioTrust4650() {
   mountHealthDashboard();
   const work = document.querySelector('#work');
   if (!work) return;
-
   let scheduled = false;
   const scheduleTrustRefresh = () => {
     if (scheduled) return;
     scheduled = true;
-    requestAnimationFrame(() => {
-      scheduled = false;
-      applyProjectTrust();
-    });
+    requestAnimationFrame(() => { scheduled = false; applyProjectTrust(); });
   };
-
   new MutationObserver(scheduleTrustRefresh).observe(work, { childList: true, subtree: true });
 }
