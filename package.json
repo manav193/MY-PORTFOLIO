@@ -14,8 +14,10 @@
     "test:production": "playwright test tests/final-production-qa.spec.js --config=playwright.production.config.js",
     "qa:links": "node scripts/link-checker.mjs",
     "qa:budget": "node scripts/performance-budget.mjs",
+    "qa:dom": "node scripts/verify-dom-contracts.mjs",
+    "qa:deployment": "node scripts/check-latest-deployment.mjs",
     "qa:engineering": "playwright test tests/engineering-qa.spec.js",
-    "qa:all": "npm run build && npm run qa:links && npm run qa:budget && npm run qa:engineering"
+    "qa:all": "npm run build && npm run qa:dom && npm run qa:links && npm run qa:budget && npm run qa:engineering"
   },
   "dependencies": {
     "clean-css": "^5.3.3",
