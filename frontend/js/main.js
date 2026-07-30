@@ -11,6 +11,7 @@ import { initSectionProgressRail } from "./modules/section-progress-rail.js";
 import { initNimo } from "./modules/nimo.js";
 import { initNimoExperienceUpgrades } from "./modules/nimo-experience-upgrades.js";
 import { initNimoArcade2630 } from "./modules/nimo-arcade-26-30.js";
+import { initPortfolio3135 } from "./modules/portfolio-31-35.js";
 import { initRuntimeFixes } from "./modules/runtime-fixes.js";
 import { initArcadeCinematicScene } from "./modules/arcade-cinematic-scene.js";
 import { initArcadeHardwareInputFixes } from "./modules/arcade-hardware-input-fixes.js";
@@ -45,6 +46,12 @@ uiStackStyle.rel = "stylesheet";
 uiStackStyle.href = "/assets/case-studies/ui-project-stack.css";
 uiStackStyle.dataset.uiProjectStackStyles = "true";
 document.head.appendChild(uiStackStyle);
+
+const portfolio3135Style = document.createElement("link");
+portfolio3135Style.rel = "stylesheet";
+portfolio3135Style.href = "/assets/case-studies/portfolio-31-35.css";
+portfolio3135Style.dataset.portfolio3135Styles = "true";
+document.head.appendChild(portfolio3135Style);
 
 window.ArcadeExperience = ExperienceController;
 window.ArcadeModuleLoader = ArcadeModuleLoader;
@@ -162,6 +169,7 @@ initNimoExperienceUpgrades();
 initNimoArcade2630();
 initFlagshipExperiences();
 initUiProjectStack();
+initPortfolio3135();
 initRuntimeFixes();
 
 if (!caseStudy) {
