@@ -1,4 +1,23 @@
+import { initFinalTrust5154 } from "./final-trust-51-54.js";
+
+let finalLayerInitialized = false;
+
+function initFinalLayer() {
+  if (finalLayerInitialized) return;
+  finalLayerInitialized = true;
+  if (!document.querySelector('[data-final-trust-styles]')) {
+    const style = document.createElement('link');
+    style.rel = 'stylesheet';
+    style.href = '/assets/case-studies/final-trust-51-54.css';
+    style.dataset.finalTrustStyles = 'true';
+    document.head.appendChild(style);
+  }
+  initFinalTrust5154();
+}
+
 export function initContactForm() {
+  initFinalLayer();
+
   const form = document.querySelector("[data-contact-form]");
   const status = document.querySelector("[data-form-status]");
   if (!form || !status) return;
@@ -10,6 +29,7 @@ export function initContactForm() {
     status.textContent = message;
     status.dataset.statusTone = tone;
     status.style.color = tone === "error" ? "#ffb4c8" : tone === "success" ? "#8ef0c5" : "var(--color-accent)";
+    window.PortfolioA11y?.announce(message);
   };
 
   const openEmailFallback = (data) => {
