@@ -18,7 +18,6 @@ import { initPublicProjectCatalog } from "./modules/public-project-catalog.js";
 import { initProjectLaunch } from "./modules/project-launches.js";
 import { ArcadeEnvironmentService } from "./modules/arcade-environment-service.js";
 import { Arcade3DPlanetEngine } from "./modules/arcade-3d-planet-engine.js";
-import ArcadeTransitions from "./arcade-transitions.js";
 import { ArcadeModuleLoader } from "./arcade-module-loader.js";
 import { ArcadeOS } from "./arcade-os.js";
 import { ArcadeRegistry, registerAllArcadeApps } from "./arcade-apps.js";
@@ -64,7 +63,6 @@ if (!caseStudy) {
   ArcadeDeveloperMode.init();
   ArcadeEnvironmentService.init();
   Arcade3DPlanetEngine.init();
-  ArcadeTransitions.init();
   initOS();
 }
 
