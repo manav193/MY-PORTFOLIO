@@ -9,6 +9,7 @@
     "preview": "npx vite preview --port 4173",
     "verify": "playwright test tests/global-shell-regression.spec.js",
     "test:arcade": "playwright test tests/arcade-regression.spec.js",
+    "test:arcade-bridge": "playwright test tests/arcade-standalone-bridge.spec.js",
     "test:experience": "playwright test tests/experience-audio.spec.js",
     "test:developer": "playwright test tests/developer-mode.spec.js",
     "test:production": "playwright test tests/final-production-qa.spec.js --config=playwright.production.config.js",
