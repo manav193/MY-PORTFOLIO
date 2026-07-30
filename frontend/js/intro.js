@@ -1,19 +1,16 @@
 /**
- * CINEMATIC 3D CABINET INTRO (STATE FIX)
- * Pure scroll-driven mechanics. No artificial state locks.
+ * CINEMATIC 3D CABINET INTRO
+ * Scroll-driven, defensive, and safe across page lifecycle transitions.
  */
 
-(function() {
+(function () {
   const introSequence = document.getElementById('intro-sequence');
   if (!introSequence) return;
 
-  // 1. FORCE SCROLL RESTORATION TO TOP
-  // This prevents the browser from jumping past the intro on refresh.
-  if (history.scrollRestoration) {
+  if ('scrollRestoration' in history) {
     history.scrollRestoration = 'manual';
   }
 
-  // 2. ACCESSIBILITY OVERRIDE
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (prefersReducedMotion) {
     document.body.classList.add('intro-skipped');
@@ -22,77 +19,102 @@
 
   const chassis = document.querySelector('.cabinet-chassis');
   const cabVolume = document.querySelector('.cab-3d-volume');
+
+  // The intro markup may be omitted or replaced on non-home builds. Never let
+  // a missing cabinet node crash the rest of the portfolio boot sequence.
+  if (!chassis) {
+    document.body.classList.add('intro-skipped');
+    console.warn('[Intro] Cabinet chassis missing; intro safely skipped.');
+    return;
+  }
+
   let rAF = null;
-  
-  // Interactive Hardware Nodes
+  let destroyed = false;
+
   const glassReflect = document.querySelector('.cab-glass-reflection');
   const joyBall = document.querySelector('.cab-joy-ball');
   const speculars = document.querySelectorAll('.cab-btn-specular, .cab-joy-specular');
 
-  // Performance Monitoring
   let frameCount = 0;
   let lastTime = performance.now();
   let isLowPerf = false;
 
-  // 3D Rotation State
   let isDragging = false;
-  let startX = 0, startY = 0;
-  let rotX = 0, rotY = 0;
-  let targetRotX = 0, targetRotY = 0;
-  let velX = 0, velY = 0;
-  let hasBootedOS = false;
-  let currentProgress = 0; // SINGLE SOURCE OF TRUTH
-  let osVisible = false;   // Track OS visibility for hysteresis
-  
-  // Hysteresis thresholds for OS lifecycle
-  const OS_CLOSE_THRESHOLD = 0.55;   // Below this: suspend OS, destroy active apps
-  const OS_HIDE_THRESHOLD = 0.25;    // Below this: hide OS layer entirely
-  const OS_REOPEN_THRESHOLD = 0.70;  // Above this: allow OS to reopen
+  let activePointerId = null;
+  let startX = 0;
+  let startY = 0;
+  let rotX = 0;
+  let rotY = 0;
+  let targetRotX = 0;
+  let targetRotY = 0;
+  let currentProgress = 0;
 
-  if (chassis) {
-    chassis.addEventListener('pointerdown', (e) => {
-      // Only allow drag if cabinet is in scaled/compact state
-      if (!chassis.classList.contains('is-scaled')) return;
-      // Do not capture drag if user is clicking inside interactive areas (screen, control deck, hatch, return, marquee, power, serial)
-      if (e.target.closest('.screen-2d-anchor') || e.target.closest('.cab-control-deck') || e.target.closest('.cab-bottom-details') || e.target.closest('.cab-oled-display') || e.target.closest('.cab-power-btn') || e.target.closest('.cab-marquee') || e.target.closest('.cab-power-led')) return;
-      isDragging = true;
-      startX = e.clientX;
-      startY = e.clientY;
-      chassis.setPointerCapture(e.pointerId);
-      velX = 0; 
-      velY = 0;
-      queueIntroUpdate();
-    });
+  const OS_CLOSE_THRESHOLD = 0.55;
+  const OS_REOPEN_THRESHOLD = 0.70;
 
-    chassis.addEventListener('pointermove', (e) => {
-      if (!isDragging) return;
-      
-      const deltaX = e.clientX - startX;
-      const deltaY = e.clientY - startY;
-      
-      // Map delta to rotation (reduced sensitivity)
-      targetRotY += deltaX * 0.08;
-      targetRotX -= deltaY * 0.08;
-      
-      // Strict premium limits
-      targetRotY = Math.max(-8, Math.min(8, targetRotY));
-      targetRotX = Math.max(-5, Math.min(5, targetRotX));
-      
-      startX = e.clientX;
-      startY = e.clientY;
-      queueIntroUpdate();
-    });
+  const queueIntroUpdate = () => {
+    if (destroyed || document.hidden || rAF !== null) return;
+    rAF = requestAnimationFrame(updateIntro);
+  };
 
-    const stopDrag = (e) => {
-      if (!isDragging) return;
-      isDragging = false;
-      chassis.releasePointerCapture(e.pointerId);
-      queueIntroUpdate();
-    };
+  const releasePointerSafely = (pointerId) => {
+    if (pointerId == null) return;
+    try {
+      if (chassis.hasPointerCapture?.(pointerId)) {
+        chassis.releasePointerCapture(pointerId);
+      }
+    } catch (_) {
+      // Pointer capture can already be released by the browser during
+      // navigation, visibility changes, or interrupted touch gestures.
+    }
+  };
 
-    chassis.addEventListener('pointerup', stopDrag);
-    chassis.addEventListener('pointercancel', stopDrag);
-  }
+  chassis.addEventListener('pointerdown', (event) => {
+    if (!chassis.classList.contains('is-scaled')) return;
+    if (event.target.closest('.screen-2d-anchor, .cab-control-deck, .cab-bottom-details, .cab-oled-display, .cab-power-btn, .cab-marquee, .cab-power-led')) return;
+
+    isDragging = true;
+    activePointerId = event.pointerId;
+    startX = event.clientX;
+    startY = event.clientY;
+
+    try {
+      chassis.setPointerCapture(event.pointerId);
+    } catch (_) {
+      // Some embedded/mobile browsers reject capture during lifecycle changes.
+    }
+
+    queueIntroUpdate();
+  });
+
+  chassis.addEventListener('pointermove', (event) => {
+    if (!isDragging || event.pointerId !== activePointerId) return;
+
+    const deltaX = event.clientX - startX;
+    const deltaY = event.clientY - startY;
+
+    targetRotY = Math.max(-8, Math.min(8, targetRotY + deltaX * 0.08));
+    targetRotX = Math.max(-5, Math.min(5, targetRotX - deltaY * 0.08));
+
+    startX = event.clientX;
+    startY = event.clientY;
+    queueIntroUpdate();
+  });
+
+  const stopDrag = (event) => {
+    if (!isDragging) return;
+    releasePointerSafely(event.pointerId ?? activePointerId);
+    isDragging = false;
+    activePointerId = null;
+    queueIntroUpdate();
+  };
+
+  chassis.addEventListener('pointerup', stopDrag);
+  chassis.addEventListener('pointercancel', stopDrag);
+  chassis.addEventListener('lostpointercapture', () => {
+    isDragging = false;
+    activePointerId = null;
+  });
 
   document.querySelectorAll('[data-intro-action]').forEach((button) => {
     button.addEventListener('click', () => {
@@ -109,129 +131,101 @@
     });
   });
 
-  const queueIntroUpdate = () => {
-    if (rAF === null && !document.hidden) rAF = requestAnimationFrame(updateIntro);
-  };
-
-  // 3. PURE SCRUBBABLE SCROLL MAPPING
-  const updateIntro = (time) => {
+  function updateIntro(time) {
     rAF = null;
-    // Monitor FPS
-    frameCount++;
+    if (destroyed || !chassis.isConnected || !introSequence.isConnected) return;
+
+    frameCount += 1;
     if (frameCount % 10 === 0 && !isLowPerf) {
       const delta = time - lastTime;
-      if (delta > 300) { 
+      if (Number.isFinite(delta) && delta > 300) {
         chassis.style.boxShadow = 'none';
         isLowPerf = true;
       }
       lastTime = time;
     }
 
-    const scrollY = window.scrollY;
-    
-    // Skip heavy DOM updates and restore PORTFOLIO state when cabinet is scrolled completely off-screen into portfolio content below
     const introRect = introSequence.getBoundingClientRect();
     if (introRect.bottom <= 0) {
-      if (chassis.classList.contains('is-scaled')) {
-        chassis.classList.remove('is-scaled');
-      }
-      if (window.ArcadeExperience && window.ArcadeExperience.getState() !== 'PORTFOLIO' && window.ArcadeExperience.getState() !== 'ARCADE_EXITING') {
-        window.ArcadeExperience.exitArcadeExperience('scroll');
+      chassis.classList.remove('is-scaled');
+      const experience = window.ArcadeExperience;
+      const state = experience?.getState?.();
+      if (experience && state !== 'PORTFOLIO' && state !== 'ARCADE_EXITING') {
+        experience.exitArcadeExperience?.('scroll');
       }
       return;
     }
-    
-    // Track height is 200vh. The sticky container takes 100vh. 
-    // We have exactly 100vh (window.innerHeight) to map our progress.
-    const maxScroll = window.innerHeight * 1.0;
-    
-    // clamp progress strictly between 0 and 1 with safety fallback
-    const rawProgress = maxScroll > 0 ? scrollY / maxScroll : 0;
-    const targetProgress = Number.isFinite(rawProgress) ? Math.min(1, Math.max(0, rawProgress)) : 0;
-    
-    // Smooth absolute progress mapping (works dynamically in both directions)
+
+    const maxScroll = Math.max(window.innerHeight, 1);
+    const rawProgress = window.scrollY / maxScroll;
+    const targetProgress = Number.isFinite(rawProgress)
+      ? Math.min(1, Math.max(0, rawProgress))
+      : 0;
+
     currentProgress += (targetProgress - currentProgress) * 0.15;
-    
-    // SAFE SINGLE SOURCE OF TRUTH (0 to 1)
-    const safeProgress = Number.isFinite(currentProgress) ? Math.min(1, Math.max(0, currentProgress)) : 0;
-    
-    // Scale cabinet chassis when moving down track
+    if (!Number.isFinite(currentProgress)) currentProgress = targetProgress;
+
+    const safeProgress = Math.min(1, Math.max(0, currentProgress));
+
     if (safeProgress > 0.05) {
       chassis.classList.add('is-scaled');
-    } else if (window.ArcadeExperience?.getState() === 'PORTFOLIO') {
+    } else if (window.ArcadeExperience?.getState?.() === 'PORTFOLIO') {
       chassis.classList.remove('is-scaled');
     }
-    
-    // ===== OS LIFECYCLE SYNCHRONIZATION WITH HYSTERESIS =====
+
     if (targetProgress >= 0.40) {
-      window.ArcadeBootController?.prewarm();
+      window.ArcadeBootController?.prewarm?.();
     }
-    if (window.ArcadeExperience) {
-      const expState = window.ArcadeExperience.getState();
-      if (targetProgress >= OS_REOPEN_THRESHOLD && expState === 'PORTFOLIO') {
-        window.ArcadeExperience.enterArcadeExperience('scroll');
-      } else if (targetProgress <= OS_CLOSE_THRESHOLD && expState !== 'PORTFOLIO' && expState !== 'ARCADE_EXITING') {
-        window.ArcadeExperience.exitArcadeExperience('scroll');
+
+    const experience = window.ArcadeExperience;
+    if (experience?.getState) {
+      const state = experience.getState();
+      if (targetProgress >= OS_REOPEN_THRESHOLD && state === 'PORTFOLIO') {
+        experience.enterArcadeExperience?.('scroll');
+      } else if (targetProgress <= OS_CLOSE_THRESHOLD && state !== 'PORTFOLIO' && state !== 'ARCADE_EXITING') {
+        experience.exitArcadeExperience?.('scroll');
       }
     }
 
-    // Mathematical Timeline from single source of truth
-    // At full Arcade presentation state (is-scaled), cabinet renders at 100% full scale (1.0)
-    let scale = 1.0;
-    
-    let opacity = 1;
-    const rotateX = 0;
+    chassis.style.transform = 'scale(1) translateZ(0) rotateX(0deg)';
+    chassis.style.opacity = '1';
+    chassis.style.pointerEvents = 'auto';
 
-    // Apply strict pure math state safely via raw transform string
-    chassis.style.transform = `scale(${scale}) translateZ(0) rotateX(${rotateX}deg)`;
-    chassis.style.opacity = opacity;
-    
-    // Disable pointer events if invisible so the real website below is clickable
-    chassis.style.pointerEvents = opacity < 0.1 ? 'none' : 'auto';
-
-    // 4. MOUSE HARDWARE PARALLAX & 3D ROTATION (Only when scaled)
     if (safeProgress > 0.05 && !isLowPerf) {
-      
-      // Handle premium spring behavior when not dragging
       if (!isDragging) {
         targetRotY += (0 - targetRotY) * 0.08;
         targetRotX += (0 - targetRotX) * 0.08;
       }
 
-      // Smooth interpolation for fluid rendering
       rotX += (targetRotX - rotX) * 0.12;
       rotY += (targetRotY - rotY) * 0.12;
 
-      // Apply to 3D Volume
       if (cabVolume) {
         cabVolume.style.setProperty('--cab-rot-x', `${rotX}deg`);
         cabVolume.style.setProperty('--cab-rot-y', `${rotY}deg`);
       }
 
-      // Hardware parallax (keep perfectly rectangular feel while preserving internal depth)
-      const normalizedRotX = rotX / 5; // -1 to 1
-      const normalizedRotY = rotY / 8; // -1 to 1
+      const normalizedRotX = rotX / 5;
+      const normalizedRotY = rotY / 8;
 
-      // Glass sweeps across screen based on Y rotation
       if (glassReflect) {
         glassReflect.style.transform = `translateX(${normalizedRotY * -15}%)`;
-        glassReflect.style.opacity = (1 - Math.abs(normalizedRotY * 0.5)) * 0.15;
+        glassReflect.style.opacity = String((1 - Math.abs(normalizedRotY * 0.5)) * 0.15);
       }
 
-      // Joystick subtle lean
       if (joyBall) {
         joyBall.style.transform = `translate(${normalizedRotY * 3}px, ${normalizedRotX * 3}px)`;
       }
 
-      // Specular highlights shift on convex buttons
-      speculars.forEach(spec => {
-        spec.style.transform = `translate(calc(-50% + ${normalizedRotY * 4}px), ${normalizedRotX * 2}px)`;
+      speculars.forEach((specular) => {
+        specular.style.transform = `translate(calc(-50% + ${normalizedRotY * 4}px), ${normalizedRotX * 2}px)`;
       });
     } else {
-      // Reset rotation when returning to full screen
-      targetRotX = 0; targetRotY = 0;
+      targetRotX = 0;
+      targetRotY = 0;
       rotX += (0 - rotX) * 0.1;
       rotY += (0 - rotY) * 0.1;
+
       if (cabVolume) {
         cabVolume.style.setProperty('--cab-rot-x', `${rotX}deg`);
         cabVolume.style.setProperty('--cab-rot-y', `${rotY}deg`);
@@ -239,22 +233,31 @@
     }
 
     const progressSettled = Math.abs(targetProgress - currentProgress) < 0.001;
-    const rotationSettled = Math.abs(rotX) < 0.01 && Math.abs(rotY) < 0.01 && Math.abs(targetRotX) < 0.01 && Math.abs(targetRotY) < 0.01;
+    const rotationSettled = Math.abs(rotX) < 0.01
+      && Math.abs(rotY) < 0.01
+      && Math.abs(targetRotX) < 0.01
+      && Math.abs(targetRotY) < 0.01;
+
     if (isDragging || !progressSettled || !rotationSettled) queueIntroUpdate();
-  };
+  }
 
   window.addEventListener('scroll', queueIntroUpdate, { passive: true });
-  window.addEventListener('resize', queueIntroUpdate);
+  window.addEventListener('resize', queueIntroUpdate, { passive: true });
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden) queueIntroUpdate();
   });
 
+  // bfcache restores should refresh visual state without forcing a disruptive
+  // scroll jump during unload/navigation.
+  window.addEventListener('pageshow', queueIntroUpdate);
+  window.addEventListener('pagehide', () => {
+    destroyed = true;
+    releasePointerSafely(activePointerId);
+    if (rAF !== null) {
+      cancelAnimationFrame(rAF);
+      rAF = null;
+    }
+  }, { once: true });
+
   queueIntroUpdate();
-
-  // If user unloads the page, scroll to 0 to be double sure
-  window.addEventListener('beforeunload', () => {
-    if (rAF !== null) cancelAnimationFrame(rAF);
-    window.scrollTo(0, 0);
-  });
-
 })();
