@@ -27,6 +27,9 @@ import { GlobalPortfolioShell, isCaseStudyPage } from "./modules/global-portfoli
 import { ArcadeDeveloperMode } from "./modules/arcade-developer-mode.js";
 
 const caseStudy = isCaseStudyPage();
+if (document.body.dataset.projectTheme === "arcade-os") {
+  document.body.dataset.projectTheme = "arcade";
+}
 
 window.ArcadeExperience = ExperienceController;
 window.ArcadeModuleLoader = ArcadeModuleLoader;
@@ -61,7 +64,7 @@ initCursorSystem();
 initCommandPalette();
 
 const flagshipTheme = document.body.dataset.projectTheme;
-if (flagshipTheme === "nimo" || flagshipTheme === "arcade-os" || flagshipTheme === "arcade") {
+if (flagshipTheme === "nimo" || flagshipTheme === "arcade") {
   const style = document.createElement("link");
   style.rel = "stylesheet";
   style.href = "assets/case-studies/flagship-showcase.css";
