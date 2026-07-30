@@ -15,6 +15,7 @@ import { initArcadeHardwareInputFixes } from "./modules/arcade-hardware-input-fi
 import { initProjectEnvironment } from "./modules/project-environment.js";
 import { initPublicProjectCatalog } from "./modules/public-project-catalog.js";
 import { initProjectLaunch } from "./modules/project-launches.js";
+import { initFlagshipExperience } from "./modules/flagship-experience.js";
 import { ArcadeEnvironmentService } from "./modules/arcade-environment-service.js";
 import { Arcade3DPlanetEngine } from "./modules/arcade-3d-planet-engine.js";
 import ArcadeTransitions from "./modules/arcade-transitions.js";
@@ -81,6 +82,7 @@ if (!caseStudy) {
 }
 
 initNimo();
+initFlagshipExperience();
 initRuntimeFixes();
 
 if (!caseStudy) {
