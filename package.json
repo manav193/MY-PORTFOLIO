@@ -11,7 +11,11 @@
     "test:arcade": "playwright test tests/arcade-regression.spec.js",
     "test:experience": "playwright test tests/experience-audio.spec.js",
     "test:developer": "playwright test tests/developer-mode.spec.js",
-    "test:production": "playwright test tests/final-production-qa.spec.js --config=playwright.production.config.js"
+    "test:production": "playwright test tests/final-production-qa.spec.js --config=playwright.production.config.js",
+    "qa:links": "node scripts/link-checker.mjs",
+    "qa:budget": "node scripts/performance-budget.mjs",
+    "qa:engineering": "playwright test tests/engineering-qa.spec.js",
+    "qa:all": "npm run build && npm run qa:links && npm run qa:budget && npm run qa:engineering"
   },
   "dependencies": {
     "clean-css": "^5.3.3",
