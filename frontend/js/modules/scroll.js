@@ -1,19 +1,65 @@
 export function initReveal() {
-  const items = document.querySelectorAll("[data-reveal]");
+  const selector = [
+    '[data-reveal]',
+    '.reveal-up',
+    '.project-card',
+    '.experiment-card',
+    '.ui-stack-item'
+  ].join(',');
+  const items = [...document.querySelectorAll(selector)];
+  if (!items.length) return;
+
+  const revealImmediately = (item) => {
+    item.classList.add('is-visible');
+    item.dataset.revealState = 'visible';
+  };
+
+  if (!('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    items.forEach(revealImmediately);
+    return;
+  }
+
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("is-visible");
-        observer.unobserve(entry.target);
-      }
+      if (!entry.isIntersecting) return;
+      revealImmediately(entry.target);
+      observer.unobserve(entry.target);
     });
-  }, { threshold: 0.16, rootMargin: "0px 0px -40px" });
+  }, { threshold: 0.04, rootMargin: '0px 0px 8% 0px' });
 
-  items.forEach((item) => observer.observe(item));
+  items.forEach((item, index) => {
+    item.dataset.revealIndex = String(index);
+    const rect = item.getBoundingClientRect();
+    if (rect.top < window.innerHeight * 1.05 && rect.bottom > 0) revealImmediately(item);
+    else observer.observe(item);
+  });
+
+  // Dynamic catalog cards may be inserted after module initialization.
+  const mutationObserver = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => mutation.addedNodes.forEach((node) => {
+      if (!(node instanceof Element)) return;
+      const candidates = [node, ...node.querySelectorAll(selector)].filter((el) => el.matches?.(selector));
+      candidates.forEach((item) => {
+        if (item.dataset.revealState === 'visible') return;
+        const rect = item.getBoundingClientRect();
+        if (rect.top < window.innerHeight * 1.05 && rect.bottom > 0) revealImmediately(item);
+        else observer.observe(item);
+      });
+    }));
+  });
+  mutationObserver.observe(document.body, { childList: true, subtree: true });
+
+  // Never leave content permanently invisible because of layout shifts or restored scroll positions.
+  window.setTimeout(() => {
+    items.forEach((item) => {
+      const rect = item.getBoundingClientRect();
+      if (rect.top < window.innerHeight * 1.35 && rect.bottom > -120) revealImmediately(item);
+    });
+  }, 900);
 }
 
 export function initCounters() {
-  const counters = document.querySelectorAll("[data-count]");
+  const counters = document.querySelectorAll('[data-count]');
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (!entry.isIntersecting) return;
@@ -26,7 +72,7 @@ export function initCounters() {
 }
 
 export function initScrollProgress() {
-  const bar = document.querySelector("[data-scroll-progress]");
+  const bar = document.querySelector('[data-scroll-progress]');
   if (!bar) return;
 
   const update = () => {
@@ -36,13 +82,13 @@ export function initScrollProgress() {
   };
 
   update();
-  window.addEventListener("scroll", update, { passive: true });
-  window.addEventListener("resize", update);
+  window.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', update);
 }
 
 export function initBackToTop() {
-  document.querySelector("[data-back-top]")?.addEventListener("click", () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  document.querySelector('[data-back-top]')?.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 }
 
