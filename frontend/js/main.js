@@ -15,7 +15,6 @@ import { initArcadeHardwareInputFixes } from "./modules/arcade-hardware-input-fi
 import { initProjectEnvironment } from "./modules/project-environment.js";
 import { initPublicProjectCatalog } from "./modules/public-project-catalog.js";
 import { initProjectLaunch } from "./modules/project-launches.js";
-import { initFlagshipExperience } from "./modules/flagship-experience.js";
 import { ArcadeEnvironmentService } from "./modules/arcade-environment-service.js";
 import { Arcade3DPlanetEngine } from "./modules/arcade-3d-planet-engine.js";
 import ArcadeTransitions from "./modules/arcade-transitions.js";
@@ -26,6 +25,7 @@ import { ArcadeOutcomeScreen } from "./modules/arcade-outcome-screen.js";
 import { ExperienceController } from "./modules/experience-controller.js";
 import { GlobalPortfolioShell, isCaseStudyPage } from "./modules/global-portfolio-shell.js";
 import { ArcadeDeveloperMode } from "./modules/arcade-developer-mode.js";
+import { initFlagshipExperiences } from "./modules/flagship-experiences.js";
 
 const caseStudy = isCaseStudyPage();
 if (document.body.dataset.projectTheme === "arcade-os") {
@@ -75,14 +75,18 @@ if (flagshipTheme === "nimo" || flagshipTheme === "arcade") {
   import("../assets/case-studies/flagship-showcase.js").catch(() => {});
 }
 
-if (!caseStudy) {
+if (caseStudy) {
+  import("../assets/case-studies/story-lab.js")
+    .then(({ initStoryLab }) => initStoryLab())
+    .catch(() => {});
+} else {
   initPublicProjectCatalog();
   initSectionProgressRail();
   initDockController();
 }
 
 initNimo();
-initFlagshipExperience();
+initFlagshipExperiences();
 initRuntimeFixes();
 
 if (!caseStudy) {
