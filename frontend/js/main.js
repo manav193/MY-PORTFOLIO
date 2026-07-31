@@ -35,12 +35,31 @@ import { initBootExperience } from "./modules/boot-experience.js";
 import { initAdaptiveHost } from "./shared/adaptive/adaptive-host.js";
 
 const caseStudy = isCaseStudyPage();
+const ARCADE_DESKTOP_QUERY =
+  '(min-width: 1024px) and (hover: hover) and (pointer: fine)';
 
-// The portfolio homepage uses the shorter runtime theme id. Case studies must
-// preserve their authored data-project-theme value so flagship/Arcade runtime
-// selectors cannot mistake a content page for the live Arcade experience.
-if (!caseStudy && document.body.dataset.projectTheme === "arcade-os") {
-  document.body.dataset.projectTheme = "arcade";
+const desktopArcadeAvailable =
+  !caseStudy &&
+  typeof window.matchMedia === 'function' &&
+  window.matchMedia(ARCADE_DESKTOP_QUERY).matches;
+
+window.isDesktopArcadeAvailable = () => {
+  if (typeof window.matchMedia !== 'function') return false;
+
+  return (
+    !document.body.matches('[data-page-type="case-study"]') &&
+    window.matchMedia(ARCADE_DESKTOP_QUERY).matches
+  );
+};
+
+// Homepage uses the shorter runtime theme id.
+// Case studies must preserve their authored project theme so the Arcade/NIMO
+// runtime cannot accidentally mount on content pages.
+if (
+  !caseStudy &&
+  document.body.dataset.projectTheme === 'arcade-os'
+) {
+  document.body.dataset.projectTheme = 'arcade';
 }
 
 const qaStyle = document.createElement("link");
@@ -88,7 +107,7 @@ if (!caseStudy) initBootExperience();
 
 initTheme();
 
-if (!caseStudy) {
+if (desktopArcadeAvailable) {
   registerAllArcadeApps();
   ArcadeDeveloperMode.init();
   ArcadeEnvironmentService.init();
@@ -213,6 +232,7 @@ if (caseStudy) {
   initPortfolio3135();
   initPortfolioTrust4650();
 
+if (desktopArcadeAvailable) {
   initArcadeCinematicScene();
   initArcadeHardwareInputFixes();
   initArcadeStandaloneBridge();
@@ -227,4 +247,4 @@ initTyping();
 initMagnetic();
 initTilt();
 initParallax();
-initContactForm();
+initContactForm();}

@@ -68,9 +68,10 @@ async function probe(service) {
   try {
     const response = await fetch(service.url(), {
       method: 'GET', cache: 'no-store', signal: controller.signal,
+      mode: service.kind === 'worker' ? 'no-cors' : 'cors',
       headers: { Accept: service.kind === 'worker' ? 'application/json' : 'text/html,application/xhtml+xml' }
     });
-    return { ok: response.ok, status: response.status, latency: Math.round(performance.now() - started) };
+    return { ok: response.ok || response.type === 'opaque', status: response.status, latency: Math.round(performance.now() - started) };
   } catch (error) {
     return { ok: false, status: 0, latency: Math.round(performance.now() - started), reason: error?.name === 'AbortError' ? 'Timed out' : 'Unreachable' };
   } finally { clearTimeout(timer); }

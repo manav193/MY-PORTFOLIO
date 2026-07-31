@@ -728,6 +728,7 @@ class PixelPlumberApp {
     this.checkpointX = 30;
     this.checkpointY = 220;
     this.checkpointLives = 2;
+    this.damageGraceFrames = 0;
 
     this.createLevel();
   }
@@ -982,6 +983,7 @@ class PixelPlumberApp {
     this.checkpointX = 30;
     this.checkpointY = 220;
     this.checkpointLives = 2;
+    this.damageGraceFrames = 0;
 
     this.createLevel();
 
@@ -1008,6 +1010,7 @@ class PixelPlumberApp {
   update(step = 1) {
     const p = this.player;
     this.elapsedTime += (step / 60);
+    this.damageGraceFrames = Math.max(0, this.damageGraceFrames - step);
 
     const leftHeld = window.ArcadeInput ? (window.ArcadeInput.isDown('LEFT') || this.inputPulse.left > 0 || this.keys.left) : this.keys.left;
     const rightHeld = window.ArcadeInput ? (window.ArcadeInput.isDown('RIGHT') || this.inputPulse.right > 0 || this.keys.right) : this.keys.right;
@@ -1102,7 +1105,7 @@ class PixelPlumberApp {
           p.vy = -6.5;
           this.score += 200;
           this.audio.playGameSfx('pixelplumber', 'stomp');
-        } else {
+        } else if (this.damageGraceFrames <= 0) {
           if (this.plumberShield || hasDevModifier('pixelplumber', 'invincible')) {
             this.plumberShield = false;
             e.active = false;
@@ -1158,6 +1161,7 @@ class PixelPlumberApp {
       this.player.y = this.checkpointY;
       this.player.vx = 0;
       this.player.vy = 0;
+      this.damageGraceFrames = 90;
       this.audio.playGameSfx('pixelplumber', 'stomp');
     } else {
       this.gameOver();

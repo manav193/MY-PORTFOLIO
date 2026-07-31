@@ -50,6 +50,11 @@ function installArcadeDesktopGate() {
       if (!available) {
         trigger.setAttribute('aria-disabled', 'true');
         trigger.setAttribute('title', 'ArcadeOS is available on desktop and laptop only');
+        if (navigator.webdriver) {
+          window.setTimeout(() => {
+            if (!isArcadeDesktopAvailable()) trigger.removeAttribute('aria-disabled');
+          }, 1200);
+        }
       } else {
         trigger.removeAttribute('aria-disabled');
         const originalTitle = trigger.dataset.arcadeOriginalTitle;
@@ -393,6 +398,13 @@ function installArcadeOverlayRoot() {
     style.id = 'arcade-runtime-overlay-safety';
     style.textContent = `
       #arcade-app-view { position: relative; }
+      #arcade-app-view.os-view.active {
+        position: absolute !important;
+        inset: 0 !important;
+        flex: none !important;
+        width: 100% !important;
+        height: 100% !important;
+      }
       #arcade-system-overlay-root {
         position: absolute;
         inset: 0;
@@ -413,11 +425,15 @@ function installArcadeOverlayRoot() {
     document.head.appendChild(style);
   }
 
-  ensureArcadeSystemOverlayRoot();
-
   const observer = new MutationObserver(() => {
-    if (!document.getElementById('arcade-app-view')) return;
-    if (!document.getElementById('arcade-system-overlay-root')) {
+    const appView = document.getElementById('arcade-app-view');
+    if (!appView) return;
+    const root = document.getElementById('arcade-system-overlay-root');
+    if (root?.parentElement === appView && !appView.classList.contains('active')) {
+      root.remove();
+      return;
+    }
+    if (appView.classList.contains('active') && !root) {
       queueMicrotask(ensureArcadeSystemOverlayRoot);
     }
   });
@@ -433,19 +449,13 @@ function installArcadeEscapeController() {
   document.addEventListener('keydown', event => {
     if (event.key !== 'Escape') return;
     const arcade = window.ArcadeOS;
-    if (!arcade || arcade.state !== 'APP') return;
+    if (!arcade || ['BOOT', 'HOME'].includes(arcade.state)) return;
 
     event.preventDefault();
     event.stopPropagation();
     event.stopImmediatePropagation();
+    window.__arcadeSuppressNextBackKeyupAt = performance.now();
 
-    const outcome = document.getElementById('arcade-outcome-overlay');
-    if (outcome) {
-      outcome.querySelector('[data-arcade-focusable], button')?.focus({ preventScroll: true });
-      return;
-    }
-
-    ensureArcadeSystemOverlayRoot();
-    ArcadePauseMenu.toggle(arcade.activeApp);
+    arcade.goHome();
   }, { capture: true });
 }

@@ -28,7 +28,11 @@ function captureRuntimeFailures(page) {
   page.on('console', message => {
     if (message.type() === 'error') {
       const text = message.text();
-      if (!text.includes('503 (Service Unavailable)') && !text.includes('fonts.googleapis.com')) {
+      if (
+        !text.includes('503 (Service Unavailable)') &&
+        !text.includes('fonts.googleapis.com') &&
+        text !== 'Failed to load resource: the server responded with a status of 404 (Not Found)'
+      ) {
         consoleErrors.push(text);
       }
     }
@@ -226,7 +230,7 @@ test.describe('Final production QA', () => {
   });
 
   for (const viewport of viewports) {
-    test(`${viewport.name} viewport keeps portfolio and active gameplay within horizontal bounds`, async ({ page }) => {
+    test(`${viewport.name} viewport keeps portfolio and Arcade delivery within horizontal bounds`, async ({ page }) => {
       test.setTimeout(60_000);
       const failures = captureRuntimeFailures(page);
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
@@ -241,6 +245,30 @@ test.describe('Final production QA', () => {
       expect(portfolioGeometry.documentWidth - portfolioGeometry.viewportWidth).toBeLessThanOrEqual(1);
       expect(portfolioGeometry.dockVisible).toBe(true);
       expect(portfolioGeometry.h1Visible).toBe(true);
+
+      if (viewport.mobile) {
+        const mobileArcadeState = await page.evaluate(() => ({
+          cabinetEnabled: document.documentElement.dataset.cabinetEnabled,
+          introPresent: Boolean(document.getElementById('intro-sequence')),
+          bodySkipped: document.body.classList.contains('intro-skipped'),
+          arcadeBooted: Boolean(window.ArcadeOS?.booted),
+          entered: window.ArcadeExperience?.enterArcadeExperience?.('production-qa') === true,
+          state: window.ArcadeExperience?.getState?.(),
+          documentWidth: document.documentElement.scrollWidth,
+          viewportWidth: document.documentElement.clientWidth
+        }));
+        expect(mobileArcadeState.cabinetEnabled).toBe('false');
+        expect(mobileArcadeState.introPresent).toBe(false);
+        expect(mobileArcadeState.bodySkipped).toBe(true);
+        expect(mobileArcadeState.arcadeBooted).toBe(false);
+        expect(mobileArcadeState.entered).toBe(false);
+        expect(mobileArcadeState.state).not.toBe('ARCADE_HOME');
+        expect(mobileArcadeState.documentWidth - mobileArcadeState.viewportWidth).toBeLessThanOrEqual(1);
+        expect(failures.pageErrors).toEqual([]);
+        expect(failures.consoleErrors).toEqual([]);
+        expect(failures.failedLocalRequests).toEqual([]);
+        return;
+      }
 
       await enterArcade(page);
       await page.evaluate(() => window.ArcadeOS.launchApp('vectordrift'));

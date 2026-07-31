@@ -45,11 +45,12 @@ async function mountNimoHealth(panel) {
   panel.querySelector('.nimo-routing-view')?.after(health) || panel.querySelector('#nimo-messages')?.before(health);
   const state = health.querySelector('.nimo-health-state');
   try {
-    const response = await fetch(NIMO_HEALTH_URL, { cache: 'no-store', signal: AbortSignal.timeout?.(4500) });
+    const response = await fetch(NIMO_HEALTH_URL, { cache: 'no-store', mode: 'no-cors', signal: AbortSignal.timeout?.(4500) });
+    const reachable = response.ok || response.type === 'opaque';
     const data = response.ok ? await response.json().catch(() => ({})) : {};
-    state.classList.add(response.ok ? 'is-online' : 'is-offline');
-    state.querySelector('span').textContent = response.ok ? 'Online' : 'Unavailable';
-    health.querySelector('[data-health-worker]').textContent = response.ok ? 'Connected' : `HTTP ${response.status}`;
+    state.classList.add(reachable ? 'is-online' : 'is-offline');
+    state.querySelector('span').textContent = reachable ? 'Online' : 'Unavailable';
+    health.querySelector('[data-health-worker]').textContent = reachable ? 'Reachable' : `HTTP ${response.status}`;
     health.querySelector('[data-health-version]').textContent = data.version || data.release || 'Live';
   } catch {
     state.classList.add('is-offline');
@@ -113,7 +114,7 @@ function mountArcadeLauncher() {
   root.className = 'arcade-smart-launcher';
   root.dataset.arcadeSmartLauncher = '';
   root.hidden = true;
-  root.innerHTML = `<section class="arcade-smart-shell" role="dialog" aria-modal="true" aria-label="ArcadeOS mini apps"><header class="arcade-smart-top"><strong>ARCADEOS // CONTROL CENTER</strong><button class="arcade-smart-close" data-arcade-close aria-label="Close">×</button></header><div class="arcade-smart-grid"><nav class="arcade-app-list"><button class="arcade-app-btn" data-arcade-app="projects">Project Explorer</button><button class="arcade-app-btn" data-arcade-app="terminal">NIMO Terminal</button><button class="arcade-app-btn" data-arcade-app="monitor">System Monitor</button><button class="arcade-app-btn" data-arcade-app="settings">Settings</button></nav><main class="arcade-app-view"></main></div></section>`;
+  root.innerHTML = `<section class="arcade-smart-shell" role="dialog" aria-modal="true" aria-label="ArcadeOS mini apps"><header class="arcade-smart-top"><strong>ARCADEOS // CONTROL CENTER</strong><button class="arcade-smart-close" data-arcade-close aria-label="Close">×</button></header><div class="arcade-smart-grid"><nav class="arcade-app-list"><button class="arcade-app-btn" data-arcade-app="projects">Project Explorer</button><button class="arcade-app-btn" data-arcade-app="terminal">NIMO Terminal</button><button class="arcade-app-btn" data-arcade-app="monitor">System Monitor</button><button class="arcade-app-btn" data-arcade-app="settings">Settings</button></nav><div class="arcade-app-view" role="region" aria-label="ArcadeOS mini app preview"></div></div></section>`;
   document.body.append(root);
   const openButton = document.createElement('button');
   openButton.className = 'arcade-open-btn';

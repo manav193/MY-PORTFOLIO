@@ -72,7 +72,9 @@ export function initArcadeCinematicScene() {
       #arcade-app-view.os-view.active {
         display: flex !important;
         flex-direction: column !important;
-        flex: 1 1 0% !important;
+        position: absolute !important;
+        inset: 0 !important;
+        flex: none !important;
         width: 100% !important;
         height: 100% !important;
         min-height: 0 !important;

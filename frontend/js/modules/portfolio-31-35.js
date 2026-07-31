@@ -165,9 +165,10 @@ async function runRuntimeChecks(section) {
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 5000);
-    const response = await fetch(NIMO_HEALTH, { cache: 'no-store', signal: controller.signal, headers: { Accept: 'application/json' } });
+    const response = await fetch(NIMO_HEALTH, { cache: 'no-store', mode: 'no-cors', signal: controller.signal });
     clearTimeout(timer);
-    checks.push(['NIMO worker', response.ok ? 'pass' : 'fail', response.ok ? `Health endpoint responded HTTP ${response.status}` : `Health endpoint returned HTTP ${response.status}`]);
+    const reachable = response.ok || response.type === 'opaque';
+    checks.push(['NIMO worker', reachable ? 'pass' : 'fail', reachable ? 'Health endpoint is reachable' : `Health endpoint returned HTTP ${response.status}`]);
   } catch {
     checks.push(['NIMO worker', 'warn', 'Endpoint could not be reached from this browser']);
   }

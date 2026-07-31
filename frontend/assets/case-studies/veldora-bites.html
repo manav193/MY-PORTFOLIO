@@ -117,6 +117,36 @@
   </main>
 
   <footer class="project-footer"><a href="../../index.html#work">Selected work</a><span>Manav Agarwal - Hyderabad, India</span></footer>
+  <script>
+    (() => {
+      const images = Array.from(document.querySelectorAll('img[data-fullres-src]'));
+      const loadImage = image => {
+        if (!image || image.dataset.fullresState === 'loaded' || image.dataset.fullresState === 'loading') return;
+        image.dataset.fullresState = 'loading';
+        image.addEventListener('load', () => { image.dataset.fullresState = 'loaded'; }, { once: true });
+        image.addEventListener('error', () => { image.dataset.fullresState = 'error'; }, { once: true });
+        image.src = image.dataset.fullresSrc;
+        if (image.dataset.fullresAlt) image.alt = image.dataset.fullresAlt;
+      };
+
+      images.forEach(image => { image.dataset.fullresState = 'pending'; });
+
+      if (!('IntersectionObserver' in window)) {
+        images.forEach(loadImage);
+        return;
+      }
+
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          observer.unobserve(entry.target);
+          loadImage(entry.target);
+        });
+      }, { rootMargin: '160px 0px', threshold: 0.01 });
+
+      images.forEach(image => observer.observe(image));
+    })();
+  </script>
   <script type="module" src="../../js/main.js"></script>
 </body>
 </html>

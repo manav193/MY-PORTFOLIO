@@ -1018,7 +1018,26 @@ const ArcadeInput = {
       return true;
     };
 
-    document.addEventListener('keyup', (e) => updateKeyState(e, false));
+    let lastBackKeydownAt = 0;
+    document.addEventListener('keyup', (e) => {
+      updateKeyState(e, false);
+      if ((e.key === 'Escape' || e.key === 'Backspace') && performance.now() - lastBackKeydownAt > 80) {
+        const suppressBackKeyupAt = window.__arcadeSuppressNextBackKeyupAt || 0;
+        if (performance.now() - suppressBackKeyupAt < 250) {
+          window.__arcadeSuppressNextBackKeyupAt = 0;
+          return;
+        }
+        const active = document.activeElement;
+        const isInput = active && (
+          active.tagName === 'INPUT' ||
+          active.tagName === 'TEXTAREA' ||
+          active.tagName === 'SELECT' ||
+          active.hasAttribute('contenteditable') ||
+          active.getAttribute('data-arcade-control') === 'text'
+        );
+        if (!isInput) ArcadeEventBus.emit('ARCADE_BACK');
+      }
+    });
     document.addEventListener('keydown', (e) => {
       if (!updateKeyState(e, true)) return;
 
@@ -1057,6 +1076,7 @@ const ArcadeInput = {
         ArcadeEventBus.emit('ARCADE_CONFIRM');
       }
       if (e.key === 'Escape') {
+        lastBackKeydownAt = performance.now();
         const smallBtns = document.querySelectorAll('.cab-btn-small');
         if (smallBtns.length >= 2) smallBtns[0].classList.add('is-pressed');
         ArcadeEventBus.emit('ARCADE_BACK');

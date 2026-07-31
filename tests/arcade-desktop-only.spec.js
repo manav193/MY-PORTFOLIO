@@ -5,7 +5,7 @@ test.describe('ArcadeOS desktop-only delivery', () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/');
     const trigger = page.locator('[data-enter-arcade]').first();
-    await expect(trigger).toHaveAttribute('aria-disabled', 'true');
+    await expect(trigger).toHaveClass(/arcade-desktop-disabled/);
     await trigger.click();
     await expect(page.locator('[data-arcade-desktop-toast]')).toContainText('desktop-only');
     await expect(page.locator('body')).not.toHaveClass(/arcade-active/);

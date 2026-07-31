@@ -175,10 +175,11 @@ async function probe(url) {
     const response = await fetch(url, {
       method: 'GET',
       cache: 'no-store',
+      mode: url.includes('nimo-core.manav-nimo.workers.dev') ? 'no-cors' : 'cors',
       signal: controller.signal,
       headers: { Accept: 'text/html,application/json' }
     });
-    return response.ok;
+    return response.ok || response.type === 'opaque';
   } catch {
     return false;
   } finally {

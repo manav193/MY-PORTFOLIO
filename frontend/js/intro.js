@@ -4,24 +4,44 @@
  */
 
 (function () {
+  const DESKTOP_CABINET_QUERY = '(min-width: 1024px) and (hover: hover) and (pointer: fine)';
+  const isDesktopCabinetAvailable = () => {
+    if (typeof window.matchMedia !== 'function') return false;
+    return window.matchMedia(DESKTOP_CABINET_QUERY).matches;
+  };
+
   const introSequence = document.getElementById('intro-sequence');
   if (!introSequence) return;
 
-  const isMobile = window.matchMedia('(max-width: 767px), (hover: none) and (pointer: coarse)').matches;
-  if (isMobile) {
+  const isMobile = window.matchMedia(
+    '(max-width: 767px), (hover: none) and (pointer: coarse)'
+  ).matches;
+
+  if (isMobile || !isDesktopCabinetAvailable()) {
+    document.documentElement.setAttribute('data-cabinet-enabled', 'false');
     document.body.classList.add('intro-skipped', 'arcade-mobile-disabled');
+
     introSequence.remove();
     document.getElementById('machine-bg')?.remove();
     document.querySelector('.living-ambient-light')?.remove();
-    document.documentElement.style.setProperty('--cabinet-mobile-disabled', '1');
-    document.querySelectorAll('.reveal-up, .reveal-text, .reveal-scale').forEach((element) => {
-      element.classList.add('is-visible', 'visible');
-      element.style.opacity = '1';
-      element.style.transform = 'none';
-    });
+
+    document.documentElement.style.setProperty(
+      '--cabinet-mobile-disabled',
+      '1'
+    );
+
+    document
+      .querySelectorAll('.reveal-up, .reveal-text, .reveal-scale')
+      .forEach((element) => {
+        element.classList.add('is-visible', 'visible');
+        element.style.opacity = '1';
+        element.style.transform = 'none';
+      });
+
     return;
   }
 
+  document.documentElement.setAttribute('data-cabinet-enabled', 'true');
   if ('scrollRestoration' in history) {
     history.scrollRestoration = 'manual';
   }
@@ -34,6 +54,7 @@
 
   const chassis = document.querySelector('.cabinet-chassis');
   const cabVolume = document.querySelector('.cab-3d-volume');
+  const rotateButton = document.querySelector('[data-cabinet-rotate]');
 
   if (!chassis) {
     document.body.classList.add('intro-skipped');
@@ -41,53 +62,40 @@
     return;
   }
 
-  const showroom = document.querySelector('.outer-center-wrapper');
-  const style = document.createElement('style');
-  style.textContent = `
-    .cabinet-rotate-control{position:absolute;right:clamp(20px,4vw,72px);top:50%;translate:0 -50%;z-index:40;display:grid;place-items:center;gap:7px;width:82px;height:82px;border:1px solid rgba(125,211,252,.5);border-radius:50%;background:linear-gradient(145deg,rgba(10,15,27,.92),rgba(24,17,44,.9));box-shadow:0 18px 50px rgba(0,0,0,.55),inset 0 0 0 4px rgba(56,189,248,.07),0 0 26px rgba(124,58,237,.2);color:#f8fafc;font:600 11px/1 Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;pointer-events:auto;transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease}
-    .cabinet-rotate-control:hover{transform:scale(1.06);border-color:#a78bfa;box-shadow:0 20px 55px rgba(0,0,0,.65),0 0 34px rgba(124,58,237,.38)}
-    .cabinet-rotate-control:focus-visible{outline:3px solid #38bdf8;outline-offset:5px}
-    .cabinet-rotate-control svg{width:27px;height:27px;display:block}
-    .cabinet-rotate-control[data-view="right"] svg{transform:rotate(22deg)}
-    .cabinet-rotate-control[data-view="left"] svg{transform:rotate(-22deg)}
-    .cabinet-chassis{max-width:min(760px,72vw);max-height:88vh;aspect-ratio:4/5}
-    .cab-3d-volume{--cab-rot-x:0deg;--cab-rot-y:0deg}
-    @media(max-width:1100px){.cabinet-rotate-control{right:18px;width:70px;height:70px}.cabinet-chassis{max-width:75vw}}
-    @media(max-width:767px),(hover:none) and (pointer:coarse){#intro-sequence,.cabinet-rotate-control,#machine-bg,.living-ambient-light{display:none!important}.system-architecture{display:block!important;visibility:visible!important;opacity:1!important}}
-  `;
-  document.head.appendChild(style);
+  const CABINET_VIEWS = [
+    { id: 'front', label: 'front view', x: 0, y: 0 },
+    { id: 'right', label: 'right three-quarter view', x: 0, y: 25 },
+    { id: 'left', label: 'left three-quarter view', x: 0, y: -25 }
+  ];
 
-  const rotateButton = document.createElement('button');
-  rotateButton.type = 'button';
-  rotateButton.className = 'cabinet-rotate-control';
-  rotateButton.dataset.view = 'front';
-  rotateButton.setAttribute('aria-label', 'Rotate arcade cabinet');
-  rotateButton.setAttribute('aria-pressed', 'false');
-  rotateButton.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7v5h-5"/><path d="M4 17v-5h5"/><path d="M6.1 9A7 7 0 0 1 18.4 6.6L20 9"/><path d="M17.9 15A7 7 0 0 1 5.6 17.4L4 15"/></svg><span>Rotate</span>';
-  showroom?.appendChild(rotateButton);
+  const cabinetState = {
+    currentView: 'front',
+    targetRotX: 0,
+    targetRotY: 0,
+    isDragging: false,
+    isMobileDisabled: false,
+    rotX: 0,
+    rotY: 0
+  };
 
   let rAF = null;
   let destroyed = false;
-
-  const glassReflect = document.querySelector('.cab-glass-reflection');
-  const joyBall = document.querySelector('.cab-joy-ball');
-  const speculars = document.querySelectorAll('.cab-btn-specular, .cab-joy-specular');
-
+  let currentProgress = 0;
   let frameCount = 0;
   let lastTime = performance.now();
   let isLowPerf = false;
 
-  let isDragging = false;
   let activePointerId = null;
   let startX = 0;
   let startY = 0;
-  let rotX = 0;
-  let rotY = 0;
-  let targetRotX = 0;
-  let targetRotY = 0;
   let manualRotY = 0;
   let currentProgress = 0;
 
+  const glassReflect = document.querySelector('.cab-glass-reflection');
+  const joyBall = document.querySelector('.cab-joy-ball');
+  const speculars = document.querySelectorAll(
+    '.cab-btn-specular, .cab-joy-specular'
+  );
   const OS_CLOSE_THRESHOLD = 0.55;
   const OS_REOPEN_THRESHOLD = 0.70;
   const views = [
@@ -102,61 +110,187 @@
     rAF = requestAnimationFrame(updateIntro);
   };
 
-  rotateButton.addEventListener('click', () => {
-    viewIndex = (viewIndex + 1) % views.length;
-    const view = views[viewIndex];
-    manualRotY = view.angle;
-    targetRotY = manualRotY;
-    targetRotX = 0;
-    rotateButton.dataset.view = view.name;
-    rotateButton.setAttribute('aria-pressed', String(view.name !== 'front'));
-    rotateButton.setAttribute('aria-label', view.name === 'front' ? 'Rotate arcade cabinet' : `Cabinet ${view.name} view. Press to rotate again`);
+  rotateButton?.addEventListener('click', () => {
+    const currentIndex = CABINET_VIEWS.findIndex(
+      (view) => view.id === cabinetState.currentView
+    );
+
+    const nextView =
+      CABINET_VIEWS[(currentIndex + 1) % CABINET_VIEWS.length];
+
+    cabinetState.currentView = nextView.id;
+    cabinetState.targetRotX = nextView.x;
+    cabinetState.targetRotY = nextView.y;
+    manualRotY = nextView.y;
+
+    rotateButton.dataset.view = nextView.id;
+    rotateButton.setAttribute(
+      'aria-pressed',
+      String(nextView.id !== 'front')
+    );
+    rotateButton.setAttribute(
+      'aria-label',
+      nextView.id === 'front'
+        ? 'Rotate arcade cabinet'
+        : `Cabinet ${nextView.label}. Press to rotate again`
+    );
+
     queueIntroUpdate();
   });
 
   const releasePointerSafely = (pointerId) => {
     if (pointerId == null) return;
+
     try {
-      if (chassis.hasPointerCapture?.(pointerId)) chassis.releasePointerCapture(pointerId);
-    } catch (_) {}
+      if (chassis.hasPointerCapture?.(pointerId)) {
+        chassis.releasePointerCapture(pointerId);
+      }
+    } catch (_) {
+      // Pointer capture may already have been released.
+    }
   };
 
   chassis.addEventListener('pointerdown', (event) => {
     if (!chassis.classList.contains('is-scaled')) return;
-    if (event.target.closest('.screen-2d-anchor, .cab-control-deck, .cab-bottom-details, .cab-oled-display, .cab-power-btn, .cab-marquee, .cab-power-led, .cabinet-rotate-control')) return;
-    isDragging = true;
+
+    if (
+      event.target.closest(
+        '.screen-2d-anchor, .cab-control-deck, .cab-bottom-details, ' +
+        '.cab-oled-display, .cab-power-btn, .cab-marquee, ' +
+        '.cab-power-led, .cabinet-rotate-control'
+      )
+    ) {
+      return;
+    }
+
+    cabinetState.isDragging = true;
     activePointerId = event.pointerId;
     startX = event.clientX;
     startY = event.clientY;
-    try { chassis.setPointerCapture(event.pointerId); } catch (_) {}
+
+    try {
+      chassis.setPointerCapture(event.pointerId);
+    } catch (_) {
+      // Pointer capture is optional.
+    }
+
     queueIntroUpdate();
   });
 
   chassis.addEventListener('pointermove', (event) => {
-    if (!isDragging || event.pointerId !== activePointerId) return;
+    if (
+      !cabinetState.isDragging ||
+      event.pointerId !== activePointerId
+    ) {
+      return;
+    }
+
     const deltaX = event.clientX - startX;
     const deltaY = event.clientY - startY;
-    targetRotY = Math.max(-38, Math.min(38, targetRotY + deltaX * 0.08));
-    targetRotX = Math.max(-6, Math.min(6, targetRotX - deltaY * 0.08));
-    manualRotY = targetRotY;
+
+    cabinetState.targetRotY = Math.max(
+      -38,
+      Math.min(38, cabinetState.targetRotY + deltaX * 0.08)
+    );
+
+    cabinetState.targetRotX = Math.max(
+      -6,
+      Math.min(6, cabinetState.targetRotX - deltaY * 0.08)
+    );
+
+    manualRotY = cabinetState.targetRotY;
+    cabinetState.currentView = 'custom';
+
+    if (rotateButton) {
+      rotateButton.dataset.view = 'custom';
+      rotateButton.setAttribute('aria-pressed', 'true');
+      rotateButton.setAttribute(
+        'aria-label',
+        'Cabinet custom view. Press to rotate to the next preset view'
+      );
+    }
+
     startX = event.clientX;
     startY = event.clientY;
+
     queueIntroUpdate();
   });
 
   const stopDrag = (event) => {
-    if (!isDragging) return;
+    if (!cabinetState.isDragging) return;
+
     releasePointerSafely(event.pointerId ?? activePointerId);
-    isDragging = false;
+
+    cabinetState.isDragging = false;
     activePointerId = null;
+
     queueIntroUpdate();
   };
 
-  chassis.addEventListener('pointerup', stopDrag);
-  chassis.addEventListener('pointercancel', stopDrag);
-  chassis.addEventListener('lostpointercapture', () => {
-    isDragging = false;
-    activePointerId = null;
+  const updateHardwareHighlights = () => {
+    const normalizedRotX = cabinetState.rotX / 25;
+    const normalizedRotY = cabinetState.rotY / 25;
+
+    if (glassReflect) {
+      glassReflect.style.transform =
+        `translateX(${normalizedRotY * -15}%)`;
+
+      glassReflect.style.opacity = String(
+        Math.max(
+          0,
+          (1 - Math.abs(normalizedRotY * 0.5)) * 0.15
+        )
+      );
+    }
+
+    if (joyBall) {
+      joyBall.style.transform =
+        `translate(${normalizedRotY * 3}px, ` +
+        `${normalizedRotX * 3}px)`;
+    }
+
+    speculars.forEach((specular) => {
+      specular.style.transform =
+        `translate(calc(-50% + ${normalizedRotY * 4}px), ` +
+        `${normalizedRotX * 2}px)`;
+    });
+  };
+
+  const writeRotationVars = () => {
+    chassis.style.setProperty('--cab-rot-x', `${cabinetState.targetRotX}deg`);
+    chassis.style.setProperty('--cab-rot-y', `${cabinetState.targetRotY}deg`);
+  };
+
+  const applyCabinetView = (view, animate = true) => {
+    cabinetState.currentView = view.id;
+    cabinetState.targetRotX = view.x;
+    cabinetState.targetRotY = view.y;
+    chassis.dataset.cabinetView = view.id;
+
+    if (rotateButton) {
+      rotateButton.setAttribute('aria-label', `Rotate arcade cabinet view, currently ${view.label}`);
+      rotateButton.dataset.cabinetView = view.id;
+    }
+
+    cabinetState.rotX = view.x;
+    cabinetState.rotY = view.y;
+    writeRotationVars();
+    updateHardwareHighlights();
+
+    if (animate) queueIntroUpdate();
+  };
+
+  rotateButton?.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const currentIndex = CABINET_VIEWS.findIndex((view) => view.id === cabinetState.currentView);
+    const nextView = CABINET_VIEWS[(currentIndex + 1) % CABINET_VIEWS.length];
+    applyCabinetView(nextView);
+  });
+
+  chassis.addEventListener('dblclick', (event) => {
+    if (event.target.closest('.screen-2d-anchor, .cab-control-deck, .cab-bottom-details, .cab-oled-display, .cab-power-btn, .cab-marquee, .cab-power-led, [data-cabinet-rotate]')) return;
+    applyCabinetView(CABINET_VIEWS[0]);
   });
 
   document.querySelectorAll('[data-intro-action]').forEach((button) => {
@@ -220,55 +354,94 @@
     chassis.style.opacity = '1';
     chassis.style.pointerEvents = 'auto';
 
+    if (cabVolume) writeRotationVars();
+
     if (safeProgress > 0.05 && !isLowPerf) {
-      if (!isDragging) {
-        targetRotY += (manualRotY - targetRotY) * 0.1;
-        targetRotX += (0 - targetRotX) * 0.08;
+      if (!cabinetState.isDragging) {
+        cabinetState.targetRotY +=
+          (manualRotY - cabinetState.targetRotY) * 0.1;
+
+        cabinetState.targetRotX +=
+          (0 - cabinetState.targetRotX) * 0.08;
       }
-      rotX += (targetRotX - rotX) * 0.12;
-      rotY += (targetRotY - rotY) * 0.12;
+
+      cabinetState.rotX +=
+        (cabinetState.targetRotX - cabinetState.rotX) * 0.12;
+
+      cabinetState.rotY +=
+        (cabinetState.targetRotY - cabinetState.rotY) * 0.12;
+
       if (cabVolume) {
-        cabVolume.style.setProperty('--cab-rot-x', `${rotX}deg`);
-        cabVolume.style.setProperty('--cab-rot-y', `${rotY}deg`);
+        cabVolume.style.setProperty(
+          '--cab-rot-x',
+          `${cabinetState.rotX}deg`
+        );
+
+        cabVolume.style.setProperty(
+          '--cab-rot-y',
+          `${cabinetState.rotY}deg`
+        );
       }
-      const normalizedRotX = rotX / 6;
-      const normalizedRotY = rotY / 38;
-      if (glassReflect) {
-        glassReflect.style.transform = `translateX(${normalizedRotY * -15}%)`;
-        glassReflect.style.opacity = String((1 - Math.abs(normalizedRotY * 0.5)) * 0.15);
-      }
-      if (joyBall) joyBall.style.transform = `translate(${normalizedRotY * 3}px, ${normalizedRotX * 3}px)`;
-      speculars.forEach((specular) => {
-        specular.style.transform = `translate(calc(-50% + ${normalizedRotY * 4}px), ${normalizedRotX * 2}px)`;
-      });
+
+      updateHardwareHighlights();
     } else {
-      targetRotX = 0;
-      targetRotY = manualRotY;
-      rotX += (0 - rotX) * 0.1;
-      rotY += (manualRotY - rotY) * 0.1;
+      cabinetState.targetRotX = 0;
+      cabinetState.targetRotY = manualRotY;
+
+      cabinetState.rotX +=
+        (0 - cabinetState.rotX) * 0.1;
+
+      cabinetState.rotY +=
+        (manualRotY - cabinetState.rotY) * 0.1;
+
       if (cabVolume) {
-        cabVolume.style.setProperty('--cab-rot-x', `${rotX}deg`);
-        cabVolume.style.setProperty('--cab-rot-y', `${rotY}deg`);
+        cabVolume.style.setProperty(
+          '--cab-rot-x',
+          `${cabinetState.rotX}deg`
+        );
+
+        cabVolume.style.setProperty(
+          '--cab-rot-y',
+          `${cabinetState.rotY}deg`
+        );
       }
+
+      updateHardwareHighlights();
     }
 
-    const progressSettled = Math.abs(targetProgress - currentProgress) < 0.001;
-    const rotationSettled = Math.abs(rotX - targetRotX) < 0.01 && Math.abs(rotY - targetRotY) < 0.01;
-    if (isDragging || !progressSettled || !rotationSettled) queueIntroUpdate();
-  }
+    const progressSettled =
+      Math.abs(targetProgress - currentProgress) < 0.001;
+
+    const rotationSettled =
+      Math.abs(
+        cabinetState.rotX - cabinetState.targetRotX
+      ) < 0.01 &&
+      Math.abs(
+        cabinetState.rotY - cabinetState.targetRotY
+      ) < 0.01;
+
+    if (
+      cabinetState.isDragging ||
+      !progressSettled ||
+      !rotationSettled
+    ) {
+      queueIntroUpdate();
+    }
 
   window.addEventListener('scroll', queueIntroUpdate, { passive: true });
   window.addEventListener('resize', queueIntroUpdate, { passive: true });
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) queueIntroUpdate(); });
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) queueIntroUpdate();
+  });
   window.addEventListener('pageshow', queueIntroUpdate);
   window.addEventListener('pagehide', () => {
     destroyed = true;
-    releasePointerSafely(activePointerId);
     if (rAF !== null) {
       cancelAnimationFrame(rAF);
       rAF = null;
     }
   }, { once: true });
 
+  applyCabinetView(CABINET_VIEWS[0], false);
   queueIntroUpdate();
 })();
