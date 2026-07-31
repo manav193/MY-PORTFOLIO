@@ -1,6 +1,7 @@
 {
   "name": "portfolio",
   "version": "1.0.0",
+  "description": "Manav Agarwal portfolio",
   "type": "module",
   "scripts": {
     "prebuild": "node scripts/inject-case-study-mobile-fixes.mjs",
