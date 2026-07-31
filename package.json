@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "node build.js && node qa-postbuild.js",
-    "build:root": "node build.js --base / && node qa-postbuild.js",
-    "build:subdir": "node build.js --base /portfolio/ && node qa-postbuild.js",
+    "prebuild": "node scripts/inject-case-study-mobile-fixes.mjs",
+    "build": "node scripts/inject-case-study-mobile-fixes.mjs && node build.js && node qa-postbuild.js",
+    "build:root": "node scripts/inject-case-study-mobile-fixes.mjs && node build.js --base / && node qa-postbuild.js",
+    "build:subdir": "node scripts/inject-case-study-mobile-fixes.mjs && node build.js --base /portfolio/ && node qa-postbuild.js",
     "preview": "npx vite preview --port 4173",
     "verify": "playwright test tests/global-shell-regression.spec.js",
     "test:arcade": "playwright test tests/arcade-regression.spec.js",
