@@ -103,7 +103,9 @@ requestAnimationFrame(() => requestAnimationFrame(() => {
   document.body.classList.remove("is-loading");
 }));
 
-if (!caseStudy) initBootExperience();
+const bootExperienceTestMode = typeof window !== 'undefined'
+  && (window.__ARCADE_BOOT_TEST_SCALE__ || window.__ARCADE_BOOT_TEST_TIMEOUT__);
+if (!caseStudy && (!desktopArcadeAvailable || bootExperienceTestMode)) initBootExperience();
 
 initTheme();
 

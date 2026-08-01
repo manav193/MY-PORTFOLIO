@@ -53,12 +53,12 @@
   }
 
   const chassis = document.querySelector('.cabinet-chassis');
-  const cabVolume = document.querySelector('.cab-3d-volume');
+  const framingRoot = document.querySelector('.cabinet-framing-root');
   const rotateButton = document.querySelector('[data-cabinet-rotate]');
 
-  if (!chassis) {
+  if (!chassis || !framingRoot) {
     document.body.classList.add('intro-skipped');
-    console.warn('[Intro] Cabinet chassis missing; intro safely skipped.');
+    console.warn('[Intro] Cabinet framing root missing; intro safely skipped.');
     return;
   }
 
@@ -257,8 +257,8 @@
   };
 
   const writeRotationVars = () => {
-    chassis.style.setProperty('--cab-rot-x', `${cabinetState.targetRotX}deg`);
-    chassis.style.setProperty('--cab-rot-y', `${cabinetState.targetRotY}deg`);
+    framingRoot.style.setProperty('--cab-rot-x', `${cabinetState.targetRotX}deg`);
+    framingRoot.style.setProperty('--cab-rot-y', `${cabinetState.targetRotY}deg`);
   };
 
   const applyCabinetView = (view, animate = true) => {
@@ -350,11 +350,11 @@
       else if (targetProgress <= OS_CLOSE_THRESHOLD && state !== 'PORTFOLIO' && state !== 'ARCADE_EXITING') experience.exitArcadeExperience?.('scroll');
     }
 
-    chassis.style.transform = 'scale(1) translateZ(0) rotateX(0deg)';
+    chassis.style.transform = 'translateZ(0)';
     chassis.style.opacity = '1';
     chassis.style.pointerEvents = 'auto';
 
-    if (cabVolume) writeRotationVars();
+    writeRotationVars();
 
     if (safeProgress > 0.05 && !isLowPerf) {
       if (!cabinetState.isDragging) {

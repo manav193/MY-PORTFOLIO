@@ -701,6 +701,32 @@ body.arcade-overdrive .arcade-earth-container::after {
   height: 100%;
 }
 
+.app-spacewars {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.app-spacewars .canvas-wrapper {
+  flex: 1 1 auto !important;
+  min-height: 0;
+}
+
+#sw-overlay-view {
+  position: absolute;
+  inset: 0;
+  z-index: 25;
+  display: none;
+  place-items: center;
+  padding: 18px;
+  text-align: center;
+  pointer-events: none;
+}
+
+#sw-overlay-view.sw-overlay-active {
+  display: grid;
+  pointer-events: auto;
+}
+
 .app-vectordrift #vd-overlay-view {
   position: absolute;
   inset: 0;

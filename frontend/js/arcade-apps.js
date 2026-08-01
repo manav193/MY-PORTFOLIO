@@ -1064,6 +1064,9 @@ class PixelPlumberApp {
 
     p.vy += 0.58 * step;
     this.movePlayerWithCollisions(p, step);
+    if (p.x < 0) {
+      p.x = 0;
+    }
     if (p.grounded) p.doubleJumpUsed = false;
 
     const targetCamX = Math.max(0, Math.min(this.worldWidth - this.playfieldWidth, p.x - this.playfieldWidth * 0.35));

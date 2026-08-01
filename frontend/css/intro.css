@@ -215,16 +215,25 @@ body:not(.intro-skipped) .living-ambient-light {
 .cabinet-chassis {
   background: transparent !important;
   box-shadow: 0 50px 100px -20px rgba(0,0,0,1), 0 20px 40px rgba(0,0,0,0.8);
-  transform: scale(1) translateZ(0) rotateX(0deg);
+  transform: translateZ(0);
+}
+
+.cabinet-framing-root {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  transform-style: preserve-3d;
+  transform-origin: 50% 50%;
+  will-change: transform;
+  transform: rotateX(var(--cab-rot-x, 0deg)) rotateY(var(--cab-rot-y, 0deg));
+  transition: transform 0.64s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .cab-3d-volume {
   position: absolute;
   inset: 0;
   transform-style: preserve-3d;
-  will-change: transform;
-  transform: rotateX(var(--cab-rot-x, 0deg)) rotateY(var(--cab-rot-y, 0deg));
-  transition: transform 0.64s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: none;
   border-radius: inherit;
 }
 
@@ -310,25 +319,25 @@ body:not(.intro-skipped) .living-ambient-light {
    MAIN CHASSIS
    ========================================================================== */
 .cabinet-chassis {
-  width: 100vw;
-  height: 100vh;
+  width: min(68vw, 760px);
+  height: min(92vh, 880px);
   aspect-ratio: 9 / 16;
   position: relative;
   transform-style: preserve-3d;
   transform-origin: 50% 50%;
   will-change: transform, opacity;
-  transform: scale(1) translateZ(0) rotateX(0deg);
+  transform: translateZ(0);
   transition: border-radius 0.3s ease-out;
 }
 
 /* Base structural scaling */
 .cabinet-chassis.is-scaled {
-  top: -40px;
-  height: min(calc(100vh - 120px), 780px);
-  width: calc(min(calc(100vh - 120px), 780px) * 0.9);
-  min-width: 500px;
-  max-width: min(720px, calc(100vw - 168px));
-  max-height: 780px;
+  top: 0;
+  height: min(calc(100vh - 96px), 760px);
+  width: calc(min(calc(100vh - 96px), 760px) * 0.9);
+  min-width: 420px;
+  max-width: min(660px, calc(100vw - 184px));
+  max-height: 760px;
   border-radius: 30px 30px 16px 16px;
   box-shadow: 0 50px 100px -20px rgba(0,0,0,1), 0 20px 40px rgba(0,0,0,0.8);
 }
@@ -336,7 +345,7 @@ body:not(.intro-skipped) .living-ambient-light {
 .cabinet-rotate-btn {
   position: absolute;
   top: 50%;
-  right: clamp(-86px, -5.8vw, -64px);
+  right: clamp(-58px, -4vw, -42px);
   z-index: 90;
   width: 50px;
   height: 50px;
@@ -392,7 +401,7 @@ body:not(.intro-skipped) .living-ambient-light {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  opacity: 0;
+  opacity: 1;
   border-radius: inherit;
   transition: opacity 0.5s ease;
   overflow: hidden;
@@ -494,7 +503,7 @@ body:not(.intro-skipped) .living-ambient-light {
   font-size: 0.5rem;
   letter-spacing: 0.1em;
   white-space: nowrap;
-  opacity: 0;
+  opacity: 1;
   pointer-events: none;
   transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   border: 1px solid rgba(255,255,255,0.05);
@@ -590,7 +599,7 @@ body:not(.intro-skipped) .living-ambient-light {
   justify-content: center;
   border-radius: 8px 8px 5px 5px;
   overflow: hidden;
-  opacity: 0;
+  opacity: 1;
   transition: opacity 0.5s ease;
 }
 .cabinet-chassis.is-scaled .cab-marquee {
@@ -632,18 +641,12 @@ body:not(.intro-skipped) .living-ambient-light {
    SCREEN & BEZEL
    ========================================================================== */
 .cabinet-screen-bezel {
-  width: 100%;
-  height: 100%;
+  width: 84%;
+  height: 45%;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  border-radius: inherit;
-}
-
-.cabinet-chassis.is-scaled .cabinet-screen-bezel {
-  width: 84%;
-  height: 45%;
   margin: clamp(10px, 2.2%, 18px) auto 0;
   border-radius: 14px;
   background-color: #0d0d0f;
@@ -681,15 +684,13 @@ body:not(.intro-skipped) .living-ambient-light {
   inset: 0;
   pointer-events: none;
   z-index: 15; /* Sits above 3D volume, below bezel/reflection if needed */
-  transform-style: preserve-3d;
-  transform: rotateX(var(--cab-rot-x, 0deg)) rotateY(var(--cab-rot-y, 0deg)) translateZ(102px);
-  transition: transform 0.64s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: transform;
+  transform-style: flat;
+  transform: translateZ(103px);
+  will-change: auto;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cab-3d-volume,
-  .screen-2d-anchor {
+  .cabinet-framing-root {
     transition: none !important;
   }
 }
@@ -703,25 +704,17 @@ body:not(.intro-skipped) .living-ambient-light {
 
 .screen-content-layer {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: calc(clamp(24px, 5.2%, 40px) + clamp(46px, 7.2%, 62px) + clamp(10px, 2.2%, 18px) + 12px);
+  left: calc(8% + 12px);
+  width: calc(84% - 24px);
+  height: calc(45% - 24px);
   pointer-events: auto;
+  border-radius: 6px;
   transform-style: flat !important;
   transform: translate3d(0, 0, 0); /* HW acceleration layer */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-}
-
-/* Aligned precisely with the bezel offsets when cabinet is scaled */
-.cabinet-chassis.is-scaled .screen-content-layer {
-  top: calc(clamp(24px, 5.2%, 40px) + clamp(46px, 7.2%, 62px) + clamp(10px, 2.2%, 18px) + 12px);
-  left: calc(8% + 12px);
-  width: calc(84% - 24px);
-  height: calc(45% - 24px);
-  border-radius: 6px;
 }
 
 /* Physical Screen Characteristics */
@@ -768,7 +761,7 @@ body:not(.intro-skipped) .living-ambient-light {
   align-items: center;
   justify-content: space-between;
   padding: 0 36px;
-  opacity: 0;
+  opacity: 1;
   transition: opacity 0.5s ease;
   background: #111113;
   border: 1px solid #1c1c1f;
