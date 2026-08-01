@@ -35,7 +35,11 @@ import { initBootExperience } from "./modules/boot-experience.js";
 import { initAdaptiveHost } from "./shared/adaptive/adaptive-host.js";
 
 const caseStudy = isCaseStudyPage();
-if (document.body.dataset.projectTheme === "arcade-os") {
+
+// The portfolio homepage uses the shorter runtime theme id. Case studies must
+// preserve their authored data-project-theme value so flagship/Arcade runtime
+// selectors cannot mistake a content page for the live Arcade experience.
+if (!caseStudy && document.body.dataset.projectTheme === "arcade-os") {
   document.body.dataset.projectTheme = "arcade";
 }
 
@@ -90,25 +94,45 @@ if (!caseStudy) {
   ArcadeEnvironmentService.init();
   Arcade3DPlanetEngine.init();
   initOS();
+
+  GlobalPortfolioShell.init();
+  window.ArcadeAdaptive = initAdaptiveHost({
+    moduleId: "arcade-os",
+    projectSelector: "[data-project-id]",
+    searchSelector: "#cmd-input, #nimo-input",
+    fabricContainer: "#machine-bg"
+  });
+
+  initProjectLaunch();
+  initCursorSystem();
+  initCommandPalette();
+
+  const proofStyle = document.createElement("link");
+  proofStyle.rel = "stylesheet";
+  proofStyle.href = "/assets/case-studies/product-proof-gallery.css";
+  document.head.appendChild(proofStyle);
+  initProductProofGallery();
+} else {
+  // Case studies are content pages. Remove any stale shell nodes that may have
+  // been restored from bfcache or injected by an older cached bundle.
+  document.querySelectorAll([
+    ".os-dock",
+    "[data-theme-dock]",
+    ".section-progress-rail",
+    "#nimo-widget",
+    "#global-nimo-root",
+    ".nimo-widget",
+    ".nimo-launcher",
+    "[data-nimo-root]",
+    ".flagship-showcase",
+    "[data-flagship-showcase]",
+    ".arcade-cinematic-scene",
+    "[data-arcade-cinematic]",
+    ".arcade-apps-label"
+  ].join(",")).forEach((node) => node.remove());
 }
 
-GlobalPortfolioShell.init();
-window.ArcadeAdaptive = initAdaptiveHost({
-  moduleId: 'arcade-os',
-  projectSelector: '[data-project-id]',
-  searchSelector: '#cmd-input, #nimo-input',
-  fabricContainer: '#machine-bg'
-});
 initProjectEnvironment();
-initProjectLaunch();
-initCursorSystem();
-initCommandPalette();
-
-const proofStyle = document.createElement("link");
-proofStyle.rel = "stylesheet";
-proofStyle.href = "/assets/case-studies/product-proof-gallery.css";
-document.head.appendChild(proofStyle);
-initProductProofGallery();
 
 const UI_STACK_IDS = ["velora-bites", "nintendo", "nike"];
 
@@ -164,7 +188,7 @@ function initUiProjectStack() {
 }
 
 const flagshipTheme = document.body.dataset.projectTheme;
-if (flagshipTheme === "nimo" || flagshipTheme === "arcade") {
+if (!caseStudy && (flagshipTheme === "nimo" || flagshipTheme === "arcade")) {
   const style = document.createElement("link");
   style.rel = "stylesheet";
   style.href = "assets/case-studies/flagship-showcase.css";
@@ -180,23 +204,21 @@ if (caseStudy) {
   initPublicProjectCatalog();
   initSectionProgressRail();
   initDockController();
-}
 
-initNimo();
-initNimoExperienceUpgrades();
-initNimoArcade2630();
-initFlagshipExperiences();
-initUiProjectStack();
-initPortfolio3135();
-initPortfolioTrust4650();
-initRuntimeFixes();
+  initNimo();
+  initNimoExperienceUpgrades();
+  initNimoArcade2630();
+  initFlagshipExperiences();
+  initUiProjectStack();
+  initPortfolio3135();
+  initPortfolioTrust4650();
 
-if (!caseStudy) {
   initArcadeCinematicScene();
   initArcadeHardwareInputFixes();
   initArcadeStandaloneBridge();
 }
 
+initRuntimeFixes();
 initReveal();
 initCounters();
 initScrollProgress();
