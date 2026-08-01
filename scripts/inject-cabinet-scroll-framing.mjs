@@ -5,11 +5,13 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const root = path.resolve(path.dirname(__filename), '..');
 const file = path.join(root, 'frontend', 'index.html');
+const sourceFile = path.join(root, 'frontend', 'js', 'cabinet-scroll-framing.js');
 const marker = 'data-cabinet-scroll-framing';
-const script = `<script src="/js/cabinet-scroll-framing.js" defer ${marker}></script>`;
+const source = fs.readFileSync(sourceFile, 'utf8').replace(/<\/script/gi, '<\\/script');
+const script = `<script ${marker}>\n${source}\n</script>`;
 
 let html = fs.readFileSync(file, 'utf8');
-const existing = new RegExp(`<script[^>]*${marker}[^>]*><\\/script>`, 'i');
+const existing = new RegExp(`<script[^>]*${marker}[^>]*>[\\s\\S]*?<\\/script>`, 'i');
 
 if (existing.test(html)) {
   html = html.replace(existing, script);
@@ -19,4 +21,4 @@ if (existing.test(html)) {
 }
 
 fs.writeFileSync(file, html);
-console.log('Injected cabinet scroll framing controller.');
+console.log('Injected inline cabinet scroll framing controller.');
