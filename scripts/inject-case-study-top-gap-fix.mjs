@@ -9,68 +9,110 @@ const marker = 'data-case-study-top-gap-fix';
 
 const fix = `
 <style ${marker}>
-/* Compact shared case-study header. The fixed showroom navigation is roughly
-   56-64px high, so the hero only needs a small breathing space below it. */
+/* Deterministic case-study hero flow.
+   Remove viewport-height centering and any transform/position rules that can
+   push the title below decorative artwork or background motifs. */
 body[data-project-theme] main {
   padding-top: 0 !important;
   margin-top: 0 !important;
 }
 
 body[data-project-theme] :is(.project-hero, .cs-hero-cinematic) {
+  display: block !important;
   min-height: 0 !important;
   height: auto !important;
-  justify-content: flex-start !important;
-  align-content: start !important;
-  gap: clamp(20px, 3vw, 36px) !important;
-  padding-top: calc(68px + env(safe-area-inset-top, 0px)) !important;
-  padding-bottom: clamp(30px, 4vw, 52px) !important;
+  padding: calc(72px + env(safe-area-inset-top, 0px)) 24px 44px !important;
   margin: 0 !important;
+  overflow: visible !important;
 }
 
-body[data-project-theme] :is(.project-hero, .cs-hero-cinematic) > :first-child,
-body[data-project-theme] .cs-hero-content {
+body[data-project-theme] .cs-hero-content,
+body[data-project-theme] .project-hero > :first-child {
+  display: block !important;
+  position: relative !important;
+  inset: auto !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  order: -10 !important;
+  transform: none !important;
+  translate: none !important;
+  width: min(100%, 900px) !important;
+  max-width: 900px !important;
+  margin: 0 auto 28px !important;
+  padding: 0 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+body[data-project-theme] :is(.cs-meta, .cs-hero-title, .cs-hero-subtitle, .project-hero h1, .project-hero p.tagline) {
+  position: relative !important;
+  inset: auto !important;
+  transform: none !important;
+  translate: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+body[data-project-theme] .cs-meta,
+body[data-project-theme] .project-hero p.tagline {
   margin-top: 0 !important;
-  padding-top: 0 !important;
-}
-
-body[data-project-theme] .project-hero h1,
-body[data-project-theme] .cs-hero-title,
-body[data-project-theme] .cs-meta {
-  margin-top: 0 !important;
-}
-
-body[data-project-theme] .cs-meta {
   margin-bottom: 12px !important;
 }
 
-body[data-project-theme] .project-actions {
-  margin-top: 24px !important;
-  margin-bottom: clamp(24px, 3vw, 44px) !important;
+body[data-project-theme] .cs-hero-title,
+body[data-project-theme] .project-hero h1 {
+  margin-top: 0 !important;
+  margin-bottom: 18px !important;
 }
 
-body[data-project-theme] .project-hero-image,
+body[data-project-theme] .project-actions {
+  margin-top: 22px !important;
+  margin-bottom: 24px !important;
+}
+
 body[data-project-theme] .cs-hero-visual,
+body[data-project-theme] .project-hero-image {
+  display: block !important;
+  position: relative !important;
+  inset: auto !important;
+  transform: none !important;
+  translate: none !important;
+  width: min(100%, 1400px) !important;
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 auto 32px !important;
+}
+
 body[data-project-theme] .cs-hero-stats {
-  margin-top: 0 !important;
+  position: static !important;
+  inset: auto !important;
+  transform: none !important;
+  translate: none !important;
+  width: min(100%, 900px) !important;
+  margin: 16px auto 0 !important;
 }
 
 @media (max-width: 1024px) {
   body[data-project-theme] :is(.project-hero, .cs-hero-cinematic) {
-    gap: 22px !important;
-    padding-top: calc(64px + env(safe-area-inset-top, 0px)) !important;
-    padding-bottom: 36px !important;
+    padding: calc(64px + env(safe-area-inset-top, 0px)) 20px 36px !important;
   }
 }
 
 @media (max-width: 768px) {
   body[data-project-theme] :is(.project-hero, .cs-hero-cinematic) {
-    gap: 18px !important;
-    padding-top: calc(58px + env(safe-area-inset-top, 0px)) !important;
-    padding-bottom: 28px !important;
+    padding: calc(54px + env(safe-area-inset-top, 0px)) 16px 28px !important;
   }
+
+  body[data-project-theme] .cs-hero-content,
+  body[data-project-theme] .project-hero > :first-child {
+    margin-bottom: 20px !important;
+  }
+
   body[data-project-theme] .project-actions {
-    margin-top: 18px !important;
-    margin-bottom: 24px !important;
+    margin-top: 16px !important;
+    margin-bottom: 20px !important;
   }
 }
 </style>`;
@@ -90,4 +132,4 @@ for (const name of files) {
   fs.writeFileSync(file, html);
 }
 
-console.log(`Normalized compact top spacing on ${files.length} project pages.`);
+console.log(`Forced normal-flow hero layout on ${files.length} project pages.`);
