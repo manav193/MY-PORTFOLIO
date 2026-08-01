@@ -6,6 +6,7 @@ const __filename = fileURLToPath(import.meta.url);
 const root = path.resolve(path.dirname(__filename), '..');
 const frontend = path.join(root, 'frontend');
 const marker = 'data-case-study-top-gap-fix';
+const bootMarker = 'data-case-study-boot-script';
 
 const fix = `
 <style ${marker}>
@@ -117,19 +118,34 @@ body[data-project-theme] .cs-hero-stats {
 }
 </style>`;
 
+const bootScript = `<script type="module" ${bootMarker}>
+  import { initCaseStudyBoot } from '/assets/case-studies/case-study-boot.js';
+  initCaseStudyBoot();
+</script>`;
+
 const files = fs.readdirSync(frontend).filter(name => /^project-.*\.html$/i.test(name));
 const existingBlock = new RegExp(`<style\\s+${marker}>[\\s\\S]*?<\\/style>`, 'i');
+const existingBoot = new RegExp(`<script[^>]*${bootMarker}[^>]*>[\\s\\S]*?<\\/script>`, 'i');
 
 for (const name of files) {
   const file = path.join(frontend, name);
   let html = fs.readFileSync(file, 'utf8');
+
   if (existingBlock.test(html)) {
     html = html.replace(existingBlock, fix.trim());
   } else {
     if (!/<\/head>/i.test(html)) throw new Error(`Missing </head> in ${name}`);
     html = html.replace(/<\/head>/i, `${fix}\n</head>`);
   }
+
+  if (existingBoot.test(html)) {
+    html = html.replace(existingBoot, bootScript);
+  } else {
+    if (!/<\/body>/i.test(html)) throw new Error(`Missing </body> in ${name}`);
+    html = html.replace(/<\/body>/i, `${bootScript}\n</body>`);
+  }
+
   fs.writeFileSync(file, html);
 }
 
-console.log(`Forced normal-flow hero layout on ${files.length} project pages.`);
+console.log(`Applied normal-flow hero layout and fixed-overlay boot animation to ${files.length} project pages.`);
