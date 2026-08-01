@@ -711,6 +711,34 @@ body.arcade-overdrive .arcade-earth-container::after {
   min-height: 0;
 }
 
+.app-blockdrop {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.app-blockdrop .canvas-wrapper {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-blockdrop canvas {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+#bd-overlay-view {
+  position: absolute;
+  inset: 0;
+}
+
 #sw-overlay-view {
   position: absolute;
   inset: 0;

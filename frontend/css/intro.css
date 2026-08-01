@@ -215,25 +215,32 @@ body:not(.intro-skipped) .living-ambient-light {
 .cabinet-chassis {
   background: transparent !important;
   box-shadow: 0 50px 100px -20px rgba(0,0,0,1), 0 20px 40px rgba(0,0,0,0.8);
-  transform: translateZ(0);
+  transform: none;
 }
 
 .cabinet-framing-root {
+  --frame-scale: 1;
+  --frame-x: 0px;
+  --frame-y: 0px;
   position: absolute;
   inset: 0;
   border-radius: inherit;
   transform-style: preserve-3d;
   transform-origin: 50% 50%;
   will-change: transform;
-  transform: rotateX(var(--cab-rot-x, 0deg)) rotateY(var(--cab-rot-y, 0deg));
-  transition: transform 0.64s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translate3d(var(--frame-x), var(--frame-y), 0) scale(var(--frame-scale));
 }
 
 .cab-3d-volume {
+  --cab-rot-x: 0deg;
+  --cab-rot-y: 0deg;
   position: absolute;
   inset: 0;
   transform-style: preserve-3d;
-  transform: none;
+  transform: rotateX(var(--cab-rot-x)) rotateY(var(--cab-rot-y));
+  transform-origin: 50% 50%;
+  will-change: transform;
+  transition: transform 0.64s cubic-bezier(0.16, 1, 0.3, 1);
   border-radius: inherit;
 }
 
@@ -319,25 +326,19 @@ body:not(.intro-skipped) .living-ambient-light {
    MAIN CHASSIS
    ========================================================================== */
 .cabinet-chassis {
-  width: min(68vw, 760px);
-  height: min(92vh, 880px);
+  width: min(68vw, 760px, calc((100vh - 120px) * 0.9));
+  height: auto;
   aspect-ratio: 9 / 16;
   position: relative;
   transform-style: preserve-3d;
   transform-origin: 50% 50%;
-  will-change: transform, opacity;
-  transform: translateZ(0);
+  will-change: opacity;
+  transform: none;
   transition: border-radius 0.3s ease-out;
 }
 
 /* Base structural scaling */
 .cabinet-chassis.is-scaled {
-  top: 0;
-  height: min(calc(100vh - 96px), 760px);
-  width: calc(min(calc(100vh - 96px), 760px) * 0.9);
-  min-width: 420px;
-  max-width: min(660px, calc(100vw - 184px));
-  max-height: 760px;
   border-radius: 30px 30px 16px 16px;
   box-shadow: 0 50px 100px -20px rgba(0,0,0,1), 0 20px 40px rgba(0,0,0,0.8);
 }
@@ -349,7 +350,7 @@ body:not(.intro-skipped) .living-ambient-light {
   z-index: 90;
   width: 50px;
   height: 50px;
-  display: none;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   border: 1px solid rgba(56, 189, 248, 0.36);
@@ -367,10 +368,6 @@ body:not(.intro-skipped) .living-ambient-light {
   transform: translateY(-50%);
   cursor: pointer;
   pointer-events: auto;
-}
-
-.cabinet-chassis.is-scaled .cabinet-rotate-btn {
-  display: inline-flex;
 }
 
 .cabinet-rotate-btn svg {
@@ -683,14 +680,14 @@ body:not(.intro-skipped) .living-ambient-light {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 15; /* Sits above 3D volume, below bezel/reflection if needed */
+  z-index: 15; /* Sits above the front panel, below bezel/reflection if needed */
   transform-style: flat;
   transform: translateZ(103px);
   will-change: auto;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cabinet-framing-root {
+  .cab-3d-volume {
     transition: none !important;
   }
 }
@@ -707,11 +704,10 @@ body:not(.intro-skipped) .living-ambient-light {
   top: calc(clamp(24px, 5.2%, 40px) + clamp(46px, 7.2%, 62px) + clamp(10px, 2.2%, 18px) + 12px);
   left: calc(8% + 12px);
   width: calc(84% - 24px);
-  height: calc(45% - 24px);
+  height: calc(45% - 30px);
   pointer-events: auto;
   border-radius: 6px;
   transform-style: flat !important;
-  transform: translate3d(0, 0, 0); /* HW acceleration layer */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
