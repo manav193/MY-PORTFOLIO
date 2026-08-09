@@ -12,6 +12,17 @@ test.describe('Homepage runtime regressions', () => {
     await expect(page.locator('#machine-bg .mb-svg, #machine-bg canvas')).toHaveCount(1);
   });
 
+  test('keeps a visible background layer when the cabinet is unavailable', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.reload({ waitUntil: 'domcontentloaded' });
+
+    await expect(page.locator('#machine-bg')).toHaveClass(/ready/);
+    await expect(page.locator('#machine-bg .mb-svg')).toHaveCount(1);
+    await expect(page.locator('#machine-bg').evaluate((element) =>
+      getComputedStyle(element, '::before').backgroundImage
+    )).resolves.toContain('linear-gradient');
+  });
+
   test('keeps the custom cursor responsive after returning from a case study', async ({ page }) => {
     await Promise.all([
       page.waitForURL(/project-nimo\.html/),

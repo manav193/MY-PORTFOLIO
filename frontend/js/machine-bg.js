@@ -30,6 +30,22 @@
     .aurora-bg {
       z-index: -2;
     }
+    #machine-bg::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background-image:
+        linear-gradient(rgba(105, 151, 220, 0.12) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(105, 151, 220, 0.12) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: radial-gradient(ellipse at 56% 42%, #000 0%, rgba(0, 0, 0, 0.72) 45%, transparent 86%);
+      pointer-events: none;
+    }
+    #machine-bg > * {
+      position: relative;
+      z-index: 1;
+    }
     .mb-svg {
       width: 150vw;
       height: 150vh;
