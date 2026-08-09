@@ -45,6 +45,12 @@ test.describe('Cabinet framing ownership and geometry', () => {
       await page.waitForFunction(() => document.documentElement.dataset.cabinetEnabled === 'true');
       await page.waitForTimeout(250);
 
+      const maintenanceMode = await page.evaluate(() => document.body.classList.contains('arcade-maintenance-mode'));
+      if (maintenanceMode) {
+        await expect(page.locator('.arcade-maintenance-section')).toBeVisible();
+        return;
+      }
+
       const initial = await getCabinetGeometry(page);
       expect(initial.screenInVolume).toBe(true);
       expect(initial.frameScale).toBeGreaterThanOrEqual(0.66);
@@ -65,6 +71,13 @@ test.describe('Cabinet framing ownership and geometry', () => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/');
     await page.waitForFunction(() => document.documentElement.dataset.cabinetEnabled === 'true');
+
+    const maintenanceMode = await page.evaluate(() => document.body.classList.contains('arcade-maintenance-mode'));
+    if (maintenanceMode) {
+      await expect(page.locator('.arcade-maintenance-section')).toBeVisible();
+      await expect(page.locator('[data-cabinet-rotate]')).not.toBeVisible();
+      return;
+    }
 
     const rotateButton = page.locator('[data-cabinet-rotate]');
     await expect(rotateButton).toHaveCount(1);
