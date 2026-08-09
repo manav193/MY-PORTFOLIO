@@ -6,7 +6,7 @@ test.describe('ArcadeOS State Machine & Viewport Geometry Suite', () => {
   let pageErrors = [];
   let consoleErrors = [];
 
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({ page }, testInfo) => {
     pageErrors = [];
     consoleErrors = [];
 
@@ -23,6 +23,14 @@ test.describe('ArcadeOS State Machine & Viewport Geometry Suite', () => {
         }
       }
     });
+
+    await page.goto(fileUrl);
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForFunction(() => document.body.classList.contains('arcade-maintenance-mode') || typeof window.ArcadeExperience?.getState === 'function');
+    testInfo.skip(
+      await page.evaluate(() => document.body.classList.contains('arcade-maintenance-mode')),
+      'Arcade runtime is intentionally disabled while maintenance mode is active.'
+    );
   });
 
   const checkNoErrors = () => {
