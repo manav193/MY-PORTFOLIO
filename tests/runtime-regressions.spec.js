@@ -35,5 +35,9 @@ test.describe('Homepage runtime regressions', () => {
     await expect(page.locator('.arcade-maintenance-section')).toBeVisible();
     await expect(page.locator('#arcade-construction-overlay')).toHaveCount(0);
     await expect(arcadeDock).not.toHaveClass(/dock-active/);
+
+    await page.locator('#work').scrollIntoViewIfNeeded();
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(100);
+    await expect(page.locator('#work')).toBeVisible();
   });
 });

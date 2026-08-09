@@ -279,6 +279,11 @@
     rAF = null;
     if (destroyed || !chassis.isConnected || !introSequence.isConnected) return;
 
+    // Maintenance replaces the cabinet with regular document content. Leaving
+    // the cinematic scroll controller active would keep routing scroll progress
+    // back into the unavailable Arcade experience.
+    if (document.body.classList.contains('arcade-maintenance-mode')) return;
+
     frameCount += 1;
     if (frameCount % 10 === 0 && !isLowPerf) {
       const delta = time - lastTime;

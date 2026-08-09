@@ -15,7 +15,7 @@
     #machine-bg {
       position: fixed;
       inset: 0;
-      z-index: -2;
+      z-index: -1;
       pointer-events: none;
       overflow: hidden;
       display: flex;
@@ -26,6 +26,9 @@
     }
     #machine-bg.ready {
       opacity: 1;
+    }
+    .aurora-bg {
+      z-index: -2;
     }
     .mb-svg {
       width: 150vw;
