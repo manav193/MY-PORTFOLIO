@@ -13,10 +13,22 @@
   const introSequence = document.getElementById('intro-sequence');
   if (!introSequence) return;
 
-  if (!isDesktopCabinetAvailable()) {
+  const isMobile = window.matchMedia(
+    '(max-width: 767px), (hover: none) and (pointer: coarse)'
+  ).matches;
+
+  if (isMobile || !isDesktopCabinetAvailable()) {
     document.documentElement.setAttribute('data-cabinet-enabled', 'false');
     document.body.classList.add('intro-skipped', 'arcade-mobile-disabled');
     introSequence.remove();
+    document.getElementById('machine-bg')?.remove();
+    document.querySelector('.living-ambient-light')?.remove();
+    document.documentElement.style.setProperty('--cabinet-mobile-disabled', '1');
+    document.querySelectorAll('.reveal-up, .reveal-text, .reveal-scale').forEach((element) => {
+      element.classList.add('is-visible', 'visible');
+      element.style.opacity = '1';
+      element.style.transform = 'none';
+    });
     return;
   }
 
