@@ -81,6 +81,7 @@ export function initAdaptiveHost({ moduleId = 'arcade-os', projectSelector = '[d
   const unsubscribe = session.subscribe(updateMode);
   const abort = new AbortController();
   const passive = { signal: abort.signal, passive: true };
+  let lastFabricPointerUpdate = 0;
 
   document.addEventListener('pointerdown', event => {
     session.record({ type: event.pointerType === 'touch' ? 'touchActivity' : 'pointerActivity' });
@@ -88,6 +89,13 @@ export function initAdaptiveHost({ moduleId = 'arcade-os', projectSelector = '[d
     if (event.pointerType !== 'touch' && session.getPreference('adaptiveInterface')) {
       fabric?.disturb(event.clientX / innerWidth, event.clientY / innerHeight, { intensity: .08 });
     }
+  }, passive);
+  document.addEventListener('pointermove', event => {
+    if (event.pointerType === 'touch' || !session.getPreference('adaptiveInterface')) return;
+    const now = performance.now();
+    if (now - lastFabricPointerUpdate < 80) return;
+    lastFabricPointerUpdate = now;
+    fabric?.disturb(event.clientX / innerWidth, event.clientY / innerHeight, { intensity: .045 });
   }, passive);
   document.addEventListener('keydown', event => {
     if (!event.metaKey && !event.ctrlKey && !event.altKey) session.record({ type: 'keyboardActivity' });

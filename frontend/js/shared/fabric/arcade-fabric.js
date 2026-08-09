@@ -28,7 +28,7 @@ export function createArcadeFabric({ container, reducedMotion = false, onFrame =
         const offset = Math.sin(x * 0.012 + y * 0.006 + time * 0.00012) * (1.1 + influence);
         x === -step ? context.moveTo(x, y + offset) : context.lineTo(x, y + offset);
       }
-      context.strokeStyle = `rgba(120, 105, 210, ${0.035 + energy * 0.025})`; context.stroke();
+      context.strokeStyle = `rgba(120, 105, 210, ${0.072 + energy * 0.055})`; context.stroke();
     }
     for (let x = -step; x < width + step; x += step) {
       context.beginPath();
@@ -38,7 +38,7 @@ export function createArcadeFabric({ container, reducedMotion = false, onFrame =
         const offset = Math.cos(y * 0.011 + x * 0.005 + time * 0.0001) * (0.8 + influence);
         y === -step ? context.moveTo(x + offset, y) : context.lineTo(x + offset, y);
       }
-      context.strokeStyle = `rgba(72, 118, 190, ${0.025 + energy * 0.02})`; context.stroke();
+      context.strokeStyle = `rgba(72, 118, 190, ${0.052 + energy * 0.045})`; context.stroke();
     }
     frame++;
     if (running) requestAnimationFrame(draw);
