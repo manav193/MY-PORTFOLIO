@@ -127,6 +127,11 @@ export function initCursorSystem() {
   };
 
   const render = () => {
+    if (document.hidden) {
+      rafId = 0;
+      return;
+    }
+
     const lag = document.body.dataset.cursorMode === "arcade" ? 0.75 : 0.28;
     ringX += (pointerX - ringX) * lag;
     ringY += (pointerY - ringY) * lag;
@@ -134,6 +139,16 @@ export function initCursorSystem() {
     dot.style.transform = `translate3d(${pointerX}px, ${pointerY}px, 0) translate(-50%, -50%)`;
     ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%)`;
     rafId = requestAnimationFrame(render);
+  };
+
+  const startRenderLoop = () => {
+    if (!rafId && !document.hidden) rafId = requestAnimationFrame(render);
+  };
+
+  const stopRenderLoop = () => {
+    if (!rafId) return;
+    cancelAnimationFrame(rafId);
+    rafId = 0;
   };
 
   window.addEventListener("pointermove", (event) => {
@@ -144,8 +159,13 @@ export function initCursorSystem() {
   window.addEventListener("pointerup", () => document.body.classList.remove("cursor-pressed"), { passive: true });
   window.addEventListener("pointerleave", () => document.body.classList.remove("cursor-hover", "cursor-pressed"));
 
-  rafId = requestAnimationFrame(render);
-  window.addEventListener("pagehide", () => cancelAnimationFrame(rafId), { once: true });
+  startRenderLoop();
+
+  // A portfolio page can be restored from the browser back-forward cache.
+  // Restart the visual cursor loop after that restore instead of leaving the
+  // last rendered cursor position frozen on screen.
+  window.addEventListener("pagehide", stopRenderLoop);
+  window.addEventListener("pageshow", startRenderLoop);
 }
 
 export function setCursorMode(mode) {

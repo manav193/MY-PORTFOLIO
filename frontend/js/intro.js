@@ -21,7 +21,6 @@
     document.documentElement.setAttribute('data-cabinet-enabled', 'false');
     document.body.classList.add('intro-skipped', 'arcade-mobile-disabled');
     introSequence.remove();
-    document.getElementById('machine-bg')?.remove();
     document.querySelector('.living-ambient-light')?.remove();
     document.documentElement.style.setProperty('--cabinet-mobile-disabled', '1');
     document.querySelectorAll('.reveal-up, .reveal-text, .reveal-scale').forEach((element) => {

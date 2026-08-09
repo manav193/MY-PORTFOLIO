@@ -1,3 +1,4 @@
+import "./machine-bg.js";
 import { initTheme } from "./modules/theme.js";
 import { initReveal, initCounters, initScrollProgress, initBackToTop } from "./modules/scroll.js";
 import { initTyping } from "./modules/typing.js";

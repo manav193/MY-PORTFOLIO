@@ -306,7 +306,10 @@ export const ExperienceController = {
   async enterArcadeExperience(source = 'button') {
     if (ARCADE_UNDER_CONSTRUCTION) {
       currentState = 'PORTFOLIO';
-      showArcadeConstructionNotice();
+      document.body.classList.remove('arcade-active');
+      // The maintenance section already communicates the unavailable state.
+      // Do not repeatedly interrupt navigation with a modal.
+      this.navigateToPortfolioSection('portfolio-intro');
       return false;
     }
 
