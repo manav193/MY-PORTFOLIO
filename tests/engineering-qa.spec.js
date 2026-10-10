@@ -2,10 +2,12 @@ import { test, expect } from '@playwright/test';
 import fs from 'node:fs';
 
 const viewports = [
-  { name: 'mobile-360', width: 360, height: 800 },
+  { name: 'desktop-1440', width: 1440, height: 900 },
+  { name: 'laptop-1366', width: 1366, height: 768 },
+  { name: 'tablet-768', width: 768, height: 1024 },
   { name: 'mobile-390', width: 390, height: 844 },
-  { name: 'tablet', width: 768, height: 1024 },
-  { name: 'desktop', width: 1440, height: 1000 }
+  { name: 'small-mobile-320', width: 320, height: 640 },
+  { name: 'mobile-landscape', width: 844, height: 390 }
 ];
 
 const keyPages = [
@@ -27,10 +29,24 @@ for (const viewport of viewports) {
     expect(response?.ok()).toBeTruthy();
     await expect(page.locator('body')).toBeVisible();
     await expect(page.locator('main, #main-content').first()).toBeVisible();
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 2)).toBeTruthy();
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 2),
+      `Horizontal overflow at ${viewport.name}`
+    ).toBeTruthy();
     expect(uncaught, `Uncaught errors at ${viewport.name}: ${uncaught.join(' | ')}`).toEqual([]);
   });
 }
+
+test('homepage remains usable with reduced motion enabled', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  const response = await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+  expect(response?.ok()).toBeTruthy();
+  await expect(page.locator('main, #main-content').first()).toBeVisible();
+  await expect(page.locator('#work')).toBeVisible();
+  await expect(page.locator('#contact')).toBeVisible();
+  expect(await page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches)).toBeTruthy();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 2)).toBeTruthy();
+});
 
 for (const item of keyPages) {
   test(`${item.name} console gate and screenshot`, async ({ page }) => {
@@ -40,7 +56,7 @@ for (const item of keyPages) {
     page.on('console', message => {
       if (message.type() === 'error' && !/favicon|third-party|net::ERR_BLOCKED_BY_CLIENT/i.test(message.text())) severeConsole.push(message.text());
     });
-    await page.setViewportSize({ width: 1440, height: 1000 });
+    await page.setViewportSize({ width: 1440, height: 900 });
     const response = await page.goto(item.path, { waitUntil: 'networkidle' });
     expect(response?.ok()).toBeTruthy();
     await expect(page.locator('body')).toBeVisible();
